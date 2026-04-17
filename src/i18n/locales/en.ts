@@ -69,6 +69,9 @@ export const en = {
     typeVolonte: "Will",
     typeConflit: "Conflict",
     typeSavoir: "Knowledge",
+    pendingSync: "{{count}} dossier(s) waiting to sync",
+    syncNow: "Sync now",
+    draftPending: "Draft — will upload when back online",
   },
   create: {
     title: "What do you want to create?",
@@ -85,6 +88,7 @@ export const en = {
     create: "Create dossier",
     cancel: "Cancel",
     created: "Dossier created!",
+    savedOffline: "Saved offline — will sync automatically.",
   },
   dossier: {
     summary: "Summary",
