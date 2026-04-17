@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Users, ScrollText, Scale, BookOpen, Loader2, FolderOpen } from "lucide-react";
+import { Search, MapPin, Users, ScrollText, Scale, BookOpen, Loader2, FolderOpen, CloudOff, RefreshCw } from "lucide-react";
+import { usePendingSync, useUnsyncedDrafts, useTriggerSync } from "@/hooks/useOfflineSync";
 
 const TYPE_ICONS: Record<string, any> = {
   terrain: MapPin, heritage: Users, volonte: ScrollText, conflit: Scale, savoir: BookOpen,
@@ -19,12 +20,15 @@ export default function Dossiers() {
   const [items, setItems] = useState<any[]>([]);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
+  const pending = usePendingSync();
+  const drafts = useUnsyncedDrafts(user?.id);
+  const triggerSync = useTriggerSync();
 
   useEffect(() => {
     if (!user) return;
     supabase.from("dossiers").select("*").eq("user_id", user.id).order("updated_at", { ascending: false })
       .then(({ data }) => { setItems(data || []); setLoading(false); });
-  }, [user]);
+  }, [user, pending]);
 
   const filtered = items.filter(d => d.title.toLowerCase().includes(q.toLowerCase()));
 
@@ -45,6 +49,33 @@ export default function Dossiers() {
   return (
     <AppLayout>
       <h1 className="text-2xl font-serif mb-4">{t("dossiers.title")}</h1>
+
+      {pending > 0 && (
+        <div className="mb-3 flex items-center gap-2 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-warning-foreground">
+          <CloudOff className="size-4 shrink-0" />
+          <span className="flex-1">{t("dossiers.pendingSync", { count: pending })}</span>
+          <button onClick={() => triggerSync()} className="text-xs font-medium inline-flex items-center gap-1 hover:underline">
+            <RefreshCw className="size-3" /> {t("dossiers.syncNow")}
+          </button>
+        </div>
+      )}
+
+      {drafts.length > 0 && (
+        <div className="mb-3 space-y-2">
+          {drafts.map((d) => (
+            <div key={d.localId} className="card-soft p-3 flex items-center gap-3 opacity-90">
+              <div className="size-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground shrink-0">
+                <CloudOff className="size-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{d.title}</p>
+                <p className="text-xs text-muted-foreground">{t("dossiers.draftPending")}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input className="pl-9 rounded-xl" placeholder={t("dossiers.search")} value={q} onChange={(e) => setQ(e.target.value)} />

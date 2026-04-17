@@ -69,6 +69,9 @@ export const fr = {
     typeVolonte: "Volonté",
     typeConflit: "Conflit",
     typeSavoir: "Savoir",
+    pendingSync: "{{count}} dossier(s) en attente de synchronisation",
+    syncNow: "Synchroniser",
+    draftPending: "Brouillon — sera envoyé une fois en ligne",
   },
   create: {
     title: "Que voulez-vous créer ?",
@@ -85,6 +88,7 @@ export const fr = {
     create: "Créer le dossier",
     cancel: "Annuler",
     created: "Dossier créé !",
+    savedOffline: "Enregistré hors ligne — sera synchronisé automatiquement.",
   },
   dossier: {
     summary: "Résumé",
