@@ -20,12 +20,15 @@ export default function Dossiers() {
   const [items, setItems] = useState<any[]>([]);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
+  const pending = usePendingSync();
+  const drafts = useUnsyncedDrafts(user?.id);
+  const triggerSync = useTriggerSync();
 
   useEffect(() => {
     if (!user) return;
     supabase.from("dossiers").select("*").eq("user_id", user.id).order("updated_at", { ascending: false })
       .then(({ data }) => { setItems(data || []); setLoading(false); });
-  }, [user]);
+  }, [user, pending]);
 
   const filtered = items.filter(d => d.title.toLowerCase().includes(q.toLowerCase()));
 
