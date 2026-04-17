@@ -6,7 +6,10 @@ import { onSyncChange, processQueue } from "@/lib/offline/sync";
 export function usePendingSync() {
   const pending = useLiveQuery(() => db.queue.count(), [], 0);
   const [, force] = useState(0);
-  useEffect(() => onSyncChange(() => force((v) => v + 1)), []);
+  useEffect(() => {
+    const off = onSyncChange(() => force((v) => v + 1));
+    return () => { off; };
+  }, []);
   return pending ?? 0;
 }
 
