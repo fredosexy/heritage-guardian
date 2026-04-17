@@ -44,17 +44,33 @@ export default function Create() {
     if (!user || !type) return;
     setSaving(true);
     try {
-      const { data, error } = await supabase.from("dossiers").insert({
-        user_id: user.id,
-        type: type as any,
-        title,
-        description: description || null,
-        location_name: location || null,
-        status: "incomplete",
-      }).select().single();
-      if (error) throw error;
-      toast.success(t("create.created"));
-      navigate(`/dossiers/${data.id}`);
+      const online = typeof navigator !== "undefined" ? navigator.onLine : true;
+      if (online) {
+        const { data, error } = await supabase.from("dossiers").insert({
+          user_id: user.id,
+          type: type as any,
+          title,
+          description: description || null,
+          location_name: location || null,
+          status: "incomplete",
+        }).select().single();
+        if (error) throw error;
+        toast.success(t("create.created"));
+        navigate(`/dossiers/${data.id}`);
+      } else {
+        const { enqueueCreateDossier } = await import("@/lib/offline/sync");
+        const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        await enqueueCreateDossier({
+          localId,
+          user_id: user.id,
+          type,
+          title,
+          description: description || null,
+          location_name: location || null,
+        });
+        toast.success(t("create.savedOffline"));
+        navigate("/dossiers");
+      }
     } catch (e: any) {
       toast.error(e.message);
     } finally {

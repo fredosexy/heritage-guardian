@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Users, ScrollText, Scale, BookOpen, Loader2, FolderOpen } from "lucide-react";
+import { Search, MapPin, Users, ScrollText, Scale, BookOpen, Loader2, FolderOpen, CloudOff, RefreshCw } from "lucide-react";
+import { usePendingSync, useUnsyncedDrafts, useTriggerSync } from "@/hooks/useOfflineSync";
 
 const TYPE_ICONS: Record<string, any> = {
   terrain: MapPin, heritage: Users, volonte: ScrollText, conflit: Scale, savoir: BookOpen,
