@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ["**/*.{js,css,html,svg,png,webp,woff2}"],
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.origin === self.location.origin && url.pathname.startsWith("/icons/"),
+            urlPattern: /\/icons\/.*/,
             handler: "CacheFirst",
             options: { cacheName: "icons", expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 } },
           },
