@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AppLayout } from "@/components/layout/AppLayout";
-import { useAuth } from "@/hooks/useAuth";
-import { useProfile } from "@/hooks/useProfile";
+import { AppLayout } from "@/features/shell";
+import { useAuth } from "@/features/identity";
+import { useProfile } from "../hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogOut, Loader2, Globe, Moon, Sun } from "lucide-react";
 import { toast } from "sonner";
-import i18n from "@/i18n";
+import i18n from "@/core/i18n";
 
 export default function Profile() {
   const { t } = useTranslation();

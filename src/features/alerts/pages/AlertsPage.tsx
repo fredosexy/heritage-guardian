@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AppLayout } from "@/components/layout/AppLayout";
+import { AppLayout } from "@/features/shell";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/features/identity";
 import { Bell, Loader2, Sparkles } from "lucide-react";
 
 type Filter = "all" | "urgent" | "info" | "suggestion";

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/lib/offline/db";
-import { onSyncChange, processQueue } from "@/lib/offline/sync";
+import { db } from "@/data/offline/db";
+import { onSyncChange, processQueue } from "@/data/offline/sync";
 
 export function usePendingSync() {
   const pending = useLiveQuery(() => db.queue.count(), [], 0);
