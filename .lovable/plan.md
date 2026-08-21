@@ -1,124 +1,100 @@
+# Plan — Refonte Mémoire (13 parties)
 
-# Plan MVP — "Mémoire" (nom provisoire)
+App de sécurisation du patrimoine africain (terres, héritages, volontés, savoirs).
+Mobile-first, offline-first, langage humain, zéro blocage, design 2026.
 
-App PWA mobile-first, offline-first, FR/EN, design moderne épuré (terre/ocre + vert), centrée sur la **Mémoire des Terres** avec un **assistant IA proactif** au cœur de l'expérience.
+Chaque partie est livrée, testée (build + parcours réel dans le navigateur), puis validée par toi avant la suivante.
 
-## 🎯 Périmètre MVP
-1. Auth (email + téléphone OTP)
-2. Onboarding intelligent (IA pose 3-4 questions, active modules)
-3. **Module Mémoire des Terres** (complet)
-4. **Assistant IA** (accueil, contextuel, proactif, actionnable)
-5. Profil utilisateur + paramètres
-6. PWA installable + offline
+## Principes appliqués partout
 
-Modules Héritage / Volontés / Savoirs : **placeholders visibles** (cards "Bientôt disponible") pour montrer la vision sans les construire.
+- **Aucune logique dans les composants** : composants = affichage + événements. Toute logique dans `services/` (règles métier pures), `data/` (accès backend), `hooks/` (liaison état ↔ UI).
+- **Composants < 300 lignes**, découpage systématique.
+- **Zéro code temporaire** : pas de mock, pas de TODO, pas de fichier mort.
+- **Bas de gamme d'abord** : pas d'animation lourde, images compressées, listes virtualisées au-delà de 50 items, budget JS surveillé, lazy-loading par route.
+- **Langage humain** : « Ton terrain est presque protégé » plutôt que « Statut : incomplete ».
+- **Progressive profiling** : navigation libre en visiteur, on ne demande que le prénom + la position au premier geste utile, le profil se complète au fil du temps.
 
-## 🎨 Design system
-- Palette : ocre/terre cuite (#B45309-like), vert savane, fond ivoire chaud, texte charbon
-- Typo : Inter (UI) + une serif douce pour titres patrimoniaux
-- Composants : cards arrondies (radius 12-16px), ombres douces, icônes Lucide
-- Mobile-first, max 3 niveaux de navigation, CTA gros et visibles
-- Bottom nav 5 items : Accueil · Dossiers · ➕ Créer · Alertes · Profil
+## Architecture modulaire (l'équivalent monorepo)
 
-## 📱 Écrans MVP
+Un vrai monorepo (workspaces) n'est pas supporté sur cette stack. On obtient le même bénéfice avec des « packages » internes, frontières claires et imports par barrel :
 
-**Auth**
-- Écran de connexion (toggle Email / Téléphone)
-- OTP SMS via Twilio (connecteur)
-- Inscription rapide (nom, langue préférée)
+```text
+src/
+  core/          config, types partagés, erreurs, utils, i18n
+  data/          accès backend + cache offline (une couche unique)
+  services/      règles métier pures et testables (score, risque, suggestions)
+  features/
+    identity/    visiteur, profil progressif, session
+    dossiers/    terres, héritages, volontés, savoirs
+    proofs/      fichiers et preuves
+    assistant/   conversation IA
+    alerts/      alertes et risques
+    dashboard/   vue de gestion
+  ui/            design system (primitives, tokens, patterns)
+  app/           routes, layouts, providers
+```
 
-**Onboarding IA** (3-4 écrans)
-- "Bonjour, je suis votre assistant patrimonial"
-- Questions : Avez-vous un terrain ? Souhaitez-vous protéger un héritage ? Enregistrer une volonté ?
-- → génère un parcours personnalisé + 1ère suggestion d'action
+Règle de dépendance : `features` → `services` → `data` → `core`. Jamais l'inverse.
 
-**Accueil (Dashboard vivant)**
-- Header : photo + "Bonjour [Nom]" + 🔔
-- **Bloc IA principal** : message dynamique + 4 boutons rapides (Sécuriser terrain, Créer héritage, Ajouter volonté, Gérer conflit)
-- Bloc Alertes (cartes colorées par criticité)
-- Bloc Suggestions IA
-- Feed activité/conseils locaux
+---
 
-**Mes dossiers**
-- Liste filtrable, badge statut (🟢 sécurisé / 🟡 incomplet / 🔴 risque)
-- Recherche + filtres par type
+## Partie 1 — Fondations d'architecture
 
-**Création (flow guidé par IA)**
-- Choix type → étapes 1-écran-1-action
-- IA suggère les champs manquants en temps réel
+Créer l'arborescence ci-dessus, déplacer le code existant dans les bons modules, poser les barrels et une règle ESLint qui interdit les imports croisés interdits. Aucun changement visuel.
 
-**Page dossier Terrain**
-- Header : nom + statut visuel + score de sécurisation
-- Onglets : Résumé · Preuves · Participants · Historique
-- Géolocalisation (carte Leaflet, optionnelle offline)
-- Upload preuves (image/doc/vidéo, compression auto pour 2G/3G)
-- **IA fixe en bas** : suggestions contextuelles ("Ajoutez un titre foncier", "Invitez un témoin")
+## Partie 2 — Design system 2026
 
-**Alertes** : liste filtrée (Urgent / Info / IA)
+Tokens sémantiques (couleurs terre/ocre/vert savane, élévations, rayons, typo serif patrimoniale + sans lisible), échelle d'espacement, états focus/pressé, variantes shadcn thémées, mode sombre. Suppression de toute couleur codée en dur. Aucun texte codé en dur hors i18n.
 
-**Profil** : infos perso, modules activés, langue (FR/EN), thème, sécurité, déconnexion
+## Partie 3 — Mode visiteur et profil progressif
 
-## 🤖 Assistant IA (Lovable AI Gateway, gemini-3-flash-preview)
+Toutes les pages consultables sans compte. Un « compte local » anonyme (identifiant sur l'appareil) porte les dossiers créés hors ligne. Au premier geste utile : une seule question — prénom + activation de la localisation. Rattachement automatique des données locales au compte réel dès qu'il est créé plus tard. Jauge « profil complété » avec relances douces, jamais bloquantes.
 
-Edge functions :
-- `ai-onboarding` : analyse réponses → renvoie parcours + modules à activer
-- `ai-context` : suggestions par dossier (analyse complétude, génère 2-3 actions concrètes)
-- `ai-proactive` : cron quotidien → scanne dossiers utilisateur → crée alertes (manque preuve, héritier non défini, etc.)
-- `ai-actionable` : génère brouillon de dossier à partir d'une intention en langage naturel
-- `ai-chat` : assistant conversationnel streaming (juridique simplifié)
+## Partie 4 — Espace utilisateur
 
-Personnalité : simple, humaine, locale, orientée action. Prompts en FR/EN selon préférence.
+Espace personnel : profil éditable (nom, téléphone, langue, thème, avatar), mes fichiers (téléversement, renommage, suppression, aperçu), mes dossiers, sécurité, appareils. Stockage privé cloisonné par utilisateur.
 
-## 🗄️ Backend (Lovable Cloud / Supabase)
+## Partie 5 — Navigation zéro-blocage
 
-Tables :
-- `profiles` (id, name, phone, language, theme, onboarding_completed)
-- `user_roles` (séparée, app_role enum) — sécurité
-- `dossiers` (id, user_id, type, title, status, visibility, metadata jsonb, geo_point, created_at)
-- `proofs` (id, dossier_id, type, storage_path, verified, created_at)
-- `participants` (id, dossier_id, user_id ou contact_info, role, permissions)
-- `alerts` (id, user_id, type, message, related_dossier_id, severity, read)
-- `ai_conversations` + `ai_messages`
+Chaque écran a une action suivante évidente et unique. Barre d'onglets simplifiée, bouton d'action central contextuel, fils d'Ariane courts, retour toujours prévisible. États vides qui expliquent et proposent l'action. Aucun cul-de-sac.
 
-Storage bucket : `dossier-proofs` (privé, RLS par propriétaire/participant)
+## Partie 6 — Dashboard connecté
 
-RLS strict sur toutes les tables. `has_role()` security definer.
+Vue de gestion moderne : état global du patrimoine, score de protection, ce qui manque, activité récente, alertes prioritaires, raccourcis. Données réelles agrégées côté service, calcul unique et partagé. Responsive : cartes empilées sur mobile, grille dense sur grand écran.
 
-## 🔌 Offline-first
+## Partie 7 — Moteur de risque et de score
 
-- Service worker (vite-plugin-pwa) avec stratégie network-first pour API, cache-first pour assets
-- IndexedDB (via Dexie) pour dossiers + brouillons hors-ligne
-- File de sync : actions queued localement → rejouées dès reconnexion
-- Indicateur de statut connexion + nombre d'éléments en attente
+Service pur : score de sécurisation d'un dossier (preuves, participants, géoloc, documents clés), détection de risque, priorisation. Utilisé par le dashboard, les dossiers et l'assistant — une seule source de vérité. Couvert par des tests.
 
-## 🌍 i18n
-- `react-i18next`, FR par défaut, EN dispo
-- Switch dans Profil
+## Partie 8 — Assistant conversationnel
 
-## 🔐 Sécurité
-- Auth email + OTP téléphone (Twilio connecteur)
-- RLS sur toutes tables, rôles séparés
-- Storage privé avec policies par dossier
-- Préparation chiffrement futur pour Volontés (V2)
+Vraie conversation : mémoire du fil, historique persisté, contexte injecté (profil, dossiers, alertes), réponses en flux, gestion des reprises (« et pour l'autre terrain ? »). Ton humain, orienté action, propositions cliquables qui exécutent réellement une action dans l'app. Multilingue FR/EN.
 
-## 📦 Stack
-- React + Vite + TS + Tailwind + shadcn (existant)
-- Lovable Cloud (Postgres + Auth + Storage + Edge functions)
-- Lovable AI Gateway (gemini-3-flash-preview)
-- Twilio (OTP SMS) via connecteur
-- Leaflet (carte), Dexie (IndexedDB), vite-plugin-pwa
-- react-i18next
+## Partie 9 — Module Terres finalisé
 
-## 🚀 Ordre de livraison (1 implémentation)
-1. Design system + i18n + layout + bottom nav
-2. Auth (email d'abord, puis OTP Twilio)
-3. Schéma DB + RLS + storage
-4. Onboarding IA + dashboard accueil
-5. Module Terres : création, liste, page dossier, preuves, géoloc
-6. Assistant IA (contextuel + chat)
-7. Alertes + IA proactive (cron)
-8. PWA + offline (Dexie + sync queue)
-9. Profil + paramètres
-10. Cards "Bientôt" pour Héritage/Volontés/Savoirs
+Création guidée (1 écran = 1 décision), carte de localisation légère, preuves avec compression automatique, participants/témoins, historique lisible en langage humain, partage familial.
 
-Tu pourras itérer ensuite module par module (Héritage, Volontés, Savoirs, écosystème experts).
+## Partie 10 — Héritages, volontés, savoirs
+
+Les trois modules restants, sur le même socle : création guidée, preuves, participants. Volontés avec accès restreint et confirmation renforcée.
+
+## Partie 11 — Offline-first consolidé
+
+Cache local complet (lecture hors ligne de tous les dossiers), file de synchronisation pour toutes les écritures (dossiers, preuves, profil), résolution de conflits, indicateur clair « X éléments en attente », reprise automatique. Preuves téléversées en différé.
+
+## Partie 12 — Performance bas de gamme
+
+Découpage par route, préchargement intelligent, images responsives, listes virtualisées, réduction des animations si l'appareil le demande, mesure réelle du poids et du temps d'affichage. Objectif : premier affichage utile rapide en 3G sur appareil d'entrée de gamme.
+
+## Partie 13 — Sécurité, qualité, finition
+
+Revue des règles d'accès aux données, journal d'activité, contrôle des rôles, audit de sécurité, tests des services critiques, accessibilité (contrastes, tailles de touche, lecteurs d'écran), métadonnées et écran d'installation.
+
+---
+
+## Notes techniques
+
+- Backend Lovable Cloud existant conservé ; ajouts prévus : journal d'activité, mémoire de conversation, fichiers utilisateur, champs de profil progressif.
+- Les migrations de base de données seront proposées à la validation au moment de la partie concernée (3, 4, 8, 13).
+- L'assistant reste sur le modèle par défaut de la passerelle IA Lovable.
+- Le service worker ne s'active que sur le site publié (contrainte de la prévisualisation) ; le cache local Dexie fonctionne partout.
