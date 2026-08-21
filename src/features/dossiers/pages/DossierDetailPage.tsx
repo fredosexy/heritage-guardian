@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { AppLayout } from "@/components/layout/AppLayout";
+import { AppLayout } from "@/features/shell";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/features/identity";
 import { ArrowLeft, MapPin, FileText, Image as ImageIcon, Trash2, Plus, Loader2, Sparkles, Users } from "lucide-react";
 import { toast } from "sonner";
 

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AppLayout } from "@/components/layout/AppLayout";
-import { useAuth } from "@/hooks/useAuth";
-import { useProfile } from "@/hooks/useProfile";
+import { AppLayout } from "@/features/shell";
+import { useAuth } from "@/features/identity";
+import { useProfile } from "@/features/profile";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, MapPin, Users, ScrollText, Scale, Bell, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";

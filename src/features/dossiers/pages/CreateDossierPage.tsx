@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { AppLayout } from "@/components/layout/AppLayout";
+import { AppLayout } from "@/features/shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/features/identity";
 import { MapPin, Users, ScrollText, Scale, BookOpen, ChevronRight, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
@@ -58,7 +58,7 @@ export default function Create() {
         toast.success(t("create.created"));
         navigate(`/dossiers/${data.id}`);
       } else {
-        const { enqueueCreateDossier } = await import("@/lib/offline/sync");
+        const { enqueueCreateDossier } = await import("@/data/offline/sync");
         const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         await enqueueCreateDossier({
           localId,
