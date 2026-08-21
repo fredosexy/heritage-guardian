@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AppLayout } from "@/features/shell";
 import { useAuth } from "@/features/identity";
-import { useProfile } from "@/features/profile";
+import { useProfile } from "../hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
