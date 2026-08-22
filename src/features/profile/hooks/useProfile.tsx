@@ -1,22 +1,19 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useCallback, useEffect, useState } from "react";
+import { profilesRepo } from "@/data";
+import type { Profile } from "@/core/types/domain";
 import { useAuth } from "@/features/identity/hooks/useAuth";
 
-export interface Profile {
-  id: string;
-  full_name: string | null;
-  phone: string | null;
-  avatar_url: string | null;
-  language: string;
-  theme: string;
-  onboarding_completed: boolean;
-  onboarding_answers: any;
-}
+export type { Profile };
 
 export function useProfile() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchProfile = useCallback(async () => {
+    if (!user) return null;
+    return profilesRepo.getProfile(user.id);
+  }, [user]);
 
   useEffect(() => {
     if (!user) {
@@ -25,22 +22,23 @@ export function useProfile() {
       return;
     }
     let cancelled = false;
-    (async () => {
-      setLoading(true);
-      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
-      if (!cancelled) {
-        setProfile(data as Profile | null);
-        setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [user]);
+    setLoading(true);
+    fetchProfile()
+      .then((data) => {
+        if (!cancelled) setProfile(data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user, fetchProfile]);
 
-  const refresh = async () => {
-    if (!user) return;
-    const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
-    setProfile(data as Profile | null);
-  };
+  const refresh = useCallback(async () => {
+    const data = await fetchProfile();
+    setProfile(data);
+  }, [fetchProfile]);
 
   return { profile, loading, refresh };
 }
