@@ -17,7 +17,7 @@ export async function updateProfile(
 
 export async function completeOnboarding(
   userId: string,
-  answers: Record<string, unknown>
+  answers: Record<string, boolean>
 ): Promise<void> {
   const { error } = await supabase
     .from("profiles")
