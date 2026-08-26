@@ -1,50 +1,30 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/features/shell";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/features/identity";
+import { usePendingSync, useTriggerSync, useUnsyncedDrafts } from "@/features/offline";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Users, ScrollText, Scale, BookOpen, Loader2, FolderOpen, CloudOff, RefreshCw } from "lucide-react";
-import { usePendingSync, useUnsyncedDrafts, useTriggerSync } from "@/features/offline";
+import { CloudOff, FolderOpen, Loader2, RefreshCw, Search } from "lucide-react";
+import { useDossiers } from "../hooks/useDossiers";
+import { DossierStatusBadge } from "../components/DossierStatusBadge";
+import { iconForType, typeLabelKey } from "../components/dossierTypeMeta";
 
-const TYPE_ICONS: Record<string, any> = {
-  terrain: MapPin, heritage: Users, volonte: ScrollText, conflit: Scale, savoir: BookOpen,
-};
-
-export default function Dossiers() {
+export default function DossiersPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [items, setItems] = useState<any[]>([]);
-  const [q, setQ] = useState("");
-  const [loading, setLoading] = useState(true);
+  const { dossiers, loading } = useDossiers();
+  const [query, setQuery] = useState("");
   const pending = usePendingSync();
   const drafts = useUnsyncedDrafts(user?.id);
   const triggerSync = useTriggerSync();
 
-  useEffect(() => {
-    if (!user) return;
-    supabase.from("dossiers").select("*").eq("user_id", user.id).order("updated_at", { ascending: false })
-      .then(({ data }) => { setItems(data || []); setLoading(false); });
-  }, [user, pending]);
-
-  const filtered = items.filter(d => d.title.toLowerCase().includes(q.toLowerCase()));
-
-  const statusBadge = (s: string) => {
-    const map: Record<string, { label: string; cls: string; dot: string }> = {
-      secure: { label: t("dossiers.statusSecure"), cls: "bg-success/10 text-success", dot: "bg-success" },
-      incomplete: { label: t("dossiers.statusIncomplete"), cls: "bg-warning/10 text-warning-foreground", dot: "bg-warning" },
-      risk: { label: t("dossiers.statusRisk"), cls: "bg-destructive/10 text-destructive", dot: "bg-destructive" },
-    };
-    const v = map[s] || map.incomplete;
-    return (
-      <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-full font-medium ${v.cls}`}>
-        <span className={`size-1.5 rounded-full ${v.dot}`} />{v.label}
-      </span>
-    );
-  };
+  const filtered = useMemo(
+    () => dossiers.filter((d) => d.title.toLowerCase().includes(query.toLowerCase())),
+    [dossiers, query]
+  );
 
   return (
     <AppLayout>
@@ -78,11 +58,18 @@ export default function Dossiers() {
 
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-        <Input className="pl-9 rounded-xl" placeholder={t("dossiers.search")} value={q} onChange={(e) => setQ(e.target.value)} />
+        <Input
+          className="pl-9 rounded-xl"
+          placeholder={t("dossiers.search")}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12"><Loader2 className="size-5 animate-spin text-primary" /></div>
+        <div className="flex justify-center py-12">
+          <Loader2 className="size-5 animate-spin text-primary" />
+        </div>
       ) : filtered.length === 0 ? (
         <div className="card-soft p-8 text-center">
           <FolderOpen className="size-10 mx-auto mb-3 text-muted-foreground" />
@@ -92,9 +79,9 @@ export default function Dossiers() {
           </Button>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {filtered.map((d) => {
-            const Icon = TYPE_ICONS[d.type] || FolderOpen;
+            const Icon = iconForType(d.type);
             return (
               <button
                 key={d.id}
@@ -105,12 +92,10 @@ export default function Dossiers() {
                   <Icon className="size-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <h3 className="font-medium truncate">{d.title}</h3>
-                  </div>
+                  <h3 className="font-medium truncate mb-1">{d.title}</h3>
                   <div className="flex items-center gap-2">
-                    {statusBadge(d.status)}
-                    <span className="text-xs text-muted-foreground">{t(`dossiers.type${d.type.charAt(0).toUpperCase() + d.type.slice(1)}`)}</span>
+                    <DossierStatusBadge status={d.status} />
+                    <span className="text-xs text-muted-foreground">{t(typeLabelKey(d.type))}</span>
                   </div>
                 </div>
               </button>
