@@ -63,7 +63,7 @@ export default function DossierDetailPage() {
 
       <div className="card-soft p-5 mb-4">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <h1 className="text-xl font-serif">{dossier.title}</h1>
+          <h1 className="text-title text-xl">{dossier.title}</h1>
           <button
             onClick={handleRemove}
             aria-label={t("dossier.delete")}
@@ -106,7 +106,7 @@ export default function DossierDetailPage() {
             <p className="text-sm text-muted-foreground">
               {participants.length === 0 ? t("dossier.noParticipants") : `${participants.length}`}
             </p>
-            <p className="text-xs text-muted-foreground mt-2">{t("dossier.participantsSoon")}</p>
+            <p className="text-caption mt-2">{t("dossier.participantsSoon")}</p>
           </div>
         </TabsContent>
 
@@ -117,7 +117,7 @@ export default function DossierDetailPage() {
               {t(typeLabelKey(dossier.type))}
             </p>
             {dossier.description && <p>{dossier.description}</p>}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-caption">
               {t("dossier.createdOn")} {new Date(dossier.created_at).toLocaleDateString()}
             </p>
           </div>

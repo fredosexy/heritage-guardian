@@ -63,6 +63,30 @@
     --shadow-elegant: 0 12px 32px -12px hsl(25 30% 20% / 0.18);
 
     /* Sidebar (default unused but kept for shadcn) */
+    /* Surfaces élevées & voiles (utilisés sur les fonds colorés) */
+    --surface: 0 0% 100%;
+    --surface-foreground: 25 20% 14%;
+    --surface-raised: 39 45% 99%;
+    --veil: 0 0% 100%;                 /* teinte des voiles translucides */
+    --veil-strong: 0 0% 100%;
+
+    /* Statuts patrimoniaux */
+    --status-secure: 142 55% 38%;
+    --status-secure-soft: 142 45% 94%;
+    --status-incomplete: 38 92% 45%;
+    --status-incomplete-soft: 38 90% 94%;
+    --status-risk: 0 70% 48%;
+    --status-risk-soft: 0 75% 96%;
+
+    /* Focus & interaction */
+    --focus-ring: 24 75% 42%;
+    --pressed: 25 30% 20%;
+
+    /* Durées de transition (réduites sur appareils bas de gamme) */
+    --motion-fast: 120ms;
+    --motion-base: 200ms;
+    --motion-slow: 340ms;
+
     --sidebar-background: 39 40% 97%;
     --sidebar-foreground: 25 20% 14%;
     --sidebar-primary: 24 75% 42%;
@@ -117,6 +141,22 @@
     --shadow-warm: 0 8px 24px -8px hsl(30 80% 58% / 0.3);
     --shadow-elegant: 0 12px 32px -12px hsl(0 0% 0% / 0.5);
 
+    --surface: 25 18% 12%;
+    --surface-foreground: 39 30% 94%;
+    --surface-raised: 25 18% 15%;
+    --veil: 39 30% 94%;
+    --veil-strong: 0 0% 100%;
+
+    --status-secure: 142 50% 48%;
+    --status-secure-soft: 142 30% 16%;
+    --status-incomplete: 38 92% 58%;
+    --status-incomplete-soft: 38 40% 16%;
+    --status-risk: 0 65% 58%;
+    --status-risk-soft: 0 40% 17%;
+
+    --focus-ring: 30 80% 58%;
+    --pressed: 39 30% 94%;
+
     --sidebar-background: 25 18% 9%;
     --sidebar-foreground: 39 30% 94%;
     --sidebar-primary: 30 80% 58%;
@@ -151,5 +191,73 @@
   }
   .card-soft {
     @apply rounded-2xl border bg-card shadow-[var(--shadow-soft)];
+  }
+}
+
+@layer components {
+  /* Voiles translucides sur fonds colorés — remplace bg-white/20 */
+  .veil {
+    background-color: hsl(var(--veil) / 0.16);
+  }
+  .veil-strong {
+    background-color: hsl(var(--veil) / 0.24);
+  }
+  .veil-hover:hover {
+    background-color: hsl(var(--veil) / 0.26);
+  }
+
+  /* Cible tactile minimale (44px) pour appareils bas de gamme */
+  .tap {
+    @apply min-h-11 min-w-11;
+  }
+
+  /* Retour au toucher, sans dépendre du hover (mobile) */
+  .pressable {
+    transition:
+      transform var(--motion-fast) ease-out,
+      background-color var(--motion-fast) ease-out;
+  }
+  .pressable:active {
+    transform: scale(0.98);
+  }
+
+  /* Anneau de focus visible et cohérent */
+  .focus-ring {
+    @apply outline-none ring-offset-2 ring-offset-background;
+  }
+  .focus-ring:focus-visible {
+    @apply ring-2;
+    --tw-ring-color: hsl(var(--focus-ring));
+  }
+
+  /* Échelle typographique — hiérarchie unique pour toute l'app */
+  .text-display {
+    @apply font-serif text-2xl leading-tight tracking-tight;
+  }
+  .text-title {
+    @apply font-serif text-lg leading-snug;
+  }
+  .text-body {
+    @apply text-sm leading-relaxed;
+  }
+  .text-caption {
+    @apply text-xs text-muted-foreground;
+  }
+  .text-overline {
+    @apply text-[11px] uppercase tracking-wide font-medium;
+  }
+}
+
+@layer base {
+  /* Appareils bas de gamme / préférence système : on coupe les animations */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

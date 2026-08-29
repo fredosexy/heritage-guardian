@@ -63,7 +63,7 @@ export default function OnboardingPage() {
             <Sparkles className="size-7 text-primary-foreground" />
           </div>
         </div>
-        <h1 className="text-2xl font-serif text-center mb-2">{t("onboarding.title")}</h1>
+        <h1 className="text-display text-center mb-2">{t("onboarding.title")}</h1>
         <p className="text-center text-muted-foreground mb-8 text-sm">{t("onboarding.subtitle")}</p>
 
         <div className="card-soft p-6 space-y-6">

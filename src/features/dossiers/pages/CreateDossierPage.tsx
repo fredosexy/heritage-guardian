@@ -48,7 +48,7 @@ export default function CreateDossierPage() {
   if (!type) {
     return (
       <AppLayout>
-        <h1 className="text-2xl font-serif mb-2">{t("create.title")}</h1>
+        <h1 className="text-display mb-2">{t("create.title")}</h1>
         <p className="text-sm text-muted-foreground mb-6">{t("create.chooseType")}</p>
         <div className="space-y-3">
           {DOSSIER_TYPES.map(({ id, icon: Icon, descKey, available }) => (
@@ -75,7 +75,7 @@ export default function CreateDossierPage() {
                     </Badge>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">{t(descKey)}</p>
+                <p className="text-caption mt-0.5">{t(descKey)}</p>
               </div>
               {available && <ChevronRight className="size-4 text-muted-foreground" />}
             </button>
@@ -90,7 +90,7 @@ export default function CreateDossierPage() {
       <button onClick={() => setType(null)} className="text-sm text-muted-foreground mb-4">
         ← {t("common.back")}
       </button>
-      <h1 className="text-2xl font-serif mb-1">{t(typeLabelKey(type))}</h1>
+      <h1 className="text-display mb-1">{t(typeLabelKey(type))}</h1>
       <p className="text-sm text-muted-foreground mb-6 flex items-center gap-1.5">
         <Sparkles className="size-3.5 text-primary" />
         {t("create.terrainDesc")}

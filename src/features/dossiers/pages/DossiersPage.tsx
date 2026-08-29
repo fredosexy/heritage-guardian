@@ -28,7 +28,7 @@ export default function DossiersPage() {
 
   return (
     <AppLayout>
-      <h1 className="text-2xl font-serif mb-4">{t("dossiers.title")}</h1>
+      <h1 className="text-display mb-4">{t("dossiers.title")}</h1>
 
       {pending > 0 && (
         <div className="mb-3 flex items-center gap-2 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-warning-foreground">
@@ -49,7 +49,7 @@ export default function DossiersPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{d.title}</p>
-                <p className="text-xs text-muted-foreground">{t("dossiers.draftPending")}</p>
+                <p className="text-caption">{t("dossiers.draftPending")}</p>
               </div>
             </div>
           ))}
@@ -95,7 +95,7 @@ export default function DossiersPage() {
                   <h3 className="font-medium truncate mb-1">{d.title}</h3>
                   <div className="flex items-center gap-2">
                     <DossierStatusBadge status={d.status} />
-                    <span className="text-xs text-muted-foreground">{t(typeLabelKey(d.type))}</span>
+                    <span className="text-caption">{t(typeLabelKey(d.type))}</span>
                   </div>
                 </div>
               </button>

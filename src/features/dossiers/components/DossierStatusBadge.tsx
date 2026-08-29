@@ -2,9 +2,9 @@ import { useTranslation } from "react-i18next";
 import type { DossierStatus } from "@/core/types/domain";
 
 const STYLES: Record<DossierStatus, { cls: string; dot: string; key: string }> = {
-  secure: { cls: "bg-success/10 text-success", dot: "bg-success", key: "dossiers.statusSecure" },
-  incomplete: { cls: "bg-warning/10 text-warning-foreground", dot: "bg-warning", key: "dossiers.statusIncomplete" },
-  risk: { cls: "bg-destructive/10 text-destructive", dot: "bg-destructive", key: "dossiers.statusRisk" },
+  secure: { cls: "bg-status-secure-soft text-status-secure", dot: "bg-status-secure", key: "dossiers.statusSecure" },
+  incomplete: { cls: "bg-status-incomplete-soft text-status-incomplete", dot: "bg-status-incomplete", key: "dossiers.statusIncomplete" },
+  risk: { cls: "bg-status-risk-soft text-status-risk", dot: "bg-status-risk", key: "dossiers.statusRisk" },
 };
 
 export function DossierStatusBadge({ status }: { status: string }) {

@@ -55,7 +55,7 @@ export default function ProfilePage() {
 
   return (
     <AppLayout>
-      <h1 className="text-2xl font-serif mb-6">{t("profile.title")}</h1>
+      <h1 className="text-display mb-6">{t("profile.title")}</h1>
 
       <section className="card-soft p-5 mb-4 space-y-3">
         <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{t("profile.personal")}</h2>

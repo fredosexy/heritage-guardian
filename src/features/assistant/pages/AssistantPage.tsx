@@ -67,7 +67,7 @@ export default function AssistantPage() {
             <div className="size-8 rounded-lg bg-gradient-warm flex items-center justify-center">
               <Sparkles className="size-4 text-primary-foreground" />
             </div>
-            <h1 className="font-serif text-lg">{t("ai.title")}</h1>
+            <h1 className="text-title">{t("ai.title")}</h1>
           </div>
         </header>
 

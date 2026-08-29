@@ -27,7 +27,7 @@ export default function AlertsPage() {
 
   return (
     <AppLayout>
-      <h1 className="text-2xl font-serif mb-4">{t("alerts.title")}</h1>
+      <h1 className="text-display mb-4">{t("alerts.title")}</h1>
       <div className="flex gap-2 mb-4 overflow-x-auto pb-1 -mx-4 px-4">
         {filters.map((f) => (
           <button
@@ -71,7 +71,7 @@ export default function AlertsPage() {
                 </p>
                 {!a.read && <span className="size-2 rounded-full bg-primary mt-1.5 shrink-0" />}
               </div>
-              <p className="text-xs text-muted-foreground">{a.message}</p>
+              <p className="text-caption">{a.message}</p>
             </button>
           ))}
         </div>
