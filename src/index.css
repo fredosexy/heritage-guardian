@@ -193,3 +193,71 @@
     @apply rounded-2xl border bg-card shadow-[var(--shadow-soft)];
   }
 }
+
+@layer components {
+  /* Voiles translucides sur fonds colorés — remplace bg-white/20 */
+  .veil {
+    background-color: hsl(var(--veil) / 0.16);
+  }
+  .veil-strong {
+    background-color: hsl(var(--veil) / 0.24);
+  }
+  .veil-hover:hover {
+    background-color: hsl(var(--veil) / 0.26);
+  }
+
+  /* Cible tactile minimale (44px) pour appareils bas de gamme */
+  .tap {
+    @apply min-h-11 min-w-11;
+  }
+
+  /* Retour au toucher, sans dépendre du hover (mobile) */
+  .pressable {
+    transition:
+      transform var(--motion-fast) ease-out,
+      background-color var(--motion-fast) ease-out;
+  }
+  .pressable:active {
+    transform: scale(0.98);
+  }
+
+  /* Anneau de focus visible et cohérent */
+  .focus-ring {
+    @apply outline-none ring-offset-2 ring-offset-background;
+  }
+  .focus-ring:focus-visible {
+    @apply ring-2;
+    --tw-ring-color: hsl(var(--focus-ring));
+  }
+
+  /* Échelle typographique — hiérarchie unique pour toute l'app */
+  .text-display {
+    @apply font-serif text-2xl leading-tight tracking-tight;
+  }
+  .text-title {
+    @apply font-serif text-lg leading-snug;
+  }
+  .text-body {
+    @apply text-sm leading-relaxed;
+  }
+  .text-caption {
+    @apply text-xs text-muted-foreground;
+  }
+  .text-overline {
+    @apply text-[11px] uppercase tracking-wide font-medium;
+  }
+}
+
+@layer base {
+  /* Appareils bas de gamme / préférence système : on coupe les animations */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

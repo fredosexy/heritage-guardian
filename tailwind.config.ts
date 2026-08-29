@@ -58,6 +58,23 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        surface: {
+          DEFAULT: "hsl(var(--surface))",
+          foreground: "hsl(var(--surface-foreground))",
+          raised: "hsl(var(--surface-raised))",
+        },
+        veil: {
+          DEFAULT: "hsl(var(--veil))",
+          strong: "hsl(var(--veil-strong))",
+        },
+        status: {
+          secure: "hsl(var(--status-secure))",
+          "secure-soft": "hsl(var(--status-secure-soft))",
+          incomplete: "hsl(var(--status-incomplete))",
+          "incomplete-soft": "hsl(var(--status-incomplete-soft))",
+          risk: "hsl(var(--status-risk))",
+          "risk-soft": "hsl(var(--status-risk-soft))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -79,6 +96,12 @@ export default {
         warm: "var(--shadow-warm)",
         elegant: "var(--shadow-elegant)",
       },
+      transitionDuration: {
+        fast: "var(--motion-fast)",
+        base: "var(--motion-base)",
+        slow: "var(--motion-slow)",
+      },
+      minHeight: { 11: "2.75rem" },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
