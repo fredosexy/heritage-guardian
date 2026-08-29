@@ -48,7 +48,7 @@ export default function HomePage() {
       <header className="flex items-center justify-between mb-6">
         <div>
           <p className="text-sm text-muted-foreground">{t("home.greeting")}</p>
-          <h1 className="text-xl font-serif">{profile?.full_name || "👋"}</h1>
+          <h1 className="text-title text-xl">{profile?.full_name || "👋"}</h1>
         </div>
         <button
           onClick={() => navigate("/alerts")}
@@ -71,7 +71,7 @@ export default function HomePage() {
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide opacity-80">{t("ai.title")}</p>
-            <p className="text-lg font-serif leading-tight">{t("home.aiPrompt")}</p>
+            <p className="text-title">{t("home.aiPrompt")}</p>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-2">
@@ -111,7 +111,7 @@ export default function HomePage() {
                 className={`w-full text-left rounded-xl border-l-4 p-3 ${severityClass(a.severity)}`}
               >
                 <p className="text-sm font-medium">{a.title}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{a.message}</p>
+                <p className="text-caption mt-0.5">{a.message}</p>
               </button>
             ))}
           </div>

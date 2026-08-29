@@ -133,7 +133,7 @@ export default function Auth() {
               <div>
                 <Label htmlFor="phone">{t("auth.phone")}</Label>
                 <Input id="phone" type="tel" placeholder="+237699999999" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                <p className="text-xs text-muted-foreground mt-1">{t("auth.phoneNote")}</p>
+                <p className="text-caption mt-1">{t("auth.phoneNote")}</p>
               </div>
               {otpSent && (
                 <div>

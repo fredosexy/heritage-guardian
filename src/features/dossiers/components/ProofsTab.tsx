@@ -38,7 +38,7 @@ export function ProofsTab({ proofs, uploading, onUpload }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{p.title}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-caption">
                   {((p.size_bytes ?? 0) / 1024).toFixed(0)} {t("dossier.kb")}
                 </p>
               </div>
