@@ -66,7 +66,7 @@ export default function HomePage() {
 
       <section className="rounded-3xl bg-gradient-hero p-6 text-primary-foreground shadow-elegant mb-6">
         <div className="flex items-start gap-3 mb-4">
-          <div className="size-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center shrink-0">
+          <div className="size-10 rounded-xl veil backdrop-blur flex items-center justify-center shrink-0">
             <Sparkles className="size-5" />
           </div>
           <div>
@@ -79,7 +79,7 @@ export default function HomePage() {
             <button
               key={label}
               onClick={() => navigate(route)}
-              className="rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur p-3 text-left transition flex flex-col gap-1.5"
+              className="rounded-xl veil veil-hover backdrop-blur p-3 text-left flex flex-col gap-1.5 pressable focus-ring tap"
             >
               <Icon className="size-5" />
               <span className="text-sm font-medium leading-tight">{label}</span>
