@@ -1,31 +1,65 @@
-import { useEffect, useState } from "react";
-import { dossiersRepo } from "@/data";
-import type { Dossier } from "@/core/types/domain";
-import { useAuth } from "@/features/identity";
+import { useEffect, useMemo, useState } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
+import { dossiersRepo, listLocalDrafts } from "@/data";
+import type { Dossier, DossierStatus } from "@/core/types/domain";
+import { useIdentity } from "@/features/identity";
 import { usePendingSync } from "@/features/offline";
 
+export interface DossierListItem {
+  id: string;
+  type: string;
+  title: string;
+  status: DossierStatus;
+  /** Dossier encore uniquement sur cet appareil (mode visiteur ou hors ligne). */
+  local?: boolean;
+}
+
 export function useDossiers() {
-  const { user } = useAuth();
+  const { userId, isGuest } = useIdentity();
   const pendingSync = usePendingSync();
-  const [dossiers, setDossiers] = useState<Dossier[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [remote, setRemote] = useState<Dossier[]>([]);
+  const [loadingRemote, setLoadingRemote] = useState(true);
+
+  const localDrafts = useLiveQuery(
+    async () => (isGuest && userId ? listLocalDrafts(userId) : []),
+    [isGuest, userId],
+    []
+  );
 
   useEffect(() => {
-    if (!user) return;
+    if (isGuest || !userId) {
+      setRemote([]);
+      setLoadingRemote(false);
+      return;
+    }
     let cancelled = false;
+    setLoadingRemote(true);
     dossiersRepo
-      .listDossiers(user.id)
+      .listDossiers(userId)
       .then((data) => {
-        if (!cancelled) setDossiers(data);
+        if (!cancelled) setRemote(data);
       })
       .catch(() => undefined)
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setLoadingRemote(false);
       });
     return () => {
       cancelled = true;
     };
-  }, [user, pendingSync]);
+  }, [userId, isGuest, pendingSync]);
 
-  return { dossiers, loading };
+  const dossiers = useMemo<DossierListItem[]>(() => {
+    if (isGuest) {
+      return (localDrafts ?? []).map((draft) => ({
+        id: draft.localId,
+        type: draft.type,
+        title: draft.title,
+        status: "incomplete" as DossierStatus,
+        local: true,
+      }));
+    }
+    return remote.map((d) => ({ id: d.id, type: d.type, title: d.title, status: d.status }));
+  }, [isGuest, localDrafts, remote]);
+
+  return { dossiers, loading: isGuest ? localDrafts === undefined : loadingRemote };
 }
