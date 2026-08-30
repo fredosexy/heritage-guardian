@@ -72,6 +72,7 @@ export const fr = {
     typeSavoir: "Savoir",
     pendingSync: "{{count}} dossier(s) en attente de synchronisation",
     syncNow: "Synchroniser",
+    localOnly: "Ce dossier est encore sur cet appareil. Créez un compte pour l'ouvrir en détail.",
     draftPending: "Brouillon — sera envoyé une fois en ligne",
   },
   create: {
@@ -91,6 +92,7 @@ export const fr = {
     create: "Créer le dossier",
     cancel: "Annuler",
     created: "Dossier créé !",
+    savedLocal: "Enregistré sur cet appareil",
     savedOffline: "Enregistré hors ligne — sera synchronisé automatiquement.",
   },
   dossier: {
@@ -113,6 +115,30 @@ export const fr = {
     kb: "Ko",
     proofAdded: "Preuve ajoutée",
     participantsSoon: "L'invitation de proches arrive bientôt.",
+  },
+  visitor: {
+    title: "Vous découvrez Mémoire",
+    subtitle: "Vos dossiers restent sur cet appareil pour l'instant.",
+    cta: "Créer un compte",
+  },
+  firstStep: {
+    title: "Juste une chose avant de commencer",
+    subtitle: "Comment doit-on vous appeler ?",
+    nameLabel: "Votre prénom",
+    namePlaceholder: "Ex. Awa",
+    locationCta: "Activer ma position",
+    locationOn: "Position activée",
+    locationWhy: "Pour retrouver vos terres plus facilement.",
+    later: "Plus tard",
+    continue: "Continuer",
+  },
+  completion: {
+    title: "Votre profil",
+    stepFirstName: "Dites-nous votre prénom",
+    stepFirstDossier: "Créez votre premier dossier",
+    stepAccount: "Créez un compte pour sauvegarder vos dossiers",
+    stepLocation: "Activez votre position",
+    stepPhone: "Ajoutez votre téléphone",
   },
   alerts: {
     title: "Alertes",

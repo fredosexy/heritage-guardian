@@ -72,6 +72,7 @@ export const en = {
     typeSavoir: "Knowledge",
     pendingSync: "{{count}} dossier(s) waiting to sync",
     syncNow: "Sync now",
+    localOnly: "This dossier is still on this device. Create an account to open it.",
     draftPending: "Draft — will upload when back online",
   },
   create: {
@@ -91,6 +92,7 @@ export const en = {
     create: "Create dossier",
     cancel: "Cancel",
     created: "Dossier created!",
+    savedLocal: "Saved on this device",
     savedOffline: "Saved offline — will sync automatically.",
   },
   dossier: {
@@ -113,6 +115,30 @@ export const en = {
     kb: "KB",
     proofAdded: "Proof added",
     participantsSoon: "Inviting relatives is coming soon.",
+  },
+  visitor: {
+    title: "You are exploring Mémoire",
+    subtitle: "Your dossiers stay on this device for now.",
+    cta: "Create an account",
+  },
+  firstStep: {
+    title: "Just one thing before we start",
+    subtitle: "What should we call you?",
+    nameLabel: "Your first name",
+    namePlaceholder: "e.g. Awa",
+    locationCta: "Turn on my location",
+    locationOn: "Location enabled",
+    locationWhy: "So we can find your land more easily.",
+    later: "Later",
+    continue: "Continue",
+  },
+  completion: {
+    title: "Your profile",
+    stepFirstName: "Tell us your first name",
+    stepFirstDossier: "Create your first dossier",
+    stepAccount: "Create an account to save your dossiers",
+    stepLocation: "Turn on your location",
+    stepPhone: "Add your phone number",
   },
   alerts: {
     title: "Alerts",

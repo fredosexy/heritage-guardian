@@ -4,4 +4,14 @@ export * as participantsRepo from "./participants.repo";
 export * as alertsRepo from "./alerts.repo";
 export * as profilesRepo from "./profiles.repo";
 export { db } from "./offline/db";
-export { enqueueCreateDossier, processQueue, initSyncListeners, onSyncChange } from "./offline/sync";
+export type { DraftDossier } from "./offline/db";
+export {
+  enqueueCreateDossier,
+  processQueue,
+  initSyncListeners,
+  onSyncChange,
+  saveLocalDraft,
+  listLocalDrafts,
+  deleteLocalDraft,
+  claimLocalDrafts,
+} from "./offline/sync";

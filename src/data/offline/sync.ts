@@ -92,3 +92,44 @@ export function initSyncListeners() {
 export async function getPendingCount(): Promise<number> {
   return db.queue.count();
 }
+
+/** Enregistre un brouillon local sans le mettre en file (mode visiteur, pas de compte). */
+export async function saveLocalDraft(
+  draft: Omit<DraftDossier, "id" | "synced" | "created_at" | "updated_at"> & { localId: string }
+): Promise<void> {
+  const now = Date.now();
+  await db.drafts.add({ ...draft, created_at: now, updated_at: now, synced: 0 });
+  emit();
+}
+
+/** Brouillons locaux (non synchronisés) portés par une identité. */
+export async function listLocalDrafts(userId: string): Promise<DraftDossier[]> {
+  return db.drafts.where({ user_id: userId, synced: 0 }).reverse().sortBy("updated_at");
+}
+
+export async function deleteLocalDraft(localId: string): Promise<void> {
+  const draft = await db.drafts.where("localId").equals(localId).first();
+  if (draft?.id) await db.drafts.delete(draft.id);
+  emit();
+}
+
+/**
+ * Rattache les brouillons d'une identité locale à un vrai compte,
+ * puis les met en file pour envoi au serveur.
+ */
+export async function claimLocalDrafts(fromUserId: string, toUserId: string): Promise<number> {
+  if (!fromUserId || fromUserId === toUserId) return 0;
+  const drafts = await db.drafts.where({ user_id: fromUserId, synced: 0 }).toArray();
+  for (const draft of drafts) {
+    await db.drafts.update(draft.id!, { user_id: toUserId, updated_at: Date.now() });
+    await db.queue.add({
+      kind: "create_dossier",
+      payload: { localId: draft.localId },
+      created_at: Date.now(),
+      attempts: 0,
+    });
+  }
+  emit();
+  if (drafts.length > 0) void processQueue();
+  return drafts.length;
+}

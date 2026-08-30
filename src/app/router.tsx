@@ -7,18 +7,22 @@ import { AssistantPage } from "@/features/assistant";
 import { ProfilePage } from "@/features/profile";
 import { NotFoundPage } from "@/features/shell";
 
+/**
+ * Mode visiteur : toutes les pages sont consultables sans compte.
+ * Seul l'onboarding (lié à un profil réel) exige un compte.
+ */
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
-      <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-      <Route path="/dossiers" element={<ProtectedRoute><DossiersPage /></ProtectedRoute>} />
-      <Route path="/dossiers/:id" element={<ProtectedRoute><DossierDetailPage /></ProtectedRoute>} />
-      <Route path="/create" element={<ProtectedRoute><CreateDossierPage /></ProtectedRoute>} />
-      <Route path="/alerts" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-      <Route path="/assistant" element={<ProtectedRoute><AssistantPage /></ProtectedRoute>} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/dossiers" element={<DossiersPage />} />
+      <Route path="/dossiers/:id" element={<DossierDetailPage />} />
+      <Route path="/create" element={<CreateDossierPage />} />
+      <Route path="/alerts" element={<AlertsPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/assistant" element={<AssistantPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
