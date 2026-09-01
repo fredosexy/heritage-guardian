@@ -19,7 +19,8 @@ export default function DossiersPage() {
   const { dossiers, loading } = useDossiers();
   const [query, setQuery] = useState("");
   const { isGuest } = useIdentity();
-  const pending = isGuest ? 0 : usePendingSync();
+  const pendingCount = usePendingSync();
+  const pending = isGuest ? 0 : pendingCount;
   const allDrafts = useUnsyncedDrafts(user?.id);
   const drafts = isGuest ? [] : allDrafts;
   const triggerSync = useTriggerSync();
