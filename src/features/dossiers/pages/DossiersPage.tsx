@@ -2,10 +2,11 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/features/shell";
-import { useAuth } from "@/features/identity";
+import { useAuth, useIdentity } from "@/features/identity";
 import { usePendingSync, useTriggerSync, useUnsyncedDrafts } from "@/features/offline";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { CloudOff, FolderOpen, Loader2, RefreshCw, Search } from "lucide-react";
 import { useDossiers } from "../hooks/useDossiers";
 import { DossierStatusBadge } from "../components/DossierStatusBadge";
@@ -17,8 +18,11 @@ export default function DossiersPage() {
   const navigate = useNavigate();
   const { dossiers, loading } = useDossiers();
   const [query, setQuery] = useState("");
-  const pending = usePendingSync();
-  const drafts = useUnsyncedDrafts(user?.id);
+  const { isGuest } = useIdentity();
+  const pendingCount = usePendingSync();
+  const pending = isGuest ? 0 : pendingCount;
+  const allDrafts = useUnsyncedDrafts(user?.id);
+  const drafts = isGuest ? [] : allDrafts;
   const triggerSync = useTriggerSync();
 
   const filtered = useMemo(
@@ -85,7 +89,9 @@ export default function DossiersPage() {
             return (
               <button
                 key={d.id}
-                onClick={() => navigate(`/dossiers/${d.id}`)}
+                onClick={() =>
+                  d.local ? toast.info(t("dossiers.localOnly")) : navigate(`/dossiers/${d.id}`)
+                }
                 className="w-full card-soft p-4 text-left hover:shadow-warm transition flex items-center gap-3"
               >
                 <div className="size-11 rounded-xl bg-accent flex items-center justify-center text-primary shrink-0">

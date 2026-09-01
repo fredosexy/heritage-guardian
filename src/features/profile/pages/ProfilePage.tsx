@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AppLayout } from "@/features/shell";
-import { useAuth } from "@/features/identity";
+import { useAuth, VisitorBanner } from "@/features/identity";
+import { ProfileCompletionCard } from "../components/ProfileCompletionCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,6 +57,9 @@ export default function ProfilePage() {
   return (
     <AppLayout>
       <h1 className="text-display mb-6">{t("profile.title")}</h1>
+
+      <VisitorBanner />
+      <ProfileCompletionCard />
 
       <section className="card-soft p-5 mb-4 space-y-3">
         <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{t("profile.personal")}</h2>

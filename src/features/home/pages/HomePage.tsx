@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/features/shell";
-import { useProfile } from "@/features/profile";
+import { useProfile, ProfileCompletionCard } from "@/features/profile";
+import { VisitorBanner, useIdentity } from "@/features/identity";
 import { useUnreadAlerts } from "@/features/alerts/hooks/useAlerts";
 import { Button } from "@/components/ui/button";
 import { Bell, ChevronRight, Loader2, MapPin, Scale, ScrollText, Sparkles, Users } from "lucide-react";
@@ -19,12 +20,13 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { profile, loading: profileLoading } = useProfile();
   const { alerts, loading: alertsLoading } = useUnreadAlerts(5);
+  const { isAuthenticated, displayName } = useIdentity();
 
   useEffect(() => {
-    if (!profileLoading && profile && !profile.onboarding_completed) {
+    if (isAuthenticated && !profileLoading && profile && !profile.onboarding_completed) {
       navigate("/onboarding", { replace: true });
     }
-  }, [profile, profileLoading, navigate]);
+  }, [profile, profileLoading, navigate, isAuthenticated]);
 
   const quickActions = [
     { icon: MapPin, label: t("home.quickSecure"), route: "/create?type=terrain" },
@@ -45,10 +47,12 @@ export default function HomePage() {
 
   return (
     <AppLayout>
+      <VisitorBanner />
+
       <header className="flex items-center justify-between mb-6">
         <div>
           <p className="text-sm text-muted-foreground">{t("home.greeting")}</p>
-          <h1 className="text-title text-xl">{profile?.full_name || "👋"}</h1>
+          <h1 className="text-title text-xl">{profile?.full_name || displayName || "👋"}</h1>
         </div>
         <button
           onClick={() => navigate("/alerts")}
@@ -63,6 +67,8 @@ export default function HomePage() {
           )}
         </button>
       </header>
+
+      <ProfileCompletionCard />
 
       <section className="rounded-3xl bg-gradient-hero p-6 text-primary-foreground shadow-elegant mb-6">
         <div className="flex items-start gap-3 mb-4">
