@@ -51,3 +51,28 @@ export async function getProofUrl(storagePath: string): Promise<string | null> {
   const { data } = await supabase.storage.from(BUCKET).createSignedUrl(storagePath, 60 * 10);
   return data?.signedUrl ?? null;
 }
+
+/** Tous les fichiers de l'utilisateur, tous dossiers confondus. */
+export async function listUserProofs(userId: string): Promise<(Proof & { dossier_title?: string | null })[]> {
+  const { data, error } = await supabase
+    .from("proofs")
+    .select("*, dossiers(title)")
+    .eq("uploaded_by", userId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(({ dossiers, ...proof }) => ({
+    ...proof,
+    dossier_title: (dossiers as { title: string } | null)?.title ?? null,
+  }));
+}
+
+export async function renameProof(proofId: string, title: string): Promise<void> {
+  const { error } = await supabase.from("proofs").update({ title }).eq("id", proofId);
+  if (error) throw error;
+}
+
+export async function deleteProof(proof: Pick<Proof, "id" | "storage_path">): Promise<void> {
+  await supabase.storage.from(BUCKET).remove([proof.storage_path]);
+  const { error } = await supabase.from("proofs").delete().eq("id", proof.id);
+  if (error) throw error;
+}
