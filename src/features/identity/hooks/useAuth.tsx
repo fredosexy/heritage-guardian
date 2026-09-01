@@ -18,9 +18,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Set up listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
       setUser(s?.user ?? null);
+      // Rattacher les données créées en mode visiteur au compte réel.
+      if (event === "SIGNED_IN" && s?.user) {
+        const uid = s.user.id;
+        setTimeout(() => {
+          void claimLocalData(uid).catch(() => undefined);
+        }, 0);
+      }
     });
 
     // THEN fetch initial session
