@@ -95,6 +95,7 @@ export default function CreateDossierPage() {
 
   return (
     <AppLayout>
+      <FirstStepDialog open={firstStepOpen} onClose={() => setFirstStepOpen(false)} />
       <button onClick={() => setType(null)} className="text-sm text-muted-foreground mb-4">
         ← {t("common.back")}
       </button>
