@@ -27,6 +27,12 @@ export default function CreateDossierPage() {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const { create, saving } = useCreateDossier();
+  const { needsFirstStep } = useIdentity();
+  const [firstStepOpen, setFirstStepOpen] = useState(false);
+
+  useEffect(() => {
+    if (needsFirstStep) setFirstStepOpen(true);
+  }, [needsFirstStep]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +44,7 @@ export default function CreateDossierPage() {
         toast.success(t("create.created"));
         navigate(`/dossiers/${result.id}`);
       } else {
-        toast.success(t("create.savedOffline"));
+        toast.success(t(result.mode === "local" ? "create.savedLocal" : "create.savedOffline"));
         navigate("/dossiers");
       }
     } catch (error) {
