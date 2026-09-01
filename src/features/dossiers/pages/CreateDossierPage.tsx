@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { FirstStepDialog, useIdentity } from "@/features/identity";
 import { useCreateDossier } from "../hooks/useCreateDossier";
 import { DOSSIER_TYPES, typeLabelKey } from "../components/dossierTypeMeta";
 
