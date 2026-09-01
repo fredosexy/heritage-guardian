@@ -9,8 +9,13 @@ export function useAlerts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setAlerts([]);
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
+    setLoading(true);
     alertsRepo
       .listAlerts(user.id)
       .then((data) => {
@@ -39,8 +44,13 @@ export function useUnreadAlerts(limit = 5) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setAlerts([]);
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
+    setLoading(true);
     alertsRepo
       .listUnreadAlerts(user.id, limit)
       .then((data) => {
