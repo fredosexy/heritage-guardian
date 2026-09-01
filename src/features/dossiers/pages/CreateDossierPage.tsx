@@ -55,6 +55,7 @@ export default function CreateDossierPage() {
   if (!type) {
     return (
       <AppLayout>
+        <FirstStepDialog open={firstStepOpen} onClose={() => setFirstStepOpen(false)} />
         <h1 className="text-display mb-2">{t("create.title")}</h1>
         <p className="text-sm text-muted-foreground mb-6">{t("create.chooseType")}</p>
         <div className="space-y-3">
