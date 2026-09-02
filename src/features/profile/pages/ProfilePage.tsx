@@ -134,15 +134,18 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {user && <SecurityCard email={user.email ?? null} />}
-
-      <Button
-        variant="outline"
-        onClick={signOut}
-        className="w-full text-destructive border-destructive/30 hover:bg-destructive/5"
-      >
-        <LogOut className="size-4" /> {t("auth.signOut")}
-      </Button>
+      {user && (
+        <>
+          <SecurityCard email={user.email ?? null} />
+          <Button
+            variant="outline"
+            onClick={signOut}
+            className="w-full text-destructive border-destructive/30 hover:bg-destructive/5"
+          >
+            <LogOut className="size-4" /> {t("auth.signOut")}
+          </Button>
+        </>
+      )}
     </AppLayout>
   );
 }
