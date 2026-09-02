@@ -3,10 +3,13 @@ import { useTranslation } from "react-i18next";
 import { AppLayout } from "@/features/shell";
 import { useAuth, VisitorBanner } from "@/features/identity";
 import { ProfileCompletionCard } from "../components/ProfileCompletionCard";
+import { AvatarCard } from "../components/AvatarCard";
+import { SecurityCard } from "../components/SecurityCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Globe, Loader2, LogOut, Moon, Sun } from "lucide-react";
+import { ChevronRight, FolderOpen, Globe, Loader2, LogOut, Moon, Paperclip, Sun } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import i18n from "@/core/i18n";
 import { profilesRepo } from "@/data";
@@ -19,6 +22,7 @@ export default function ProfilePage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"));
 
   useEffect(() => {
@@ -60,6 +64,30 @@ export default function ProfilePage() {
 
       <VisitorBanner />
       <ProfileCompletionCard />
+
+      {user && <AvatarCard userId={user.id} profile={profile} onChanged={refresh} />}
+
+      <section className="mb-4 space-y-2">
+        {[
+          { icon: Paperclip, label: t("profile.myFiles"), hint: t("profile.myFilesHint"), route: "/files" },
+          { icon: FolderOpen, label: t("profile.myDossiers"), hint: t("profile.myDossiersHint"), route: "/dossiers" },
+        ].map(({ icon: Icon, label, hint, route }) => (
+          <button
+            key={route}
+            onClick={() => navigate(route)}
+            className="w-full card-soft p-4 flex items-center gap-3 text-left pressable focus-ring tap"
+          >
+            <span className="size-10 rounded-xl bg-accent text-primary flex items-center justify-center shrink-0">
+              <Icon className="size-4" />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-sm font-medium">{label}</span>
+              <span className="block text-caption">{hint}</span>
+            </span>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </button>
+        ))}
+      </section>
 
       <section className="card-soft p-5 mb-4 space-y-3">
         <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{t("profile.personal")}</h2>
@@ -106,13 +134,18 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      <Button
-        variant="outline"
-        onClick={signOut}
-        className="w-full text-destructive border-destructive/30 hover:bg-destructive/5"
-      >
-        <LogOut className="size-4" /> {t("auth.signOut")}
-      </Button>
+      {user && (
+        <>
+          <SecurityCard email={user.email ?? null} />
+          <Button
+            variant="outline"
+            onClick={signOut}
+            className="w-full text-destructive border-destructive/30 hover:bg-destructive/5"
+          >
+            <LogOut className="size-4" /> {t("auth.signOut")}
+          </Button>
+        </>
+      )}
     </AppLayout>
   );
 }
