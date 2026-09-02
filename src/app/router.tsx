@@ -5,6 +5,7 @@ import { CreateDossierPage, DossierDetailPage, DossiersPage } from "@/features/d
 import { AlertsPage } from "@/features/alerts";
 import { AssistantPage } from "@/features/assistant";
 import { ProfilePage } from "@/features/profile";
+import { MyFilesPage } from "@/features/files";
 import { NotFoundPage } from "@/features/shell";
 
 /**
@@ -22,6 +23,7 @@ export function AppRoutes() {
       <Route path="/create" element={<CreateDossierPage />} />
       <Route path="/alerts" element={<AlertsPage />} />
       <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/files" element={<MyFilesPage />} />
       <Route path="/assistant" element={<AssistantPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
