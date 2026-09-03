@@ -1,8 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AppLayout } from "@/features/shell";
+import { AppLayout, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
 import { useIdentity } from "@/features/identity";
-import { Button } from "@/components/ui/button";
 import { FolderOpen, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useMyFiles } from "../hooks/useMyFiles";
@@ -25,31 +24,34 @@ export default function MyFilesPage() {
 
   return (
     <AppLayout>
-      <button onClick={() => navigate(-1)} className="text-sm text-muted-foreground mb-4 tap focus-ring">
-        ← {t("common.back")}
-      </button>
-      <h1 className="text-display mb-1">{t("files.title")}</h1>
-      <p className="text-sm text-muted-foreground mb-6">{t("files.subtitle")}</p>
+      <PageHeader
+        title={t("files.title")}
+        subtitle={t("files.subtitle")}
+        parentLabel={t("nav.profile")}
+        showBack
+      />
 
       {!isAuthenticated ? (
-        <div className="card-soft p-8 text-center">
-          <p className="text-muted-foreground mb-4">{t("files.needAccount")}</p>
-          <Button onClick={() => navigate("/auth")} className="bg-gradient-warm">
-            {t("visitor.cta")}
-          </Button>
-        </div>
+        <EmptyState
+          icon={FolderOpen}
+          title={t("files.needAccount")}
+          actionLabel={t("visitor.cta")}
+          onAction={() => navigate("/auth")}
+          secondaryLabel={t("next.seeDossiers")}
+          onSecondary={() => navigate("/dossiers")}
+        />
       ) : loading ? (
         <div className="flex justify-center py-12">
           <Loader2 className="size-5 animate-spin text-primary" />
         </div>
       ) : files.length === 0 ? (
-        <div className="card-soft p-8 text-center">
-          <FolderOpen className="size-10 mx-auto mb-3 text-muted-foreground" />
-          <p className="text-muted-foreground mb-4">{t("files.empty")}</p>
-          <Button onClick={() => navigate("/dossiers")} className="bg-gradient-warm">
-            {t("files.goToDossiers")}
-          </Button>
-        </div>
+        <EmptyState
+          icon={FolderOpen}
+          title={t("files.empty")}
+          description={t("files.emptyHint")}
+          actionLabel={t("files.goToDossiers")}
+          onAction={() => navigate("/dossiers")}
+        />
       ) : (
         <div className="space-y-2">
           {files.map((file) => (
@@ -63,6 +65,8 @@ export default function MyFilesPage() {
           ))}
         </div>
       )}
+
+      <NextActionCard className="mt-4" />
     </AppLayout>
   );
 }

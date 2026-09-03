@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AppLayout } from "@/features/shell";
+import { AppLayout, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
 import { Bell, Loader2, Sparkles } from "lucide-react";
 import { useAlerts } from "../hooks/useAlerts";
 
@@ -27,7 +27,7 @@ export default function AlertsPage() {
 
   return (
     <AppLayout>
-      <h1 className="text-display mb-4">{t("alerts.title")}</h1>
+      <PageHeader title={t("alerts.title")} subtitle={t("alerts.subtitle")} />
       <div className="flex gap-2 mb-4 overflow-x-auto pb-1 -mx-4 px-4">
         {filters.map((f) => (
           <button
@@ -47,10 +47,13 @@ export default function AlertsPage() {
           <Loader2 className="size-5 animate-spin text-primary" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="card-soft p-8 text-center">
-          <Bell className="size-10 mx-auto mb-3 text-muted-foreground" />
-          <p className="text-muted-foreground">{t("alerts.empty")}</p>
-        </div>
+        <EmptyState
+          icon={Bell}
+          title={t("alerts.empty")}
+          description={t("alerts.emptyHint")}
+          actionLabel={t("next.createDossier")}
+          onAction={() => navigate("/create")}
+        />
       ) : (
         <div className="space-y-2">
           {filtered.map((a) => (
@@ -76,6 +79,8 @@ export default function AlertsPage() {
           ))}
         </div>
       )}
+
+      <NextActionCard className="mt-4" />
     </AppLayout>
   );
 }

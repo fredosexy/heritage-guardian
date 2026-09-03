@@ -58,6 +58,8 @@ export const fr = {
     noSuggestions: "L'IA prépare vos suggestions…",
   },
   dossiers: {
+    emptyHint: "Un dossier, c'est un bien mis à l'abri : terrain, héritage, volonté.",
+    subtitle: "Tout ce que vous protégez, au même endroit.",
     title: "Mes dossiers",
     empty: "Aucun dossier pour le moment.",
     createFirst: "Créer mon premier dossier",
@@ -96,6 +98,7 @@ export const fr = {
     savedOffline: "Enregistré hors ligne — sera synchronisé automatiquement.",
   },
   dossier: {
+    notFoundHint: "Ce dossier a peut-être été supprimé.",
     summary: "Résumé",
     proofs: "Preuves",
     participants: "Participants",
@@ -141,6 +144,8 @@ export const fr = {
     stepPhone: "Ajoutez votre téléphone",
   },
   alerts: {
+    emptyHint: "Rien à signaler. Continuez à renforcer vos dossiers.",
+    subtitle: "Ce qui demande votre attention, du plus urgent au moins pressé.",
     title: "Alertes",
     filterAll: "Toutes",
     filterUrgent: "Urgent",
@@ -150,6 +155,7 @@ export const fr = {
     markRead: "Marquer comme lu",
   },
   files: {
+    emptyHint: "Vos photos et documents apparaîtront ici dès votre première preuve.",
     title: "Mes fichiers",
     subtitle: "Tout ce que vous avez ajouté à vos dossiers, en un seul endroit.",
     empty: "Aucun fichier pour l'instant.",

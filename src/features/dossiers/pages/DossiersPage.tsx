@@ -1,11 +1,10 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AppLayout } from "@/features/shell";
+import { AppLayout, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
 import { useAuth, useIdentity } from "@/features/identity";
 import { usePendingSync, useTriggerSync, useUnsyncedDrafts } from "@/features/offline";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { CloudOff, FolderOpen, Loader2, RefreshCw, Search } from "lucide-react";
 import { useDossiers } from "../hooks/useDossiers";
@@ -32,7 +31,7 @@ export default function DossiersPage() {
 
   return (
     <AppLayout>
-      <h1 className="text-display mb-4">{t("dossiers.title")}</h1>
+      <PageHeader title={t("dossiers.title")} subtitle={t("dossiers.subtitle")} />
 
       {pending > 0 && (
         <div className="mb-3 flex items-center gap-2 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-warning-foreground">
@@ -75,13 +74,15 @@ export default function DossiersPage() {
           <Loader2 className="size-5 animate-spin text-primary" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="card-soft p-8 text-center">
-          <FolderOpen className="size-10 mx-auto mb-3 text-muted-foreground" />
-          <p className="text-muted-foreground mb-4">{t("dossiers.empty")}</p>
-          <Button onClick={() => navigate("/create")} className="bg-gradient-warm">
-            {t("dossiers.createFirst")}
-          </Button>
-        </div>
+        <EmptyState
+          icon={FolderOpen}
+          title={t("dossiers.empty")}
+          description={t("dossiers.emptyHint")}
+          actionLabel={t("dossiers.createFirst")}
+          onAction={() => navigate("/create")}
+          secondaryLabel={t("next.askAssistant")}
+          onSecondary={() => navigate("/assistant")}
+        />
       ) : (
         <div className="space-y-2">
           {filtered.map((d) => {
@@ -109,6 +110,8 @@ export default function DossiersPage() {
           })}
         </div>
       )}
+
+      <NextActionCard className="mt-4" />
     </AppLayout>
   );
 }

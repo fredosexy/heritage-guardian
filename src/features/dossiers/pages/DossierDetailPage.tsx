@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { AppLayout } from "@/features/shell";
+import { AppLayout, EmptyState, PageHeader } from "@/features/shell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Loader2, MapPin, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -47,7 +47,15 @@ export default function DossierDetailPage() {
   if (!dossier) {
     return (
       <AppLayout>
-        <p className="text-muted-foreground text-center py-12">{t("dossier.notFound")}</p>
+        <div className="py-10">
+          <EmptyState
+            icon={ArrowLeft}
+            title={t("dossier.notFound")}
+            description={t("dossier.notFoundHint")}
+            actionLabel={t("next.seeDossiers")}
+            onAction={() => navigate("/dossiers", { replace: true })}
+          />
+        </div>
       </AppLayout>
     );
   }
@@ -57,13 +65,11 @@ export default function DossierDetailPage() {
 
   return (
     <AppLayout>
-      <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground mb-3">
-        <ArrowLeft className="size-4" /> {t("common.back")}
-      </button>
+      <PageHeader title={dossier.title} parentLabel={t("dossiers.title")} showBack />
 
       <div className="card-soft p-5 mb-4">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <h1 className="text-title text-xl">{dossier.title}</h1>
+          <p className="text-sm text-muted-foreground">{t(typeLabelKey(dossier.type))}</p>
           <button
             onClick={handleRemove}
             aria-label={t("dossier.delete")}
@@ -96,7 +102,7 @@ export default function DossierDetailPage() {
           <TabsTrigger value="summary">{t("dossier.summary")}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="proofs" className="mt-4">
+        <TabsContent value="proofs" className="mt-4" id="proofs">
           <ProofsTab proofs={proofs} uploading={uploading} onUpload={handleUpload} />
         </TabsContent>
 
