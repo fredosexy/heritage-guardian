@@ -58,6 +58,8 @@ export const fr = {
     noSuggestions: "L'IA prépare vos suggestions…",
   },
   dossiers: {
+    emptyHint: "Un dossier, c'est un bien mis à l'abri : terrain, héritage, volonté.",
+    subtitle: "Tout ce que vous protégez, au même endroit.",
     title: "Mes dossiers",
     empty: "Aucun dossier pour le moment.",
     createFirst: "Créer mon premier dossier",
@@ -96,6 +98,7 @@ export const fr = {
     savedOffline: "Enregistré hors ligne — sera synchronisé automatiquement.",
   },
   dossier: {
+    notFoundHint: "Ce dossier a peut-être été supprimé.",
     summary: "Résumé",
     proofs: "Preuves",
     participants: "Participants",
@@ -141,6 +144,8 @@ export const fr = {
     stepPhone: "Ajoutez votre téléphone",
   },
   alerts: {
+    emptyHint: "Rien à signaler. Continuez à renforcer vos dossiers.",
+    subtitle: "Ce qui demande votre attention, du plus urgent au moins pressé.",
     title: "Alertes",
     filterAll: "Toutes",
     filterUrgent: "Urgent",
@@ -150,6 +155,7 @@ export const fr = {
     markRead: "Marquer comme lu",
   },
   files: {
+    emptyHint: "Vos photos et documents apparaîtront ici dès votre première preuve.",
     title: "Mes fichiers",
     subtitle: "Tout ce que vous avez ajouté à vos dossiers, en un seul endroit.",
     empty: "Aucun fichier pour l'instant.",
@@ -197,6 +203,29 @@ export const fr = {
     creditsOut: "Crédits IA épuisés. Ajoutez des crédits dans votre espace Lovable.",
     error: "L'assistant n'a pas pu répondre. Réessayez.",
     welcome: "Bonjour ! Posez-moi vos questions sur vos terres, héritages ou volontés.",
+  },
+  next: {
+    title: "Et maintenant",
+    createDossier: "Protéger un bien",
+    createDossierHint: "Terrain, héritage, volonté ou savoir.",
+    firstDossierHint: "Commencez par le bien qui compte le plus pour vous.",
+    addProof: "Ajouter une preuve",
+    addProofHint: "Une photo ou un document rend ce dossier plus solide.",
+    seeAlerts: "Voir ce qui demande votre attention",
+    seeAlertsHint: "Quelques points à regarder aujourd'hui.",
+    createAccount: "Mettre vos données à l'abri",
+    createAccountHint: "Créez votre compte : vos dossiers vous suivront partout.",
+    profileHint: "Un détail de plus et vos proches vous retrouvent facilement.",
+    askAssistant: "Demander conseil",
+    askAssistantHint: "L'assistant vous dit quoi faire ensuite.",
+    seeDossiers: "Revoir mes dossiers",
+    seeDossiersHint: "Tout ce que vous avez déjà protégé.",
+  },
+  notFound: {
+    title: "Cette page n'existe pas",
+    description: "Le lien a peut-être changé. Revenons à l'essentiel.",
+    action: "Retour à l'accueil",
+    secondary: "Voir mes dossiers",
   },
   common: {
     loading: "Chargement…",

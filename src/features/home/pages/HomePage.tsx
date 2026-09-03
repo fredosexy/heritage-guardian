@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AppLayout } from "@/features/shell";
+import { AppLayout, NextActionCard } from "@/features/shell";
 import { useProfile, ProfileCompletionCard } from "@/features/profile";
 import { VisitorBanner, useIdentity } from "@/features/identity";
 import { useUnreadAlerts } from "@/features/alerts/hooks/useAlerts";
@@ -69,6 +69,8 @@ export default function HomePage() {
       </header>
 
       <ProfileCompletionCard />
+
+      <NextActionCard className="mb-6" />
 
       <section className="rounded-3xl bg-gradient-hero p-6 text-primary-foreground shadow-elegant mb-6">
         <div className="flex items-start gap-3 mb-4">

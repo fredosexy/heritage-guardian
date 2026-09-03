@@ -58,6 +58,8 @@ export const en = {
     noSuggestions: "AI is preparing your suggestions…",
   },
   dossiers: {
+    emptyHint: "A dossier is an asset kept safe: land, heritage, will.",
+    subtitle: "Everything you protect, in one place.",
     title: "My dossiers",
     empty: "No dossiers yet.",
     createFirst: "Create my first dossier",
@@ -96,6 +98,7 @@ export const en = {
     savedOffline: "Saved offline — will sync automatically.",
   },
   dossier: {
+    notFoundHint: "This dossier may have been deleted.",
     summary: "Summary",
     proofs: "Proofs",
     participants: "Participants",
@@ -141,6 +144,8 @@ export const en = {
     stepPhone: "Add your phone number",
   },
   alerts: {
+    emptyHint: "Nothing to report. Keep strengthening your dossiers.",
+    subtitle: "What needs your attention, most urgent first.",
     title: "Alerts",
     filterAll: "All",
     filterUrgent: "Urgent",
@@ -150,6 +155,7 @@ export const en = {
     markRead: "Mark as read",
   },
   files: {
+    emptyHint: "Your photos and documents show up here after your first proof.",
     title: "My files",
     subtitle: "Everything you added to your dossiers, in one place.",
     empty: "No files yet.",
@@ -197,6 +203,29 @@ export const en = {
     creditsOut: "AI credits exhausted. Add credits in your Lovable workspace.",
     error: "The assistant could not reply. Please try again.",
     welcome: "Hello! Ask me anything about your land, heritage or wills.",
+  },
+  next: {
+    title: "What's next",
+    createDossier: "Protect an asset",
+    createDossierHint: "Land, heritage, will or knowledge.",
+    firstDossierHint: "Start with what matters most to you.",
+    addProof: "Add a proof",
+    addProofHint: "A photo or document makes this dossier stronger.",
+    seeAlerts: "See what needs your attention",
+    seeAlertsHint: "A few things to look at today.",
+    createAccount: "Keep your data safe",
+    createAccountHint: "Create your account: your dossiers follow you anywhere.",
+    profileHint: "One more detail and your family can reach you easily.",
+    askAssistant: "Ask for advice",
+    askAssistantHint: "The assistant tells you what to do next.",
+    seeDossiers: "Review my dossiers",
+    seeDossiersHint: "Everything you already protected.",
+  },
+  notFound: {
+    title: "This page does not exist",
+    description: "The link may have changed. Let's get back on track.",
+    action: "Back to home",
+    secondary: "See my dossiers",
   },
   common: {
     loading: "Loading…",
