@@ -5,3 +5,5 @@ export { claimLocalData } from "./claim-local-data";
 export type { ClaimResult } from "./claim-local-data";
 export { computeProfileCompletion } from "./profile-completion";
 export type { ProfileCompletion, CompletionStep, ProfileCompletionInput } from "./profile-completion";
+export { computeNextAction, centralAction, parentRoute } from "./next-action";
+export type { NextAction, NextActionIcon, NextActionInput } from "./next-action";
