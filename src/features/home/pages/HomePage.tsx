@@ -5,8 +5,9 @@ import { AppLayout, NextActionCard } from "@/features/shell";
 import { useProfile, ProfileCompletionCard } from "@/features/profile";
 import { VisitorBanner, useIdentity } from "@/features/identity";
 import { useUnreadAlerts } from "@/features/alerts/hooks/useAlerts";
+import { HomeHeader } from "../components/HomeHeader";
 import { Button } from "@/components/ui/button";
-import { Bell, ChevronRight, Loader2, MapPin, Scale, ScrollText, Sparkles, Users } from "lucide-react";
+import { ChevronRight, Loader2, MapPin, Scale, ScrollText, Sparkles, Users } from "lucide-react";
 
 const severityClass = (severity: string) =>
   severity === "high"
@@ -20,7 +21,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { profile, loading: profileLoading } = useProfile();
   const { alerts, loading: alertsLoading } = useUnreadAlerts(5);
-  const { isAuthenticated, displayName } = useIdentity();
+  const { isAuthenticated, displayName, guest } = useIdentity();
 
   useEffect(() => {
     if (isAuthenticated && !profileLoading && profile && !profile.onboarding_completed) {

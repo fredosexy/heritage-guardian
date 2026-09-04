@@ -9,6 +9,7 @@ export const en = {
     create: "Create",
     alerts: "Alerts",
     profile: "Profile",
+    assistant: "Assistant",
   },
   auth: {
     welcome: "Welcome to Mémoire",
@@ -44,6 +45,24 @@ export const en = {
     next: "Continue",
     skip: "Skip",
     firstSuggestion: "Here is a first tip to get you started.",
+  },
+  greeting: {
+    hello: "Hi 👋",
+    helloName: "Hi {{name}} 👋",
+    searchHint: "You can find exactly what you are looking for.",
+    urgencies: "Around here, {{count}} active urgency(ies) today",
+    context: {
+      morning: "In {{zone}}, it's a bright morning.",
+      afternoon: "In {{zone}}, the afternoon is going quietly.",
+      evening: "In {{zone}}, the evening is calm.",
+      night: "In {{zone}}, the night is gentle. All is kept safe.",
+    },
+    contextNoZone: {
+      morning: "A good morning to keep your assets safe.",
+      afternoon: "Good afternoon. One more dossier, one more land protected.",
+      evening: "Good evening. Your land and heritage stay guarded.",
+      night: "Good night. Mémoire watches over your heritage.",
+    },
   },
   home: {
     greeting: "Hello",
