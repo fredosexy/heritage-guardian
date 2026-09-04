@@ -47,5 +47,6 @@ export function buildGreeting({ firstName, zone, urgentCount = 0, hour }: Greeti
     contextParams: hasZone ? { zone: zone!.trim() } : {},
     urgencyKey: urgentCount > 0 ? "greeting.urgencies" : null,
     urgencyParams: { count: urgentCount },
+    dayPart,
   };
 }
