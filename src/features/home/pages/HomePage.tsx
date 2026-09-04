@@ -49,24 +49,11 @@ export default function HomePage() {
     <AppLayout>
       <VisitorBanner />
 
-      <header className="flex items-center justify-between mb-6">
-        <div>
-          <p className="text-sm text-muted-foreground">{t("home.greeting")}</p>
-          <h1 className="text-title text-xl">{profile?.full_name || displayName || "👋"}</h1>
-        </div>
-        <button
-          onClick={() => navigate("/alerts")}
-          className="relative size-11 rounded-full bg-card border flex items-center justify-center shadow-soft"
-          aria-label={t("nav.alerts")}
-        >
-          <Bell className="size-5" />
-          {alerts.length > 0 && (
-            <span className="absolute -top-1 -right-1 size-5 text-[10px] rounded-full bg-destructive text-destructive-foreground flex items-center justify-center font-bold">
-              {alerts.length}
-            </span>
-          )}
-        </button>
-      </header>
+      <HomeHeader
+        firstName={profile?.full_name?.split(" ")[0] || displayName}
+        zone={guest.locationName}
+        alertCount={alerts.length}
+      />
 
       <ProfileCompletionCard />
 
