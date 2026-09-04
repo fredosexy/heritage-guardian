@@ -7,3 +7,4 @@ export { computeProfileCompletion } from "./profile-completion";
 export type { ProfileCompletion, CompletionStep, ProfileCompletionInput } from "./profile-completion";
 export { computeNextAction, centralAction, parentRoute } from "./next-action";
 export type { NextAction, NextActionIcon, NextActionInput } from "./next-action";
+export { buildGreeting, dayPartFor, type Greeting, type GreetingInput, type DayPart } from "./greeting";

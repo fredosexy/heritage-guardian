@@ -9,6 +9,7 @@ export const fr = {
     create: "Créer",
     alerts: "Alertes",
     profile: "Profil",
+    assistant: "Assistant",
   },
   auth: {
     welcome: "Bienvenue sur Mémoire",
@@ -44,6 +45,24 @@ export const fr = {
     next: "Continuer",
     skip: "Passer",
     firstSuggestion: "Voici un premier conseil pour bien démarrer.",
+  },
+  greeting: {
+    hello: "Salut 👋",
+    helloName: "Salut {{name}} 👋",
+    searchHint: "Tu peux trouver exactement ce que tu cherches.",
+    urgencies: "Ici, {{count}} urgence(s) active(s) aujourd'hui",
+    context: {
+      morning: "À {{zone}}, il fait beau ce matin.",
+      afternoon: "À {{zone}}, l'après-midi avance tranquillement.",
+      evening: "À {{zone}}, la soirée est calme.",
+      night: "À {{zone}}, la nuit est douce. Tout est gardé.",
+    },
+    contextNoZone: {
+      morning: "Belle matinée pour mettre vos biens à l'abri.",
+      afternoon: "Bon après-midi. Un dossier de plus, une terre protégée.",
+      evening: "Bonne soirée. Vos terres et héritages restent gardés.",
+      night: "Bonne nuit. Mémoire veille sur votre patrimoine.",
+    },
   },
   home: {
     greeting: "Bonjour",

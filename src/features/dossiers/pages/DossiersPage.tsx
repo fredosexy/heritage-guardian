@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AppLayout, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
+import { AppLayout, EmptyState, NextActionCard, PageHeader, TopBar } from "@/features/shell";
 import { useAuth, useIdentity } from "@/features/identity";
 import { usePendingSync, useTriggerSync, useUnsyncedDrafts } from "@/features/offline";
 import { Input } from "@/components/ui/input";
@@ -31,7 +31,7 @@ export default function DossiersPage() {
 
   return (
     <AppLayout>
-      <PageHeader title={t("dossiers.title")} subtitle={t("dossiers.subtitle")} />
+      <PageHeader title={t("dossiers.title")} subtitle={t("dossiers.subtitle")} right={<TopBar />} />
 
       {pending > 0 && (
         <div className="mb-3 flex items-center gap-2 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-warning-foreground">
