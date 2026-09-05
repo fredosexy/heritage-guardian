@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AppLayout } from "@/features/shell";
+import { AppLayout, AssistantTip } from "@/features/shell";
 import { useAuth, VisitorBanner } from "@/features/identity";
 import { ProfileCompletionCard } from "../components/ProfileCompletionCard";
 import { AvatarCard } from "../components/AvatarCard";
@@ -63,6 +63,7 @@ export default function ProfilePage() {
       <h1 className="text-display mb-6">{t("profile.title")}</h1>
 
       <VisitorBanner />
+      <AssistantTip className="mb-4" />
       <ProfileCompletionCard />
 
       {user && <AvatarCard userId={user.id} profile={profile} onChanged={refresh} />}

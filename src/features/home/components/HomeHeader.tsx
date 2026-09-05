@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Search, ShieldAlert } from "lucide-react";
 import { buildGreeting } from "@/services";
+import { AssistantTip } from "@/features/shell";
 
 interface Props {
   firstName?: string | null;
@@ -48,6 +49,8 @@ export function HomeHeader({ firstName, zone, alertCount = 0, avatarUrl }: Props
         <Search className="size-4 shrink-0" />
         <span className="truncate">{t("greeting.searchHint")}</span>
       </button>
+
+      <AssistantTip className="mt-3" />
     </header>
   );
 }

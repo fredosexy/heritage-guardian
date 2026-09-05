@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AppLayout, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
+import { AppLayout, AssistantTip, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
 import { Bell, Loader2, Sparkles } from "lucide-react";
 import { useAlerts } from "../hooks/useAlerts";
 
@@ -28,6 +28,8 @@ export default function AlertsPage() {
   return (
     <AppLayout>
       <PageHeader title={t("alerts.title")} subtitle={t("alerts.subtitle")} />
+
+      <AssistantTip className="mb-4" />
       <div className="flex gap-2 mb-4 overflow-x-auto pb-1 -mx-4 px-4">
         {filters.map((f) => (
           <button

@@ -8,3 +8,4 @@ export type { ProfileCompletion, CompletionStep, ProfileCompletionInput } from "
 export { computeNextAction, centralAction, parentRoute } from "./next-action";
 export type { NextAction, NextActionIcon, NextActionInput } from "./next-action";
 export { buildGreeting, dayPartFor, type Greeting, type GreetingInput, type DayPart } from "./greeting";
+export { buildScreenTip, type ScreenTip, type ScreenTipInput } from "./screen-assistant";
