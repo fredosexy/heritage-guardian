@@ -33,6 +33,8 @@ export default function DossiersPage() {
     <AppLayout>
       <PageHeader title={t("dossiers.title")} subtitle={t("dossiers.subtitle")} />
 
+      <AssistantTip className="mb-4" />
+
       {pending > 0 && (
         <div className="mb-3 flex items-center gap-2 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-warning-foreground">
           <CloudOff className="size-4 shrink-0" />
