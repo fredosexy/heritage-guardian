@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AppLayout } from "@/features/shell";
+import { AppLayout, AssistantTip } from "@/features/shell";
 import { useAuth, VisitorBanner } from "@/features/identity";
 import { ProfileCompletionCard } from "../components/ProfileCompletionCard";
 import { AvatarCard } from "../components/AvatarCard";

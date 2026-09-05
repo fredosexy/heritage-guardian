@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AppLayout, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
+import { AppLayout, AssistantTip, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
 import { useIdentity } from "@/features/identity";
 import { FolderOpen, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -30,6 +30,8 @@ export default function MyFilesPage() {
         parentLabel={t("nav.profile")}
         showBack
       />
+
+      <AssistantTip className="mb-4" fileCount={files.length} />
 
       {!isAuthenticated ? (
         <EmptyState
