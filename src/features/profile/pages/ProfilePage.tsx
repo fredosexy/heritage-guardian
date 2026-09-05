@@ -63,6 +63,7 @@ export default function ProfilePage() {
       <h1 className="text-display mb-6">{t("profile.title")}</h1>
 
       <VisitorBanner />
+      <AssistantTip className="mb-4" />
       <ProfileCompletionCard />
 
       {user && <AvatarCard userId={user.id} profile={profile} onChanged={refresh} />}
