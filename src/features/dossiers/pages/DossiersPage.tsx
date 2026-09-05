@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AppLayout, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
+import { AppLayout, AssistantTip, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
 import { useAuth, useIdentity } from "@/features/identity";
 import { usePendingSync, useTriggerSync, useUnsyncedDrafts } from "@/features/offline";
 import { Input } from "@/components/ui/input";
