@@ -4,7 +4,7 @@ import { Bell, FolderOpen, Home, Paperclip, Plus, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { centralAction } from "@/services";
 import { profilesRepo } from "@/data";
-import { useAlerts } from "@/features/alerts";
+import { useAlerts } from "@/features/alerts/hooks/useAlerts";
 import { useProfile } from "@/features/profile";
 import { cn } from "@/lib/utils";
 

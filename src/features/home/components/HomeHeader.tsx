@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Search, ShieldAlert } from "lucide-react";
-import { TopBar } from "@/features/shell";
 import { buildGreeting } from "@/services";
 
 interface Props {
@@ -30,7 +29,6 @@ export function HomeHeader({ firstName, zone, alertCount = 0, avatarUrl }: Props
           <h1 className="text-display truncate">{t(greeting.titleKey, greeting.titleParams)}</h1>
           <p className="text-sm text-muted-foreground mt-1">{t(greeting.contextKey, greeting.contextParams)}</p>
         </div>
-        <TopBar alertCount={alertCount} avatarUrl={avatarUrl} />
       </div>
 
       {greeting.urgencyKey && (
