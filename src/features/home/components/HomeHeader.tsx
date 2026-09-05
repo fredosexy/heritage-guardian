@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Search, ShieldAlert } from "lucide-react";
 import { buildGreeting } from "@/services";
+import { AssistantTip } from "@/features/shell";
 
 interface Props {
   firstName?: string | null;
