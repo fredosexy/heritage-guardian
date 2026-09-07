@@ -76,3 +76,12 @@ export async function deleteProof(proof: Pick<Proof, "id" | "storage_path">): Pr
   const { error } = await supabase.from("proofs").delete().eq("id", proof.id);
   if (error) throw error;
 }
+
+/** Nombre de preuves par dossier pour un utilisateur. */
+export async function countProofsByDossier(userId: string): Promise<Record<string, number>> {
+  const { data, error } = await supabase.from("proofs").select("dossier_id").eq("uploaded_by", userId);
+  if (error) throw error;
+  const out: Record<string, number> = {};
+  for (const row of data ?? []) out[row.dossier_id] = (out[row.dossier_id] ?? 0) + 1;
+  return out;
+}
