@@ -19,7 +19,7 @@ export function useAlerts() {
     }
     let cancelled = false;
     setLoading(true);
-    syncAlerts(user.id, (key, vars) => t(key, vars as never) as string)
+    syncAlerts(user.id, (key, vars) => String(t(key, vars as never)))
       .catch(() => alertsRepo.listAlerts(user.id))
       .then((data) => {
         if (!cancelled && data) setAlerts(data);
