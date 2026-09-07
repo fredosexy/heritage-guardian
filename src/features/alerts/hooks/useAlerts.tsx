@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { alertsRepo } from "@/data";
 import type { Alert } from "@/core/types/domain";
 import { useAuth } from "@/features/identity";
+import { syncAlerts } from "@/services";
 
 export function useAlerts() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,10 +19,10 @@ export function useAlerts() {
     }
     let cancelled = false;
     setLoading(true);
-    alertsRepo
-      .listAlerts(user.id)
+    syncAlerts(user.id, (key, vars) => t(key, vars as never) as string)
+      .catch(() => alertsRepo.listAlerts(user.id))
       .then((data) => {
-        if (!cancelled) setAlerts(data);
+        if (!cancelled && data) setAlerts(data);
       })
       .catch(() => undefined)
       .finally(() => {
@@ -28,7 +31,7 @@ export function useAlerts() {
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [user, t]);
 
   const markRead = useCallback(async (id: string) => {
     setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, read: true } : a)));
