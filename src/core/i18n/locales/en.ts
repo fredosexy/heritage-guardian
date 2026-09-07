@@ -172,6 +172,42 @@ export const en = {
     filterAi: "AI",
     empty: "No alerts.",
     markRead: "Mark as read",
+    emailTitle: "Email alerts",
+    emailHint: "Get an email when something important happens.",
+    emailOn: "On",
+    emailOff: "Off",
+  },
+  alertRules: {
+    noProof: {
+      title: "No proof for “{{title}}”",
+      message: "One photo or document makes this asset far stronger.",
+      action: "Add a proof",
+    },
+    noHeir: {
+      title: "Nobody is named yet for “{{title}}”",
+      message: "Add an heir or a witness to avoid misunderstandings later.",
+      action: "Add a person",
+    },
+    atRisk: {
+      title: "“{{title}}” is at risk",
+      message: "This dossier needs your attention today.",
+      action: "Open dossier",
+    },
+    stale: {
+      title: "Nothing new on “{{title}}” for {{days}} days",
+      message: "A quick visit keeps this dossier up to date.",
+      action: "Update",
+    },
+    noDossier: {
+      title: "Protect a first asset",
+      message: "Land, a heritage or a will: start with what matters most.",
+      action: "Start",
+    },
+    profile: {
+      title: "Complete your profile",
+      message: "A little more information and your dossiers are better protected.",
+      action: "Complete",
+    },
   },
   files: {
     emptyHint: "Your photos and documents show up here after your first proof.",
