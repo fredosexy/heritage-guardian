@@ -172,6 +172,42 @@ export const fr = {
     filterAi: "IA",
     empty: "Aucune alerte.",
     markRead: "Marquer comme lu",
+    emailTitle: "Alertes par e-mail",
+    emailHint: "Recevez un e-mail quand quelque chose d'important arrive.",
+    emailOn: "Activées",
+    emailOff: "Désactivées",
+  },
+  alertRules: {
+    noProof: {
+      title: "Aucune preuve pour « {{title}} »",
+      message: "Une photo ou un document suffit à rendre ce bien beaucoup plus solide.",
+      action: "Ajouter une preuve",
+    },
+    noHeir: {
+      title: "Personne n'est encore désigné pour « {{title}} »",
+      message: "Ajoutez un héritier ou un témoin pour éviter les malentendus plus tard.",
+      action: "Ajouter une personne",
+    },
+    atRisk: {
+      title: "« {{title}} » est en danger",
+      message: "Ce dossier demande votre attention aujourd'hui.",
+      action: "Voir le dossier",
+    },
+    stale: {
+      title: "Rien de neuf sur « {{title}} » depuis {{days}} jours",
+      message: "Un petit passage suffit pour garder ce dossier à jour.",
+      action: "Mettre à jour",
+    },
+    noDossier: {
+      title: "Mettez un premier bien à l'abri",
+      message: "Un terrain, un héritage ou une volonté : commencez par ce qui compte le plus.",
+      action: "Commencer",
+    },
+    profile: {
+      title: "Complétez votre profil",
+      message: "Quelques informations de plus et vos dossiers seront mieux protégés.",
+      action: "Compléter",
+    },
   },
   files: {
     emptyHint: "Vos photos et documents apparaîtront ici dès votre première preuve.",
