@@ -81,6 +81,8 @@ export type Database = {
           action_label: string | null
           action_route: string | null
           created_at: string
+          dedupe_key: string | null
+          email_sent_at: string | null
           id: string
           message: string
           read: boolean
@@ -94,6 +96,8 @@ export type Database = {
           action_label?: string | null
           action_route?: string | null
           created_at?: string
+          dedupe_key?: string | null
+          email_sent_at?: string | null
           id?: string
           message: string
           read?: boolean
@@ -107,6 +111,8 @@ export type Database = {
           action_label?: string | null
           action_route?: string | null
           created_at?: string
+          dedupe_key?: string | null
+          email_sent_at?: string | null
           id?: string
           message?: string
           read?: boolean
@@ -231,6 +237,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          email_alerts: boolean
           full_name: string | null
           id: string
           language: string
@@ -243,6 +250,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          email_alerts?: boolean
           full_name?: string | null
           id: string
           language?: string
@@ -255,6 +263,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          email_alerts?: boolean
           full_name?: string | null
           id?: string
           language?: string
