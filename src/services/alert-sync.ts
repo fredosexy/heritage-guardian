@@ -23,10 +23,10 @@ export async function syncAlerts(userId: string, t: Translate): Promise<Alert[]>
 
   const completion = profile
     ? computeProfileCompletion({
-        fullName: profile.full_name,
+        hasAccount: true,
+        firstName: profile.full_name,
         phone: profile.phone,
-        avatarUrl: profile.avatar_url,
-        onboardingCompleted: profile.onboarding_completed,
+        hasLocation: dossiers.some((d) => !!d.location_name),
         dossierCount: dossiers.length,
       })
     : null;
