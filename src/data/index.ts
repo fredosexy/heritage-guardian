@@ -3,6 +3,7 @@ export * as proofsRepo from "./proofs.repo";
 export * as participantsRepo from "./participants.repo";
 export * as alertsRepo from "./alerts.repo";
 export * as profilesRepo from "./profiles.repo";
+export * as usagePreferencesRepo from "./usage-preferences.repo";
 export { db } from "./offline/db";
 export type { DraftDossier } from "./offline/db";
 export {
