@@ -45,8 +45,8 @@ export default function Auth() {
         toast.success(t("auth.signedIn"));
       }
       navigate("/");
-    } catch (e: any) {
-      toast.error(e.message || t("auth.error"));
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : t("auth.error"));
     } finally {
       setLoading(false);
     }
@@ -59,8 +59,8 @@ export default function Auth() {
       if (error) throw error;
       setOtpSent(true);
       toast.success("Code envoyé");
-    } catch (e: any) {
-      toast.error(e.message || t("auth.error"));
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : t("auth.error"));
     } finally {
       setLoading(false);
     }
@@ -73,8 +73,8 @@ export default function Auth() {
       if (error) throw error;
       toast.success(t("auth.signedIn"));
       navigate("/");
-    } catch (e: any) {
-      toast.error(e.message || t("auth.error"));
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : t("auth.error"));
     } finally {
       setLoading(false);
     }
