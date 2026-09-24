@@ -16,6 +16,19 @@ export function SecurityCard({ email }: { email: string | null }) {
   const deviceLabel =
     typeof navigator === "undefined" ? "—" : `${navigator.platform || "Appareil"} · ${navigator.language}`;
 
+  const signOutOtherDevices = async () => {
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signOut({ scope: "others" });
+      if (error) throw error;
+      toast.success(t("profile.otherSessionsClosed"));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("auth.error"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const changePassword = async () => {
     if (password.length < 8) {
       toast.error(t("profile.passwordTooShort"));
@@ -67,6 +80,10 @@ export function SecurityCard({ email }: { email: string | null }) {
           <p className="text-caption truncate">{email ?? deviceLabel}</p>
         </div>
       </div>
+      <Button type="button" variant="outline" disabled={busy} onClick={() => void signOutOtherDevices()} className="w-full">
+        {t("profile.closeOtherSessions")}
+      </Button>
+      <p className="text-caption">{t("profile.sessionsHint")}</p>
     </section>
   );
 }
