@@ -14,6 +14,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: codex/phase-0-foundation
       - uses: actions/setup-node@v4
         with:
           node-version: 22
