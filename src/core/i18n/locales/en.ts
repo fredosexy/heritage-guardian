@@ -254,6 +254,7 @@ export const en = {
     placeholder: "Ask a question…",
     send: "Send",
     thinking: "Thinking…",
+    authRequired: "Create an account or sign in to use the online assistant.",
     rateLimit: "Too many requests, try again shortly.",
     creditsOut: "AI credits exhausted. Add credits in your Lovable workspace.",
     error: "The assistant could not reply. Please try again.",

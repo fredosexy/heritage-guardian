@@ -1,10 +1,23 @@
-import { corsHeaders } from "@supabase/supabase-js/cors";
+import { authorizeAiRequest, corsHeaders, json } from "../_shared/security.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   try {
+    const authorization = await authorizeAiRequest(req);
+    if (authorization === "unauthorized") return json({ error: "unauthorized" }, 401);
+    if (authorization === "rate_limited") return json({ error: "rate_limit" }, 429);
+
     const { messages, language = "fr" } = await req.json();
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > 20 ||
+        !["fr", "en"].includes(String(language).slice(0, 2)) ||
+        messages.some((message) =>
+          !message || !["user", "assistant"].includes(message.role) ||
+          typeof message.content !== "string" || message.content.length < 1 || message.content.length > 2_000
+        ) || messages.reduce((sum, message) => sum + message.content.length, 0) > 8_000) {
+      return json({ error: "invalid_input" }, 400);
+    }
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
 
@@ -37,17 +50,16 @@ Rules:
       }),
     });
 
-    if (response.status === 429) return new Response(JSON.stringify({ error: "rate_limit" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    if (response.status === 402) return new Response(JSON.stringify({ error: "credits" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (response.status === 429) return json({ error: "rate_limit" }, 429);
+    if (response.status === 402) return json({ error: "credits" }, 402);
     if (!response.ok) {
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      return new Response(JSON.stringify({ error: "ai_error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      console.error("AI gateway error:", response.status);
+      return json({ error: "ai_error" }, 500);
     }
 
     return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
   } catch (e) {
     console.error("ai-chat error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "unknown" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return json({ error: "internal_error" }, 500);
   }
 });

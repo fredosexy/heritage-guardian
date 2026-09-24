@@ -9,7 +9,7 @@ export async function getProfile(userId: string): Promise<Profile | null> {
 
 export async function updateProfile(
   userId: string,
-  patch: Partial<Pick<Profile, "full_name" | "phone" | "language" | "theme" | "avatar_url">>
+  patch: Partial<Pick<Profile, "full_name" | "phone" | "language" | "theme" | "avatar_url" | "email_alerts">>
 ): Promise<void> {
   const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
   if (error) throw error;

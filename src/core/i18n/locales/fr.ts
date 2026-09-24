@@ -254,6 +254,7 @@ export const fr = {
     placeholder: "Posez une question…",
     send: "Envoyer",
     thinking: "Réflexion…",
+    authRequired: "Créez un compte ou connectez-vous pour utiliser l’assistant en ligne.",
     rateLimit: "Trop de requêtes, réessayez dans un instant.",
     creditsOut: "Crédits IA épuisés. Ajoutez des crédits dans votre espace Lovable.",
     error: "L'assistant n'a pas pu répondre. Réessayez.",

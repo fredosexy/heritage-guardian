@@ -1,10 +1,13 @@
 import { AppProviders } from "./providers";
 import { AppRoutes } from "./router";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 const App = () => (
-  <AppProviders>
-    <AppRoutes />
-  </AppProviders>
+  <ErrorBoundary>
+    <AppProviders>
+      <AppRoutes />
+    </AppProviders>
+  </ErrorBoundary>
 );
 
 export default App;

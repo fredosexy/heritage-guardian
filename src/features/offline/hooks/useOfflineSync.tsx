@@ -8,7 +8,7 @@ export function usePendingSync() {
   const [, force] = useState(0);
   useEffect(() => {
     const off = onSyncChange(() => force((v) => v + 1));
-    return () => { off; };
+    return off;
   }, []);
   return pending ?? 0;
 }

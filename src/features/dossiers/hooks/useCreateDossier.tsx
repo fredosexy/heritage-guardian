@@ -45,6 +45,7 @@ export function useCreateDossier() {
         const online = typeof navigator === "undefined" ? true : navigator.onLine;
         if (online) {
           const dossier = await dossiersRepo.createDossier({
+            client_operation_id: draft.localId,
             user_id: userId,
             type: form.type,
             title: form.title,

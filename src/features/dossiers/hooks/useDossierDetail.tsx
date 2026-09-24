@@ -15,16 +15,27 @@ export function useDossierDetail(id?: string) {
   const [uploading, setUploading] = useState(false);
 
   const load = useCallback(async () => {
-    if (!id || !user) return;
-    const [d, p, pa] = await Promise.all([
-      dossiersRepo.getDossier(id),
-      proofsRepo.listProofs(id),
-      participantsRepo.listParticipants(id),
-    ]);
-    setDossier(d);
-    setProofs(p);
-    setParticipants(pa);
-    setLoading(false);
+    if (!id || !user) {
+      setDossier(null);
+      setProofs([]);
+      setParticipants([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const [d, p, pa] = await Promise.all([
+        dossiersRepo.getDossier(id),
+        proofsRepo.listProofs(id),
+        participantsRepo.listParticipants(id),
+      ]);
+      setDossier(d);
+      setProofs(p);
+      setParticipants(pa);
+    } finally {
+      setLoading(false);
+    }
   }, [id, user]);
 
   useEffect(() => {

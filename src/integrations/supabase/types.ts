@@ -134,6 +134,7 @@ export type Database = {
       }
       dossiers: {
         Row: {
+          client_operation_id: string | null
           completion_score: number
           created_at: string
           description: string | null
@@ -150,6 +151,7 @@ export type Database = {
           visibility: Database["public"]["Enums"]["dossier_visibility"]
         }
         Insert: {
+          client_operation_id?: string | null
           completion_score?: number
           created_at?: string
           description?: string | null
@@ -166,6 +168,7 @@ export type Database = {
           visibility?: Database["public"]["Enums"]["dossier_visibility"]
         }
         Update: {
+          client_operation_id?: string | null
           completion_score?: number
           created_at?: string
           description?: string | null

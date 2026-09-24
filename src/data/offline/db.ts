@@ -19,7 +19,7 @@ export interface DraftDossier {
 export interface QueuedOp {
   id?: number;
   kind: "create_dossier" | "update_dossier" | "delete_dossier";
-  payload: any;
+  payload: { localId: string };
   created_at: number;
   attempts: number;
   last_error?: string | null;
@@ -28,7 +28,7 @@ export interface QueuedOp {
 export interface CachedDossier {
   id: string;
   user_id: string;
-  data: any;
+  data: unknown;
   cached_at: number;
 }
 

@@ -7,7 +7,7 @@ export interface ChatMessage {
 }
 
 export class AiUnavailableError extends Error {
-  constructor(public reason: "rate_limit" | "credits" | "unknown") {
+  constructor(public reason: "unauthorized" | "rate_limit" | "credits" | "unknown") {
     super(reason);
   }
 }
@@ -35,18 +35,23 @@ export async function streamChat(params: {
   language: string;
   onDelta: (fullText: string) => void;
 }): Promise<void> {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const accessToken = sessionData.session?.access_token;
+  if (!accessToken) throw new AiUnavailableError("unauthorized");
+
   const response = await fetch(
     `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ messages: params.messages, language: params.language }),
     }
   );
 
+  if (response.status === 401) throw new AiUnavailableError("unauthorized");
   if (response.status === 429) throw new AiUnavailableError("rate_limit");
   if (response.status === 402) throw new AiUnavailableError("credits");
   if (!response.ok || !response.body) throw new AiUnavailableError("unknown");

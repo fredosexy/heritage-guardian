@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Dossier, DossierStatus, DossierType } from "@/core/types/domain";
 
 export interface NewDossierInput {
+  client_operation_id?: string | null;
   user_id: string;
   type: DossierType | string;
   title: string;
@@ -31,6 +32,7 @@ export async function createDossier(input: NewDossierInput): Promise<Dossier> {
   const { data, error } = await supabase
     .from("dossiers")
     .insert({
+      client_operation_id: input.client_operation_id ?? null,
       user_id: input.user_id,
       type: input.type as DossierType,
       title: input.title,
