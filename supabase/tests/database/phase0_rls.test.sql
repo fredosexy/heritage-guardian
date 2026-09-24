@@ -103,7 +103,7 @@ select is(
 
 select is(
   (select count(*) from pg_policies where schemaname = 'public' and tablename = 'proofs'),
-  4::bigint,
+  5::bigint,
   'proofs table has expected RLS policies'
 );
 
