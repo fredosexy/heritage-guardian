@@ -36,6 +36,13 @@ export const fr = {
   onboarding: {
     title: "Personnalisons votre expérience",
     subtitle: "Quelques questions pour mieux vous accompagner.",
+    usageContext: "Vous utilisez surtout l’application dans quel contexte ?",
+    usageAudio: "Comment préférez-vous recevoir les explications ?",
+    usageAssistance: "Souhaitez-vous avancer seul ou être davantage guidé ?",
+    usageInterface: "Quel niveau de détail voulez-vous afficher ?",
+    usageAccompaniment: "Utilisez-vous l’application seul ou avec une personne de confiance ?",
+    progress: "Étape {{current}} sur {{total}}",
+
     q1: "Possédez-vous un terrain ou un bien immobilier ?",
     q2: "Souhaitez-vous protéger un héritage familial ?",
     q3: "Voulez-vous enregistrer une volonté ou un testament ?",
