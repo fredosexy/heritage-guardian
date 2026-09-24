@@ -102,7 +102,7 @@ export default function OnboardingPage() {
 
   const choosePreference = (value: string) => {
     const current = preferenceQuestions[preferenceStep];
-    setPreferences((previous) => ({ ...previous, [current.key]: value }));
+    setPreferences((previous) => ({ ...previous, [current.key]: value } as UsagePreferencesPatch));
     if (preferenceStep < preferenceQuestions.length - 1) {
       setPreferenceStep((currentStep) => currentStep + 1);
     } else {
