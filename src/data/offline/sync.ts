@@ -47,7 +47,8 @@ export async function processQueue(): Promise<void> {
           }
           const { data, error } = await supabase
             .from("dossiers")
-            .insert({
+            .upsert({
+              client_operation_id: draft.localId,
               user_id: draft.user_id,
               type: draft.type as any,
               title: draft.title,
@@ -56,7 +57,7 @@ export async function processQueue(): Promise<void> {
               latitude: draft.latitude ?? null,
               longitude: draft.longitude ?? null,
               status: "incomplete",
-            })
+            }, { onConflict: "user_id,client_operation_id" })
             .select()
             .single();
           if (error) throw error;
@@ -64,15 +65,16 @@ export async function processQueue(): Promise<void> {
           await db.queue.delete(op.id!);
           emit();
         } else {
-          // Other kinds not implemented yet — drop
-          await db.queue.delete(op.id!);
+          // Never acknowledge an operation that has not actually been applied.
+          // Keeping it in the queue makes the failure visible and retryable.
+          throw new Error(`Unsupported offline operation: ${op.kind}`);
         }
       } catch (e: any) {
         await db.queue.update(op.id!, {
           attempts: (op.attempts || 0) + 1,
           last_error: e?.message || String(e),
         });
-        // Stop loop on first failure to retry later
+        // Stop on the first failure to preserve operation ordering.
         break;
       }
     }

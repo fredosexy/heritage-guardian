@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+# Local environment files. Only the documented template is versioned.
+.env
+.env.*
+!.env.example
+
+# npm is the canonical package manager for this project.
+bun.lock
+bun.lockb
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

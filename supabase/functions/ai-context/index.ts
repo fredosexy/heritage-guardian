@@ -1,9 +1,23 @@
-import { corsHeaders } from "@supabase/supabase-js/cors";
+import { authorizeAiRequest, corsHeaders, json } from "../_shared/security.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
   try {
+    const authorization = await authorizeAiRequest(req);
+    if (authorization === "unauthorized") return json({ error: "unauthorized" }, 401);
+    if (authorization === "rate_limited") return json({ error: "rate_limit" }, 429);
+
     const { dossier, proofs_count, participants_count } = await req.json();
+    if (!dossier || typeof dossier !== "object" ||
+        typeof dossier.type !== "string" || dossier.type.length > 40 ||
+        typeof dossier.title !== "string" || dossier.title.length < 1 || dossier.title.length > 160 ||
+        (dossier.description != null && (typeof dossier.description !== "string" || dossier.description.length > 2_000)) ||
+        (dossier.location_name != null && (typeof dossier.location_name !== "string" || dossier.location_name.length > 200)) ||
+        !Number.isInteger(proofs_count) || proofs_count < 0 || proofs_count > 10_000 ||
+        !Number.isInteger(participants_count) || participants_count < 0 || participants_count > 10_000) {
+      return json({ error: "invalid_input" }, 400);
+    }
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
 
