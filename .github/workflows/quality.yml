@@ -18,6 +18,12 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Regenerate lockfile for Phase 0 repair
+        run: npm install --package-lock-only --ignore-scripts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: regenerated-package-lock
+          path: package-lock.json
       - run: npm ci
       - run: npm run check
 
