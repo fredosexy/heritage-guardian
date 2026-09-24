@@ -6,6 +6,13 @@ export type Proof = Tables<"proofs">;
 export type Participant = Tables<"participants">;
 export type Alert = Tables<"alerts">;
 export type Profile = Tables<"profiles">;
+export type UsagePreferences = Tables<"usage_preferences">;
+
+export type UsageContext = "rural" | "urbain";
+export type AssistanceLevel = "autonome" | "assiste";
+export type InterfaceLevel = "essentiel" | "standard" | "complet";
+export type AudioPreference = "prefere" | "optionnel";
+export type AccompanimentPreference = "seul" | "accompagne";
 
 export type DossierType = Enums<"dossier_type">;
 export type DossierStatus = Enums<"dossier_status">;
