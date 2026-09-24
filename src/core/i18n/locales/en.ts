@@ -36,6 +36,13 @@ export const en = {
   onboarding: {
     title: "Let's personalize your experience",
     subtitle: "A few questions to better support you.",
+    usageContext: "In which context do you mainly use the application?",
+    usageAudio: "How would you prefer to receive explanations?",
+    usageAssistance: "Would you rather proceed alone or receive more guidance?",
+    usageInterface: "How much detail would you like to display?",
+    usageAccompaniment: "Do you use the application alone or with someone you trust?",
+    progress: "Step {{current}} of {{total}}",
+
     q1: "Do you own land or real estate?",
     q2: "Do you want to protect a family heritage?",
     q3: "Would you like to record a will?",
