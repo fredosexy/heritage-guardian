@@ -110,7 +110,7 @@ STABLE
 SECURITY DEFINER
 SET search_path = public
 SET row_security = off
-AS $
+AS $$
   SELECT EXISTS (
     SELECT 1
     FROM public.persons p
@@ -126,7 +126,7 @@ AS $
         )
       )
   )
-$;
+$$;
 
 REVOKE ALL ON FUNCTION public.can_view_person(uuid, uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.can_view_person(uuid, uuid) TO authenticated;
