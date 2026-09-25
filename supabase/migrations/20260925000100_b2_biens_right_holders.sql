@@ -103,18 +103,37 @@ ALTER TABLE public.persons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.biens ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bien_right_holders ENABLE ROW LEVEL SECURITY;
 
+CREATE OR REPLACE FUNCTION public.can_view_person(_person_id uuid, _user_id uuid)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+SET row_security = off
+AS $
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.persons p
+    WHERE p.id = _person_id
+      AND (
+        p.created_by = _user_id
+        OR p.linked_profile_id = _user_id
+        OR EXISTS (
+          SELECT 1
+          FROM public.bien_right_holders brh
+          WHERE brh.person_id = p.id
+            AND public.can_view_bien(brh.bien_id, _user_id)
+        )
+      )
+  )
+$;
+
+REVOKE ALL ON FUNCTION public.can_view_person(uuid, uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.can_view_person(uuid, uuid) TO authenticated;
+
 CREATE POLICY "view legitimate persons"
   ON public.persons FOR SELECT
-  USING (
-    created_by = auth.uid()
-    OR linked_profile_id = auth.uid()
-    OR EXISTS (
-      SELECT 1
-      FROM public.bien_right_holders brh
-      WHERE brh.person_id = persons.id
-        AND public.can_view_bien(brh.bien_id, auth.uid())
-    )
-  );
+  USING (public.can_view_person(id, auth.uid()));
 
 CREATE POLICY "create persons with clear responsibility"
   ON public.persons FOR INSERT
