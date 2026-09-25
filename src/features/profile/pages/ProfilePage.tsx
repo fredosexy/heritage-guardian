@@ -5,6 +5,7 @@ import { useAuth, VisitorBanner } from "@/features/identity";
 import { ProfileCompletionCard } from "../components/ProfileCompletionCard";
 import { AvatarCard } from "../components/AvatarCard";
 import { SecurityCard } from "../components/SecurityCard";
+import { UsagePreferencesCard } from "../components/UsagePreferencesCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -67,6 +68,7 @@ export default function ProfilePage() {
       <ProfileCompletionCard />
 
       {user && <AvatarCard userId={user.id} profile={profile} onChanged={refresh} />}
+      {user && <UsagePreferencesCard />}
 
       <section className="mb-4 space-y-2">
         {[

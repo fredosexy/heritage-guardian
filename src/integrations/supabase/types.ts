@@ -247,6 +247,7 @@ export type Database = {
           onboarding_answers: Json | null
           onboarding_completed: boolean
           phone: string | null
+          status: string
           theme: string
           updated_at: string
         }
@@ -260,6 +261,7 @@ export type Database = {
           onboarding_answers?: Json | null
           onboarding_completed?: boolean
           phone?: string | null
+          status?: string
           theme?: string
           updated_at?: string
         }
@@ -273,10 +275,52 @@ export type Database = {
           onboarding_answers?: Json | null
           onboarding_completed?: boolean
           phone?: string | null
+          status?: string
           theme?: string
           updated_at?: string
         }
         Relationships: []
+      }
+      usage_preferences: {
+        Row: {
+          accompaniment_preference: string
+          assistance_level: string
+          audio_preference: string
+          context_type: string
+          created_at: string
+          interface_level: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accompaniment_preference?: string
+          assistance_level?: string
+          audio_preference?: string
+          context_type?: string
+          created_at?: string
+          interface_level?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accompaniment_preference?: string
+          assistance_level?: string
+          audio_preference?: string
+          context_type?: string
+          created_at?: string
+          interface_level?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       proofs: {
         Row: {
