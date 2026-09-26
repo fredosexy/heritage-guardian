@@ -186,6 +186,7 @@ export const fr = {
     guidesHint: "Les étapes officielles publiées pour votre type de dossier.",
   },
   actors: {
+    helpNow: "Voici qui peut vous aider maintenant",
     directoryTitle: "Qui peut vous aider",
     directoryHint: "Un seul annuaire d'acteurs et de services vérifiables.",
     search: "Rechercher un nom ou un lieu",
