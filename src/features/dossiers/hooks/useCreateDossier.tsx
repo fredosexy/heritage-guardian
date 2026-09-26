@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { dossiersRepo, enqueueCreateDossier } from "@/data";
+import { dossiersRepo, enqueueCreateDossier, proceduresRepo } from "@/data";
 import { useIdentity } from "@/features/identity";
 import type { DossierType } from "@/core/types/domain";
 
@@ -23,6 +23,11 @@ export function useCreateDossier() {
       const operationId = newLocalId();
       if (typeof navigator === "undefined" || navigator.onLine) {
         const dossier = await dossiersRepo.createDossier({ ...form, client_operation_id: operationId });
+        try {
+          await proceduresRepo.initializeDossierJourney(dossier.id);
+        } catch (error) {
+          if (!(typeof error === "object" && error !== null && "code" in error && error.code === "P0002")) throw error;
+        }
         return { mode: "online", id: dossier.id };
       }
       await enqueueCreateDossier({ localId: operationId, user_id: userId, ...form });

@@ -8,6 +8,7 @@ import { ProfilePage } from "@/features/profile";
 import { MyFilesPage } from "@/features/files";
 import { BienDetailPage, BiensPage, CreateBienPage } from "@/features/biens";
 import { NotFoundPage } from "@/features/shell";
+import { ProceduresPage } from "@/features/procedures";
 
 /**
  * Mode visiteur : toutes les pages sont consultables sans compte.
@@ -29,6 +30,7 @@ export function AppRoutes() {
       <Route path="/biens/new" element={<ProtectedRoute><CreateBienPage /></ProtectedRoute>} />
       <Route path="/biens/:id" element={<ProtectedRoute><BienDetailPage /></ProtectedRoute>} />
       <Route path="/assistant" element={<AssistantPage />} />
+      <Route path="/procedure" element={<ProceduresPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

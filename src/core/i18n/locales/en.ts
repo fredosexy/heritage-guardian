@@ -166,6 +166,23 @@ export const en = {
     roles: { titulaire: "Holder", ayant_droit: "Beneficiary", declarant: "Declarant", accompagnateur: "Supporter", temoin: "Witness", professionnel: "Professional", service: "Service", autorite: "Authority" },
     participantStatuses: { invite: "Invited", actif: "Active", refuse: "Declined", revoque: "Revoked" },
   },
+  journey: {
+    title: "My journey",
+    notInitialized: "No published procedure currently matches this dossier.",
+    initialize: "Find my journey",
+    progress: "{{percent}}% of the journey completed",
+    completeCurrent: "Mark this step complete",
+    statuses: { a_faire: "To do", en_cours: "In progress", terminee: "Completed", bloquee: "Blocked", a_verifier: "To verify" },
+    levels: { local: "Local", rural: "Rural", arrondissement: "District", departement: "Department", region: "Region", national: "National", autre: "Other level" },
+  },
+  procedures: {
+    title: "Procedures",
+    subtitle: "Published journeys and their applicable versions.",
+    empty: "No published procedure",
+    emptyHint: "Procedures must be verified before publication.",
+    published: "Published",
+    source: "Source",
+  },
   visitor: {
     title: "You are exploring Mémoire",
     subtitle: "Your dossiers stay on this device for now.",

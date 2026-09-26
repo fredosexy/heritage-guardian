@@ -11,6 +11,9 @@ export type UsagePreferences = Tables<"usage_preferences">;
 export type Bien = Tables<"biens">;
 export type Person = Tables<"persons">;
 export type BienRightHolder = Tables<"bien_right_holders">;
+export type ProcedureDefinition = Tables<"procedure_definitions">;
+export type ProcedureStep = Tables<"procedure_steps">;
+export type DossierStep = Tables<"dossier_steps">;
 
 export type UsageContext = "rural" | "urbain";
 export type AssistanceLevel = "autonome" | "assiste";
