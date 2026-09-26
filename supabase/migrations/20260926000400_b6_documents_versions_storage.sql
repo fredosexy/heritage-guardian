@@ -73,6 +73,14 @@ DROP POLICY IF EXISTS "owners update proofs" ON public.proofs;
 
 CREATE POLICY "authorized users view documents" ON public.proofs FOR SELECT
   USING (public.can_view_dossier(dossier_id, auth.uid()));
+CREATE POLICY "verifiers view documents" ON public.proofs FOR SELECT
+  USING (public.can_verify_actor(auth.uid()));
+CREATE POLICY "document inserts use rpc" ON public.proofs FOR INSERT
+  WITH CHECK (false);
+CREATE POLICY "document updates use rpc" ON public.proofs FOR UPDATE
+  USING (false) WITH CHECK (false);
+CREATE POLICY "document deletes denied" ON public.proofs FOR DELETE
+  USING (false);
 CREATE POLICY "authorized users view document versions" ON public.document_versions FOR SELECT
   USING (EXISTS (SELECT 1 FROM public.proofs d WHERE d.id = document_id AND public.can_view_dossier(d.dossier_id, auth.uid())));
 
