@@ -7,6 +7,9 @@ export type Participant = Tables<"participants">;
 export type Alert = Tables<"alerts">;
 export type Profile = Tables<"profiles">;
 export type UsagePreferences = Tables<"usage_preferences">;
+export type Bien = Tables<"biens">;
+export type Person = Tables<"persons">;
+export type BienRightHolder = Tables<"bien_right_holders">;
 
 export type UsageContext = "rural" | "urbain";
 export type AssistanceLevel = "autonome" | "assiste";
