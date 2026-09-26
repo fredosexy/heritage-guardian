@@ -99,8 +99,8 @@ select is(
 
 select is(
   (select count(*) from pg_policies where schemaname = 'public' and tablename = 'dossiers'),
-  5::bigint,
-  'dossiers table has expected RLS policies'
+  3::bigint,
+  'dossiers table has B3 select, insert and update policies without physical delete'
 );
 
 select * from finish();
