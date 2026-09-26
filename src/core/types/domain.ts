@@ -3,7 +3,8 @@ import type { Tables, TablesInsert, Enums } from "@/integrations/supabase/types"
 export type Dossier = Tables<"dossiers">;
 export type DossierInsert = TablesInsert<"dossiers">;
 export type Proof = Tables<"proofs">;
-export type Participant = Tables<"participants">;
+export type DossierParticipant = Tables<"dossier_participants">;
+export type Participant = DossierParticipant;
 export type Alert = Tables<"alerts">;
 export type Profile = Tables<"profiles">;
 export type UsagePreferences = Tables<"usage_preferences">;
