@@ -286,3 +286,87 @@ GRANT EXECUTE ON FUNCTION public.create_bien_with_holder(
   text, text, text, text, text, double precision, double precision,
   text, text, text, text, text
 ) TO authenticated;
+
+
+CREATE OR REPLACE FUNCTION public.add_declared_right_holder(
+  p_bien_id uuid,
+  p_display_name text,
+  p_role text,
+  p_phone text DEFAULT NULL,
+  p_email text DEFAULT NULL
+)
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+SET row_security = off
+AS $$
+DECLARE
+  current_user_id uuid := auth.uid();
+  new_person_id uuid;
+  new_relation_id uuid;
+BEGIN
+  IF current_user_id IS NULL THEN
+    RAISE EXCEPTION 'authentication_required' USING ERRCODE = '42501';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM public.biens
+    WHERE id = p_bien_id AND created_by = current_user_id AND status <> 'archive'
+  ) THEN
+    RAISE EXCEPTION 'asset_management_forbidden' USING ERRCODE = '42501';
+  END IF;
+
+  IF p_display_name IS NULL OR char_length(btrim(p_display_name)) < 2 THEN
+    RAISE EXCEPTION 'holder_name_required' USING ERRCODE = '22023';
+  END IF;
+
+  IF p_role NOT IN ('titulaire', 'co_titulaire', 'ayant_droit', 'representant_autorise', 'autre') THEN
+    RAISE EXCEPTION 'invalid_holder_role' USING ERRCODE = '22023';
+  END IF;
+
+  INSERT INTO public.persons (display_name, phone, email, created_by)
+  VALUES (btrim(p_display_name), p_phone, p_email, current_user_id)
+  RETURNING id INTO new_person_id;
+
+  INSERT INTO public.bien_right_holders (bien_id, person_id, role, status, declared_by)
+  VALUES (p_bien_id, new_person_id, p_role, 'declare', current_user_id)
+  RETURNING id INTO new_relation_id;
+
+  RETURN new_relation_id;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.add_declared_right_holder(uuid, text, text, text, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.add_declared_right_holder(uuid, text, text, text, text) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.revoke_declared_right_holder(p_relation_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+SET row_security = off
+AS $$
+DECLARE
+  current_user_id uuid := auth.uid();
+BEGIN
+  IF current_user_id IS NULL THEN
+    RAISE EXCEPTION 'authentication_required' USING ERRCODE = '42501';
+  END IF;
+
+  UPDATE public.bien_right_holders brh
+  SET status = 'revoque', revoked_at = now()
+  FROM public.biens b
+  WHERE brh.id = p_relation_id
+    AND b.id = brh.bien_id
+    AND b.created_by = current_user_id
+    AND brh.status IN ('declare', 'a_verifier');
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'right_holder_revocation_forbidden' USING ERRCODE = '42501';
+  END IF;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.revoke_declared_right_holder(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.revoke_declared_right_holder(uuid) TO authenticated;
