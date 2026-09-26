@@ -200,6 +200,15 @@ export const en = {
     competenceStatus: { declare: "declared", verification_en_cours: "under review", verifie: "verified", expire: "expired", suspendu: "suspended", revoque: "revoked" },
     competences: { geometre: "Surveyor", notaire: "Notary", chef_traditionnel: "Traditional chief", cadastre: "Cadastre", conservation_fonciere: "Land registry", sous_prefecture: "Sub-prefecture", mindcaf: "MINDCAF", mediation: "Mediation", autre: "Other" },
   },
+  documents: {
+    title: "Documents and evidence", hint: "Add a photo or document useful to your process.", type: "Document type",
+    camera: "Take a photo", file: "Choose a file", uploading: "Secure upload…", added: "Document added", preview: "View", replace: "New version", version: "Version {{number}}", versionAdded: "New version added",
+    empty: "No document added.", coverage: "{{provided}} of {{required}} expected document(s) provided", missing: "Still needed",
+    types: { attestation: "Certificate", recu: "Receipt", photo: "Photo", plan: "Plan", piece_identite: "Identity document", titre_foncier: "Land title", acte: "Deed", declaration: "Declaration", proces_verbal: "Official report", autre: "Other document" },
+    sources: { declaration: "Declared", utilisateur: "Provided by the user", accompagnateur: "Provided by a helper", acteur: "Provided by an actor", service: "Provided by a service", source_officielle: "Official source" },
+    statuses: { declare: "Declared", fourni: "Document received", a_verifier: "To verify", verifie: "Verified", officiel: "Official", rejete: "Rejected", archive: "Archived" },
+    errors: { unsupported_mime_type: "This file format is not accepted.", invalid_file_size: "The file is empty or larger than 15 MB." },
+  },
   visitor: {
     title: "You are exploring Mémoire",
     subtitle: "Your dossiers stay on this device for now.",

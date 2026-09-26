@@ -200,6 +200,15 @@ export const fr = {
     competenceStatus: { declare: "déclarée", verification_en_cours: "en vérification", verifie: "vérifiée", expire: "expirée", suspendu: "suspendue", revoque: "révoquée" },
     competences: { geometre: "Géomètre", notaire: "Notaire", chef_traditionnel: "Chef traditionnel", cadastre: "Cadastre", conservation_fonciere: "Conservation foncière", sous_prefecture: "Sous-préfecture", mindcaf: "MINDCAF", mediation: "Médiation", autre: "Autre" },
   },
+  documents: {
+    title: "Documents et pièces", hint: "Ajoutez une photo ou un document utile à votre démarche.", type: "Type de document",
+    camera: "Prendre une photo", file: "Choisir un fichier", uploading: "Envoi sécurisé…", added: "Document ajouté", preview: "Consulter", replace: "Nouvelle version", version: "Version {{number}}", versionAdded: "Nouvelle version ajoutée",
+    empty: "Aucun document ajouté.", coverage: "{{provided}} document(s) fourni(s) sur {{required}} attendu(s)", missing: "Encore nécessaire",
+    types: { attestation: "Attestation", recu: "Reçu", photo: "Photo", plan: "Plan", piece_identite: "Pièce d’identité", titre_foncier: "Titre foncier", acte: "Acte", declaration: "Déclaration", proces_verbal: "Procès-verbal", autre: "Autre document" },
+    sources: { declaration: "Déclaré", utilisateur: "Fourni par l’utilisateur", accompagnateur: "Fourni par un accompagnateur", acteur: "Fourni par un acteur", service: "Fourni par un service", source_officielle: "Source officielle" },
+    statuses: { declare: "Déclaré", fourni: "Document reçu", a_verifier: "À vérifier", verifie: "Vérifié", officiel: "Officiel", rejete: "Rejeté", archive: "Archivé" },
+    errors: { unsupported_mime_type: "Ce format de fichier n’est pas accepté.", invalid_file_size: "Le fichier est vide ou dépasse 15 Mo." },
+  },
   visitor: {
     title: "Vous découvrez Mémoire",
     subtitle: "Vos dossiers restent sur cet appareil pour l'instant.",

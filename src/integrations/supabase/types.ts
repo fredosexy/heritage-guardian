@@ -362,6 +362,7 @@ export type Database = {
           is_optional: boolean
           procedure_id: string
           required_competence: string | null
+          required_document_types: string[]
           rules_json: Json | null
           short_description: string
           step_order: number
@@ -376,6 +377,7 @@ export type Database = {
           is_optional?: boolean
           procedure_id: string
           required_competence?: string | null
+          required_document_types?: string[]
           rules_json?: Json | null
           short_description: string
           step_order: number
@@ -390,6 +392,7 @@ export type Database = {
           is_optional?: boolean
           procedure_id?: string
           required_competence?: string | null
+          required_document_types?: string[]
           rules_json?: Json | null
           short_description?: string
           step_order?: number
@@ -699,44 +702,77 @@ export type Database = {
           },
         ]
       }
+      document_versions: {
+        Row: { checksum: string; created_at: string; document_id: string; id: string; mime_type: string; provided_by: string | null; replaced_at: string | null; size_bytes: number; storage_path: string; uploaded_by: string; version_number: number }
+        Insert: { checksum: string; created_at?: string; document_id: string; id?: string; mime_type: string; provided_by?: string | null; replaced_at?: string | null; size_bytes: number; storage_path: string; uploaded_by: string; version_number: number }
+        Update: { checksum?: string; created_at?: string; document_id?: string; id?: string; mime_type?: string; provided_by?: string | null; replaced_at?: string | null; size_bytes?: number; storage_path?: string; uploaded_by?: string; version_number?: number }
+        Relationships: [{ foreignKeyName: "document_versions_document_id_fkey"; columns: ["document_id"]; isOneToOne: false; referencedRelation: "proofs"; referencedColumns: ["id"] }]
+      }
       proofs: {
         Row: {
+          archived_at: string | null
+          bien_id: string | null
+          client_operation_id: string | null
           created_at: string
+          created_by: string
+          current_version_id: string | null
+          document_type: string
           dossier_id: string
           id: string
           metadata: Json
           mime_type: string | null
           size_bytes: number | null
+          source_type: string
           storage_path: string
           title: string | null
           type: Database["public"]["Enums"]["proof_type"]
           uploaded_by: string
+          updated_at: string
+          verification_status: string
           verified: boolean
         }
         Insert: {
+          archived_at?: string | null
+          bien_id?: string | null
+          client_operation_id?: string | null
           created_at?: string
+          created_by: string
+          current_version_id?: string | null
+          document_type: string
           dossier_id: string
           id?: string
           metadata?: Json
           mime_type?: string | null
           size_bytes?: number | null
+          source_type?: string
           storage_path: string
           title?: string | null
           type: Database["public"]["Enums"]["proof_type"]
           uploaded_by: string
+          updated_at?: string
+          verification_status: string
           verified?: boolean
         }
         Update: {
+          archived_at?: string | null
+          bien_id?: string | null
+          client_operation_id?: string | null
           created_at?: string
+          created_by?: string
+          current_version_id?: string | null
+          document_type?: string
           dossier_id?: string
           id?: string
           metadata?: Json
           mime_type?: string | null
           size_bytes?: number | null
+          source_type?: string
           storage_path?: string
           title?: string | null
           type?: Database["public"]["Enums"]["proof_type"]
           uploaded_by?: string
+          updated_at?: string
+          verification_status?: string
           verified?: boolean
         }
         Relationships: [
@@ -794,6 +830,13 @@ export type Database = {
       }
     }
     Functions: {
+      archive_document: { Args: { p_document_id: string }; Returns: undefined }
+      rename_document: { Args: { p_document_id: string; p_title: string }; Returns: undefined }
+      register_document_version: {
+        Args: { p_bien_id?: string | null; p_checksum: string; p_client_operation_id?: string | null; p_document_id: string; p_document_type: string; p_dossier_id: string; p_mime_type: string; p_provided_by?: string | null; p_size_bytes: number; p_source_type: string; p_storage_path: string; p_title: string; p_version_id: string }
+        Returns: string
+      }
+      transition_document_status: { Args: { p_document_id: string; p_source_type?: string | null; p_status: string }; Returns: undefined }
       can_verify_actor: { Args: { _user_id: string }; Returns: boolean }
       verify_actor: { Args: { p_actor_id: string; p_status: string }; Returns: undefined }
       verify_actor_competence: { Args: { p_competence_id: string; p_status: string }; Returns: undefined }
