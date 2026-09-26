@@ -72,7 +72,6 @@ ALTER TABLE public.dossier_participants
   ADD COLUMN person_id uuid REFERENCES public.persons(id) ON DELETE RESTRICT,
   ADD COLUMN status text NOT NULL DEFAULT 'invite' CHECK (status IN ('invite','actif','refuse','revoque')),
   ADD COLUMN invited_by uuid REFERENCES auth.users(id),
-  ADD COLUMN accepted_at timestamptz,
   ADD COLUMN revoked_at timestamptz;
 
 UPDATE public.dossier_participants dp
