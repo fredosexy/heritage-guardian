@@ -202,7 +202,7 @@ export const en = {
   },
   documents: {
     title: "Documents and evidence", hint: "Add a photo or document useful to your process.", type: "Document type",
-    camera: "Take a photo", file: "Choose a file", uploading: "Secure upload…", added: "Document added",
+    camera: "Take a photo", file: "Choose a file", uploading: "Secure upload…", added: "Document added", preview: "View", replace: "New version", version: "Version {{number}}", versionAdded: "New version added",
     empty: "No document added.", coverage: "{{provided}} of {{required}} expected document(s) provided", missing: "Still needed",
     types: { attestation: "Certificate", recu: "Receipt", photo: "Photo", plan: "Plan", piece_identite: "Identity document", titre_foncier: "Land title", acte: "Deed", declaration: "Declaration", proces_verbal: "Official report", autre: "Other document" },
     sources: { declaration: "Declared", utilisateur: "Provided by the user", accompagnateur: "Provided by a helper", acteur: "Provided by an actor", service: "Provided by a service", source_officielle: "Official source" },
