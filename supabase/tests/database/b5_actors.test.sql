@@ -23,7 +23,7 @@ select set_config('request.jwt.claims','{"sub":"b5000000-0000-4000-8000-00000000
 select is((select count(*) from public.actors),0::bigint,'unpublished actor is hidden from another user');
 select is((select count(*) from public.actor_credentials),0::bigint,'private credential is hidden from another user');
 select is((select count(*) from public.actor_competences),0::bigint,'competence of unpublished actor is hidden');
-select is((select count(*) from (update public.actors set name='Interdit' where id='b5100000-0000-4000-8000-000000000001' returning *) s),0::bigint,'user cannot update another actor');
+select results_eq($$ update public.actors set name='Interdit' where id='b5100000-0000-4000-8000-000000000001' returning name $$,ARRAY[]::text[],'user cannot update another actor');
 
 reset role;
 set local role authenticated;
