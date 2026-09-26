@@ -14,6 +14,13 @@ export type BienRightHolder = Tables<"bien_right_holders">;
 export type ProcedureDefinition = Tables<"procedure_definitions">;
 export type ProcedureStep = Tables<"procedure_steps">;
 export type DossierStep = Tables<"dossier_steps">;
+export type Actor = Tables<"actors">;
+export type ActorCompetence = Tables<"actor_competences">;
+export type ActorCredential = Tables<"actor_credentials">;
+
+export type TerritorialLevel = "local" | "rural" | "arrondissement" | "departement" | "region" | "national" | "autre";
+export type ActorVerificationStatus = "non_verifie" | "verification_en_cours" | "verifie" | "suspendu" | "revoque";
+export type CompetenceStatus = "declare" | "verification_en_cours" | "verifie" | "expire" | "suspendu" | "revoque";
 
 export type UsageContext = "rural" | "urbain";
 export type AssistanceLevel = "autonome" | "assiste";
