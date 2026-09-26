@@ -1,151 +1,53 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { AppLayout } from "@/features/shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Loader2, Sparkles } from "lucide-react";
-import { toast } from "sonner";
-import { FirstStepDialog, useIdentity } from "@/features/identity";
+import { biensRepo } from "@/data";
+import type { Bien, DossierType } from "@/core/types/domain";
 import { useCreateDossier } from "../hooks/useCreateDossier";
-import { DOSSIER_TYPES, typeLabelKey } from "../components/dossierTypeMeta";
+
+const TYPES: DossierType[] = ["acquisition", "achat", "succession", "heritage", "protection", "regularisation", "partage", "transmission", "vente", "autre"];
 
 export default function CreateDossierPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const requestedType = params.get("type");
-  const availableIds = DOSSIER_TYPES.filter((d) => d.available).map((d) => d.id);
-
-  const [type, setType] = useState<string | null>(
-    requestedType && availableIds.includes(requestedType) ? requestedType : null
-  );
+  const { create, saving } = useCreateDossier();
+  const [biens, setBiens] = useState<Bien[]>([]);
+  const [bienId, setBienId] = useState("");
+  const [type, setType] = useState<DossierType>("protection");
+  const [visibility, setVisibility] = useState<"prive" | "public">("prive");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
-  const { create, saving } = useCreateDossier();
-  const { needsFirstStep } = useIdentity();
-  const [firstStepOpen, setFirstStepOpen] = useState(false);
 
-  useEffect(() => {
-    if (needsFirstStep) setFirstStepOpen(true);
-  }, [needsFirstStep]);
+  useEffect(() => { void biensRepo.getBiensForUser().then((rows) => { setBiens(rows); if (rows[0]) setBienId(rows[0].id); }); }, []);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!type) return;
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
     try {
-      const result = await create({ type, title, description, location_name: location });
-      if (!result) return;
-      if (result.mode === "online") {
-        toast.success(t("create.created"));
-        navigate(`/dossiers/${result.id}`);
-      } else {
-        toast.success(t(result.mode === "local" ? "create.savedLocal" : "create.savedOffline"));
-        navigate("/dossiers");
-      }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : t("auth.error"));
-    }
+      const result = await create({ bien_id: bienId, type, title, description, visibility });
+      if (result?.mode === "online") navigate(`/dossiers/${result.id}`);
+      else navigate("/dossiers");
+      toast.success(t("create.created"));
+    } catch (error) { toast.error(error instanceof Error ? error.message : t("auth.error")); }
   };
 
-  if (!type) {
-    return (
-      <AppLayout>
-        <FirstStepDialog open={firstStepOpen} onClose={() => setFirstStepOpen(false)} />
-        <h1 className="text-display mb-2">{t("create.title")}</h1>
-        <p className="text-sm text-muted-foreground mb-6">{t("create.chooseType")}</p>
-        <div className="space-y-3">
-          {DOSSIER_TYPES.map(({ id, icon: Icon, descKey, available }) => (
-            <button
-              key={id}
-              onClick={() => (available ? setType(id) : toast.info(t("create.comingSoon")))}
-              className={`w-full card-soft p-4 text-left flex items-center gap-3 transition ${
-                available ? "hover:shadow-warm" : "opacity-70"
-              }`}
-            >
-              <div
-                className={`size-11 rounded-xl flex items-center justify-center shrink-0 ${
-                  available ? "bg-gradient-warm text-primary-foreground" : "bg-muted text-muted-foreground"
-                }`}
-              >
-                <Icon className="size-5" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">{t(typeLabelKey(id))}</span>
-                  {!available && (
-                    <Badge variant="secondary" className="text-[10px]">
-                      {t("create.comingSoon")}
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-caption mt-0.5">{t(descKey)}</p>
-              </div>
-              {available && <ChevronRight className="size-4 text-muted-foreground" />}
-            </button>
-          ))}
-        </div>
-      </AppLayout>
-    );
-  }
-
-  return (
-    <AppLayout>
-      <FirstStepDialog open={firstStepOpen} onClose={() => setFirstStepOpen(false)} />
-      <button onClick={() => setType(null)} className="text-sm text-muted-foreground mb-4">
-        ← {t("common.back")}
-      </button>
-      <h1 className="text-display mb-1">{t(typeLabelKey(type))}</h1>
-      <p className="text-sm text-muted-foreground mb-6 flex items-center gap-1.5">
-        <Sparkles className="size-3.5 text-primary" />
-        {t("create.terrainDesc")}
-      </p>
-      <form onSubmit={submit} className="space-y-4">
-        <div>
-          <Label htmlFor="title">{t("create.titleLabel")}</Label>
-          <Input
-            id="title"
-            required
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder={t("create.titlePlaceholder")}
-            className="rounded-xl"
-          />
-        </div>
-        <div>
-          <Label htmlFor="loc">{t("dossier.location")}</Label>
-          <Input
-            id="loc"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder={t("create.locationPlaceholder")}
-            className="rounded-xl"
-          />
-        </div>
-        <div>
-          <Label htmlFor="desc">{t("create.descLabel")}</Label>
-          <Textarea
-            id="desc"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder={t("create.descPlaceholder")}
-            rows={3}
-            className="rounded-xl"
-          />
-        </div>
-        <div className="flex gap-2 pt-2">
-          <Button type="button" variant="outline" onClick={() => navigate(-1)} className="flex-1">
-            {t("create.cancel")}
-          </Button>
-          <Button type="submit" disabled={saving || !title} className="flex-1 bg-gradient-warm">
-            {saving && <Loader2 className="size-4 animate-spin" />} {t("create.create")}
-          </Button>
-        </div>
-      </form>
-    </AppLayout>
-  );
+  return <AppLayout>
+    <h1 className="text-display mb-2">{t("create.title")}</h1>
+    <p className="text-sm text-muted-foreground mb-6">{t("create.b3Hint")}</p>
+    {biens.length === 0 ? <div className="card-soft p-5 space-y-3"><p>{t("create.assetRequired")}</p><Button onClick={() => navigate("/biens/new")}>{t("create.createAsset")}</Button></div> :
+    <form onSubmit={submit} className="space-y-4">
+      <div><Label htmlFor="bien">{t("create.asset")}</Label><select id="bien" className="w-full h-10 rounded-xl border bg-background px-3" value={bienId} onChange={(e) => setBienId(e.target.value)}>{biens.map((bien) => <option key={bien.id} value={bien.id}>{bien.title}</option>)}</select></div>
+      <div><Label htmlFor="type">{t("dossier.typeLabel")}</Label><select id="type" className="w-full h-10 rounded-xl border bg-background px-3" value={type} onChange={(e) => setType(e.target.value as DossierType)}>{TYPES.map((value) => <option key={value} value={value}>{t(`dossiers.types.${value}`, value)}</option>)}</select></div>
+      <div><Label htmlFor="title">{t("create.titleLabel")}</Label><Input id="title" required minLength={2} maxLength={160} value={title} onChange={(e) => setTitle(e.target.value)} /></div>
+      <div><Label htmlFor="description">{t("create.descLabel")}</Label><Textarea id="description" maxLength={4000} value={description} onChange={(e) => setDescription(e.target.value)} /></div>
+      <div><Label htmlFor="visibility">{t("dossier.visibility")}</Label><select id="visibility" className="w-full h-10 rounded-xl border bg-background px-3" value={visibility} onChange={(e) => setVisibility(e.target.value as "prive" | "public")}><option value="prive">{t("dossier.visibilityPrivate")}</option><option value="public">{t("dossier.visibilityPublic")}</option></select><p className="text-caption mt-1">{t("dossier.publicNotice")}</p></div>
+      <Button type="submit" disabled={saving || !bienId || title.trim().length < 2} className="w-full">{saving && <Loader2 className="size-4 animate-spin" />}{t("create.create")}</Button>
+    </form>}
+  </AppLayout>;
 }
