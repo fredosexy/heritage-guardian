@@ -1,6 +1,6 @@
 begin;
 
-select plan(15);
+select plan(16);
 
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password,
@@ -89,12 +89,16 @@ select set_config('request.jwt.claims', '{"sub":"b2000000-0000-4000-8000-0000000
 
 select is((select count(*) from public.biens), 0::bigint, 'unrelated user cannot read assets');
 select is((select count(*) from public.bien_right_holders), 0::bigint, 'unrelated user cannot read holders');
-select is((select count(*) from public.persons), 1::bigint, 'unrelated user sees only own linked person');
-select throws_ok(
-  $$ update public.biens set title = 'Intrusion' $$,
-  '42501',
-  null,
-  'unrelated user cannot update an asset'
+select is((select count(*) from public.persons), 0::bigint, 'unrelated user cannot read declared persons');
+select lives_ok(
+  $ update public.biens set title = 'Intrusion' $,
+  'RLS safely hides assets from unrelated update'
+);
+
+select is(
+  (select count(*) from public.biens where title = 'Intrusion'),
+  0::bigint,
+  'unrelated user changes no asset'
 );
 
 reset role;
