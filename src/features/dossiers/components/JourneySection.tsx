@@ -2,6 +2,7 @@ import { Check, Circle, CircleAlert, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { useDossierJourney } from "../hooks/useDossierJourney";
+import { StepActorRecommendations } from "./StepActorRecommendations";
 
 export function JourneySection({ dossierId, hasProcedure }: { dossierId: string; hasProcedure: boolean }) {
   const { t } = useTranslation();
@@ -15,5 +16,6 @@ export function JourneySection({ dossierId, hasProcedure }: { dossierId: string;
       <div><p className={`text-sm ${step.status === "en_cours" ? "font-semibold" : ""}`}>{step.title}</p><p className="text-caption">{t(`journey.levels.${step.territorial_level}`)} · {t(`journey.statuses.${step.status}`)}</p>{step.status === "bloquee" && <p className="text-xs text-destructive mt-1">{step.blocked_reason}</p>}</div>
     </div>)}</div>
     {summary.currentStep?.status === "en_cours" && <Button className="w-full" onClick={() => void completeCurrent()}>{t("journey.completeCurrent")}</Button>}
+    <StepActorRecommendations procedureStepId={summary.currentStep?.procedure_step_id} />
   </section>;
 }
