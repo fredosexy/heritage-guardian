@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { AppLayout, EmptyState, PageHeader } from "@/features/shell";
 import { Button } from "@/components/ui/button";
 import { useDossierDetail } from "../hooks/useDossierDetail";
+import { JourneySection } from "../components/JourneySection";
 
 export default function DossierDetailPage() {
   const { id } = useParams();
@@ -26,6 +27,7 @@ export default function DossierDetailPage() {
       <h2 className="font-medium flex items-center gap-2"><UserRound className="size-4" />{t("dossier.concernedPeople")}</h2>
       {participants.length === 0 ? <p className="text-caption">{t("dossier.noParticipants")}</p> : participants.map((participant) => <div key={participant.id} className="rounded-xl border p-3"><p className="text-sm font-medium">{participant.person.display_name}</p><p className="text-caption">{t(`dossier.roles.${participant.role}`, participant.role)} · {t(`dossier.participantStatuses.${participant.status}`, participant.status)}</p></div>)}
     </section>
+    <JourneySection dossierId={dossier.id} hasProcedure={Boolean(dossier.procedure_definition_id)} />
     <Button variant="outline" className="w-full" onClick={doArchive}><Archive className="size-4" />{t("dossier.archive")}</Button>
   </AppLayout>;
 }
