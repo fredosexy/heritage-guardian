@@ -34,6 +34,12 @@ export async function getActorsForStep(step: { required_competence?: string | nu
   return rankActors(actors, { ...context, requiredCompetence: step.required_competence, territorialLevel: step.territorial_level });
 }
 
+export async function getActorsForDossierStep(procedureStepId: string, context: Omit<ActorSearchContext, "requiredCompetence" | "territorialLevel"> = {}) {
+  const { data, error } = await supabase.from("procedure_steps").select("required_competence, territorial_level").eq("id", procedureStepId).maybeSingle();
+  if (error) throw error;
+  return data ? getActorsForStep(data, context) : [];
+}
+
 export async function getActorCompetences(actorId: string): Promise<ActorCompetence[]> {
   const { data, error } = await supabase.from("actor_competences").select("*").eq("actor_id", actorId).order("label");
   if (error) throw error;
