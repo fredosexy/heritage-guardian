@@ -202,7 +202,7 @@ export const fr = {
   },
   documents: {
     title: "Documents et pièces", hint: "Ajoutez une photo ou un document utile à votre démarche.", type: "Type de document",
-    camera: "Prendre une photo", file: "Choisir un fichier", uploading: "Envoi sécurisé…", added: "Document ajouté",
+    camera: "Prendre une photo", file: "Choisir un fichier", uploading: "Envoi sécurisé…", added: "Document ajouté", preview: "Consulter", replace: "Nouvelle version", version: "Version {{number}}", versionAdded: "Nouvelle version ajoutée",
     empty: "Aucun document ajouté.", coverage: "{{provided}} document(s) fourni(s) sur {{required}} attendu(s)", missing: "Encore nécessaire",
     types: { attestation: "Attestation", recu: "Reçu", photo: "Photo", plan: "Plan", piece_identite: "Pièce d’identité", titre_foncier: "Titre foncier", acte: "Acte", declaration: "Déclaration", proces_verbal: "Procès-verbal", autre: "Autre document" },
     sources: { declaration: "Déclaré", utilisateur: "Fourni par l’utilisateur", accompagnateur: "Fourni par un accompagnateur", acteur: "Fourni par un acteur", service: "Fourni par un service", source_officielle: "Source officielle" },
