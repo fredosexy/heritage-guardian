@@ -4,7 +4,7 @@ CREATE TABLE public.procedure_definitions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   code text NOT NULL CHECK (code ~ '^[a-z0-9_]{3,80}$'),
   dossier_type public.dossier_type NOT NULL,
-  territory text NOT NULL CHECK (char_length(btrim(territory)) BETWEEN 2 AND 120),
+  territory text NOT NULL CHECK (territory = '*' OR char_length(btrim(territory)) BETWEEN 2 AND 120),
   version integer NOT NULL CHECK (version > 0),
   status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','a_verifier','validee','publiee','archivee')),
   source_reference text CHECK (source_reference IS NULL OR char_length(source_reference) <= 1000),
