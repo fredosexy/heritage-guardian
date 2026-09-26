@@ -38,11 +38,23 @@ CREATE INDEX dossiers_owner_id_idx ON public.dossiers(owner_id);
 
 CREATE OR REPLACE FUNCTION public.sync_dossier_owner_columns()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public SET row_security = off AS $$
+DECLARE existing_id uuid; existing_bien_id uuid;
 BEGIN
   NEW.owner_id := COALESCE(NEW.owner_id, NEW.user_id);
   NEW.user_id := COALESCE(NEW.user_id, NEW.owner_id);
   IF NEW.owner_id IS DISTINCT FROM NEW.user_id THEN
     RAISE EXCEPTION 'dossier_owner_mismatch' USING ERRCODE = '23514';
+  END IF;
+  IF TG_OP = 'INSERT' AND NEW.client_operation_id IS NOT NULL THEN
+    SELECT d.id, d.bien_id INTO existing_id, existing_bien_id
+    FROM public.dossiers d
+    WHERE d.user_id = NEW.user_id
+      AND d.client_operation_id = NEW.client_operation_id
+    LIMIT 1;
+    IF existing_id IS NOT NULL THEN
+      NEW.id := existing_id;
+      NEW.bien_id := existing_bien_id;
+    END IF;
   END IF;
   IF NEW.bien_id IS NULL THEN
     INSERT INTO public.biens (
