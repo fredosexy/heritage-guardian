@@ -1,6 +1,6 @@
 begin;
 
-select plan(16);
+select plan(17);
 
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password,
