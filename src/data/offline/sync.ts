@@ -48,23 +48,18 @@ export async function processQueue(): Promise<void> {
             await db.queue.delete(op.id!);
             continue;
           }
-          const { data, error } = await supabase
-            .from("dossiers")
-            .upsert({
-              client_operation_id: draft.localId,
-              user_id: draft.user_id,
-              type: draft.type as DossierType,
-              title: draft.title,
-              description: draft.description || null,
-              location_name: draft.location_name || null,
-              latitude: draft.latitude ?? null,
-              longitude: draft.longitude ?? null,
-              status: "incomplete",
-            }, { onConflict: "user_id,client_operation_id" })
-            .select()
-            .single();
+          if (!draft.bien_id) throw new Error("Ce brouillon doit être rattaché à un bien avant synchronisation.");
+          const { data, error } = await supabase.rpc("create_dossier", {
+            p_bien_id: draft.bien_id,
+            p_type: draft.type as DossierType,
+            p_title: draft.title,
+            p_visibility: draft.visibility ?? "prive",
+            p_description: draft.description || null,
+            p_include_bien_holders: true,
+            p_client_operation_id: draft.localId,
+          });
           if (error) throw error;
-          await db.drafts.update(draft.id!, { synced: 1, remote_id: data.id });
+          await db.drafts.update(draft.id!, { synced: 1, remote_id: data });
           await db.queue.delete(op.id!);
           emit();
         } else {

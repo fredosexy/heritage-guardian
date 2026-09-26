@@ -17,9 +17,9 @@ export function computeCompletionScore(input: ScoringInput): number {
 }
 
 export function statusFromScore(score: number): DossierStatus {
-  if (score >= 75) return "secure";
-  if (score >= 40) return "incomplete";
-  return "risk";
+  if (score >= 75) return "actif";
+  if (score >= 40) return "a_verifier";
+  return "a_completer";
 }
 
 export function scoreDossier(dossier: Dossier, proofsCount: number, participantsCount = 0) {

@@ -1,0 +1,21 @@
+-- B3 enum extensions are isolated because PostgreSQL requires a commit before new values are used.
+ALTER TYPE public.dossier_type ADD VALUE IF NOT EXISTS 'acquisition';
+ALTER TYPE public.dossier_type ADD VALUE IF NOT EXISTS 'achat';
+ALTER TYPE public.dossier_type ADD VALUE IF NOT EXISTS 'succession';
+ALTER TYPE public.dossier_type ADD VALUE IF NOT EXISTS 'protection';
+ALTER TYPE public.dossier_type ADD VALUE IF NOT EXISTS 'regularisation';
+ALTER TYPE public.dossier_type ADD VALUE IF NOT EXISTS 'partage';
+ALTER TYPE public.dossier_type ADD VALUE IF NOT EXISTS 'transmission';
+ALTER TYPE public.dossier_type ADD VALUE IF NOT EXISTS 'vente';
+ALTER TYPE public.dossier_type ADD VALUE IF NOT EXISTS 'autre';
+ALTER TYPE public.dossier_status ADD VALUE IF NOT EXISTS 'brouillon';
+ALTER TYPE public.dossier_status ADD VALUE IF NOT EXISTS 'actif';
+ALTER TYPE public.dossier_status ADD VALUE IF NOT EXISTS 'en_attente';
+ALTER TYPE public.dossier_status ADD VALUE IF NOT EXISTS 'bloque';
+ALTER TYPE public.dossier_status ADD VALUE IF NOT EXISTS 'a_verifier';
+ALTER TYPE public.dossier_status ADD VALUE IF NOT EXISTS 'a_completer';
+ALTER TYPE public.dossier_status ADD VALUE IF NOT EXISTS 'en_traitement';
+ALTER TYPE public.dossier_status ADD VALUE IF NOT EXISTS 'a_finaliser';
+ALTER TYPE public.dossier_status ADD VALUE IF NOT EXISTS 'clos';
+ALTER TYPE public.dossier_status ADD VALUE IF NOT EXISTS 'archive';
+ALTER TYPE public.dossier_visibility ADD VALUE IF NOT EXISTS 'prive';

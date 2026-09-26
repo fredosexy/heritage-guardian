@@ -4,12 +4,11 @@ export interface DraftDossier {
   id?: number;
   localId: string;
   user_id: string;
+  bien_id: string;
   type: string;
   title: string;
   description?: string | null;
-  location_name?: string | null;
-  latitude?: number | null;
-  longitude?: number | null;
+  visibility: "prive" | "public";
   created_at: number;
   updated_at: number;
   synced: 0 | 1; // Dexie indexes booleans poorly; use 0/1

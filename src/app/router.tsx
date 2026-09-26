@@ -19,9 +19,9 @@ export function AppRoutes() {
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
       <Route path="/" element={<HomePage />} />
-      <Route path="/dossiers" element={<DossiersPage />} />
-      <Route path="/dossiers/:id" element={<DossierDetailPage />} />
-      <Route path="/create" element={<CreateDossierPage />} />
+      <Route path="/dossiers" element={<ProtectedRoute><DossiersPage /></ProtectedRoute>} />
+      <Route path="/dossiers/:id" element={<ProtectedRoute><DossierDetailPage /></ProtectedRoute>} />
+      <Route path="/create" element={<ProtectedRoute><CreateDossierPage /></ProtectedRoute>} />
       <Route path="/alerts" element={<AlertsPage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/files" element={<MyFilesPage />} />

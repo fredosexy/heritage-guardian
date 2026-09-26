@@ -134,7 +134,11 @@ export type Database = {
       }
       dossiers: {
         Row: {
+          archived_at: string | null
+          bien_id: string
           client_operation_id: string | null
+          closed_at: string | null
+          completion_level: string
           completion_score: number
           created_at: string
           description: string | null
@@ -143,6 +147,7 @@ export type Database = {
           location_name: string | null
           longitude: number | null
           metadata: Json
+          owner_id: string
           status: Database["public"]["Enums"]["dossier_status"]
           title: string
           type: Database["public"]["Enums"]["dossier_type"]
@@ -151,7 +156,11 @@ export type Database = {
           visibility: Database["public"]["Enums"]["dossier_visibility"]
         }
         Insert: {
+          archived_at?: string | null
+          bien_id: string
           client_operation_id?: string | null
+          closed_at?: string | null
+          completion_level?: string
           completion_score?: number
           created_at?: string
           description?: string | null
@@ -160,6 +169,7 @@ export type Database = {
           location_name?: string | null
           longitude?: number | null
           metadata?: Json
+          owner_id: string
           status?: Database["public"]["Enums"]["dossier_status"]
           title: string
           type: Database["public"]["Enums"]["dossier_type"]
@@ -168,7 +178,11 @@ export type Database = {
           visibility?: Database["public"]["Enums"]["dossier_visibility"]
         }
         Update: {
+          archived_at?: string | null
+          bien_id?: string
           client_operation_id?: string | null
+          closed_at?: string | null
+          completion_level?: string
           completion_score?: number
           created_at?: string
           description?: string | null
@@ -177,6 +191,7 @@ export type Database = {
           location_name?: string | null
           longitude?: number | null
           metadata?: Json
+          owner_id?: string
           status?: Database["public"]["Enums"]["dossier_status"]
           title?: string
           type?: Database["public"]["Enums"]["dossier_type"]
@@ -184,9 +199,17 @@ export type Database = {
           user_id?: string
           visibility?: Database["public"]["Enums"]["dossier_visibility"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dossiers_bien_id_fkey"
+            columns: ["bien_id"]
+            isOneToOne: false
+            referencedRelation: "biens"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      participants: {
+      dossier_participants: {
         Row: {
           accepted_at: string | null
           contact_email: string | null
@@ -196,8 +219,12 @@ export type Database = {
           dossier_id: string
           id: string
           invited_at: string
-          role: Database["public"]["Enums"]["participant_role"]
+          invited_by: string
+          person_id: string
+          revoked_at: string | null
+          role: string
           share_percentage: number | null
+          status: string
           user_id: string | null
         }
         Insert: {
@@ -209,8 +236,12 @@ export type Database = {
           dossier_id: string
           id?: string
           invited_at?: string
-          role?: Database["public"]["Enums"]["participant_role"]
+          invited_by: string
+          person_id: string
+          revoked_at?: string | null
+          role?: string
           share_percentage?: number | null
+          status?: string
           user_id?: string | null
         }
         Update: {
@@ -222,8 +253,12 @@ export type Database = {
           dossier_id?: string
           id?: string
           invited_at?: string
-          role?: Database["public"]["Enums"]["participant_role"]
+          invited_by?: string
+          person_id?: string
+          revoked_at?: string | null
+          role?: string
           share_percentage?: number | null
+          status?: string
           user_id?: string | null
         }
         Relationships: [
@@ -232,6 +267,13 @@ export type Database = {
             columns: ["dossier_id"]
             isOneToOne: false
             referencedRelation: "dossiers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dossier_participants_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "persons"
             referencedColumns: ["id"]
           },
         ]
@@ -538,9 +580,52 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      participants: {
+        Row: {
+          accepted_at: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string | null
+          dossier_id: string | null
+          id: string | null
+          invited_at: string | null
+          invited_by: string | null
+          person_id: string | null
+          revoked_at: string | null
+          role: string | null
+          share_percentage: number | null
+          status: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      add_dossier_participant: {
+        Args: { p_dossier_id: string; p_person_id: string; p_role: string }
+        Returns: string
+      }
+      can_view_dossier: {
+        Args: { _dossier_id: string; _user_id: string }
+        Returns: boolean
+      }
+      create_dossier: {
+        Args: {
+          p_bien_id: string
+          p_client_operation_id?: string | null
+          p_description?: string | null
+          p_include_bien_holders?: boolean
+          p_title: string
+          p_type: Database["public"]["Enums"]["dossier_type"]
+          p_visibility?: Database["public"]["Enums"]["dossier_visibility"]
+        }
+        Returns: string
+      }
+      revoke_dossier_participant: {
+        Args: { p_participant_id: string }
+        Returns: undefined
+      }
       add_declared_right_holder: {
         Args: {
           p_bien_id: string
@@ -600,9 +685,9 @@ export type Database = {
       alert_severity: "low" | "medium" | "high"
       alert_type: "urgent" | "info" | "suggestion"
       app_role: "admin" | "moderator" | "user"
-      dossier_status: "secure" | "incomplete" | "risk"
-      dossier_type: "terrain" | "heritage" | "volonte" | "conflit" | "savoir"
-      dossier_visibility: "private" | "family" | "public"
+      dossier_status: "secure" | "incomplete" | "risk" | "brouillon" | "actif" | "en_attente" | "bloque" | "a_verifier" | "a_completer" | "en_traitement" | "a_finaliser" | "clos" | "archive"
+      dossier_type: "terrain" | "heritage" | "volonte" | "conflit" | "savoir" | "acquisition" | "achat" | "succession" | "protection" | "regularisation" | "partage" | "transmission" | "vente" | "autre"
+      dossier_visibility: "private" | "family" | "public" | "prive"
       participant_role: "owner" | "heir" | "witness" | "expert" | "viewer"
       proof_type: "image" | "document" | "video" | "audio"
     }
@@ -735,9 +820,9 @@ export const Constants = {
       alert_severity: ["low", "medium", "high"],
       alert_type: ["urgent", "info", "suggestion"],
       app_role: ["admin", "moderator", "user"],
-      dossier_status: ["secure", "incomplete", "risk"],
-      dossier_type: ["terrain", "heritage", "volonte", "conflit", "savoir"],
-      dossier_visibility: ["private", "family", "public"],
+      dossier_status: ["secure", "incomplete", "risk", "brouillon", "actif", "en_attente", "bloque", "a_verifier", "a_completer", "en_traitement", "a_finaliser", "clos", "archive"],
+      dossier_type: ["terrain", "heritage", "volonte", "conflit", "savoir", "acquisition", "achat", "succession", "protection", "regularisation", "partage", "transmission", "vente", "autre"],
+      dossier_visibility: ["private", "family", "public", "prive"],
       participant_role: ["owner", "heir", "witness", "expert", "viewer"],
       proof_type: ["image", "document", "video", "audio"],
     },

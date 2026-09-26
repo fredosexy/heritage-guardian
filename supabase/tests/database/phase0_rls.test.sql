@@ -23,25 +23,15 @@ values (
   'Phase 0 isolation dossier'
 );
 
-insert into public.dossiers (user_id, type, title, client_operation_id)
-values (
-  '10000000-0000-4000-8000-000000000001',
-  'terrain',
-  'Idempotent dossier',
-  'phase0-operation-0001'
-)
-on conflict (user_id, client_operation_id)
-do update set title = excluded.title;
+select public.create_dossier(
+  (select bien_id from public.dossiers where id = '30000000-0000-4000-8000-000000000003'),
+  'terrain', 'Idempotent dossier', 'prive', null, false, 'phase0-operation-0001'
+);
 
-insert into public.dossiers (user_id, type, title, client_operation_id)
-values (
-  '10000000-0000-4000-8000-000000000001',
-  'terrain',
-  'Idempotent dossier',
-  'phase0-operation-0001'
-)
-on conflict (user_id, client_operation_id)
-do update set title = excluded.title;
+select public.create_dossier(
+  (select bien_id from public.dossiers where id = '30000000-0000-4000-8000-000000000003'),
+  'terrain', 'Idempotent dossier', 'prive', null, false, 'phase0-operation-0001'
+);
 
 select is(
   (select count(*) from public.dossiers where client_operation_id = 'phase0-operation-0001'),
@@ -109,8 +99,8 @@ select is(
 
 select is(
   (select count(*) from pg_policies where schemaname = 'public' and tablename = 'dossiers'),
-  5::bigint,
-  'dossiers table has expected RLS policies'
+  3::bigint,
+  'dossiers table has B3 select, insert and update policies without physical delete'
 );
 
 select * from finish();
