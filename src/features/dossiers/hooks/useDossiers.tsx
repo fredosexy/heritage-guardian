@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { dossiersRepo, listLocalDrafts } from "@/data";
-import type { Dossier, DossierStatus } from "@/core/types/domain";
+import type { DossierStatus } from "@/core/types/domain";
+import type { DossierWithBien } from "@/data/dossiers.repo";
 import { useIdentity } from "@/features/identity";
 import { usePendingSync } from "@/features/offline";
 
@@ -10,6 +11,9 @@ export interface DossierListItem {
   type: string;
   title: string;
   status: DossierStatus;
+  visibility?: string;
+  completion_level?: string;
+  bien_title?: string;
   /** Dossier encore uniquement sur cet appareil (mode visiteur ou hors ligne). */
   local?: boolean;
 }
@@ -17,7 +21,7 @@ export interface DossierListItem {
 export function useDossiers() {
   const { userId, isGuest } = useIdentity();
   const pendingSync = usePendingSync();
-  const [remote, setRemote] = useState<Dossier[]>([]);
+  const [remote, setRemote] = useState<DossierWithBien[]>([]);
   const [loadingRemote, setLoadingRemote] = useState(true);
 
   const localDrafts = useLiveQuery(
@@ -54,11 +58,11 @@ export function useDossiers() {
         id: draft.localId,
         type: draft.type,
         title: draft.title,
-        status: "incomplete" as DossierStatus,
+        status: "brouillon" as DossierStatus,
         local: true,
       }));
     }
-    return remote.map((d) => ({ id: d.id, type: d.type, title: d.title, status: d.status }));
+    return remote.map((d) => ({ id: d.id, type: d.type, title: d.title, status: d.status, visibility: d.visibility, completion_level: d.completion_level, bien_title: d.bien.title }));
   }, [isGuest, localDrafts, remote]);
 
   return { dossiers, loading: isGuest ? localDrafts === undefined : loadingRemote };
