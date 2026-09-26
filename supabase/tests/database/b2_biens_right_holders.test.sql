@@ -91,7 +91,7 @@ select is((select count(*) from public.biens), 0::bigint, 'unrelated user cannot
 select is((select count(*) from public.bien_right_holders), 0::bigint, 'unrelated user cannot read holders');
 select is((select count(*) from public.persons), 0::bigint, 'unrelated user cannot read declared persons');
 select lives_ok(
-  $ update public.biens set title = 'Intrusion' $,
+  $$ update public.biens set title = 'Intrusion' $$,
   'RLS safely hides assets from unrelated update'
 );
 
