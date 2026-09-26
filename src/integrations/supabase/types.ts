@@ -541,6 +541,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_declared_right_holder: {
+        Args: {
+          p_bien_id: string
+          p_display_name: string
+          p_email?: string | null
+          p_phone?: string | null
+          p_role: string
+        }
+        Returns: string
+      }
       can_view_bien: {
         Args: { _bien_id: string; _user_id: string }
         Returns: boolean
@@ -576,6 +586,10 @@ export type Database = {
       is_dossier_participant: {
         Args: { _dossier_id: string; _user_id: string }
         Returns: boolean
+      }
+      revoke_declared_right_holder: {
+        Args: { p_relation_id: string }
+        Returns: undefined
       }
       owns_dossier: {
         Args: { _dossier_id: string; _user_id: string }
