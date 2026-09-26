@@ -214,8 +214,9 @@ CREATE OR REPLACE FUNCTION public.create_bien_with_holder(
 )
 RETURNS uuid
 LANGUAGE plpgsql
-SECURITY INVOKER
+SECURITY DEFINER
 SET search_path = public
+SET row_security = off
 AS $$
 DECLARE
   current_user_id uuid := auth.uid();
