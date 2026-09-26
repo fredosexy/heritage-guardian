@@ -12,9 +12,9 @@ describe("dossier scoring", () => {
   });
 
   it("maps score boundaries without ambiguity", () => {
-    expect(statusFromScore(39)).toBe("risk");
-    expect(statusFromScore(40)).toBe("incomplete");
-    expect(statusFromScore(74)).toBe("incomplete");
-    expect(statusFromScore(75)).toBe("secure");
+    expect(statusFromScore(39)).toBe("a_completer");
+    expect(statusFromScore(40)).toBe("a_verifier");
+    expect(statusFromScore(74)).toBe("a_verifier");
+    expect(statusFromScore(75)).toBe("actif");
   });
 });
