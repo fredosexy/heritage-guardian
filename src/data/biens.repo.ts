@@ -86,3 +86,26 @@ export async function archiveBien(id: string): Promise<void> {
     .eq("id", id);
   if (error) throw error;
 }
+
+
+export async function addRightHolder(
+  bienId: string,
+  input: { display_name: string; role: BienHolderRole; phone?: string | null; email?: string | null },
+): Promise<string> {
+  const { data, error } = await supabase.rpc("add_declared_right_holder", {
+    p_bien_id: bienId,
+    p_display_name: input.display_name,
+    p_role: input.role,
+    p_phone: input.phone ?? null,
+    p_email: input.email ?? null,
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function revokeRightHolder(relationId: string): Promise<void> {
+  const { error } = await supabase.rpc("revoke_declared_right_holder", {
+    p_relation_id: relationId,
+  });
+  if (error) throw error;
+}
