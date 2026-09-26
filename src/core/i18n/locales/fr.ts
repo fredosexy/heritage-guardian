@@ -166,6 +166,23 @@ export const fr = {
     roles: { titulaire: "Titulaire", ayant_droit: "Ayant droit", declarant: "Déclarant", accompagnateur: "Accompagnateur", temoin: "Témoin", professionnel: "Professionnel", service: "Service", autorite: "Autorité" },
     participantStatuses: { invite: "Invité", actif: "Actif", refuse: "Refusé", revoque: "Révoqué" },
   },
+  journey: {
+    title: "Mon parcours",
+    notInitialized: "Aucune procédure publiée ne correspond encore à ce dossier.",
+    initialize: "Trouver mon parcours",
+    progress: "{{percent}} % du parcours terminé",
+    completeCurrent: "Marquer cette étape terminée",
+    statuses: { a_faire: "À faire", en_cours: "En cours", terminee: "Terminée", bloquee: "Bloquée", a_verifier: "À vérifier" },
+    levels: { local: "Local", rural: "Rural", arrondissement: "Arrondissement", departement: "Département", region: "Région", national: "National", autre: "Autre niveau" },
+  },
+  procedures: {
+    title: "Procédures",
+    subtitle: "Les parcours publiés et leur version applicable.",
+    empty: "Aucune procédure publiée",
+    emptyHint: "Les procédures doivent être vérifiées avant leur publication.",
+    published: "Publiée",
+    source: "Source",
+  },
   visitor: {
     title: "Vous découvrez Mémoire",
     subtitle: "Vos dossiers restent sur cet appareil pour l'instant.",
