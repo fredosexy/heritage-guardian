@@ -1,4 +1,5 @@
-export type TerritorialLevel = "local" | "rural" | "arrondissement" | "departement" | "region" | "national" | "autre";
+import type { TerritorialLevel } from "@/core/types/domain";
+export type { TerritorialLevel } from "@/core/types/domain";
 export type JourneyStepStatus = "a_faire" | "en_cours" | "terminee" | "bloquee" | "a_verifier";
 
 export interface JourneyStepLike {
