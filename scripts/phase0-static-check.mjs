@@ -54,7 +54,8 @@ requireCondition(
 );
 
 requireCondition(
-  offlineSync.includes('onConflict: "user_id,client_operation_id"'),
+  offlineSync.includes('onConflict: "user_id,client_operation_id"') ||
+    (offlineSync.includes('.rpc("create_dossier"') && offlineSync.includes("p_client_operation_id: draft.localId")),
   "offline dossier creation must be idempotent"
 );
 
