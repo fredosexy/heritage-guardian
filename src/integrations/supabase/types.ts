@@ -281,6 +281,149 @@ export type Database = {
         }
         Relationships: []
       }
+      persons: {
+        Row: {
+          created_at: string
+          created_by: string
+          display_name: string
+          email: string | null
+          id: string
+          linked_profile_id: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          display_name: string
+          email?: string | null
+          id?: string
+          linked_profile_id?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          display_name?: string
+          email?: string | null
+          id?: string
+          linked_profile_id?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "persons_linked_profile_id_fkey"
+            columns: ["linked_profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      biens: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          created_by: string
+          creation_context: string
+          description: string | null
+          id: string
+          latitude: number | null
+          location_label: string
+          longitude: number | null
+          origin_declared: string | null
+          status: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          created_by: string
+          creation_context: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          location_label: string
+          longitude?: number | null
+          origin_declared?: string | null
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          created_by?: string
+          creation_context?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          location_label?: string
+          longitude?: number | null
+          origin_declared?: string | null
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bien_right_holders: {
+        Row: {
+          bien_id: string
+          created_at: string
+          declared_by: string
+          id: string
+          person_id: string
+          revoked_at: string | null
+          role: string
+          status: string
+          verified_at: string | null
+        }
+        Insert: {
+          bien_id: string
+          created_at?: string
+          declared_by: string
+          id?: string
+          person_id: string
+          revoked_at?: string | null
+          role: string
+          status?: string
+          verified_at?: string | null
+        }
+        Update: {
+          bien_id?: string
+          created_at?: string
+          declared_by?: string
+          id?: string
+          person_id?: string
+          revoked_at?: string | null
+          role?: string
+          status?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bien_right_holders_bien_id_fkey"
+            columns: ["bien_id"]
+            isOneToOne: false
+            referencedRelation: "biens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bien_right_holders_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usage_preferences: {
         Row: {
           accompaniment_preference: string
@@ -398,6 +541,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_bien: {
+        Args: { _bien_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_person: {
+        Args: { _person_id: string; _user_id: string }
+        Returns: boolean
+      }
+      create_bien_with_holder: {
+        Args: {
+          p_creation_context: string
+          p_description?: string | null
+          p_holder_email?: string | null
+          p_holder_name?: string | null
+          p_holder_phone?: string | null
+          p_holder_role?: string
+          p_latitude?: number | null
+          p_location_label: string
+          p_longitude?: number | null
+          p_origin_declared?: string | null
+          p_title: string
+          p_type: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
