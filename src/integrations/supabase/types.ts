@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      actor_competences: {
+        Row: { actor_id: string; competence_code: string; created_at: string; expires_at: string | null; id: string; label: string; status: string; verified_at: string | null; verified_by: string | null }
+        Insert: { actor_id: string; competence_code: string; created_at?: string; expires_at?: string | null; id?: string; label: string; status?: string; verified_at?: string | null; verified_by?: string | null }
+        Update: { actor_id?: string; competence_code?: string; created_at?: string; expires_at?: string | null; id?: string; label?: string; status?: string; verified_at?: string | null; verified_by?: string | null }
+        Relationships: [{ foreignKeyName: "actor_competences_actor_id_fkey"; columns: ["actor_id"]; isOneToOne: false; referencedRelation: "actors"; referencedColumns: ["id"] }]
+      }
+      actor_credentials: {
+        Row: { actor_id: string; created_at: string; credential_type: string; document_id: string | null; expires_at: string | null; id: string; issued_at: string | null; reference: string | null; status: string; verified_at: string | null; verified_by: string | null }
+        Insert: { actor_id: string; created_at?: string; credential_type: string; document_id?: string | null; expires_at?: string | null; id?: string; issued_at?: string | null; reference?: string | null; status?: string; verified_at?: string | null; verified_by?: string | null }
+        Update: { actor_id?: string; created_at?: string; credential_type?: string; document_id?: string | null; expires_at?: string | null; id?: string; issued_at?: string | null; reference?: string | null; status?: string; verified_at?: string | null; verified_by?: string | null }
+        Relationships: [{ foreignKeyName: "actor_credentials_actor_id_fkey"; columns: ["actor_id"]; isOneToOne: false; referencedRelation: "actors"; referencedColumns: ["id"] }]
+      }
+      actors: {
+        Row: { actor_type: string; availability_status: string; created_at: string; description: string | null; id: string; is_published: boolean; location: string; name: string; profile_id: string | null; suspended_at: string | null; territorial_level: string; updated_at: string; verification_status: string; verified_at: string | null; verified_by: string | null }
+        Insert: { actor_type: string; availability_status?: string; created_at?: string; description?: string | null; id?: string; is_published?: boolean; location: string; name: string; profile_id?: string | null; suspended_at?: string | null; territorial_level: string; updated_at?: string; verification_status?: string; verified_at?: string | null; verified_by?: string | null }
+        Update: { actor_type?: string; availability_status?: string; created_at?: string; description?: string | null; id?: string; is_published?: boolean; location?: string; name?: string; profile_id?: string | null; suspended_at?: string | null; territorial_level?: string; updated_at?: string; verification_status?: string; verified_at?: string | null; verified_by?: string | null }
+        Relationships: []
+      }
       ai_conversations: {
         Row: {
           context_id: string | null
@@ -776,6 +794,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_verify_actor: { Args: { _user_id: string }; Returns: boolean }
+      verify_actor: { Args: { p_actor_id: string; p_status: string }; Returns: undefined }
+      verify_actor_competence: { Args: { p_competence_id: string; p_status: string }; Returns: undefined }
+      verify_actor_credential: { Args: { p_credential_id: string; p_status: string }; Returns: undefined }
       initialize_dossier_journey: {
         Args: { p_dossier_id: string; p_procedure_id?: string | null }
         Returns: string
