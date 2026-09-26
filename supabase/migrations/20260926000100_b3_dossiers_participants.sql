@@ -37,7 +37,7 @@ CREATE INDEX dossiers_bien_id_idx ON public.dossiers(bien_id);
 CREATE INDEX dossiers_owner_id_idx ON public.dossiers(owner_id);
 
 CREATE OR REPLACE FUNCTION public.sync_dossier_owner_columns()
-RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public SET row_security = off AS $$
 BEGIN
   NEW.owner_id := COALESCE(NEW.owner_id, NEW.user_id);
   NEW.user_id := COALESCE(NEW.user_id, NEW.owner_id);
