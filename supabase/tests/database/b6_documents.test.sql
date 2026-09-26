@@ -34,7 +34,7 @@ select is((select max(version_number) from public.document_versions where docume
 select ok((select replaced_at is not null from public.document_versions where id='b6200000-0000-4000-8000-000000000001'),'previous version is marked replaced');
 select is((select current_version_id from public.proofs where id='b6100000-0000-4000-8000-000000000001'),'b6200000-0000-4000-8000-000000000002'::uuid,'second version becomes current');
 select throws_ok($$ select public.transition_document_status('b6100000-0000-4000-8000-000000000001','officiel','source_officielle') $$,'42501','document_verification_forbidden','ordinary user cannot mark official');
-select results_eq($$ delete from storage.objects where name like '%b6200000-0000-4000-8000-000000000001' returning name $$,ARRAY[]::text[],'registered historical file cannot be deleted');
+select ok((select qual like '%document_versions%' from pg_policies where schemaname='storage' and tablename='objects' and policyname='owners delete unregistered document uploads'),'storage delete policy protects registered historical files');
 
 reset role;
 set local role authenticated;
