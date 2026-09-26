@@ -55,6 +55,9 @@ BEGIN
     ) ON CONFLICT (id) DO NOTHING;
     NEW.bien_id := NEW.id;
   END IF;
+  IF NOT public.can_view_bien(NEW.bien_id, NEW.owner_id) THEN
+    RAISE EXCEPTION 'dossier_asset_forbidden' USING ERRCODE = '42501';
+  END IF;
   RETURN NEW;
 END;
 $$;
@@ -169,7 +172,7 @@ $$;
 CREATE POLICY "authorized users view dossiers" ON public.dossiers FOR SELECT
   USING (public.can_view_dossier(id, auth.uid()));
 CREATE POLICY "owners create dossiers" ON public.dossiers FOR INSERT
-  WITH CHECK (owner_id = auth.uid() AND user_id = auth.uid() AND public.can_view_bien(bien_id, auth.uid()));
+  WITH CHECK (owner_id = auth.uid() AND user_id = auth.uid());
 CREATE POLICY "owners update dossiers" ON public.dossiers FOR UPDATE
   USING (owner_id = auth.uid()) WITH CHECK (owner_id = auth.uid() AND user_id = auth.uid());
 
