@@ -8,6 +8,7 @@ export * as accessRepo from "./access.repo";
 export * as interventionsRepo from "./interventions.repo";
 export * as communicationsRepo from "./communications.repo";
 export * as signalementsRepo from "./signalements.repo";
+export * as auditRepo from "./audit.repo";
 export * as biensRepo from "./biens.repo";
 export * as proofsRepo from "./proofs.repo";
 export * as participantsRepo from "./participants.repo";

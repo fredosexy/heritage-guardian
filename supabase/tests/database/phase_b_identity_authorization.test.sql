@@ -1,6 +1,6 @@
 begin;
 
-select plan(57);
+select plan(61);
 
 -- --------------------------------------------------------------------------
 -- Structure
@@ -81,12 +81,14 @@ select lives_ok(
   'owner may declare a non-user Person before account linking'
 );
 
-reset role; set local role authenticated;
+reset role;
+select set_config('test.claim_person_id',(select id::text from public.persons where email='phase-b-claim@test'),false);
+set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000006","role":"authenticated"}',true);
 
 select lives_ok(
   $$ select public.claim_person_record(
-    (select id from public.persons where email='phase-b-claim@test'),
+    current_setting('test.claim_person_id')::uuid,
     'bb900000-0000-4000-8000-000000000020'
   ) $$,
   'matching account can claim a pre-existing Person'

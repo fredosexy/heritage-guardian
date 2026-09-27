@@ -11,6 +11,7 @@ import { AccessSection } from "@/features/access";
 import { InterventionsSection } from "@/features/interventions";
 import { ExchangesSection } from "@/features/communications";
 import { SignalementsSection } from "@/features/signalements";
+import { DossierHistorySection } from "@/features/audit";
 
 export default function DossierDetailPage() {
   const { id } = useParams();
@@ -38,6 +39,7 @@ export default function DossierDetailPage() {
     <AccessSection dossierId={dossier.id} ownerId={dossier.owner_id} />
     <ExchangesSection dossierId={dossier.id} ownerId={dossier.owner_id} />
     <SignalementsSection dossierId={dossier.id} bienId={dossier.bien_id} />
+    <DossierHistorySection dossierId={dossier.id} />
     <Button variant="outline" className="w-full" onClick={doArchive}><Archive className="size-4" />{t("dossier.archive")}</Button>
   </AppLayout>;
 }
