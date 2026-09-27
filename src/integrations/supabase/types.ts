@@ -14,6 +14,12 @@ export type Database = {
   }
   public: {
     Tables: {
+      dossier_interventions: {
+        Row: { actor_id:string|null; action_type:string; comment:string|null; created_at:string; dossier_id:string; id:string; on_behalf_of:string|null; participant_id:string|null; performed_at:string; performed_by:string; role:string; step_id:string|null; supersedes_intervention_id:string|null; territorial_level:string; verification_status:string; verified_at:string|null; verified_by:string|null }
+        Insert: { actor_id?:string|null; action_type:string; comment?:string|null; created_at?:string; dossier_id:string; id?:string; on_behalf_of?:string|null; participant_id?:string|null; performed_at?:string; performed_by:string; role:string; step_id?:string|null; supersedes_intervention_id?:string|null; territorial_level:string; verification_status?:string; verified_at?:string|null; verified_by?:string|null }
+        Update: { actor_id?:string|null; action_type?:string; comment?:string|null; created_at?:string; dossier_id?:string; id?:string; on_behalf_of?:string|null; participant_id?:string|null; performed_at?:string; performed_by?:string; role?:string; step_id?:string|null; supersedes_intervention_id?:string|null; territorial_level?:string; verification_status?:string; verified_at?:string|null; verified_by?:string|null }
+        Relationships: []
+      }
       access_requests: {
         Row: { created_at:string; dossier_id:string; expires_at:string|null; id:string; message:string|null; purpose:string; requested_by:string; requester_actor_id:string|null; resolved_at:string|null; resolved_by:string|null; status:string }
         Insert: { created_at?:string; dossier_id:string; expires_at?:string|null; id?:string; message?:string|null; purpose:string; requested_by:string; requester_actor_id?:string|null; resolved_at?:string|null; resolved_by?:string|null; status?:string }
@@ -847,6 +853,12 @@ export type Database = {
       }
     }
     Functions: {
+      can_create_intervention:{Args:{p_dossier_id:string;p_step_id:string|null;p_actor_id:string|null;p_participant_id:string|null;p_role:string;p_action:string};Returns:boolean}
+      create_dossier_intervention:{Args:{p_dossier_id:string;p_step_id:string|null;p_actor_id:string|null;p_participant_id:string|null;p_on_behalf_of:string|null;p_role:string;p_action_type:string;p_territorial_level:string;p_comment?:string|null};Returns:string}
+      correct_dossier_intervention:{Args:{p_previous_id:string;p_action_type:string;p_comment:string};Returns:string}
+      verify_dossier_intervention:{Args:{p_intervention_id:string;p_status:string};Returns:undefined}
+      can_complete_dossier_step:{Args:{p_step_id:string};Returns:boolean}
+      complete_dossier_step_from_interventions:{Args:{p_step_id:string};Returns:undefined}
       request_dossier_access:{Args:{p_actor_id:string|null;p_dossier_id:string;p_expires_at?:string|null;p_message:string;p_purpose:string;p_scopes:string[]};Returns:string}
       resolve_access_request:{Args:{p_decision:string;p_document_ids?:string[];p_expires_at?:string|null;p_request_id:string;p_scopes?:string[]};Returns:string|null}
       cancel_access_request:{Args:{p_request_id:string};Returns:undefined}
