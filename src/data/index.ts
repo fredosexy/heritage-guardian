@@ -1,3 +1,4 @@
+export * as authorizationRepo from "./authorization.repo";
 export * as dossiersRepo from "./dossiers.repo";
 export * as proceduresRepo from "./procedures.repo";
 export * as actorsRepo from "./actors.repo";
