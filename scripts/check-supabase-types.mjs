@@ -27,6 +27,16 @@ const criticalFunctions = [
   "claim_command_idempotency",
   "register_inbox_event",
   "claim_outbox_batch",
+  "ensure_current_user_person",
+  "create_person_record",
+  "claim_person_record",
+  "create_family_relation",
+  "revise_family_relation",
+  "assign_application_role",
+  "grant_explicit_permission",
+  "deny_explicit_permission",
+  "create_representation_mandate",
+  "resolve_action_context",
 ];
 
 const missingFunctions = criticalFunctions.filter(
