@@ -1,6 +1,6 @@
 begin;
 
-select plan(53);
+select plan(57);
 
 -- --------------------------------------------------------------------------
 -- Structure
@@ -24,7 +24,8 @@ insert into auth.users(
 ('00000000-0000-0000-0000-000000000000','bb000000-0000-4000-8000-000000000002','authenticated','authenticated','phase-b-reader@test','',now(),'{}','{"full_name":"Reader B"}',now(),now()),
 ('00000000-0000-0000-0000-000000000000','bb000000-0000-4000-8000-000000000003','authenticated','authenticated','phase-b-represented@test','',now(),'{}','{"full_name":"Represented B"}',now(),now()),
 ('00000000-0000-0000-0000-000000000000','bb000000-0000-4000-8000-000000000004','authenticated','authenticated','phase-b-representative@test','',now(),'{}','{"full_name":"Representative B"}',now(),now()),
-('00000000-0000-0000-0000-000000000000','bb000000-0000-4000-8000-000000000005','authenticated','authenticated','phase-b-outsider@test','',now(),'{}','{"full_name":"Outsider B"}',now(),now());
+('00000000-0000-0000-0000-000000000000','bb000000-0000-4000-8000-000000000005','authenticated','authenticated','phase-b-outsider@test','',now(),'{}','{"full_name":"Outsider B"}',now(),now()),
+('00000000-0000-0000-0000-000000000000','bb000000-0000-4000-8000-000000000006','authenticated','authenticated','phase-b-claim@test','',now(),'{}','{"full_name":"Claim B"}',now(),now());
 
 -- Migration backfill happened before these test users existed, so create linked Persons explicitly as system fixture.
 insert into public.persons(id,linked_profile_id,display_name,created_by,identity_status) values
@@ -64,12 +65,50 @@ select is(
 );
 
 select throws_ok(
-  $$ select public.update_person_record(
+  $ select public.update_person_record(
     'bb110000-0000-4000-8000-000000000001','Oncle Vérifié',null,null,
     'VERIFIED','UNKNOWN',null,null,'bb900000-0000-4000-8000-000000000002'
-  ) $$,
+  ) $,
   '42501','identity_verification_forbidden',
   'ordinary creator cannot self-verify identity'
+);
+
+select lives_ok(
+  $ select public.create_person_record(
+    'Personne à revendiquer',null,'phase-b-claim@test','DECLARED',
+    'bb900000-0000-4000-8000-000000000019'
+  ) $,
+  'owner may declare a non-user Person before account linking'
+);
+
+reset role; set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000006","role":"authenticated"}',true);
+
+select lives_ok(
+  $ select public.claim_person_record(
+    (select id from public.persons where email='phase-b-claim@test'),
+    'bb900000-0000-4000-8000-000000000020'
+  ) $,
+  'matching account can claim a pre-existing Person'
+);
+
+select is(
+  (select linked_profile_id from public.persons where email='phase-b-claim@test'),
+  'bb000000-0000-4000-8000-000000000006'::uuid,
+  'claimed Person links to the claiming account'
+);
+
+reset role; set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
+
+select throws_ok(
+  $ select public.update_person_record(
+    (select id from public.persons where email='phase-b-claim@test'),
+    'Modification interdite',null,'phase-b-claim@test','DECLARED','UNKNOWN',null,null,
+    'bb900000-0000-4000-8000-000000000021'
+  ) $,
+  '42501','person_update_forbidden',
+  'original declarant loses edit authority after Person is claimed'
 );
 
 -- --------------------------------------------------------------------------
