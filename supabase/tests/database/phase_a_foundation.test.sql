@@ -110,6 +110,23 @@ select set_config('request.jwt.claims','{"sub":"aa000000-0000-4000-8000-00000000
 select ok(NOT public.has_effective_permission('VIEW','CASE','aa300000-0000-4000-8000-000000000001'),'explicit deny overrides role allow');
 
 reset role;
+-- The represented account must itself hold the authority it delegates.
+insert into public.permission_grants(
+  id,user_id,permission,scope_type,scope_id,granted_by
+) values
+(
+  'aa225000-0000-4000-8000-000000000001',
+  'aa000000-0000-4000-8000-000000000002',
+  'VIEW','ASSET','aa310000-0000-4000-8000-000000000001',
+  'aa000000-0000-4000-8000-000000000002'
+),
+(
+  'aa225000-0000-4000-8000-000000000002',
+  'aa000000-0000-4000-8000-000000000002',
+  'EDIT','ASSET','aa310000-0000-4000-8000-000000000001',
+  'aa000000-0000-4000-8000-000000000002'
+);
+
 insert into public.representation_mandates(
   id,represented_person_id,representative_user_id,scope_type,scope_id,permissions,source_type,created_by,confirmed_by_represented_at
 ) values(
