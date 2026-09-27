@@ -15,14 +15,19 @@ function configuredOrigins(): string[] {
     : DEFAULT_ALLOWED_ORIGINS;
 }
 
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^$()|[\]\\]/g, "\\$&");
+}
+
 function matchesOrigin(origin: string, rule: string): boolean {
   if (rule === origin) return true;
   if (!rule.includes("*")) return false;
 
-  const escaped = rule
-    .replace(/[.+?^${}()|[]\\]/g, "\\$&")
-    .replace(/\*/g, ".*");
-  return new RegExp(`^${escaped}$`).test(origin);
+  const wildcardPattern = rule
+    .split("*")
+    .map(escapeRegex)
+    .join(".*");
+  return new RegExp(`^${wildcardPattern}$`).test(origin);
 }
 
 export function isAllowedOrigin(req: Request): boolean {
