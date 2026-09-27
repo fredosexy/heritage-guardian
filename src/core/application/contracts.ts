@@ -17,6 +17,11 @@ export const ActionContextSchema = z.object({
   acting_role: z.string().max(80).nullable().optional(),
   represented_person_id: z.string().uuid().nullable().optional(),
   mandate_id: z.string().uuid().nullable().optional(),
+  scope_type: z.enum([
+    "GLOBAL","FAMILY","ASSET","CASE","INHERITANCE","TRANSMISSION",
+    "CONFLICT","PROCEDURE","MISSION","DOCUMENT","ALERT","ECONOMIC_ACTIVITY",
+  ]).nullable().optional(),
+  scope_id: z.string().uuid().nullable().optional(),
   correlation_id: z.string().uuid(),
   causation_id: z.string().uuid().nullable().optional(),
   locale: z.string().max(20).nullable().optional(),
@@ -66,6 +71,8 @@ export interface ActionContextInput {
   acting_role?: string | null;
   represented_person_id?: string | null;
   mandate_id?: string | null;
+  scope_type?: "GLOBAL" | "FAMILY" | "ASSET" | "CASE" | "INHERITANCE" | "TRANSMISSION" | "CONFLICT" | "PROCEDURE" | "MISSION" | "DOCUMENT" | "ALERT" | "ECONOMIC_ACTIVITY" | null;
+  scope_id?: string | null;
   correlation_id?: string;
   causation_id?: string | null;
   locale?: string | null;
