@@ -902,6 +902,10 @@ export type Database = {
     }
     Functions: {
       current_user_person_id:{Args:Record<PropertyKey,never>;Returns:string|null}
+      ensure_current_user_person:{Args:{p_correlation_id:string};Returns:string}
+      create_person_record:{Args:{p_correlation_id:string;p_display_name:string;p_email:string|null;p_identity_status:string;p_phone:string|null};Returns:string}
+      claim_person_record:{Args:{p_correlation_id:string;p_person_id:string};Returns:string}
+      accept_dossier_participation:{Args:{p_correlation_id:string;p_participant_id:string};Returns:undefined}
       resolve_person_id:{Args:{p_person_id:string};Returns:string|null}
       update_person_record:{Args:{p_birth_date:string|null;p_correlation_id:string;p_death_date:string|null;p_death_status:string;p_display_name:string;p_email:string|null;p_identity_status:string;p_person_id:string;p_phone:string|null};Returns:undefined}
       merge_person_records:{Args:{p_correlation_id:string;p_source_person_id:string;p_target_person_id:string};Returns:string}
