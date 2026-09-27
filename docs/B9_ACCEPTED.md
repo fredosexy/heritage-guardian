@@ -2,7 +2,7 @@
 
 **Date :** 27 septembre 2026  
 **Périmètre :** B9 uniquement  
-**Décision :** implémentation à certifier avant fusion volontaire.
+**Décision :** implémentation terminée et certifiée ; fusion volontaire requise avant B10.
 
 ## 1. Existant réutilisé
 
