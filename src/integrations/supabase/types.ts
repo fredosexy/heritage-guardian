@@ -14,6 +14,23 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_requests: {
+        Row: { created_at:string; dossier_id:string; expires_at:string|null; id:string; message:string|null; purpose:string; requested_by:string; requester_actor_id:string|null; resolved_at:string|null; resolved_by:string|null; status:string }
+        Insert: { created_at?:string; dossier_id:string; expires_at?:string|null; id?:string; message?:string|null; purpose:string; requested_by:string; requester_actor_id?:string|null; resolved_at?:string|null; resolved_by?:string|null; status?:string }
+        Update: { created_at?:string; dossier_id?:string; expires_at?:string|null; id?:string; message?:string|null; purpose?:string; requested_by?:string; requester_actor_id?:string|null; resolved_at?:string|null; resolved_by?:string|null; status?:string }
+        Relationships: []
+      }
+      access_request_scopes: {
+        Row:{request_id:string;scope:string}; Insert:{request_id:string;scope:string}; Update:{request_id?:string;scope?:string}; Relationships:[{foreignKeyName:"access_request_scopes_request_id_fkey";columns:["request_id"];isOneToOne:false;referencedRelation:"access_requests";referencedColumns:["id"]}]
+      }
+      access_grants: {
+        Row:{created_from_request_id:string|null; dossier_id:string; expires_at:string|null; granted_at:string; granted_by:string; grantee_actor_id:string|null; grantee_user_id:string|null; id:string; purpose:string; revoked_at:string|null}
+        Insert:{created_from_request_id?:string|null; dossier_id:string; expires_at?:string|null; granted_at?:string; granted_by:string; grantee_actor_id?:string|null; grantee_user_id?:string|null; id?:string; purpose:string; revoked_at?:string|null}
+        Update:{created_from_request_id?:string|null; dossier_id?:string; expires_at?:string|null; granted_at?:string; granted_by?:string; grantee_actor_id?:string|null; grantee_user_id?:string|null; id?:string; purpose?:string; revoked_at?:string|null}
+        Relationships:[]
+      }
+      access_grant_scopes:{Row:{grant_id:string;scope:string};Insert:{grant_id:string;scope:string};Update:{grant_id?:string;scope?:string};Relationships:[{foreignKeyName:"access_grant_scopes_grant_id_fkey";columns:["grant_id"];isOneToOne:false;referencedRelation:"access_grants";referencedColumns:["id"]}]}
+      access_grant_documents:{Row:{document_id:string;grant_id:string};Insert:{document_id:string;grant_id:string};Update:{document_id?:string;grant_id?:string};Relationships:[{foreignKeyName:"access_grant_documents_grant_id_fkey";columns:["grant_id"];isOneToOne:false;referencedRelation:"access_grants";referencedColumns:["id"]}]}
       actor_competences: {
         Row: { actor_id: string; competence_code: string; created_at: string; expires_at: string | null; id: string; label: string; status: string; verified_at: string | null; verified_by: string | null }
         Insert: { actor_id: string; competence_code: string; created_at?: string; expires_at?: string | null; id?: string; label: string; status?: string; verified_at?: string | null; verified_by?: string | null }
@@ -830,6 +847,14 @@ export type Database = {
       }
     }
     Functions: {
+      request_dossier_access:{Args:{p_actor_id:string|null;p_dossier_id:string;p_expires_at?:string|null;p_message:string;p_purpose:string;p_scopes:string[]};Returns:string}
+      resolve_access_request:{Args:{p_decision:string;p_document_ids?:string[];p_expires_at?:string|null;p_request_id:string;p_scopes?:string[]};Returns:string|null}
+      cancel_access_request:{Args:{p_request_id:string};Returns:undefined}
+      revoke_access_grant:{Args:{p_grant_id:string};Returns:undefined}
+      has_active_grant:{Args:{_dossier_id:string;_user_id:string};Returns:boolean}
+      has_scope:{Args:{_dossier_id:string;_scope:string;_user_id:string};Returns:boolean}
+      can_access_document:{Args:{_document_id:string;_user_id:string};Returns:boolean}
+      get_granted_dossier_summary:{Args:{p_dossier_id:string};Returns:{id:string;location_label:string;status:Database["public"]["Enums"]["dossier_status"];title:string;type:Database["public"]["Enums"]["dossier_type"]}[]}
       archive_document: { Args: { p_document_id: string }; Returns: undefined }
       rename_document: { Args: { p_document_id: string; p_title: string }; Returns: undefined }
       register_document_version: {

@@ -209,6 +209,11 @@ export const en = {
     statuses: { declare: "Declared", fourni: "Document received", a_verifier: "To verify", verifie: "Verified", officiel: "Official", rejete: "Rejected", archive: "Archived" },
     errors: { unsupported_mime_type: "This file format is not accepted.", invalid_file_size: "The file is empty or larger than 15 MB." },
   },
+  access: {
+    title: "Access and interventions", hint: "Choose exactly who can see or do what.", pending: "Pending requests", noPending: "No pending request.", active: "Active access", noActive: "No active access.", accept: "Accept", refuse: "Refuse", revoke: "Revoke", purpose: "Why do you need access?", request: "Request access", requested: "Request sent", acceptee: "Access granted", refusee: "Request refused",
+    scopes: { voir_resume: "View the summary", voir_documents_selectionnes: "View selected documents", ajouter_document: "Add a document", accompagner: "Provide support", intervenir: "Intervene on a step", commenter: "Add a comment" },
+    statuses: { en_attente: "Pending", acceptee: "Accepted", refusee: "Refused", annulee: "Cancelled", expiree: "Expired" },
+  },
   visitor: {
     title: "You are exploring Mémoire",
     subtitle: "Your dossiers stay on this device for now.",

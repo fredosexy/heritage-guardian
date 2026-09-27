@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useDossierDetail } from "../hooks/useDossierDetail";
 import { JourneySection } from "../components/JourneySection";
 import { DocumentsSection } from "../components/DocumentsSection";
+import { AccessSection } from "@/features/access";
 
 export default function DossierDetailPage() {
   const { id } = useParams();
@@ -30,6 +31,7 @@ export default function DossierDetailPage() {
     </section>
     <DocumentsSection dossierId={dossier.id} bienId={dossier.bien_id} />
     <JourneySection dossierId={dossier.id} hasProcedure={Boolean(dossier.procedure_definition_id)} />
+    <AccessSection dossierId={dossier.id} ownerId={dossier.owner_id} />
     <Button variant="outline" className="w-full" onClick={doArchive}><Archive className="size-4" />{t("dossier.archive")}</Button>
   </AppLayout>;
 }
