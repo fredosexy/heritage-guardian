@@ -1,6 +1,6 @@
 begin;
 
-select plan(34);
+select plan(39);
 
 select ok(to_regclass('public.role_assignments') is not null,'role_assignments exists');
 select ok(to_regclass('public.permission_grants') is not null,'permission_grants exists');
@@ -18,6 +18,37 @@ select ok((select relrowsecurity from pg_class where oid='public.permission_gran
 select ok((select relrowsecurity from pg_class where oid='public.permission_denies'::regclass),'permission denies RLS enabled');
 select ok((select relrowsecurity from pg_class where oid='public.representation_mandates'::regclass),'mandates RLS enabled');
 select ok((select relrowsecurity from pg_class where oid='public.audit_events'::regclass),'audit RLS enabled');
+
+select ok(
+  NOT (select has_function_privilege('authenticated',p.oid,'EXECUTE')
+       from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+       where n.nspname='public' and p.proname='record_audit_event'),
+  'authenticated cannot execute internal audit writer directly'
+);
+select ok(
+  NOT (select has_function_privilege('authenticated',p.oid,'EXECUTE')
+       from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+       where n.nspname='public' and p.proname='enqueue_domain_event'),
+  'authenticated cannot enqueue domain events directly'
+);
+select ok(
+  NOT (select has_function_privilege('authenticated',p.oid,'EXECUTE')
+       from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+       where n.nspname='public' and p.proname='claim_command_idempotency'),
+  'authenticated cannot claim command idempotency directly'
+);
+select ok(
+  (select has_function_privilege('authenticated',p.oid,'EXECUTE')
+   from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+   where n.nspname='public' and p.proname='has_effective_permission'),
+  'authenticated may call the safe effective-permission query'
+);
+select ok(
+  (select has_function_privilege('service_role',p.oid,'EXECUTE')
+   from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+   where n.nspname='public' and p.proname='claim_outbox_batch'),
+  'service role may claim outbox work'
+);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','aa000000-0000-4000-8000-000000000001','authenticated','authenticated','phasea-one@test','',now(),'{}','{}',now(),now()),
