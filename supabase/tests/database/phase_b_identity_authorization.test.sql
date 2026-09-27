@@ -1,6 +1,6 @@
 begin;
 
-select plan(52);
+select plan(53);
 
 -- --------------------------------------------------------------------------
 -- Structure
@@ -328,9 +328,29 @@ select ok(
   'unconfirmed declared mandate gives no permission'
 );
 
--- Account holder creates mandate for representative: explicit represented-person confirmation activates it immediately.
+-- Account holder may delegate only authority it already holds.
+reset role; set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
+select public.assign_application_role(
+  'bb000000-0000-4000-8000-000000000003',
+  'CONTRIBUTOR','CASE',(select id from phase_b_test_ids where key='case'),
+  now()+interval '7 days','bb900000-0000-4000-8000-000000000017'
+);
+
 reset role; set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000003","role":"authenticated"}',true);
+
+select throws_ok(
+  $ select public.create_representation_mandate(
+    'bb100000-0000-4000-8000-000000000003',
+    'bb000000-0000-4000-8000-000000000004',
+    'CASE',(select id from phase_b_test_ids where key='case'),
+    array['GRANT_ACCESS'],'DECLARATION',null,now()+interval '7 days',
+    'bb900000-0000-4000-8000-000000000018'
+  ) $,
+  '42501','mandate_permission_not_delegable',
+  'represented principal cannot delegate a permission it does not hold'
+);
 
 select lives_ok(
   $$ select public.create_representation_mandate(
