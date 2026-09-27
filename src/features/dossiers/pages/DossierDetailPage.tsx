@@ -11,6 +11,7 @@ import { AccessSection } from "@/features/access";
 import { InterventionsSection } from "@/features/interventions";
 import { ExchangesSection } from "@/features/communications";
 import { SignalementsSection } from "@/features/signalements";
+import { DossierHistorySection } from "@/features/audit";
 
 export default function DossierDetailPage() {
   const { id } = useParams();
