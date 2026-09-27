@@ -28,6 +28,7 @@ En cas de contradiction, la série canonique prévaut.
 ## Accès rapide
 
 - [Index canonique complet](./canonical/README.md)
+- [Audit Documentation ↔ Code — 2026-09-27](./audits/2026-09-27-CANONICAL-CODE-AUDIT.md)
 - [12 — Architecture inter-domaines](./canonical/12-ARCHITECTURE-INTER-DOMAINES.md)
 - [13 — Event Model & Contracts](./canonical/13-EVENT-MODEL-AND-CONTRACTS.md)
 - [14 — Commands & Application Services](./canonical/14-COMMANDS-AND-APPLICATION-SERVICES.md)
@@ -37,6 +38,28 @@ En cas de contradiction, la série canonique prévaut.
 - [25 — Tests et qualité](./canonical/25-TESTS-ET-QUALITE.md)
 - [26 — Déploiement / Production](./canonical/26-DEPLOIEMENT-ENVIRONNEMENTS-PRODUCTION.md)
 - [27 — ADR](./canonical/27-ADR-ARCHITECTURE-DECISION-RECORDS.md)
+
+---
+
+## Audits
+
+### 2026-09-27 — Documentation canonique ↔ Code réel
+
+**[Ouvrir l’audit complet](./audits/2026-09-27-CANONICAL-CODE-AUDIT.md)**
+
+Résultat :
+
+```text
+COMPLETE : 0 / 28
+PARTIAL  : 21 / 28
+MISSING  : 7 / 28
+```
+
+Ce résultat utilise la cible canonique complète 00→27. La baseline existante B1→B10 reste une fondation technique réelle et réutilisable.
+
+Prochaine phase recommandée :
+
+**Phase A — Stabilisation sécurité et fondation transverse.**
 
 ---
 
@@ -91,6 +114,10 @@ Avant de modifier le code :
 
 ## État
 
-**Documentation canonique : COMPLETE — 00/27 à 27/27.**
+```text
+Documentation canonique : COMPLETE — 00→27
+Audit documentation ↔ code : COMPLETE
+Code conforme à la cible canonique : PARTIAL
+```
 
-La prochaine étape recommandée est un **audit de conformité du code par rapport à la documentation canonique**, avec matrice Complete / Partial / Missing.
+La suite n’est plus un nouvel audit documentaire. Elle consiste à appliquer le backlog de convergence défini par l’audit.
