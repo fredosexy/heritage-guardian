@@ -2,7 +2,7 @@
 
 **Date :** 28 septembre 2026  
 **Périmètre :** corrections de convergence uniquement  
-**Statut :** implémenté, certification CI en attente
+**Statut :** implémenté et certifié par la CI Quality #180
 
 ## Objectif
 
@@ -34,3 +34,10 @@ C1 ne développe aucune fonctionnalité B12. La synchronisation hors ligne compl
 - suite SQL/RLS complète ;
 - tests C1 sur les événements et les privilèges ;
 - PR verte avant toute fusion explicite.
+
+## Résultat de certification
+
+- `npm run check` : succès ;
+- reset complet Supabase et application de toutes les migrations : succès ;
+- 15 fichiers pgTAP, 323 assertions SQL/RLS : succès ;
+- fusion non effectuée : validation explicite du propriétaire requise.
