@@ -6,24 +6,51 @@ export interface ChatMessage {
   content: string;
 }
 
+export interface SafeDossierProjection {
+  dossier_type: string;
+  status: string;
+  completion_band: "low" | "medium" | "high";
+  has_location: boolean;
+  has_description: boolean;
+  proofs_count: number;
+  participants_count: number;
+}
+
 export class AiUnavailableError extends Error {
   constructor(public reason: "unauthorized" | "rate_limit" | "credits" | "unknown") {
     super(reason);
   }
 }
 
-/** Contextual suggestions for a dossier (2-3 concrete next actions). */
+export function buildSafeDossierProjection(params: {
+  dossier: Dossier;
+  proofsCount: number;
+  participantsCount: number;
+}): SafeDossierProjection {
+  const completionScore = Number(params.dossier.completion_score ?? 0);
+  const completion_band: SafeDossierProjection["completion_band"] =
+    completionScore >= 75 ? "high" : completionScore >= 40 ? "medium" : "low";
+
+  return {
+    dossier_type: String(params.dossier.type),
+    status: String(params.dossier.status),
+    completion_band,
+    has_location: Boolean(params.dossier.location_name),
+    has_description: Boolean(params.dossier.description?.trim()),
+    proofs_count: Math.max(0, params.proofsCount),
+    participants_count: Math.max(0, params.participantsCount),
+  };
+}
+
+/** Contextual suggestions based only on a deliberately minimized projection. */
 export async function fetchDossierSuggestions(params: {
   dossier: Dossier;
   proofsCount: number;
   participantsCount: number;
 }): Promise<string[]> {
+  const projection = buildSafeDossierProjection(params);
   const { data, error } = await supabase.functions.invoke("ai-context", {
-    body: {
-      dossier: params.dossier,
-      proofs_count: params.proofsCount,
-      participants_count: params.participantsCount,
-    },
+    body: { projection },
   });
   if (error) return [];
   return (data?.suggestions as string[] | undefined) ?? [];
