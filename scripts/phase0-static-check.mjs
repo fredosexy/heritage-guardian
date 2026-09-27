@@ -87,6 +87,40 @@ for (const requiredFile of [
   requireCondition(existsSync(new URL(requiredFile, root)), `${requiredFile} is required by Phase A`);
 }
 
+const phaseBFoundation = read("supabase/migrations/20260927130000_phase_b_identity_authorization.sql");
+for (const requiredPrimitive of [
+  "identity_status",
+  "death_status",
+  "person_aliases",
+  "family_relations",
+  "family_relation_revisions",
+  "merge_person_records",
+  "create_representation_mandate",
+  "resolve_action_context",
+]) {
+  requireCondition(
+    phaseBFoundation.includes(requiredPrimitive),
+    `Phase B foundation is missing ${requiredPrimitive}`
+  );
+}
+
+for (const requiredFile of [
+  "supabase/tests/database/phase_b_identity_authorization.test.sql",
+  "src/data/persons.repo.ts",
+  "src/data/family-relations.repo.ts",
+  "src/data/authorization.repo.ts",
+  "src/test/phase-b-identity-authorization.test.ts",
+]) {
+  requireCondition(existsSync(new URL(requiredFile, root)), `${requiredFile} is required by Phase B`);
+}
+
+const phaseBDelegationSecurity = read("supabase/migrations/20260927133000_phase_b_delegation_security.sql");
+requireCondition(
+  phaseBDelegationSecurity.includes("mandate_permission_not_delegable") &&
+    phaseBDelegationSecurity.includes("has_direct_permission_allow_for"),
+  "Phase B must prevent representation mandates from creating authority"
+);
+
 const offlineSync = read("src/data/offline/sync.ts");
 requireCondition(
   offlineSync.includes("Unsupported offline operation"),
