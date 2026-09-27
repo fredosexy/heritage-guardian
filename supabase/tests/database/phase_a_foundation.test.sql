@@ -1,6 +1,6 @@
 begin;
 
-select plan(32);
+select plan(34);
 
 select ok(to_regclass('public.role_assignments') is not null,'role_assignments exists');
 select ok(to_regclass('public.permission_grants') is not null,'permission_grants exists');
