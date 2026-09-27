@@ -65,19 +65,19 @@ select is(
 );
 
 select throws_ok(
-  $ select public.update_person_record(
+  $$ select public.update_person_record(
     'bb110000-0000-4000-8000-000000000001','Oncle Vérifié',null,null,
     'VERIFIED','UNKNOWN',null,null,'bb900000-0000-4000-8000-000000000002'
-  ) $,
+  ) $$,
   '42501','identity_verification_forbidden',
   'ordinary creator cannot self-verify identity'
 );
 
 select lives_ok(
-  $ select public.create_person_record(
+  $$ select public.create_person_record(
     'Personne à revendiquer',null,'phase-b-claim@test','DECLARED',
     'bb900000-0000-4000-8000-000000000019'
-  ) $,
+  ) $$,
   'owner may declare a non-user Person before account linking'
 );
 
@@ -85,10 +85,10 @@ reset role; set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000006","role":"authenticated"}',true);
 
 select lives_ok(
-  $ select public.claim_person_record(
+  $$ select public.claim_person_record(
     (select id from public.persons where email='phase-b-claim@test'),
     'bb900000-0000-4000-8000-000000000020'
-  ) $,
+  ) $$,
   'matching account can claim a pre-existing Person'
 );
 
@@ -102,11 +102,11 @@ reset role; set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 
 select throws_ok(
-  $ select public.update_person_record(
+  $$ select public.update_person_record(
     (select id from public.persons where email='phase-b-claim@test'),
     'Modification interdite',null,'phase-b-claim@test','DECLARED','UNKNOWN',null,null,
     'bb900000-0000-4000-8000-000000000021'
-  ) $,
+  ) $$,
   '42501','person_update_forbidden',
   'original declarant loses edit authority after Person is claimed'
 );
@@ -342,7 +342,7 @@ select public.create_person_record(
 );
 
 select lives_ok(
-  $ select public.create_representation_mandate(
+  $$ select public.create_representation_mandate(
     (select id from public.persons where display_name='Parent accompagné' and created_by='bb000000-0000-4000-8000-000000000001'),
     'bb000000-0000-4000-8000-000000000004',
     'CASE',(select id from phase_b_test_ids where key='case'),
@@ -380,13 +380,13 @@ reset role; set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000003","role":"authenticated"}',true);
 
 select throws_ok(
-  $ select public.create_representation_mandate(
+  $$ select public.create_representation_mandate(
     'bb100000-0000-4000-8000-000000000003',
     'bb000000-0000-4000-8000-000000000004',
     'CASE',(select id from phase_b_test_ids where key='case'),
     array['GRANT_ACCESS'],'DECLARATION',null,now()+interval '7 days',
     'bb900000-0000-4000-8000-000000000018'
-  ) $,
+  ) $$,
   '42501','mandate_permission_not_delegable',
   'represented principal cannot delegate a permission it does not hold'
 );
