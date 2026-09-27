@@ -47,19 +47,19 @@ En cas de contradiction, la série canonique prévaut.
 
 **[Ouvrir l’audit complet](./audits/2026-09-27-CANONICAL-CODE-AUDIT.md)**
 
-Résultat :
+Ce rapport constitue la photographie initiale du 27 septembre 2026. Depuis cet audit, la Phase A et les blocs B1→B11 ont été implémentés, testés et fusionnés.
 
-```text
-COMPLETE : 0 / 28
-PARTIAL  : 21 / 28
-MISSING  : 7 / 28
-```
+État d’implémentation au 28 septembre 2026 :
 
-Ce résultat utilise la cible canonique complète 00→27. La baseline existante B1→B10 reste une fondation technique réelle et réutilisable.
+- **B1→B10 :** complets dans leur périmètre automatisé ;
+- **B11 :** socle d’audit append-only complet ; couverture documents, acteurs et procédures finalisée par C1 ;
+- **B12 :** partiel minimal (création de dossier hors ligne uniquement) ;
+- **B13 :** partiel (alertes et e-mail hérités) ;
+- **B14 :** fondations backend uniquement, sans interface d’administration ;
+- **B15 :** partiel (CI présente, durcissement E2E/performance/accessibilité restant) ;
+- **B16 :** non commencé.
 
-Prochaine phase recommandée :
-
-**Phase A — Stabilisation sécurité et fondation transverse.**
+Prochaine phase : **B12 — synchronisation hors ligne complète**, après validation et fusion de C1.
 
 ---
 
@@ -117,7 +117,7 @@ Avant de modifier le code :
 ```text
 Documentation canonique : COMPLETE — 00→27
 Audit documentation ↔ code : COMPLETE
-Code conforme à la cible canonique : PARTIAL
+Code conforme à la cible canonique : PARTIAL — B1→B11 réalisés, C1 en validation
 ```
 
 La suite n’est plus un nouvel audit documentaire. Elle consiste à appliquer le backlog de convergence défini par l’audit.
