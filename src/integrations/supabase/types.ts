@@ -21,7 +21,7 @@ export type Database = {
         Relationships: []
       }
       access_request_scopes: {
-        Row:{request_id:string;scope:string}; Insert:{request_id:string;scope:string}; Update:{request_id?:string;scope?:string}; Relationships:[]
+        Row:{request_id:string;scope:string}; Insert:{request_id:string;scope:string}; Update:{request_id?:string;scope?:string}; Relationships:[{foreignKeyName:"access_request_scopes_request_id_fkey";columns:["request_id"];isOneToOne:false;referencedRelation:"access_requests";referencedColumns:["id"]}]
       }
       access_grants: {
         Row:{created_from_request_id:string|null; dossier_id:string; expires_at:string|null; granted_at:string; granted_by:string; grantee_actor_id:string|null; grantee_user_id:string|null; id:string; purpose:string; revoked_at:string|null}
@@ -29,8 +29,8 @@ export type Database = {
         Update:{created_from_request_id?:string|null; dossier_id?:string; expires_at?:string|null; granted_at?:string; granted_by?:string; grantee_actor_id?:string|null; grantee_user_id?:string|null; id?:string; purpose?:string; revoked_at?:string|null}
         Relationships:[]
       }
-      access_grant_scopes:{Row:{grant_id:string;scope:string};Insert:{grant_id:string;scope:string};Update:{grant_id?:string;scope?:string};Relationships:[]}
-      access_grant_documents:{Row:{document_id:string;grant_id:string};Insert:{document_id:string;grant_id:string};Update:{document_id?:string;grant_id?:string};Relationships:[]}
+      access_grant_scopes:{Row:{grant_id:string;scope:string};Insert:{grant_id:string;scope:string};Update:{grant_id?:string;scope?:string};Relationships:[{foreignKeyName:"access_grant_scopes_grant_id_fkey";columns:["grant_id"];isOneToOne:false;referencedRelation:"access_grants";referencedColumns:["id"]}]}
+      access_grant_documents:{Row:{document_id:string;grant_id:string};Insert:{document_id:string;grant_id:string};Update:{document_id?:string;grant_id?:string};Relationships:[{foreignKeyName:"access_grant_documents_grant_id_fkey";columns:["grant_id"];isOneToOne:false;referencedRelation:"access_grants";referencedColumns:["id"]}]}
       actor_competences: {
         Row: { actor_id: string; competence_code: string; created_at: string; expires_at: string | null; id: string; label: string; status: string; verified_at: string | null; verified_by: string | null }
         Insert: { actor_id: string; competence_code: string; created_at?: string; expires_at?: string | null; id?: string; label: string; status?: string; verified_at?: string | null; verified_by?: string | null }
