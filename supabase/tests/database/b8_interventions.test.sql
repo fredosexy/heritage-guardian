@@ -56,7 +56,7 @@ select set_config('request.jwt.claims','{"sub":"b8000000-0000-4000-8000-00000000
 select lives_ok($$select public.correct_dossier_intervention((select id from public.dossier_interventions where supersedes_intervention_id is null),'corrige','Précision')$$,'performer creates a correction');
 select is((select count(*) from public.dossier_interventions),2::bigint,'original intervention remains after correction');
 select ok((select supersedes_intervention_id is not null from public.dossier_interventions where action_type='corrige'),'correction points to original');
-select throws_ok($update public.dossier_interventions set comment='overwrite'$,'42501',null,'direct update is denied');
+select throws_ok($b8$update public.dossier_interventions set comment='overwrite'$b8$,'42501',null,'direct update is denied');
 select throws_ok($$delete from public.dossier_interventions$$,'42501',null,'destructive delete is denied');
 
 reset role;
