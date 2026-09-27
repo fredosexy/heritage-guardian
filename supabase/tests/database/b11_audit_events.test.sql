@@ -16,7 +16,7 @@ set local role authenticated;select set_config('request.jwt.claims','{"sub":"bb0
 do $b11$begin perform public.add_dossier_participant('bb200000-0000-4000-8000-000000000001','bb300000-0000-4000-8000-000000000001','accompagnateur');end$b11$;
 select is((select action from public.audit_events where target_type='DOSSIER_PARTICIPANT'),'PARTICIPANT_ADDED','participant addition is audited');
 do $b11$begin perform public.revoke_dossier_participant((select id from public.dossier_participants where dossier_id='bb200000-0000-4000-8000-000000000001' and person_id='bb300000-0000-4000-8000-000000000001'));end$b11$;
-select is((select action from public.audit_events where target_type='DOSSIER_PARTICIPANT' order by occurred_at desc,id desc limit 1),'PARTICIPANT_REVOKED','participant revocation is audited');
+select is((select count(*) from public.audit_events where target_type='DOSSIER_PARTICIPANT' and action='PARTICIPANT_REVOKED'),1::bigint,'participant revocation is audited');
 select throws_ok($$insert into public.audit_events(action,target_domain,result,correlation_id)values('FORGED','DOSSIER','SUCCEEDED',gen_random_uuid())$$,'42501',null,'client cannot forge an event');
 select throws_ok($$update public.audit_events set action='FORGED' where target_id='bb200000-0000-4000-8000-000000000001'$$,'42501',null,'client cannot update the journal');
 select throws_ok($$delete from public.audit_events where target_id='bb200000-0000-4000-8000-000000000001'$$,'42501',null,'client cannot delete the journal');
