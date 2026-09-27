@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { createCorrelationId } from "@/core/observability";
 import type { DossierParticipant, Person } from "@/core/types/domain";
 
 export interface DossierParticipantWithPerson extends DossierParticipant { person: Person; }
@@ -28,4 +29,15 @@ export async function countParticipantsByDossier(dossierIds: string[]): Promise<
   const out: Record<string, number> = {};
   for (const row of data ?? []) out[row.dossier_id] = (out[row.dossier_id] ?? 0) + 1;
   return out;
+}
+
+export async function acceptParticipation(
+  participantId: string,
+  correlationId = createCorrelationId(),
+): Promise<void> {
+  const { error } = await supabase.rpc("accept_dossier_participation", {
+    p_participant_id: participantId,
+    p_correlation_id: correlationId,
+  });
+  if (error) throw error;
 }
