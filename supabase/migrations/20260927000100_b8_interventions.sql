@@ -138,7 +138,7 @@ END $$;
 
 ALTER TABLE public.dossier_interventions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "authorized users view interventions" ON public.dossier_interventions FOR SELECT USING(
- public.can_view_dossier(dossier_id,auth.uid()) OR public.has_active_grant(dossier_id,auth.uid())
+ public.can_view_dossier(dossier_id,auth.uid()) OR public.has_active_grant(dossier_id,auth.uid()) OR public.can_verify_actor(auth.uid())
 );
 REVOKE ALL ON public.dossier_interventions FROM anon,authenticated;
 GRANT SELECT ON public.dossier_interventions TO authenticated;
