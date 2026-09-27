@@ -1,5 +1,4 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
 
 const root = new URL("../", import.meta.url);
 const failures = [];
@@ -29,6 +28,32 @@ requireCondition(assistant.includes("access_token"), "AI calls must use the auth
 requireCondition(
   !assistant.includes("Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`"),
   "AI calls must not authenticate with the public key"
+);
+requireCondition(
+  assistant.includes("buildSafeDossierProjection") && !assistant.includes("dossier: params.dossier"),
+  "Vita contextual calls must use the safe minimized dossier projection"
+);
+
+const edgeSecurity = read("supabase/functions/_shared/security.ts");
+requireCondition(
+  edgeSecurity.includes("APP_ALLOWED_ORIGINS"),
+  "Edge Functions must support an explicit allowed-origin configuration"
+);
+requireCondition(
+  !edgeSecurity.includes('"Access-Control-Allow-Origin": "*"'),
+  "Edge Functions must not use wildcard CORS"
+);
+
+const edgeConfig = read("supabase/config.toml");
+for (const fn of ["ai-chat", "ai-context", "notify-alerts"]) {
+  const block = new RegExp(`\\[functions\\.${fn}\\][\\s\\S]*?verify_jwt\\s*=\\s*true`);
+  requireCondition(block.test(edgeConfig), `${fn} must require platform JWT verification`);
+}
+
+const viteConfig = read("vite.config.ts");
+requireCondition(
+  !viteConfig.includes("supabase-storage") && !viteConfig.includes("supabase\\.co\\/storage"),
+  "Private Supabase Storage responses must not be cached by the service worker"
 );
 
 const offlineSync = read("src/data/offline/sync.ts");
