@@ -60,7 +60,7 @@ select throws_ok($b8$update public.dossier_interventions set comment='overwrite'
 select throws_ok($$delete from public.dossier_interventions$$,'42501',null,'destructive delete is denied');
 
 reset role;
-update public.access_grants set expires_at=now()-interval '1 minute' where id='b8900000-0000-4000-8000-000000000001';
+update public.access_grants set granted_at=now()-interval '2 days',expires_at=now()-interval '1 day' where id='b8900000-0000-4000-8000-000000000001';
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"b8000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
 select is(public.can_create_intervention('b8200000-0000-4000-8000-000000000001','b8500000-0000-4000-8000-000000000001','b8600000-0000-4000-8000-000000000001',null,'professionnel','constate'),false,'expired grant blocks intervention');
