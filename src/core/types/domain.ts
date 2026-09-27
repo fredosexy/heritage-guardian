@@ -19,6 +19,8 @@ export type DossierStep = Tables<"dossier_steps">;
 export type Actor = Tables<"actors">;
 export type ActorCompetence = Tables<"actor_competences">;
 export type ActorCredential = Tables<"actor_credentials">;
+export type AccessRequest = Tables<"access_requests">;
+export type AccessGrant = Tables<"access_grants">;
 
 export type TerritorialLevel = "local" | "rural" | "arrondissement" | "departement" | "region" | "national" | "autre";
 export type ActorVerificationStatus = "non_verifie" | "verification_en_cours" | "verifie" | "suspendu" | "revoque";
