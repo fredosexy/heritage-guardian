@@ -209,6 +209,11 @@ export const en = {
     statuses: { declare: "Declared", fourni: "Document received", a_verifier: "To verify", verifie: "Verified", officiel: "Official", rejete: "Rejected", archive: "Archived" },
     errors: { unsupported_mime_type: "This file format is not accepted.", invalid_file_size: "The file is empty or larger than 15 MB." },
   },
+  interventions: {
+    title: "Intervention history", hint: "Who did what, at which step and with which status.", add: "Record an intervention", comment: "Optional comment", confirm: "Confirm intervention", created: "Intervention recorded", empty: "No intervention recorded.", withoutStep: "No step", correction: "This intervention corrects a previous intervention.", completeStep: "Check and complete step", stepCompleted: "Step completed", conditionsMissing: "This step’s conditions are not met yet.",
+    actions: { declare:"Declaration recorded", accompagne:"Support provided", constate:"Finding recorded", temoigne:"Testimony recorded", signe:"Signature recorded", verifie:"Verification performed", valide:"Validation performed", enregistre:"Registration performed", transmis:"Item transmitted", recu:"Item received", corrige:"Correction recorded" },
+    statuses: { declare:"Declared", a_verifier:"To verify", verifie:"Verified", conteste:"Disputed", invalide:"Invalid" },
+  },
   access: {
     title: "Access and interventions", hint: "Choose exactly who can see or do what.", pending: "Pending requests", noPending: "No pending request.", active: "Active access", noActive: "No active access.", accept: "Accept", refuse: "Refuse", revoke: "Revoke", purpose: "Why do you need access?", request: "Request access", requested: "Request sent", acceptee: "Access granted", refusee: "Request refused",
     scopes: { voir_resume: "View the summary", voir_documents_selectionnes: "View selected documents", ajouter_document: "Add a document", accompagner: "Provide support", intervenir: "Intervene on a step", commenter: "Add a comment" },
