@@ -3,6 +3,7 @@ export * as proceduresRepo from "./procedures.repo";
 export * as actorsRepo from "./actors.repo";
 export * as accessRepo from "./access.repo";
 export * as interventionsRepo from "./interventions.repo";
+export * as communicationsRepo from "./communications.repo";
 export * as biensRepo from "./biens.repo";
 export * as proofsRepo from "./proofs.repo";
 export * as participantsRepo from "./participants.repo";
