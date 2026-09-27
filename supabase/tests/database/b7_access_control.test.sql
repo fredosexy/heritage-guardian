@@ -1,11 +1,13 @@
 begin;
-select plan(21);
+select plan(22);
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','b7000000-0000-4000-8000-000000000001','authenticated','authenticated','owner-b7@test','',now(),'{}','{}',now(),now()),
 ('00000000-0000-0000-0000-000000000000','b7000000-0000-4000-8000-000000000002','authenticated','authenticated','requester-b7@test','',now(),'{}','{}',now(),now()),
 ('00000000-0000-0000-0000-000000000000','b7000000-0000-4000-8000-000000000003','authenticated','authenticated','other-b7@test','',now(),'{}','{}',now(),now());
 insert into public.biens(id,created_by,type,title,location_label,creation_context) values('b7100000-0000-4000-8000-000000000001','b7000000-0000-4000-8000-000000000001','terrain','Bien B7','Ngomedzap','propre_bien');
 insert into public.dossiers(id,user_id,owner_id,bien_id,type,title,status,visibility) values('b7200000-0000-4000-8000-000000000001','b7000000-0000-4000-8000-000000000001','b7000000-0000-4000-8000-000000000001','b7100000-0000-4000-8000-000000000001','succession','Dossier B7','actif','prive');
+insert into public.actors(id,profile_id,actor_type,name,location,territorial_level,verification_status,is_published,verified_by,verified_at)
+values('b7500000-0000-4000-8000-000000000001','b7000000-0000-4000-8000-000000000002','professionnel','Géomètre B7','Ngomedzap','rural','verifie',true,'b7000000-0000-4000-8000-000000000001',now());
 insert into public.proofs(id,dossier_id,bien_id,type,title,storage_path,mime_type,size_bytes,uploaded_by,verified,document_type,source_type,verification_status,created_by)
 values
 ('b7300000-0000-4000-8000-000000000001','b7200000-0000-4000-8000-000000000001','b7100000-0000-4000-8000-000000000001','document','Acte','legacy/a','application/pdf',10,'b7000000-0000-4000-8000-000000000001',false,'acte','utilisateur','fourni','b7000000-0000-4000-8000-000000000001'),
@@ -13,9 +15,9 @@ values
 
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"b7000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
-select is((select count(*) from public.dossiers),0::bigint,'user without grant cannot read private dossier');
+select is((select count(*) from public.dossiers),0::bigint,'verified professional without grant cannot read private dossier');
 select is((select count(*) from public.proofs),0::bigint,'user without grant cannot read documents');
-select lives_ok($$ select public.request_dossier_access('b7200000-0000-4000-8000-000000000001',null,'Aider au dossier','Besoin du résumé',array['voir_resume','voir_documents_selectionnes'],now()+interval '2 days') $$,'user requests scoped access');
+select lives_ok($$ select public.request_dossier_access('b7200000-0000-4000-8000-000000000001','b7500000-0000-4000-8000-000000000001','Aider au dossier','Besoin du résumé',array['voir_resume','voir_documents_selectionnes'],now()+interval '2 days') $$,'actor requests scoped access');
 select is((select count(*) from public.access_requests),1::bigint,'requester reads own request');
 
 reset role; set local role authenticated;
@@ -30,7 +32,7 @@ select ok(public.has_scope('b7200000-0000-4000-8000-000000000001','b7000000-0000
 select is((select count(*) from public.get_granted_dossier_summary('b7200000-0000-4000-8000-000000000001')),1::bigint,'summary projection is accessible');
 select is((select count(*) from public.proofs),0::bigint,'summary grant exposes no documents');
 select throws_ok($$ insert into public.access_grant_scopes values((select id from public.access_grants limit 1),'intervenir') $$,'42501',null,'grantee cannot increase scopes');
-select lives_ok($$ select public.request_dossier_access('b7200000-0000-4000-8000-000000000001',null,'Voir un acte','',array['voir_documents_selectionnes'],now()+interval '2 days') $$,'requester asks selected documents');
+select lives_ok($$ select public.request_dossier_access('b7200000-0000-4000-8000-000000000001','b7500000-0000-4000-8000-000000000001','Voir un acte','',array['voir_documents_selectionnes'],now()+interval '2 days') $$,'requester asks selected documents');
 
 reset role; set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"b7000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
@@ -40,6 +42,12 @@ reset role; set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"b7000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
 select is((select count(*) from public.proofs),1::bigint,'selected document grant exposes only one document');
 select is((select title from public.proofs),'Acte','unselected document remains hidden');
+
+reset role;
+insert into public.access_grants(id,dossier_id,grantee_user_id,granted_by,purpose) values('b7400000-0000-4000-8000-000000000088','b7200000-0000-4000-8000-000000000001','b7000000-0000-4000-8000-000000000002','b7000000-0000-4000-8000-000000000001','Ajouter une pièce');
+insert into public.access_grant_scopes values('b7400000-0000-4000-8000-000000000088','ajouter_document');
+set local role authenticated; select set_config('request.jwt.claims','{"sub":"b7000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
+select lives_ok($$ select public.register_document_version('b7300000-0000-4000-8000-000000000003','b7600000-0000-4000-8000-000000000003','b7200000-0000-4000-8000-000000000001','b7100000-0000-4000-8000-000000000001','photo','Photo ajoutée','accompagnateur','dossiers/b7200000-0000-4000-8000-000000000001/documents/b7300000-0000-4000-8000-000000000003/b7600000-0000-4000-8000-000000000003','image/jpeg',100,repeat('c',64),null,'b7-add-doc') $$,'add-document scope is enforced by backend workflow');
 
 reset role;
 insert into public.access_grants(id,dossier_id,grantee_user_id,granted_by,purpose,granted_at,expires_at) values('b7400000-0000-4000-8000-000000000099','b7200000-0000-4000-8000-000000000001','b7000000-0000-4000-8000-000000000003','b7000000-0000-4000-8000-000000000001','Expired',now()-interval '2 days',now()-interval '1 day');
