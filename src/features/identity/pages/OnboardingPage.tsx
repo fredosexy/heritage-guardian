@@ -89,7 +89,7 @@ export default function OnboardingPage() {
           title: t("home.quickSecure"),
           message: t("onboarding.firstSuggestion"),
           action_label: t("home.quickSecure"),
-          action_route: "/create?type=terrain",
+          action_route: "/create?type=protection",
         });
       }
       navigate("/", { replace: true });
