@@ -108,7 +108,13 @@ IF NOT FOUND THEN RAISE EXCEPTION 'conversation_close_forbidden' USING ERRCODE='
 ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;ALTER TABLE public.conversation_members ENABLE ROW LEVEL SECURITY;ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "members view conversations" ON public.conversations FOR SELECT USING(public.can_access_conversation(id,auth.uid()));
 CREATE POLICY "members view memberships" ON public.conversation_members FOR SELECT USING(public.can_access_conversation(conversation_id,auth.uid()));
-CREATE POLICY "members view messages" ON public.messages FOR SELECT USING(public.can_access_conversation(conversation_id,auth.uid()));
+CREATE POLICY "members view messages" ON public.messages FOR SELECT USING(
+ public.can_access_conversation(conversation_id,auth.uid()) AND (
+  attachment_document_id IS NULL OR public.can_access_document(attachment_document_id,auth.uid()) OR EXISTS(
+   SELECT 1 FROM public.conversations c WHERE c.id=conversation_id AND public.can_view_dossier(c.dossier_id,auth.uid())
+  )
+ )
+);
 REVOKE ALL ON public.conversations,public.conversation_members,public.messages FROM anon,authenticated;
 GRANT SELECT ON public.conversations,public.conversation_members,public.messages TO authenticated;
 REVOKE ALL ON FUNCTION public.create_contextual_conversation(text,uuid,uuid,uuid,uuid,uuid[]),public.send_contextual_message(uuid,text,text,text,text,uuid,uuid,uuid),public.remove_conversation_member(uuid,uuid),public.close_conversation(uuid),public.can_access_conversation(uuid,uuid) FROM PUBLIC;
