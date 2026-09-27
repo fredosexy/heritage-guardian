@@ -85,10 +85,10 @@ reset role; set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000006","role":"authenticated"}',true);
 
 select lives_ok(
-  $ select public.claim_person_record(
+  $$ select public.claim_person_record(
     'bb900000-0000-4000-8000-000000000020',
     (select id from public.persons where email='phase-b-claim@test')
-  ) $,
+  ) $$,
   'matching account can claim a pre-existing Person'
 );
 
