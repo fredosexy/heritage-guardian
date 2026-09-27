@@ -1,6 +1,6 @@
 begin;
 
-select plan(51);
+select plan(52);
 
 -- --------------------------------------------------------------------------
 -- Structure
@@ -275,9 +275,15 @@ set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000005","role":"authenticated"}',true);
 select ok(
   public.has_effective_permission(
+    'VIEW_CASE_SUMMARY','CASE',(select id from public.dossiers where title='Dossier Phase B')
+  ),
+  'legacy voir_resume grant maps only to canonical summary permission'
+);
+select ok(
+  NOT public.has_effective_permission(
     'VIEW','CASE',(select id from public.dossiers where title='Dossier Phase B')
   ),
-  'legacy voir_resume grant maps to canonical VIEW during convergence'
+  'legacy summary grant does not widen into full case VIEW'
 );
 
 -- --------------------------------------------------------------------------
@@ -286,13 +292,15 @@ select ok(
 reset role; set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 
--- Owner creates a local non-user person that can be represented only after stronger activation.
-insert into public.persons(id,display_name,created_by,identity_status)
-values('bb120000-0000-4000-8000-000000000001','Parent accompagné','bb000000-0000-4000-8000-000000000001','DECLARED');
+-- Owner creates a local non-user person through the canonical application service.
+select public.create_person_record(
+  'Parent accompagné',null,null,'DECLARED',
+  'bb900000-0000-4000-8000-000000000016'
+);
 
 select lives_ok(
-  $$ select public.create_representation_mandate(
-    'bb120000-0000-4000-8000-000000000001',
+  $ select public.create_representation_mandate(
+    (select id from public.persons where display_name='Parent accompagné' and created_by='bb000000-0000-4000-8000-000000000001'),
     'bb000000-0000-4000-8000-000000000004',
     'CASE',(select id from public.dossiers where title='Dossier Phase B'),
     array['VIEW'],'DECLARATION',null,now()+interval '7 days',
@@ -302,7 +310,7 @@ select lives_ok(
 );
 
 select is(
-  (select status from public.representation_mandates where represented_person_id='bb120000-0000-4000-8000-000000000001'),
+  (select status from public.representation_mandates where represented_person_id=(select id from public.persons where display_name='Parent accompagné' and created_by='bb000000-0000-4000-8000-000000000001')),
   'SUSPENDED',
   'unconfirmed declaration mandate is suspended'
 );
@@ -362,8 +370,8 @@ select lives_ok(
 select throws_ok(
   $$ select public.resolve_action_context(
     'REPRESENTATIVE',
-    'bb120000-0000-4000-8000-000000000001',
-    (select id from public.representation_mandates where represented_person_id='bb120000-0000-4000-8000-000000000001'),
+    (select represented_person_id from public.representation_mandates where status='SUSPENDED' limit 1),
+    (select id from public.representation_mandates where status='SUSPENDED' limit 1),
     'CASE',(select id from public.dossiers where title='Dossier Phase B'),
     'bb900000-0000-4000-8000-000000000014'
   ) $$,
@@ -408,7 +416,7 @@ select ok(
 );
 select is(
   (select count(*) from public.event_contracts where event_name like 'person.%' and status='ACTIVE'),
-  11::bigint,
+  12::bigint,
   'phase B event contracts are registered'
 );
 
