@@ -1,3 +1,5 @@
+export * as familyRelationsRepo from "./family-relations.repo";
+export * as personsRepo from "./persons.repo";
 export * as authorizationRepo from "./authorization.repo";
 export * as dossiersRepo from "./dossiers.repo";
 export * as proceduresRepo from "./procedures.repo";
