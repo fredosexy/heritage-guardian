@@ -2,7 +2,7 @@
 
 **Date :** 27 septembre 2026  
 **Périmètre :** B8 uniquement  
-**Décision :** implémentation à certifier avant fusion volontaire.
+**Décision :** implémentation terminée et certifiée ; fusion volontaire requise avant B9.
 
 ## 1. Existant réutilisé
 
@@ -69,7 +69,7 @@ Les actions proposées dépendent du rôle. La fin d’étape explique lorsque l
 
 ## 8. Tests
 
-Couverture prévue :
+La CI valide TypeScript, lint, tests unitaires, build, reset Supabase, migrations et 18 scénarios SQL B8 couvrant :
 
 - règles unitaires par rôle ;
 - intervention professionnelle avec et sans Grant ;
