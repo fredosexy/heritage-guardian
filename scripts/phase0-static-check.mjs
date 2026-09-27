@@ -56,6 +56,37 @@ requireCondition(
   "Private Supabase Storage responses must not be cached by the service worker"
 );
 
+const phaseAFoundation = read("supabase/migrations/20260927110000_phase_a_transverse_foundation.sql");
+for (const requiredPrimitive of [
+  "role_assignments",
+  "permission_grants",
+  "permission_denies",
+  "representation_mandates",
+  "command_idempotency_records",
+  "event_contracts",
+  "integration_outbox",
+  "integration_inbox",
+  "audit_events",
+  "has_effective_permission",
+]) {
+  requireCondition(
+    phaseAFoundation.includes(requiredPrimitive),
+    `Phase A foundation is missing ${requiredPrimitive}`
+  );
+}
+
+for (const requiredFile of [
+  "src/core/application/contracts.ts",
+  "src/core/application/service.ts",
+  "src/core/events/contracts.ts",
+  "src/core/authorization/contracts.ts",
+  "src/core/observability/contracts.ts",
+  "scripts/check-supabase-types.mjs",
+  "supabase/tests/database/phase_a_foundation.test.sql",
+]) {
+  requireCondition(existsSync(new URL(requiredFile, root)), `${requiredFile} is required by Phase A`);
+}
+
 const offlineSync = read("src/data/offline/sync.ts");
 requireCondition(
   offlineSync.includes("Unsupported offline operation"),
