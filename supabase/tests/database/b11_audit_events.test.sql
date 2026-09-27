@@ -11,7 +11,8 @@ select is((select action from public.audit_events where target_id='bb200000-0000
 select is((select actor_user_id from public.audit_events where target_id='bb200000-0000-4000-8000-000000000001'),'bb000000-0000-4000-8000-000000000001'::uuid,'actual user is retained');
 select ok((select correlation_id is not null from public.audit_events where target_id='bb200000-0000-4000-8000-000000000001'),'correlation id is generated');
 select is((select safe_context->>'source' from public.audit_events where target_id='bb200000-0000-4000-8000-000000000001'),'BACKEND','source is controlled by backend');
-insert into public.persons(id,linked_profile_id,display_name,created_by)values('bb300000-0000-4000-8000-000000000001','bb000000-0000-4000-8000-000000000002','Participant B11','bb000000-0000-4000-8000-000000000001');
+reset role;insert into public.persons(id,linked_profile_id,display_name,created_by)values('bb300000-0000-4000-8000-000000000001','bb000000-0000-4000-8000-000000000002','Participant B11','bb000000-0000-4000-8000-000000000001');
+set local role authenticated;select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 insert into public.dossier_participants(id,dossier_id,person_id,user_id,contact_name,role,status,invited_by)values('bb400000-0000-4000-8000-000000000001','bb200000-0000-4000-8000-000000000001','bb300000-0000-4000-8000-000000000001','bb000000-0000-4000-8000-000000000002','Participant','accompagnateur','invite','bb000000-0000-4000-8000-000000000001');
 select is((select action from public.audit_events where target_id='bb400000-0000-4000-8000-000000000001'),'PARTICIPANT_ADDED','participant addition is audited');
 update public.dossier_participants set status='revoque',revoked_at=now() where id='bb400000-0000-4000-8000-000000000001';
