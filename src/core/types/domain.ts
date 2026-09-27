@@ -22,6 +22,9 @@ export type ActorCredential = Tables<"actor_credentials">;
 export type AccessRequest = Tables<"access_requests">;
 export type AccessGrant = Tables<"access_grants">;
 export type DossierIntervention = Tables<"dossier_interventions">;
+export type Conversation = Tables<"conversations">;
+export type ConversationMember = Tables<"conversation_members">;
+export type Message = Tables<"messages">;
 
 export type TerritorialLevel = "local" | "rural" | "arrondissement" | "departement" | "region" | "national" | "autre";
 export type ActorVerificationStatus = "non_verifie" | "verification_en_cours" | "verifie" | "suspendu" | "revoque";

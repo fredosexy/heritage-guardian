@@ -9,6 +9,7 @@ import { JourneySection } from "../components/JourneySection";
 import { DocumentsSection } from "../components/DocumentsSection";
 import { AccessSection } from "@/features/access";
 import { InterventionsSection } from "@/features/interventions";
+import { ExchangesSection } from "@/features/communications";
 
 export default function DossierDetailPage() {
   const { id } = useParams();
@@ -34,6 +35,7 @@ export default function DossierDetailPage() {
     <JourneySection dossierId={dossier.id} hasProcedure={Boolean(dossier.procedure_definition_id)} />
     <InterventionsSection dossierId={dossier.id} ownerId={dossier.owner_id} />
     <AccessSection dossierId={dossier.id} ownerId={dossier.owner_id} />
+    <ExchangesSection dossierId={dossier.id} ownerId={dossier.owner_id} />
     <Button variant="outline" className="w-full" onClick={doArchive}><Archive className="size-4" />{t("dossier.archive")}</Button>
   </AppLayout>;
 }
