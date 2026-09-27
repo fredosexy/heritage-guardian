@@ -1,7 +1,10 @@
 project_id = "beikcjoeskqcwpcjcyqn"
 
 [functions.ai-chat]
-verify_jwt = false
+verify_jwt = true
 
 [functions.ai-context]
-verify_jwt = false
+verify_jwt = true
+
+[functions.notify-alerts]
+verify_jwt = true
