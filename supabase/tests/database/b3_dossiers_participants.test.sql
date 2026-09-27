@@ -10,8 +10,11 @@ set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"b3000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 select lives_ok($$ select public.create_bien_with_holder('terrain','Bien B3','Yaoundé','proche_accompagne',null,null,null,null,'Jeanne M.',null,'b3-holder@example.test','titulaire') $$,'owner creates asset for another person');
 
+reset role;
 update public.persons set linked_profile_id='b3000000-0000-4000-8000-000000000002'
 where display_name='Jeanne M.' and created_by='b3000000-0000-4000-8000-000000000001';
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"b3000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 
 select lives_ok($$ select public.create_dossier((select id from public.biens where title='Bien B3'),'succession','Succession Jeanne','prive',null,true,'b3-operation-1') $$,'owner creates dossier linked to asset');
 select is((select count(*) from public.dossiers where title='Succession Jeanne' and bien_id is not null),1::bigint,'dossier has one asset');
