@@ -30,10 +30,10 @@ export default function HomePage() {
   }, [profile, profileLoading, navigate, isAuthenticated]);
 
   const quickActions = [
-    { icon: MapPin, label: t("home.quickSecure"), route: "/create?type=terrain" },
-    { icon: Users, label: t("home.quickHeritage"), route: "/create?type=heritage" },
-    { icon: ScrollText, label: t("home.quickWill"), route: "/create?type=volonte" },
-    { icon: Scale, label: t("home.quickConflict"), route: "/create?type=conflit" },
+    { icon: MapPin, label: t("home.quickSecure"), route: "/create?type=protection" },
+    { icon: Users, label: t("home.quickHeritage"), route: "/create?type=succession" },
+    { icon: ScrollText, label: t("home.quickWill"), route: "/create?type=transmission" },
+    { icon: Scale, label: t("home.quickConflict"), route: "/create?type=regularisation" },
   ];
 
   if (profileLoading || alertsLoading) {
