@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:phase0": "node scripts/phase0-static-check.mjs",
-    "check": "npm run test:phase0 && npm run typecheck && npm run lint && npm run test && npm run build"
+    "check:supabase-types": "node scripts/check-supabase-types.mjs",
+    "check": "npm run test:phase0 && npm run check:supabase-types && npm run typecheck && npm run lint && npm run test && npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
