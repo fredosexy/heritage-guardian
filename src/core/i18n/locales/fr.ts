@@ -209,6 +209,11 @@ export const fr = {
     statuses: { declare: "Déclaré", fourni: "Document reçu", a_verifier: "À vérifier", verifie: "Vérifié", officiel: "Officiel", rejete: "Rejeté", archive: "Archivé" },
     errors: { unsupported_mime_type: "Ce format de fichier n’est pas accepté.", invalid_file_size: "Le fichier est vide ou dépasse 15 Mo." },
   },
+  interventions: {
+    title: "Historique des interventions", hint: "Qui a fait quoi, à quelle étape et avec quel statut.", add: "Enregistrer une intervention", comment: "Commentaire facultatif", confirm: "Confirmer l’intervention", created: "Intervention enregistrée", empty: "Aucune intervention enregistrée.", withoutStep: "Sans étape", correction: "Cette intervention corrige une intervention précédente.", completeStep: "Vérifier et terminer l’étape", stepCompleted: "Étape terminée", conditionsMissing: "Les conditions de cette étape ne sont pas encore remplies.",
+    actions: { declare:"Déclaration enregistrée", accompagne:"Accompagnement réalisé", constate:"Constat effectué", temoigne:"Témoignage enregistré", signe:"Signature enregistrée", verifie:"Vérification réalisée", valide:"Validation réalisée", enregistre:"Enregistrement effectué", transmis:"Élément transmis", recu:"Élément reçu", corrige:"Correction enregistrée" },
+    statuses: { declare:"Déclarée", a_verifier:"À vérifier", verifie:"Vérifiée", conteste:"Contestée", invalide:"Invalidée" },
+  },
   access: {
     title: "Accès et interventions", hint: "Décidez précisément qui peut voir ou faire quoi.", pending: "Demandes en attente", noPending: "Aucune demande en attente.", active: "Accès actifs", noActive: "Aucun accès actif.", accept: "Accepter", refuse: "Refuser", revoke: "Révoquer", purpose: "Pourquoi demandez-vous cet accès ?", request: "Demander l’accès", requested: "Demande envoyée", acceptee: "Accès accordé", refusee: "Demande refusée",
     scopes: { voir_resume: "Voir le résumé", voir_documents_selectionnes: "Voir les papiers choisis", ajouter_document: "Ajouter un document", accompagner: "Vous accompagner", intervenir: "Intervenir sur une étape", commenter: "Ajouter un commentaire" },

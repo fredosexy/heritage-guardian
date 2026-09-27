@@ -51,3 +51,8 @@ export async function getActorCredentials(actorId: string): Promise<ActorCredent
   if (error) throw error;
   return data ?? [];
 }
+
+export async function getActorForProfile(profileId:string):Promise<ActorWithCompetences|null>{
+ const {data,error}=await supabase.from("actors").select("*, actor_competences(*)").eq("profile_id",profileId).maybeSingle();
+ if(error)throw error; return data as ActorWithCompetences|null;
+}

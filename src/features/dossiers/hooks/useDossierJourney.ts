@@ -14,6 +14,5 @@ export function useDossierJourney(dossierId?: string) {
   useEffect(() => { void load(); }, [load]);
   const summary = useMemo(() => getJourneySummary(steps), [steps]);
   const initialize = useCallback(async () => { if (dossierId) { await proceduresRepo.initializeDossierJourney(dossierId); await load(); } }, [dossierId, load]);
-  const completeCurrent = useCallback(async () => { if (summary.currentStep?.status === "en_cours") { await proceduresRepo.completeStep(summary.currentStep.id); await load(); } }, [summary.currentStep, load]);
-  return { steps, summary, loading, initialize, completeCurrent, reload: load };
+  return { steps, summary, loading, initialize, reload: load };
 }
