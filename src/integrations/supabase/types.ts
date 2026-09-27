@@ -550,32 +550,53 @@ export type Database = {
       }
       persons: {
         Row: {
+          birth_date: string | null
           created_at: string
           created_by: string
+          death_date: string | null
+          death_status: string
           display_name: string
           email: string | null
           id: string
+          identity_status: string
           linked_profile_id: string | null
+          merged_at: string | null
+          merged_by: string | null
+          merged_into_person_id: string | null
           phone: string | null
           updated_at: string
         }
         Insert: {
+          birth_date?: string | null
           created_at?: string
           created_by: string
+          death_date?: string | null
+          death_status?: string
           display_name: string
           email?: string | null
           id?: string
+          identity_status?: string
           linked_profile_id?: string | null
+          merged_at?: string | null
+          merged_by?: string | null
+          merged_into_person_id?: string | null
           phone?: string | null
           updated_at?: string
         }
         Update: {
+          birth_date?: string | null
           created_at?: string
           created_by?: string
+          death_date?: string | null
+          death_status?: string
           display_name?: string
           email?: string | null
           id?: string
+          identity_status?: string
           linked_profile_id?: string | null
+          merged_at?: string | null
+          merged_by?: string | null
+          merged_into_person_id?: string | null
           phone?: string | null
           updated_at?: string
         }
@@ -585,6 +606,13 @@ export type Database = {
             columns: ["linked_profile_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "persons_merged_into_person_id_fkey"
+            columns: ["merged_into_person_id"]
+            isOneToOne: false
+            referencedRelation: "persons"
             referencedColumns: ["id"]
           },
         ]
@@ -816,10 +844,13 @@ export type Database = {
         ]
       }
       ai_rate_limits:{Row:{request_count:number;user_id:string;window_start:string};Insert:{request_count?:number;user_id:string;window_start:string};Update:{request_count?:number;user_id?:string;window_start?:string};Relationships:[]}
+      person_aliases:{Row:{alias_name:string;alias_type:string;created_at:string;created_by:string;id:string;person_id:string;revoked_at:string|null;source_document_id:string|null;source_type:string};Insert:{alias_name:string;alias_type?:string;created_at?:string;created_by:string;id?:string;person_id:string;revoked_at?:string|null;source_document_id?:string|null;source_type?:string};Update:{alias_name?:string;alias_type?:string;created_at?:string;created_by?:string;id?:string;person_id?:string;revoked_at?:string|null;source_document_id?:string|null;source_type?:string};Relationships:[]}
+      family_relations:{Row:{created_at:string;created_by:string;current_revision:number;from_person_id:string;id:string;relation_type:string;revoked_at:string|null;status:string;to_person_id:string;updated_at:string};Insert:{created_at?:string;created_by:string;current_revision?:number;from_person_id:string;id?:string;relation_type:string;revoked_at?:string|null;status?:string;to_person_id:string;updated_at?:string};Update:{created_at?:string;created_by?:string;current_revision?:number;from_person_id?:string;id?:string;relation_type?:string;revoked_at?:string|null;status?:string;to_person_id?:string;updated_at?:string};Relationships:[]}
+      family_relation_revisions:{Row:{created_at:string;created_by:string;id:string;note:string|null;relation_id:string;relation_type:string;source_document_id:string|null;source_type:string;status:string;supersedes_revision_id:string|null;version_number:number};Insert:{created_at?:string;created_by:string;id?:string;note?:string|null;relation_id:string;relation_type:string;source_document_id?:string|null;source_type:string;status:string;supersedes_revision_id?:string|null;version_number:number};Update:{created_at?:string;created_by?:string;id?:string;note?:string|null;relation_id?:string;relation_type?:string;source_document_id?:string|null;source_type?:string;status?:string;supersedes_revision_id?:string|null;version_number?:number};Relationships:[]}
       role_assignments:{Row:{assigned_by:string|null;created_at:string;id:string;revoked_at:string|null;role:string;scope_id:string|null;scope_type:string;status:string;user_id:string;valid_from:string;valid_until:string|null};Insert:{assigned_by?:string|null;created_at?:string;id?:string;revoked_at?:string|null;role:string;scope_id?:string|null;scope_type:string;status?:string;user_id:string;valid_from?:string;valid_until?:string|null};Update:{assigned_by?:string|null;created_at?:string;id?:string;revoked_at?:string|null;role?:string;scope_id?:string|null;scope_type?:string;status?:string;user_id?:string;valid_from?:string;valid_until?:string|null};Relationships:[]}
       permission_grants:{Row:{created_at:string;granted_by:string|null;id:string;permission:string;reason_code:string|null;revoked_at:string|null;scope_id:string|null;scope_type:string;status:string;user_id:string;valid_from:string;valid_until:string|null};Insert:{created_at?:string;granted_by?:string|null;id?:string;permission:string;reason_code?:string|null;revoked_at?:string|null;scope_id?:string|null;scope_type:string;status?:string;user_id:string;valid_from?:string;valid_until?:string|null};Update:{created_at?:string;granted_by?:string|null;id?:string;permission?:string;reason_code?:string|null;revoked_at?:string|null;scope_id?:string|null;scope_type?:string;status?:string;user_id?:string;valid_from?:string;valid_until?:string|null};Relationships:[]}
       permission_denies:{Row:{created_at:string;denied_by:string|null;id:string;permission:string;reason_code:string;revoked_at:string|null;scope_id:string|null;scope_type:string;status:string;user_id:string;valid_from:string;valid_until:string|null};Insert:{created_at?:string;denied_by?:string|null;id?:string;permission:string;reason_code:string;revoked_at?:string|null;scope_id?:string|null;scope_type:string;status?:string;user_id:string;valid_from?:string;valid_until?:string|null};Update:{created_at?:string;denied_by?:string|null;id?:string;permission?:string;reason_code?:string;revoked_at?:string|null;scope_id?:string|null;scope_type?:string;status?:string;user_id?:string;valid_from?:string;valid_until?:string|null};Relationships:[]}
-      representation_mandates:{Row:{created_at:string;created_by:string;id:string;permissions:string[];representative_user_id:string;represented_person_id:string;revoked_at:string|null;revoked_by:string|null;scope_id:string|null;scope_type:string;source_document_id:string|null;source_type:string;status:string;valid_from:string;valid_until:string|null};Insert:{created_at?:string;created_by:string;id?:string;permissions:string[];representative_user_id:string;represented_person_id:string;revoked_at?:string|null;revoked_by?:string|null;scope_id?:string|null;scope_type:string;source_document_id?:string|null;source_type:string;status?:string;valid_from?:string;valid_until?:string|null};Update:{created_at?:string;created_by?:string;id?:string;permissions?:string[];representative_user_id?:string;represented_person_id?:string;revoked_at?:string|null;revoked_by?:string|null;scope_id?:string|null;scope_type?:string;source_document_id?:string|null;source_type?:string;status?:string;valid_from?:string;valid_until?:string|null};Relationships:[]}
+      representation_mandates:{Row:{confirmed_by_represented_at:string|null;created_at:string;created_by:string;id:string;permissions:string[];representative_person_id:string|null;representative_user_id:string;represented_person_id:string;revoked_at:string|null;revoked_by:string|null;scope_id:string|null;scope_type:string;source_document_id:string|null;source_type:string;status:string;valid_from:string;valid_until:string|null;verified_at:string|null;verified_by:string|null};Insert:{confirmed_by_represented_at?:string|null;created_at?:string;created_by:string;id?:string;permissions:string[];representative_person_id?:string|null;representative_user_id:string;represented_person_id:string;revoked_at?:string|null;revoked_by?:string|null;scope_id?:string|null;scope_type:string;source_document_id?:string|null;source_type:string;status?:string;valid_from?:string;valid_until?:string|null;verified_at?:string|null;verified_by?:string|null};Update:{confirmed_by_represented_at?:string|null;created_at?:string;created_by?:string;id?:string;permissions?:string[];representative_person_id?:string|null;representative_user_id?:string;represented_person_id?:string;revoked_at?:string|null;revoked_by?:string|null;scope_id?:string|null;scope_type?:string;source_document_id?:string|null;source_type?:string;status?:string;valid_from?:string;valid_until?:string|null;verified_at?:string|null;verified_by?:string|null};Relationships:[]}
       command_idempotency_records:{Row:{command_name:string;command_version:number;completed_at:string|null;correlation_id:string;created_at:string;expires_at:string|null;id:string;idempotency_key:string;principal_key:string;request_hash:string;result_payload:Json|null;status:string;target_ref:Json|null};Insert:{command_name:string;command_version?:number;completed_at?:string|null;correlation_id:string;created_at?:string;expires_at?:string|null;id?:string;idempotency_key:string;principal_key:string;request_hash:string;result_payload?:Json|null;status?:string;target_ref?:Json|null};Update:{command_name?:string;command_version?:number;completed_at?:string|null;correlation_id?:string;created_at?:string;expires_at?:string|null;id?:string;idempotency_key?:string;principal_key?:string;request_hash?:string;result_payload?:Json|null;status?:string;target_ref?:Json|null};Relationships:[]}
       event_contracts:{Row:{allowed_consumers:string[];confidentiality:string;contract_id:string;created_at:string;event_category:string;event_name:string;event_version:number;id:string;ordering_policy:string;payload_schema:Json;producer_domain:string;status:string};Insert:{allowed_consumers?:string[];confidentiality?:string;contract_id:string;created_at?:string;event_category:string;event_name:string;event_version:number;id?:string;ordering_policy?:string;payload_schema?:Json;producer_domain:string;status?:string};Update:{allowed_consumers?:string[];confidentiality?:string;contract_id?:string;created_at?:string;event_category?:string;event_name?:string;event_version?:number;id?:string;ordering_policy?:string;payload_schema?:Json;producer_domain?:string;status?:string};Relationships:[]}
       integration_outbox:{Row:{acting_role:string|null;actor_person_id:string|null;actor_user_id:string|null;aggregate_sequence:number|null;aggregate_version:number|null;attempts:number;available_at:string;causation_id:string|null;confidentiality:string;correlation_id:string;envelope:Json;event_category:string;event_id:string;event_name:string;event_origin:string;event_version:number;id:string;last_error_at:string|null;last_error_code:string|null;mandate_id:string|null;occurred_at:string;published_at:string|null;recorded_at:string;represented_person_id:string|null;source_domain:string;source_entity_id:string|null;source_entity_type:string;status:string};Insert:{acting_role?:string|null;actor_person_id?:string|null;actor_user_id?:string|null;aggregate_sequence?:number|null;aggregate_version?:number|null;attempts?:number;available_at?:string;causation_id?:string|null;confidentiality?:string;correlation_id:string;envelope:Json;event_category:string;event_id:string;event_name:string;event_origin?:string;event_version:number;id?:string;last_error_at?:string|null;last_error_code?:string|null;mandate_id?:string|null;occurred_at:string;published_at?:string|null;recorded_at?:string;represented_person_id?:string|null;source_domain:string;source_entity_id?:string|null;source_entity_type:string;status?:string};Update:{acting_role?:string|null;actor_person_id?:string|null;actor_user_id?:string|null;aggregate_sequence?:number|null;aggregate_version?:number|null;attempts?:number;available_at?:string;causation_id?:string|null;confidentiality?:string;correlation_id?:string;envelope?:Json;event_category?:string;event_id?:string;event_name?:string;event_origin?:string;event_version?:number;id?:string;last_error_at?:string|null;last_error_code?:string|null;mandate_id?:string|null;occurred_at?:string;published_at?:string|null;recorded_at?:string;represented_person_id?:string|null;source_domain?:string;source_entity_id?:string|null;source_entity_type?:string;status?:string};Relationships:[]}
@@ -870,6 +901,22 @@ export type Database = {
       }
     }
     Functions: {
+      current_user_person_id:{Args:Record<PropertyKey,never>;Returns:string|null}
+      resolve_person_id:{Args:{p_person_id:string};Returns:string|null}
+      update_person_record:{Args:{p_birth_date:string|null;p_correlation_id:string;p_death_date:string|null;p_death_status:string;p_display_name:string;p_email:string|null;p_identity_status:string;p_person_id:string;p_phone:string|null};Returns:undefined}
+      merge_person_records:{Args:{p_correlation_id:string;p_source_person_id:string;p_target_person_id:string};Returns:string}
+      create_family_relation:{Args:{p_correlation_id:string;p_from_person_id:string;p_note:string|null;p_relation_type:string;p_source_document_id:string|null;p_source_type:string;p_to_person_id:string};Returns:string}
+      revise_family_relation:{Args:{p_correlation_id:string;p_note:string|null;p_relation_id:string;p_relation_type:string;p_source_document_id:string|null;p_source_type:string;p_status:string};Returns:number}
+      assign_application_role:{Args:{p_correlation_id:string;p_role:string;p_scope_id:string|null;p_scope_type:string;p_user_id:string;p_valid_until:string|null};Returns:string}
+      revoke_application_role:{Args:{p_correlation_id:string;p_role_assignment_id:string};Returns:undefined}
+      grant_explicit_permission:{Args:{p_correlation_id:string;p_permission:string;p_reason_code:string|null;p_scope_id:string|null;p_scope_type:string;p_user_id:string;p_valid_until:string|null};Returns:string}
+      deny_explicit_permission:{Args:{p_correlation_id:string;p_permission:string;p_reason_code:string;p_scope_id:string|null;p_scope_type:string;p_user_id:string;p_valid_until:string|null};Returns:string}
+      revoke_explicit_permission:{Args:{p_correlation_id:string;p_record_id:string;p_record_type:string};Returns:undefined}
+      create_representation_mandate:{Args:{p_correlation_id:string;p_permissions:string[];p_representative_user_id:string;p_represented_person_id:string;p_scope_id:string|null;p_scope_type:string;p_source_document_id:string|null;p_source_type:string;p_valid_until:string|null};Returns:string}
+      confirm_representation_mandate:{Args:{p_correlation_id:string;p_mandate_id:string};Returns:undefined}
+      verify_representation_mandate:{Args:{p_correlation_id:string;p_formalized:boolean;p_mandate_id:string};Returns:undefined}
+      revoke_representation_mandate:{Args:{p_correlation_id:string;p_mandate_id:string};Returns:undefined}
+      resolve_action_context:{Args:{p_acting_role:string|null;p_correlation_id:string;p_mandate_id:string|null;p_represented_person_id:string|null;p_scope_id:string|null;p_scope_type:string|null};Returns:Json}
       consume_ai_quota:{Args:{max_requests?:number};Returns:boolean}
       authorization_scope_matches:{Args:{p_rule_scope_id:string|null;p_rule_scope_type:string;p_target_scope_id:string|null;p_target_scope_type:string};Returns:boolean}
       role_allows_permission:{Args:{p_permission:string;p_role:string};Returns:boolean}
