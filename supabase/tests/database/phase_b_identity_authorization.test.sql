@@ -152,11 +152,15 @@ select public.create_dossier(
   'terrain','Dossier Phase B','prive',null,true,'phase-b-case-001'
 );
 
+create temporary table phase_b_test_ids(key text primary key,id uuid);
+insert into phase_b_test_ids(key,id)
+select 'case',id from public.dossiers where title='Dossier Phase B';
+
 select is(
   (select count(*) from public.role_assignments
    where user_id='bb000000-0000-4000-8000-000000000001'
      and role='CASE_ADMIN' and scope_type='CASE'
-     and scope_id=(select id from public.dossiers where title='Dossier Phase B')
+     and scope_id=(select id from phase_b_test_ids where key='case')
      and status='ACTIVE'),
   1::bigint,
   'case owner receives canonical CASE_ADMIN role'
@@ -164,7 +168,7 @@ select is(
 
 select ok(
   public.has_effective_permission(
-    'GRANT_ACCESS','CASE',(select id from public.dossiers where title='Dossier Phase B')
+    'GRANT_ACCESS','CASE',(select id from phase_b_test_ids where key='case')
   ),
   'case admin has canonical GRANT_ACCESS'
 );
@@ -175,7 +179,7 @@ select ok(
 select lives_ok(
   $$ select public.assign_application_role(
     'bb000000-0000-4000-8000-000000000002','READER','CASE',
-    (select id from public.dossiers where title='Dossier Phase B'),
+    (select id from phase_b_test_ids where key='case'),
     null,'bb900000-0000-4000-8000-000000000007'
   ) $$,
   'case owner can assign scoped reader role'
@@ -186,7 +190,7 @@ select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-00000000
 
 select ok(
   public.has_effective_permission(
-    'VIEW','CASE',(select id from public.dossiers where title='Dossier Phase B')
+    'VIEW','CASE',(select id from phase_b_test_ids where key='case')
   ),
   'reader role grants case VIEW'
 );
@@ -201,7 +205,7 @@ select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-00000000
 
 select public.deny_explicit_permission(
   'bb000000-0000-4000-8000-000000000002','VIEW','CASE',
-  (select id from public.dossiers where title='Dossier Phase B'),
+  (select id from phase_b_test_ids where key='case'),
   null,'TEST_DENY','bb900000-0000-4000-8000-000000000008'
 );
 
@@ -210,7 +214,7 @@ select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-00000000
 
 select ok(
   NOT public.has_effective_permission(
-    'VIEW','CASE',(select id from public.dossiers where title='Dossier Phase B')
+    'VIEW','CASE',(select id from phase_b_test_ids where key='case')
   ),
   'explicit deny overrides reader role'
 );
@@ -230,7 +234,7 @@ select lives_ok(
 select lives_ok(
   $$ select public.grant_explicit_permission(
     'bb000000-0000-4000-8000-000000000002','EDIT','CASE',
-    (select id from public.dossiers where title='Dossier Phase B'),
+    (select id from phase_b_test_ids where key='case'),
     now()+interval '1 day','TEMP_EDIT','bb900000-0000-4000-8000-000000000010'
   ) $$,
   'scope manager can create explicit permission grant'
@@ -240,7 +244,7 @@ reset role; set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
 select ok(
   public.has_effective_permission(
-    'EDIT','CASE',(select id from public.dossiers where title='Dossier Phase B')
+    'EDIT','CASE',(select id from phase_b_test_ids where key='case')
   ),
   'explicit permission grant is effective'
 );
@@ -249,7 +253,7 @@ select throws_ok(
   $$ insert into public.permission_grants(user_id,permission,scope_type,scope_id,granted_by)
      values(
        'bb000000-0000-4000-8000-000000000002','ADMIN_CASE','CASE',
-       (select id from public.dossiers where title='Dossier Phase B'),
+       (select id from phase_b_test_ids where key='case'),
        'bb000000-0000-4000-8000-000000000002'
      ) $$,
   '42501',null,
@@ -264,7 +268,7 @@ insert into public.access_grants(
   id,dossier_id,grantee_user_id,granted_by,purpose
 ) values(
   'bb700000-0000-4000-8000-000000000001',
-  (select id from public.dossiers where title='Dossier Phase B'),
+  (select id from phase_b_test_ids where key='case'),
   'bb000000-0000-4000-8000-000000000005',
   'bb000000-0000-4000-8000-000000000001','Legacy summary'
 );
@@ -275,13 +279,13 @@ set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000005","role":"authenticated"}',true);
 select ok(
   public.has_effective_permission(
-    'VIEW_CASE_SUMMARY','CASE',(select id from public.dossiers where title='Dossier Phase B')
+    'VIEW_CASE_SUMMARY','CASE',(select id from phase_b_test_ids where key='case')
   ),
   'legacy voir_resume grant maps only to canonical summary permission'
 );
 select ok(
   NOT public.has_effective_permission(
-    'VIEW','CASE',(select id from public.dossiers where title='Dossier Phase B')
+    'VIEW','CASE',(select id from phase_b_test_ids where key='case')
   ),
   'legacy summary grant does not widen into full case VIEW'
 );
@@ -302,7 +306,7 @@ select lives_ok(
   $ select public.create_representation_mandate(
     (select id from public.persons where display_name='Parent accompagné' and created_by='bb000000-0000-4000-8000-000000000001'),
     'bb000000-0000-4000-8000-000000000004',
-    'CASE',(select id from public.dossiers where title='Dossier Phase B'),
+    'CASE',(select id from phase_b_test_ids where key='case'),
     array['VIEW'],'DECLARATION',null,now()+interval '7 days',
     'bb900000-0000-4000-8000-000000000011'
   ) $$,
@@ -319,7 +323,7 @@ reset role; set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-000000000004","role":"authenticated"}',true);
 select ok(
   NOT public.has_effective_permission(
-    'VIEW','CASE',(select id from public.dossiers where title='Dossier Phase B')
+    'VIEW','CASE',(select id from phase_b_test_ids where key='case')
   ),
   'unconfirmed declared mandate gives no permission'
 );
@@ -332,7 +336,7 @@ select lives_ok(
   $$ select public.create_representation_mandate(
     'bb100000-0000-4000-8000-000000000003',
     'bb000000-0000-4000-8000-000000000004',
-    'CASE',(select id from public.dossiers where title='Dossier Phase B'),
+    'CASE',(select id from phase_b_test_ids where key='case'),
     array['VIEW','CONTRIBUTE'],'DECLARATION',null,now()+interval '7 days',
     'bb900000-0000-4000-8000-000000000012'
   ) $$,
@@ -351,7 +355,7 @@ select set_config('request.jwt.claims','{"sub":"bb000000-0000-4000-8000-00000000
 
 select ok(
   public.has_effective_permission(
-    'VIEW','CASE',(select id from public.dossiers where title='Dossier Phase B')
+    'VIEW','CASE',(select id from phase_b_test_ids where key='case')
   ),
   'confirmed mandate grants representative VIEW'
 );
@@ -361,7 +365,7 @@ select lives_ok(
     'REPRESENTATIVE',
     'bb100000-0000-4000-8000-000000000003',
     (select id from public.representation_mandates where represented_person_id='bb100000-0000-4000-8000-000000000003'),
-    'CASE',(select id from public.dossiers where title='Dossier Phase B'),
+    'CASE',(select id from phase_b_test_ids where key='case'),
     'bb900000-0000-4000-8000-000000000013'
   ) $$,
   'server resolves a valid represented ActionContext'
@@ -372,7 +376,7 @@ select throws_ok(
     'REPRESENTATIVE',
     (select represented_person_id from public.representation_mandates where status='SUSPENDED' limit 1),
     (select id from public.representation_mandates where status='SUSPENDED' limit 1),
-    'CASE',(select id from public.dossiers where title='Dossier Phase B'),
+    'CASE',(select id from phase_b_test_ids where key='case'),
     'bb900000-0000-4000-8000-000000000014'
   ) $$,
   '42501','representation_mandate_invalid',
@@ -389,7 +393,7 @@ select lives_ok(
 
 select ok(
   NOT public.has_effective_permission(
-    'VIEW','CASE',(select id from public.dossiers where title='Dossier Phase B')
+    'VIEW','CASE',(select id from phase_b_test_ids where key='case')
   ),
   'mandate revocation removes representative permission immediately'
 );
