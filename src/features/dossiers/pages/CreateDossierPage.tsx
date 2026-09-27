@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { biensRepo } from "@/data";
 import type { Bien, DossierType } from "@/core/types/domain";
+import { resolveRequestedDossierType } from "@/services/dossier-intent";
 import { useCreateDossier } from "../hooks/useCreateDossier";
 
 const TYPES: DossierType[] = ["acquisition", "achat", "succession", "heritage", "protection", "regularisation", "partage", "transmission", "vente", "autre"];
@@ -17,10 +18,11 @@ const TYPES: DossierType[] = ["acquisition", "achat", "succession", "heritage", 
 export default function CreateDossierPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { create, saving } = useCreateDossier();
   const [biens, setBiens] = useState<Bien[]>([]);
   const [bienId, setBienId] = useState("");
-  const [type, setType] = useState<DossierType>("protection");
+  const [type, setType] = useState<DossierType>(() => resolveRequestedDossierType(searchParams.get("type")) ?? "protection");
   const [visibility, setVisibility] = useState<"prive" | "public">("prive");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
