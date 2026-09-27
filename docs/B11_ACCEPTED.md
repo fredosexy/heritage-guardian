@@ -1,7 +1,7 @@
 # B11 — Journal global de responsabilité
 
 ## Statut
-Implémentée sur `codex/b11-global-audit-v2`. Certification finale en attente de la CI.
+Implémentée et certifiée sur `codex/b11-global-audit-v2` (Quality run #177).
 
 ## Décision d’architecture
 B11 réutilise la fondation transverse canonique déjà présente : `audit_events`, `record_audit_event`, corrélation, représentation et immutabilité. Aucune seconde table d’historique n’est créée.
