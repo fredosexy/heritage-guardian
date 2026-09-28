@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { claimLocalData } from "@/services/claim-local-data";
+import { setActiveSyncPrincipal } from "@/data/offline/sync";
 
 interface AuthContextValue {
   user: User | null;
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
       setUser(s?.user ?? null);
+      void setActiveSyncPrincipal(s?.user.id ?? null);
       // Rattacher les données créées en mode visiteur au compte réel.
       if (event === "SIGNED_IN" && s?.user) {
         const uid = s.user.id;
@@ -35,6 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
       setUser(s?.user ?? null);
+      void setActiveSyncPrincipal(s?.user.id ?? null);
       setLoading(false);
     });
 
@@ -42,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
+    await setActiveSyncPrincipal(null);
     await supabase.auth.signOut();
   };
 
