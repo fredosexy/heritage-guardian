@@ -1,4 +1,5 @@
-import Dexie, { Table } from "dexie";
+import Dexie, { type Table } from "dexie";
+import type { LocalOperation, PendingUpload, SyncMetadata } from "./types";
 
 export interface DraftDossier {
   id?: number;
@@ -11,11 +12,11 @@ export interface DraftDossier {
   visibility: "prive" | "public";
   created_at: number;
   updated_at: number;
-  synced: 0 | 1; // Dexie indexes booleans poorly; use 0/1
+  synced: 0 | 1;
   remote_id?: string | null;
 }
 
-export interface QueuedOp {
+export interface LegacyQueuedOp {
   id?: number;
   kind: "create_dossier" | "update_dossier" | "delete_dossier";
   payload: { localId: string };
@@ -33,8 +34,11 @@ export interface CachedDossier {
 
 class MemoireDB extends Dexie {
   drafts!: Table<DraftDossier, number>;
-  queue!: Table<QueuedOp, number>;
-  cachedDossiers!: Table<CachedDossier, string>;
+  queue!: Table<LegacyQueuedOp, number>;
+  cachedDossiers!: Table<CachedDossier, [string, string]>;
+  operations!: Table<LocalOperation, string>;
+  uploads!: Table<PendingUpload, string>;
+  syncMetadata!: Table<SyncMetadata, string>;
 
   constructor() {
     super("memoire-offline");
@@ -42,6 +46,14 @@ class MemoireDB extends Dexie {
       drafts: "++id, localId, user_id, synced, updated_at",
       queue: "++id, kind, created_at",
       cachedDossiers: "id, user_id, cached_at",
+    });
+    this.version(2).stores({
+      drafts: "++id, &localId, user_id, [user_id+synced], updated_at",
+      queue: "++id, kind, created_at",
+      cachedDossiers: "[user_id+id], user_id, cached_at",
+      operations: "&operation_id, principal_id, [principal_id+status], [principal_id+next_retry_at], created_at",
+      uploads: "&upload_id, principal_id, operation_id, created_at",
+      syncMetadata: "&principal_id",
     });
   }
 }
