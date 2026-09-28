@@ -1,6 +1,6 @@
 begin;
 
-select plan(61);
+select plan(66);
 
 -- --------------------------------------------------------------------------
 -- Structure
@@ -163,13 +163,68 @@ select is((select count(*) from public.persons where id='bb110000-0000-4000-8000
 select is((select count(*) from public.person_aliases where alias_type='MERGED_RECORD'),1::bigint,'merge records prior display name as alias');
 
 select throws_ok(
-  $$ select public.merge_person_records(
+  $ select public.merge_person_records(
     'bb100000-0000-4000-8000-000000000001',
     'bb100000-0000-4000-8000-000000000002',
     'bb900000-0000-4000-8000-000000000006'
-  ) $$,
+  ) $,
   '42501',null,
   'distinct linked accounts cannot be merged by ordinary user'
+);
+
+-- Multi-hop merges must collapse directly to the terminal canonical Person.
+select public.create_person_record(
+  'Merge Chain A',null,null,'DECLARED','bb900000-0000-4000-8000-000000000022'
+);
+select public.create_person_record(
+  'Merge Chain B',null,null,'DECLARED','bb900000-0000-4000-8000-000000000023'
+);
+select public.create_person_record(
+  'Merge Chain C',null,null,'DECLARED','bb900000-0000-4000-8000-000000000024'
+);
+
+select lives_ok(
+  $ select public.merge_person_records(
+    (select id from public.persons where display_name='Merge Chain A' and created_by='bb000000-0000-4000-8000-000000000001'),
+    (select id from public.persons where display_name='Merge Chain B' and created_by='bb000000-0000-4000-8000-000000000001'),
+    'bb900000-0000-4000-8000-000000000025'
+  ) $,
+  'first merge in a canonical chain succeeds'
+);
+
+select lives_ok(
+  $ select public.merge_person_records(
+    (select id from public.persons where display_name='Merge Chain B' and created_by='bb000000-0000-4000-8000-000000000001'),
+    (select id from public.persons where display_name='Merge Chain C' and created_by='bb000000-0000-4000-8000-000000000001'),
+    'bb900000-0000-4000-8000-000000000026'
+  ) $,
+  'second merge re-canonicalizes prior aliases'
+);
+
+select is(
+  public.resolve_person_id(
+    (select id from public.persons where display_name='Merge Chain A' and created_by='bb000000-0000-4000-8000-000000000001')
+  ),
+  (select id from public.persons where display_name='Merge Chain C' and created_by='bb000000-0000-4000-8000-000000000001'),
+  'multi-hop historical person resolves to terminal canonical target'
+);
+
+select is(
+  (select merged_into_person_id from public.persons
+   where display_name='Merge Chain A' and created_by='bb000000-0000-4000-8000-000000000001'),
+  (select id from public.persons
+   where display_name='Merge Chain C' and created_by='bb000000-0000-4000-8000-000000000001'),
+  'historical redirect is flattened to a single hop'
+);
+
+select throws_ok(
+  $ select public.merge_person_records(
+    (select id from public.persons where display_name='Merge Chain C' and created_by='bb000000-0000-4000-8000-000000000001'),
+    (select id from public.persons where display_name='Merge Chain A' and created_by='bb000000-0000-4000-8000-000000000001'),
+    'bb900000-0000-4000-8000-000000000027'
+  ) $,
+  '22023','person_merge_invalid_state',
+  'canonical person cannot merge back through its historical redirect'
 );
 
 -- --------------------------------------------------------------------------
