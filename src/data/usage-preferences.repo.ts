@@ -49,8 +49,15 @@ export async function updateUsagePreferences(
   });
   if (updated) return updated;
   if (queued) {
-    const current = await getUsagePreferences(userId);
-    if (current) return { ...current, ...patch };
+    return {
+      user_id: userId,
+      context_type: patch.context_type ?? "urbain",
+      assistance_level: patch.assistance_level ?? "autonome",
+      interface_level: patch.interface_level ?? "standard",
+      audio_preference: patch.audio_preference ?? "optionnel",
+      accompaniment_preference: patch.accompaniment_preference ?? "seul",
+      updated_at: new Date().toISOString(),
+    } as UsagePreferences;
   }
   throw new Error("usage_preferences_update_failed");
 }
