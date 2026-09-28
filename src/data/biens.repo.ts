@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Bien, BienRightHolder, Person } from "@/core/types/domain";
+import { runOrQueueId } from "./offline/command-client";
 
 export type BienType = "terrain" | "parcelle" | "maison" | "propriete_familiale" | "autre";
 export type BienCreationContext = "propre_bien" | "proche_accompagne" | "bien_familial";
@@ -25,6 +26,11 @@ export interface BienRightHolderWithPerson extends BienRightHolder {
 }
 
 export async function createBien(input: CreateBienInput): Promise<string> {
+  return runOrQueueId({
+    targetDomain: "ASSET",
+    commandName: "CREATE_BIEN",
+    payload: input as unknown as Record<string, unknown>,
+  }, async () => {
   const { data, error } = await supabase.rpc("create_bien_with_holder", {
     p_type: input.type,
     p_title: input.title,
@@ -41,6 +47,7 @@ export async function createBien(input: CreateBienInput): Promise<string> {
   });
   if (error) throw error;
   return data;
+  });
 }
 
 export async function getBiensForUser(): Promise<Bien[]> {
