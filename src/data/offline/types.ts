@@ -26,7 +26,8 @@ export type OfflineCommandName =
   | "SEND_TEXT_MESSAGE"
   | "CREATE_SIGNALEMENT"
   | "UPDATE_USAGE_PREFERENCES"
-  | "UPLOAD_DOCUMENT";
+  | "UPLOAD_DOCUMENT"
+  | "REGISTER_DOCUMENT";
 
 export interface LocalOperation {
   operation_id: string;
