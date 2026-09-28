@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { runOrQueueVoid } from "./offline/command-client";
 import type {
   AccompanimentPreference,
   AssistanceLevel,
@@ -30,11 +31,26 @@ export async function updateUsagePreferences(
   userId: string,
   patch: UsagePreferencesPatch,
 ): Promise<UsagePreferences> {
-  const { data, error } = await supabase
-    .from("usage_preferences")
-    .upsert({ user_id: userId, ...patch }, { onConflict: "user_id" })
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+  let updated: UsagePreferences | null = null;
+  const queued = await runOrQueueVoid({
+    principalId: userId,
+    targetDomain: "IDENTITY",
+    commandName: "UPDATE_USAGE_PREFERENCES",
+    aggregateId: userId,
+    payload: patch as Record<string, unknown>,
+  }, async () => {
+    const { data, error } = await supabase
+      .from("usage_preferences")
+      .upsert({ user_id: userId, ...patch }, { onConflict: "user_id" })
+      .select()
+      .single();
+    if (error) throw error;
+    updated = data;
+  });
+  if (updated) return updated;
+  if (queued) {
+    const current = await getUsagePreferences(userId);
+    if (current) return { ...current, ...patch };
+  }
+  throw new Error("usage_preferences_update_failed");
 }
