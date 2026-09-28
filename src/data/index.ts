@@ -17,11 +17,17 @@ export * as profilesRepo from "./profiles.repo";
 export * as usagePreferencesRepo from "./usage-preferences.repo";
 export { db } from "./offline/db";
 export type { DraftDossier } from "./offline/db";
+export type { LocalOperation, PendingUpload, SyncStatus } from "./offline/types";
 export {
   enqueueCreateDossier,
+  enqueueOperation,
   processQueue,
   initSyncListeners,
   onSyncChange,
+  setActiveSyncPrincipal,
+  retryOperation,
+  cancelOperation,
+  getPendingCount,
   saveLocalDraft,
   listLocalDrafts,
   deleteLocalDraft,
