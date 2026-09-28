@@ -11,8 +11,8 @@ import { NotFoundPage } from "@/features/shell";
 import { ProceduresPage } from "@/features/procedures";
 
 /**
- * Mode visiteur : toutes les pages sont consultables sans compte.
- * Seul l'onboarding (lié à un profil réel) exige un compte.
+ * Les pages d’information et d’orientation restent consultables en visiteur.
+ * Les données privées, mutations et détails de dossier exigent un compte.
  */
 export function AppRoutes() {
   return (
