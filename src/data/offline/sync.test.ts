@@ -62,6 +62,34 @@ describe("offline sync auth revalidation", () => {
     expect(mockDb.queue.update).not.toHaveBeenCalled();
   });
 
+  it("keeps the operation queued when the protected API call expires", async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: "user-a" } },
+      error: null,
+    });
+    mockSupabase.from.mockReturnValue({
+      insert: vi.fn(() => ({
+        select: vi.fn(() => ({
+          single: vi.fn().mockResolvedValue({
+            data: null,
+            error: { message: "JWT expired" },
+          }),
+        })),
+      })),
+    });
+
+    await processQueue();
+
+    expect(mockDb.queue.delete).not.toHaveBeenCalled();
+    expect(mockDb.queue.update).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({
+        attempts: 1,
+        last_error: "JWT expired",
+      }),
+    );
+  });
+
   it("does not replay a queued operation under a different account", async () => {
     mockSupabase.auth.getUser.mockResolvedValue({
       data: { user: { id: "user-b" } },
