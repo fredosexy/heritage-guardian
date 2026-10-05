@@ -1,15 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
 import { db, DraftDossier } from "./db";
-import type { DossierType } from "@/core/types/domain";
 
 let syncing = false;
 const listeners = new Set<() => void>();
 
 export function onSyncChange(cb: () => void) {
   listeners.add(cb);
-  return () => {
-    listeners.delete(cb);
-  };
+  return () => listeners.delete(cb);
 }
 function emit() {
   listeners.forEach((l) => l());
@@ -48,32 +45,34 @@ export async function processQueue(): Promise<void> {
             await db.queue.delete(op.id!);
             continue;
           }
-          if (!draft.bien_id) throw new Error("Ce brouillon doit être rattaché à un bien avant synchronisation.");
-          const { data, error } = await supabase.rpc("create_dossier", {
-            p_bien_id: draft.bien_id,
-            p_type: draft.type as DossierType,
-            p_title: draft.title,
-            p_visibility: draft.visibility ?? "prive",
-            p_description: draft.description || null,
-            p_include_bien_holders: true,
-            p_client_operation_id: draft.localId,
-          });
+          const { data, error } = await supabase
+            .from("dossiers")
+            .insert({
+              user_id: draft.user_id,
+              type: draft.type as any,
+              title: draft.title,
+              description: draft.description || null,
+              location_name: draft.location_name || null,
+              latitude: draft.latitude ?? null,
+              longitude: draft.longitude ?? null,
+              status: "incomplete",
+            })
+            .select()
+            .single();
           if (error) throw error;
-          await db.drafts.update(draft.id!, { synced: 1, remote_id: data });
+          await db.drafts.update(draft.id!, { synced: 1, remote_id: data.id });
           await db.queue.delete(op.id!);
           emit();
         } else {
-          // Never acknowledge an operation that has not actually been applied.
-          // Keeping it in the queue makes the failure visible and retryable.
-          throw new Error(`Unsupported offline operation: ${op.kind}`);
+          // Other kinds not implemented yet — drop
+          await db.queue.delete(op.id!);
         }
-      } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : String(error);
+      } catch (e: any) {
         await db.queue.update(op.id!, {
           attempts: (op.attempts || 0) + 1,
-          last_error: message,
+          last_error: e?.message || String(e),
         });
-        // Stop on the first failure to preserve operation ordering.
+        // Stop loop on first failure to retry later
         break;
       }
     }

@@ -30,6 +30,11 @@ export default defineConfig(({ mode }) => ({
             handler: "CacheFirst",
             options: { cacheName: "icons", expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 } },
           },
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
+            handler: "StaleWhileRevalidate",
+            options: { cacheName: "supabase-storage", expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 7 } },
+          },
         ],
       },
     }),

@@ -1,38 +1,67 @@
 import { useCallback, useState } from "react";
-import { dossiersRepo, enqueueCreateDossier, proceduresRepo } from "@/data";
+import { dossiersRepo, enqueueCreateDossier, saveLocalDraft } from "@/data";
 import { useIdentity } from "@/features/identity";
-import type { DossierType } from "@/core/types/domain";
 
 export interface CreateDossierForm {
-  bien_id: string;
-  type: DossierType;
+  type: string;
   title: string;
   description?: string;
-  visibility: "prive" | "public";
+  location_name?: string;
 }
-export type CreateResult = { mode: "online"; id: string } | { mode: "offline" };
-const newLocalId = () => `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+export type CreateResult =
+  | { mode: "online"; id: string }
+  | { mode: "offline" }
+  | { mode: "local" };
+
+function newLocalId() {
+  return `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
 
 export function useCreateDossier() {
   const { userId, isGuest } = useIdentity();
   const [saving, setSaving] = useState(false);
-  const create = useCallback(async (form: CreateDossierForm): Promise<CreateResult | null> => {
-    if (!userId || isGuest) return null;
-    setSaving(true);
-    try {
-      const operationId = newLocalId();
-      if (typeof navigator === "undefined" || navigator.onLine) {
-        const dossier = await dossiersRepo.createDossier({ ...form, client_operation_id: operationId });
-        try {
-          await proceduresRepo.initializeDossierJourney(dossier.id);
-        } catch (error) {
-          if (!(typeof error === "object" && error !== null && "code" in error && error.code === "P0002")) throw error;
+
+  const create = useCallback(
+    async (form: CreateDossierForm): Promise<CreateResult | null> => {
+      if (!userId) return null;
+      setSaving(true);
+      try {
+        const draft = {
+          localId: newLocalId(),
+          user_id: userId,
+          type: form.type,
+          title: form.title,
+          description: form.description || null,
+          location_name: form.location_name || null,
+        };
+
+        // Visiteur : tout reste sur l'appareil jusqu'à la création du compte.
+        if (isGuest) {
+          await saveLocalDraft(draft);
+          return { mode: "local" };
         }
-        return { mode: "online", id: dossier.id };
+
+        const online = typeof navigator === "undefined" ? true : navigator.onLine;
+        if (online) {
+          const dossier = await dossiersRepo.createDossier({
+            user_id: userId,
+            type: form.type,
+            title: form.title,
+            description: form.description || null,
+            location_name: form.location_name || null,
+          });
+          return { mode: "online", id: dossier.id };
+        }
+
+        await enqueueCreateDossier(draft);
+        return { mode: "offline" };
+      } finally {
+        setSaving(false);
       }
-      await enqueueCreateDossier({ localId: operationId, user_id: userId, ...form });
-      return { mode: "offline" };
-    } finally { setSaving(false); }
-  }, [userId, isGuest]);
+    },
+    [userId, isGuest]
+  );
+
   return { create, saving };
 }

@@ -5,11 +5,10 @@ import { useAuth, VisitorBanner } from "@/features/identity";
 import { ProfileCompletionCard } from "../components/ProfileCompletionCard";
 import { AvatarCard } from "../components/AvatarCard";
 import { SecurityCard } from "../components/SecurityCard";
-import { UsagePreferencesCard } from "../components/UsagePreferencesCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronRight, FolderOpen, Globe, Landmark, Loader2, LogOut, Moon, Paperclip, Sun } from "lucide-react";
+import { ChevronRight, FolderOpen, Globe, Loader2, LogOut, Moon, Paperclip, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import i18n from "@/core/i18n";
@@ -68,11 +67,9 @@ export default function ProfilePage() {
       <ProfileCompletionCard />
 
       {user && <AvatarCard userId={user.id} profile={profile} onChanged={refresh} />}
-      {user && <UsagePreferencesCard />}
 
       <section className="mb-4 space-y-2">
         {[
-          { icon: Landmark, label: t("profile.myBiens"), hint: t("profile.myBiensHint"), route: "/biens" },
           { icon: Paperclip, label: t("profile.myFiles"), hint: t("profile.myFilesHint"), route: "/files" },
           { icon: FolderOpen, label: t("profile.myDossiers"), hint: t("profile.myDossiersHint"), route: "/dossiers" },
         ].map(({ icon: Icon, label, hint, route }) => (

@@ -106,7 +106,6 @@ export default function DossiersPage() {
                     <DossierStatusBadge status={d.status} />
                     <span className="text-caption">{t(typeLabelKey(d.type))}</span>
                   </div>
-                  {d.bien_title && <p className="text-caption mt-1">{d.bien_title} · {d.visibility} · {d.completion_level}</p>}
                 </div>
               </button>
             );

@@ -45,9 +45,7 @@ export default function AssistantPage() {
       } catch (error) {
         if (error instanceof AiUnavailableError) {
           toast.error(
-            error.reason === "unauthorized"
-              ? t("ai.authRequired")
-              : error.reason === "rate_limit"
+            error.reason === "rate_limit"
               ? t("ai.rateLimit")
               : error.reason === "credits"
               ? t("ai.creditsOut")
@@ -92,9 +90,7 @@ export default function AssistantPage() {
     } catch (error) {
       if (error instanceof AiUnavailableError) {
         toast.error(
-          error.reason === "unauthorized"
-            ? t("ai.authRequired")
-            : error.reason === "rate_limit"
+          error.reason === "rate_limit"
             ? t("ai.rateLimit")
             : error.reason === "credits"
             ? t("ai.creditsOut")

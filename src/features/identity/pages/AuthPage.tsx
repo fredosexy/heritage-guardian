@@ -45,27 +45,8 @@ export default function Auth() {
         toast.success(t("auth.signedIn"));
       }
       navigate("/");
-    } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : t("auth.error"));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const sendRecoveryEmail = async () => {
-    if (!email) {
-      toast.error(t("auth.recoveryEmailRequired"));
-      return;
-    }
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/profile`,
-      });
-      if (error) throw error;
-      toast.success(t("auth.recoverySent"));
-    } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : t("auth.error"));
+    } catch (e: any) {
+      toast.error(e.message || t("auth.error"));
     } finally {
       setLoading(false);
     }
@@ -78,8 +59,8 @@ export default function Auth() {
       if (error) throw error;
       setOtpSent(true);
       toast.success("Code envoyé");
-    } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : t("auth.error"));
+    } catch (e: any) {
+      toast.error(e.message || t("auth.error"));
     } finally {
       setLoading(false);
     }
@@ -92,8 +73,8 @@ export default function Auth() {
       if (error) throw error;
       toast.success(t("auth.signedIn"));
       navigate("/");
-    } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : t("auth.error"));
+    } catch (e: any) {
+      toast.error(e.message || t("auth.error"));
     } finally {
       setLoading(false);
     }
@@ -145,11 +126,6 @@ export default function Auth() {
                   {loading && <Loader2 className="size-4 animate-spin" />}
                   {t("auth.continueWithEmail")}
                 </Button>
-                {mode === "signin" && (
-                  <Button type="button" variant="ghost" disabled={loading} onClick={() => void sendRecoveryEmail()} className="w-full">
-                    {t("auth.forgotPassword")}
-                  </Button>
-                )}
               </form>
             </TabsContent>
 

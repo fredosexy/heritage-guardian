@@ -4,11 +4,12 @@ export interface DraftDossier {
   id?: number;
   localId: string;
   user_id: string;
-  bien_id: string;
   type: string;
   title: string;
   description?: string | null;
-  visibility: "prive" | "public";
+  location_name?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   created_at: number;
   updated_at: number;
   synced: 0 | 1; // Dexie indexes booleans poorly; use 0/1
@@ -18,7 +19,7 @@ export interface DraftDossier {
 export interface QueuedOp {
   id?: number;
   kind: "create_dossier" | "update_dossier" | "delete_dossier";
-  payload: { localId: string };
+  payload: any;
   created_at: number;
   attempts: number;
   last_error?: string | null;
@@ -27,7 +28,7 @@ export interface QueuedOp {
 export interface CachedDossier {
   id: string;
   user_id: string;
-  data: unknown;
+  data: any;
   cached_at: number;
 }
 
