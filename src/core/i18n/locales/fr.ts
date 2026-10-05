@@ -77,7 +77,7 @@ export const fr = {
   },
   modules: {
     label: "Parcours", progressTitle: "Votre progression", progressHint: "L'état évolue avec les actions réellement réalisées.",
-    dossiersCount: "{{count}} dossier(s)", secureCount: "{{count}} sécurisé(s)", riskCount: "{{count}} à surveiller", nextAttention: "Prochaine attention", inProgressHint: "{{count}} élément(s) demandent encore une action.",
+    dossiersCount: "{{count}} dossier(s)", secureCount: "{{count}} sécurisé(s)", riskCount: "{{count}} à surveiller", nextAttention: "Prochaine attention", people: "personnes", proofs: "preuves", inProgressHint: "{{count}} élément(s) demandent encore une action.",
     openPath: "Voir le parcours", visitorStart: "Commencer avec l'assistant", guidedHint: "Mémoire vous accompagne étape par étape.",
     state: { new: "À découvrir", progress: "En cours", risk: "À surveiller", secure: "Bien avancé" },
     cta: { new: "Faire le premier geste", progress: "Continuer", risk: "Traiter le point de vigilance", secure: "Renforcer et préparer la suite" },
