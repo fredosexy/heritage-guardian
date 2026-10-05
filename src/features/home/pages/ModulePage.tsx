@@ -21,6 +21,7 @@ export default function ModulePage() {
   const inProgress = related.filter((d) => d.status !== "secure").length;
 
   const startRoute = id === "terrain" ? "/create?type=terrain" : "/assistant";
+  const nextStep = related.find((d) => d.status !== "secure");
 
   return (
     <AppLayout>
@@ -97,7 +98,7 @@ export default function ModulePage() {
             <span className="block font-semibold">
               {isGuest ? t("modules.visitorStart") : t(`modules.cta.${secure > 0 ? "progress" : "new"}`)}
             </span>
-            <span className="block text-sm opacity-85 mt-1">{t("modules.guidedHint")}</span>
+            <span className="block text-sm opacity-85 mt-1">{nextStep ? t("modules.nextStepExisting", { title: nextStep.title }) : t("modules.guidedHint")}</span>
           </span>
           <ChevronRight className="size-5 shrink-0" />
         </span>
