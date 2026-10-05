@@ -38,6 +38,23 @@ export async function getDossierSteps(dossierId: string): Promise<DossierStep[]>
   return data ?? [];
 }
 
+export async function getDossierStepsByDossierIds(dossierIds: string[]): Promise<Record<string, DossierStep[]>> {
+  if (dossierIds.length === 0) return {};
+
+  const { data, error } = await supabase
+    .from("dossier_steps")
+    .select("*")
+    .in("dossier_id", dossierIds)
+    .order("dossier_id")
+    .order("step_order");
+  if (error) throw error;
+
+  return (data ?? []).reduce<Record<string, DossierStep[]>>((acc, step) => {
+    (acc[step.dossier_id] ??= []).push(step);
+    return acc;
+  }, {});
+}
+
 export async function transitionStep(stepId: string, status: string, blockedReason?: string): Promise<void> {
   const { error } = await supabase.rpc("transition_dossier_step", {
     p_step_id: stepId,
