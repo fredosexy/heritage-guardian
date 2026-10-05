@@ -77,7 +77,7 @@ export const en = {
   },
   modules: {
     label: "Journey", progressTitle: "Your progress", progressHint: "The state changes with actions actually completed.",
-    dossiersCount: "{{count}} dossier(s)", secureCount: "{{count}} secured", riskCount: "{{count}} at risk", nextAttention: "Next attention", inProgressHint: "{{count}} item(s) still need an action.",
+    dossiersCount: "{{count}} dossier(s)", secureCount: "{{count}} secured", riskCount: "{{count}} at risk", nextAttention: "Next attention", people: "people", proofs: "proofs", inProgressHint: "{{count}} item(s) still need an action.",
     openPath: "View journey", visitorStart: "Start with the assistant", guidedHint: "Mémoire guides you step by step.",
     state: { new: "Discover", progress: "In progress", risk: "Needs attention", secure: "Well advanced" },
     cta: { new: "Take the first step", progress: "Continue", risk: "Handle the warning", secure: "Strengthen and prepare next" },
