@@ -53,7 +53,12 @@ export function useDossiers() {
     Promise.all([dossiersRepo.listDossiers(userId), countProofsByDossier(userId)])
       .then(async ([data, proofCounts]) => {
         const participantCounts = await participantsRepo.countParticipantsByDossier(data.map((d) => d.id));
-        const journeySteps = await proceduresRepo.getDossierStepsByDossierIds(data.map((d) => d.id));
+        let journeySteps: Record<string, Awaited<ReturnType<typeof proceduresRepo.getDossierStepsByDossierIds>>[string]> = {};
+        try {
+          journeySteps = await proceduresRepo.getDossierStepsByDossierIds(data.map((d) => d.id));
+        } catch {
+          // B4 is additive: if the migration is not deployed yet, keep the Home usable.
+        }
         const journeyEntries = data.map((d) => {
           const summary = getJourneySummary(journeySteps[d.id] ?? []);
           return [d.id, {
