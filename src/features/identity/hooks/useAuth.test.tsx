@@ -42,6 +42,22 @@ describe("AuthProvider session lifecycle", () => {
     auth.signOut.mockResolvedValue({ error: null });
   });
 
+  it("accepts the fresh session emitted by TOKEN_REFRESHED", async () => {
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+
+    const refreshedSession = { user: { id: "refreshed-user" } };
+    authListener?.("TOKEN_REFRESHED", refreshedSession);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("loading")).toHaveTextContent("false");
+      expect(screen.getByTestId("user")).toHaveTextContent("refreshed-user");
+    });
+  });
+
   it("does not restore a stale session after a newer auth event", async () => {
     let resolveSession!: (value: any) => void;
     auth.getSession.mockReturnValue(
