@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { dossiersRepo, listLocalDrafts, participantsRepo, countProofsByDossier } from "@/data";
+import { dossiersRepo, listLocalDrafts, participantsRepo, countProofsByDossier, proceduresRepo } from "@/data";
 import type { Dossier, DossierStatus } from "@/core/types/domain";
-import { getNextDossierAttention } from "@/services";
+import { getNextDossierAttention, getJourneySummary } from "@/services";
 import { useIdentity } from "@/features/identity";
 import { usePendingSync } from "@/features/offline";
 
@@ -17,6 +17,10 @@ export interface DossierListItem {
   participantsCount: number;
   proofsCount: number;
   nextAttention: string;
+  journeyProgress?: number;
+  currentStepTitle?: string | null;
+  nextStepTitle?: string | null;
+  blockedStepTitle?: string | null;
   local?: boolean;
 }
 
@@ -26,6 +30,7 @@ export function useDossiers() {
   const [remote, setRemote] = useState<Dossier[]>([]);
   const [participants, setParticipants] = useState<Record<string, number>>({});
   const [proofs, setProofs] = useState<Record<string, number>>({});
+  const [journeys, setJourneys] = useState<Record<string, { progress: number; current: string | null; next: string | null; blocked: string | null }>>({});
   const [loadingRemote, setLoadingRemote] = useState(true);
 
   const localDrafts = useLiveQuery(
@@ -39,6 +44,7 @@ export function useDossiers() {
       setRemote([]);
       setParticipants({});
       setProofs({});
+      setJourneys({});
       setLoadingRemote(false);
       return;
     }
@@ -47,10 +53,25 @@ export function useDossiers() {
     Promise.all([dossiersRepo.listDossiers(userId), countProofsByDossier(userId)])
       .then(async ([data, proofCounts]) => {
         const participantCounts = await participantsRepo.countParticipantsByDossier(data.map((d) => d.id));
+        const journeyEntries = await Promise.all(data.map(async (d) => {
+          try {
+            const steps = await proceduresRepo.getDossierSteps(d.id);
+            const summary = getJourneySummary(steps);
+            return [d.id, {
+              progress: summary.progressPercent,
+              current: summary.currentStep?.title ?? null,
+              next: summary.nextStep?.title ?? null,
+              blocked: summary.blockedSteps[0]?.title ?? null,
+            }] as const;
+          } catch {
+            return [d.id, { progress: 0, current: null, next: null, blocked: null }] as const;
+          }
+        }));
         if (!cancelled) {
           setRemote(data);
           setProofs(proofCounts);
           setParticipants(participantCounts);
+          setJourneys(Object.fromEntries(journeyEntries));
         }
       })
       .catch(() => undefined)
@@ -63,16 +84,24 @@ export function useDossiers() {
       id: draft.localId, type: draft.type, title: draft.title,
       status: "incomplete" as DossierStatus, completionScore: 0,
       updatedAt: new Date().toISOString(), participantsCount: 0, proofsCount: 0,
-      nextAttention: "Commencer votre dossier", local: true,
+      nextAttention: "Commencer votre dossier", journeyProgress: 0, currentStepTitle: null, nextStepTitle: null, blockedStepTitle: null, local: true,
     }));
     return remote.map((d) => ({
       id: d.id, type: d.type, title: d.title, status: d.status,
       completionScore: d.completion_score, updatedAt: d.updated_at,
       locationName: d.location_name, participantsCount: participants[d.id] ?? 0,
       proofsCount: proofs[d.id] ?? 0,
-      nextAttention: getNextDossierAttention(d, proofs[d.id] ?? 0, participants[d.id] ?? 0).label,
+      nextAttention: journeys[d.id]?.blocked
+        ? `Parcours bloqué : ${journeys[d.id].blocked}`
+        : journeys[d.id]?.current
+          ? `Étape en cours : ${journeys[d.id].current}`
+          : getNextDossierAttention(d, proofs[d.id] ?? 0, participants[d.id] ?? 0).label,
+      journeyProgress: journeys[d.id]?.progress ?? 0,
+      currentStepTitle: journeys[d.id]?.current ?? null,
+      nextStepTitle: journeys[d.id]?.next ?? null,
+      blockedStepTitle: journeys[d.id]?.blocked ?? null,
     }));
-  }, [isGuest, localDrafts, remote, participants, proofs]);
+  }, [isGuest, localDrafts, remote, participants, proofs, journeys]);
 
   return { dossiers, loading: isGuest ? localDrafts === undefined : loadingRemote };
 }
