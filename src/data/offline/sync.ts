@@ -44,7 +44,6 @@ export async function processQueue(): Promise<void> {
         if (sessionError || !currentUser) break;
 
         if (op.kind === "create_dossier") {
-        if (op.kind === "create_dossier") {
           const draft = await db.drafts.where("localId").equals(op.payload.localId).first();
           if (!draft) {
             await db.queue.delete(op.id!);
