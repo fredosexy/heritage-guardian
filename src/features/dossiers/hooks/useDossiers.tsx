@@ -53,20 +53,16 @@ export function useDossiers() {
     Promise.all([dossiersRepo.listDossiers(userId), countProofsByDossier(userId)])
       .then(async ([data, proofCounts]) => {
         const participantCounts = await participantsRepo.countParticipantsByDossier(data.map((d) => d.id));
-        const journeyEntries = await Promise.all(data.map(async (d) => {
-          try {
-            const steps = await proceduresRepo.getDossierSteps(d.id);
-            const summary = getJourneySummary(steps);
-            return [d.id, {
-              progress: summary.progressPercent,
-              current: summary.currentStep?.title ?? null,
-              next: summary.nextStep?.title ?? null,
-              blocked: summary.blockedSteps[0]?.title ?? null,
-            }] as const;
-          } catch {
-            return [d.id, { progress: 0, current: null, next: null, blocked: null }] as const;
-          }
-        }));
+        const journeySteps = await proceduresRepo.getDossierStepsByDossierIds(data.map((d) => d.id));
+        const journeyEntries = data.map((d) => {
+          const summary = getJourneySummary(journeySteps[d.id] ?? []);
+          return [d.id, {
+            progress: summary.progressPercent,
+            current: summary.currentStep?.title ?? null,
+            next: summary.nextStep?.title ?? null,
+            blocked: summary.blockedSteps[0]?.title ?? null,
+          }] as const;
+        });
         if (!cancelled) {
           setRemote(data);
           setProofs(proofCounts);
