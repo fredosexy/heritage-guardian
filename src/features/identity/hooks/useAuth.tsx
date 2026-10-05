@@ -23,18 +23,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Subscribe FIRST. Auth events are authoritative for the live client state.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
-      authEventVersion.current += 1;
+      const eventVersion = ++authEventVersion.current;
       if (!mounted) return;
 
-      setSession(s);
-      setUser(s?.user ?? null);
+      // SIGNED_OUT is authoritative even if a stale/non-null session is
+      // unexpectedly supplied with the event. TOKEN_REFRESHED replaces the
+      // session object with the freshly issued token pair.
+      const nextSession = event === "SIGNED_OUT" ? null : s;
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
       setLoading(false);
 
-      // Rattacher les données créées en mode visiteur au compte réel.
+      // Rattacher les données créées en mode visiteur au compte réel, but only
+      // while this exact SIGNED_IN identity is still the current auth state.
       if (event === "SIGNED_IN" && s?.user) {
         const uid = s.user.id;
-        setTimeout(() => {
-          if (mounted) void claimLocalData(uid).catch(() => undefined);
+        setTimeout(async () => {
+          if (!mounted || authEventVersion.current !== eventVersion) return;
+          const { data: { session: currentSession } } = await supabase.auth.getSession();
+          if (
+            !mounted ||
+            authEventVersion.current !== eventVersion ||
+            currentSession?.user.id !== uid
+          ) return;
+          void claimLocalData(uid).catch(() => undefined);
         }, 0);
       }
     });
