@@ -35,6 +35,15 @@ export async function processQueue(): Promise<void> {
     const ops = await db.queue.orderBy("created_at").toArray();
     for (const op of ops) {
       try {
+        // Offline authorization is not permanent. Before every network
+        // operation, require a currently authenticated user matching the
+        // identity that originally created the draft. A logout, expiration,
+        // or account switch therefore pauses the queue instead of replaying
+        // the operation with a stale identity.
+        const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
+        if (sessionError || !currentUser) break;
+
+        if (op.kind === "create_dossier") {
         if (op.kind === "create_dossier") {
           const draft = await db.drafts.where("localId").equals(op.payload.localId).first();
           if (!draft) {
@@ -45,6 +54,8 @@ export async function processQueue(): Promise<void> {
             await db.queue.delete(op.id!);
             continue;
           }
+          if (draft.user_id !== currentUser.id) break;
+
           const { data, error } = await supabase
             .from("dossiers")
             .insert({
