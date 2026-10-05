@@ -54,7 +54,7 @@ export default function HomePage() {
     [dossiers]
   );
 
-  const firstActiveModule = moduleStats.find((module) => module.dossierCount > 0) ?? moduleStats[0];
+  const firstActiveModule = moduleStats.find((module) => module.dossierCount > 0 && module.secureCount === 0) ?? moduleStats.find((module) => module.dossierCount > 0) ?? moduleStats[0];
 
   const openModule = (route: string) => {
     if (!isAuthenticated && needsFirstStep) {
