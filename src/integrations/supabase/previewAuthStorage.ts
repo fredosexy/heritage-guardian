@@ -29,7 +29,7 @@ export function brokeredPreviewStorage() {
     : (dev ? ['https://lovable.dev', 'http://localhost:3000'] : ['https://lovable.dev']);
   const RESULT = 'lovable-preview-auth:result';
   const TIMEOUT = 2000;
-  const newId = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+  const newId = () => crypto.randomUUID();
 
   const request = (type: string, key: string, value?: string): Promise<{ ok: boolean; value?: string | null } | null> =>
     new Promise((resolve) => {
@@ -81,10 +81,12 @@ export function brokeredPreviewStorage() {
       // Do not persist auth material locally in brokered preview mode. A failed
       // broker write must fail closed rather than leaving a token that can later
       // be resurrected independently of the broker.
-      await request('lovable-preview-auth:set', key, value);
+      const res = await request('lovable-preview-auth:set', key, value);
+      if (!res || !res.ok) throw new Error('Preview auth broker unavailable');
     },
     removeItem: async (key: string) => {
-      await request('lovable-preview-auth:remove', key);
+      const res = await request('lovable-preview-auth:remove', key);
+      if (!res || !res.ok) throw new Error('Preview auth broker unavailable');
     },
   };
 }
