@@ -10,7 +10,9 @@ export interface DossierListItem {
   type: string;
   title: string;
   status: DossierStatus;
-  /** Dossier encore uniquement sur cet appareil (mode visiteur ou hors ligne). */
+  completionScore: number;
+  updatedAt: string;
+  locationName?: string | null;
   local?: boolean;
 }
 
@@ -43,9 +45,7 @@ export function useDossiers() {
       .finally(() => {
         if (!cancelled) setLoadingRemote(false);
       });
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [userId, isGuest, pendingSync]);
 
   const dossiers = useMemo<DossierListItem[]>(() => {
@@ -55,10 +55,20 @@ export function useDossiers() {
         type: draft.type,
         title: draft.title,
         status: "incomplete" as DossierStatus,
+        completionScore: 0,
+        updatedAt: new Date().toISOString(),
         local: true,
       }));
     }
-    return remote.map((d) => ({ id: d.id, type: d.type, title: d.title, status: d.status }));
+    return remote.map((d) => ({
+      id: d.id,
+      type: d.type,
+      title: d.title,
+      status: d.status,
+      completionScore: d.completion_score,
+      updatedAt: d.updated_at,
+      locationName: d.location_name,
+    }));
   }, [isGuest, localDrafts, remote]);
 
   return { dossiers, loading: isGuest ? localDrafts === undefined : loadingRemote };
