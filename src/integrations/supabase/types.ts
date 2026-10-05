@@ -165,6 +165,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           visibility?: Database["public"]["Enums"]["dossier_visibility"]
+          procedure_definition_id?: string | null
         }
         Update: {
           completion_score?: number
