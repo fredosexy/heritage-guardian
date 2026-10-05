@@ -114,7 +114,7 @@ export default function HomePage() {
       </section>
       <section className="mb-6">
         <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.modulesTitle")}</h2><p className="text-caption mt-1">{t("home.modulesConnectedHint")}</p></div></div>
-        <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} participantsCount={module.participantsCount} proofsCount={module.proofsCount} />)}</div>
+        <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} journeyProgress={module.journeyProgress} currentStepTitle={module.currentStepTitle} nextStepTitle={module.nextStepTitle} blockedStepTitle={module.blockedStepTitle} participantsCount={module.participantsCount} proofsCount={module.proofsCount} />)}</div>
       </section>
       <section className="mb-6">
         <h2 className="text-base font-serif mb-3 flex items-center justify-between"><span>{t("home.alerts")}</span>{alerts.length > 0 && <button onClick={() => navigate("/alerts")} className="text-xs text-primary font-sans flex items-center gap-0.5">{alerts.length} <ChevronRight className="size-3" /></button>}</h2>
