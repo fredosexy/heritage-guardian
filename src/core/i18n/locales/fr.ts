@@ -77,10 +77,10 @@ export const fr = {
   },
   modules: {
     label: "Parcours", progressTitle: "Votre progression", progressHint: "L'état évolue avec les actions réellement réalisées.",
-    dossiersCount: "{{count}} dossier(s)", secureCount: "{{count}} sécurisé(s)", inProgressHint: "{{count}} élément(s) demandent encore une action.",
+    dossiersCount: "{{count}} dossier(s)", secureCount: "{{count}} sécurisé(s)", riskCount: "{{count}} à surveiller", nextAttention: "Prochaine attention", inProgressHint: "{{count}} élément(s) demandent encore une action.",
     openPath: "Voir le parcours", visitorStart: "Commencer avec l'assistant", guidedHint: "Mémoire vous accompagne étape par étape.",
-    state: { new: "À découvrir", progress: "En cours", secure: "Bien avancé" },
-    cta: { new: "Faire le premier geste", progress: "Continuer", secure: "Renforcer et préparer la suite" },
+    state: { new: "À découvrir", progress: "En cours", risk: "À surveiller", secure: "Bien avancé" },
+    cta: { new: "Faire le premier geste", progress: "Continuer", risk: "Traiter le point de vigilance", secure: "Renforcer et préparer la suite" },
     stepsTitle: "Le parcours",
     terrain: { title: "Enregistrer un bien", description: "Identifiez un terrain ou un bien important et commencez à réunir les éléments qui le rendent plus sûr.", longDescription: "Un parcours pour identifier le bien, documenter sa situation, rassembler les preuves utiles et préparer les prochaines vérifications.", steps: ["Identifier le bien", "Ajouter les informations et preuves", "Vérifier les personnes concernées", "Préparer la suite"] },
     heritage: { title: "Héritage & succession", description: "Préparez la transmission familiale avec une vision claire des personnes, des biens et des étapes à venir.", longDescription: "Un parcours destiné à rendre la succession plus lisible : personnes concernées, biens, pièces, décisions et prochaines étapes.", steps: ["Identifier les personnes concernées", "Rassembler les informations", "Clarifier les responsabilités", "Préparer la transmission"] },
