@@ -49,6 +49,10 @@ export default function HomePage() {
         nextAttention: attention?.nextAttention,
         participantsCount: related.reduce((sum, dossier) => sum + dossier.participantsCount, 0),
         proofsCount: related.reduce((sum, dossier) => sum + dossier.proofsCount, 0),
+        journeyProgress: Math.max(0, ...related.map((d) => d.journeyProgress ?? 0)),
+        currentStepTitle: attention?.currentStepTitle ?? null,
+        nextStepTitle: attention?.nextStepTitle ?? null,
+        blockedStepTitle: attention?.blockedStepTitle ?? null,
       };
     }),
     [dossiers]
@@ -86,7 +90,7 @@ export default function HomePage() {
         </section>
         <section className="mb-7">
           <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.modulesTitle")}</h2><p className="text-caption mt-1">{t("home.modulesVisitorHint")}</p></div><Sparkles className="size-5 text-primary" /></div>
-          <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} participantsCount={module.participantsCount} proofsCount={module.proofsCount} onFirstGesture={openModule} />)}</div>
+          <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} journeyProgress={module.journeyProgress} currentStepTitle={module.currentStepTitle} nextStepTitle={module.nextStepTitle} blockedStepTitle={module.blockedStepTitle} participantsCount={module.participantsCount} proofsCount={module.proofsCount} onFirstGesture={openModule} />)}</div>
         </section>
         <section className="rounded-3xl bg-gradient-hero p-5 text-primary-foreground shadow-elegant mb-6">
           <div className="flex items-start gap-3"><Sparkles className="size-5 mt-0.5 shrink-0" /><div><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><p className="text-sm opacity-85 mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>
