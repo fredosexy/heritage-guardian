@@ -173,6 +173,9 @@ export const en = {
     stepAccount: "Create an account to save your dossiers",
     stepLocation: "Turn on your location",
     stepPhone: "Add your phone number",
+    stateWellAdvanced: "Profile is well filled in",
+    stateTakingShape: "Your profile is taking shape",
+    stateToComplete: "A few details still need to be added",
   },
   alerts: {
     emptyHint: "Nothing to report. Keep strengthening your dossiers.",
