@@ -136,6 +136,9 @@ export const fr = {
     saveTerrain: "Enregistrer la fiche du terrain",
     editTerrain: "Modifier les sections",
     saveTerrainChanges: "Enregistrer les modifications",
+    territorialLevel: "Niveau",
+    requiredCompetence: "Compétence requise",
+    territorialLevels: { local: "Local", rural: "Rural", arrondissement: "Arrondissement", departement: "Département", region: "Région", national: "National", autre: "Autre" },
     terrainSaved: "Fiche du terrain mise à jour",
     terrainSections: {
       histoire: { title: "Histoire du terrain", hint: "Ce que l'on sait de son origine et de son évolution.", placeholder: "Racontez les faits connus, anciens usages, transmissions ou événements importants…" },
