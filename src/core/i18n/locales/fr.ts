@@ -176,6 +176,12 @@ export const fr = {
     proofVerified: "Vérifiée",
     proofNeedsVerification: "Vérification à poursuivre",
     participantsSoon: "L'invitation de proches arrive bientôt.",
+    peopleConcerned: "Personnes concernées",
+    peopleConcernedHint: "Les personnes déjà rattachées à ce dossier, avec le rôle enregistré dans les données.",
+    unnamedPerson: "Personne sans nom",
+    personConnected: "Participation confirmée",
+    personInvitationPending: "Invitation en attente",
+    participantRoles: { owner: "Propriétaire", heir: "Héritier", witness: "Témoin", expert: "Expert", viewer: "Consultation" },
   },
   visitor: {
     title: "Vous découvrez Mémoire",
