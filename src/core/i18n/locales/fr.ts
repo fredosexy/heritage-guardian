@@ -134,6 +134,9 @@ export const fr = {
     terrainValidationTitle: "Validation progressive",
     terrainValidationHint: "Une fiche complète ne signifie pas encore qu'elle est validée. Les étapes professionnelles seront affichées ici lorsqu'une procédure officielle publiée sera disponible.",
     saveTerrain: "Enregistrer la fiche du terrain",
+    editTerrain: "Modifier les sections",
+    saveTerrainChanges: "Enregistrer les modifications",
+    terrainSaved: "Fiche du terrain mise à jour",
     terrainSections: {
       histoire: { title: "Histoire du terrain", hint: "Ce que l'on sait de son origine et de son évolution.", placeholder: "Racontez les faits connus, anciens usages, transmissions ou événements importants…" },
       provenance: { title: "Provenance", hint: "D'où vient le droit ou la possession du terrain.", placeholder: "Indiquez l'origine connue : acquisition, héritage, donation, attribution, transmission…" },
