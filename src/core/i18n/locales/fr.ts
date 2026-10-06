@@ -198,6 +198,9 @@ export const fr = {
     stepAccount: "Créez un compte pour sauvegarder vos dossiers",
     stepLocation: "Activez votre position",
     stepPhone: "Ajoutez votre téléphone",
+    stateWellAdvanced: "Profil bien renseigné",
+    stateTakingShape: "Votre profil prend forme",
+    stateToComplete: "Quelques informations restent à ajouter",
   },
   alerts: {
     emptyHint: "Rien à signaler. Continuez à renforcer vos dossiers.",
