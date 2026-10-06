@@ -117,6 +117,38 @@ export default function DossierDetailPage() {
         </div>
       </div>
 
+      {dossier.type === "terrain" && (
+        <section className="card-soft p-5 mb-4">
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <p className="text-sm font-semibold">{t("create.terrainFormTitle")}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t("create.terrainFormHint")}</p>
+            </div>
+            <MapPin className="size-4 text-primary shrink-0" />
+          </div>
+          <div className="grid gap-2">
+            {(["histoire","provenance","proprietaires","ayantsDroit","documentation","localisation","dimensions","etat","miseEnValeur"] as const).map((key, index) => {
+              const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+                ? dossier.metadata as { terrain?: { sections?: Record<string, string> } }
+                : {};
+              const value = metadata.terrain?.sections?.[key];
+              return (
+                <div key={key} className="rounded-2xl border border-border p-3">
+                  <div className="flex items-center gap-3">
+                    <span className="size-7 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-xs font-semibold">{index + 1}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">{t(`create.terrainSections.${key}.title`)}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{value || t(`create.terrainSections.${key}.hint`)}</p>
+                    </div>
+                    {value ? <CircleCheck className="size-4 text-primary shrink-0" /> : null}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {journey.length > 0 && (
         <section className="card-soft p-5 mb-4">
           <div className="flex items-center justify-between gap-3 mb-4">
