@@ -1,4 +1,5 @@
 export { computeCompletionScore, statusFromScore, scoreDossier } from "./dossier-scoring";
+export { getNextDossierAttention, type DossierAttention } from "./dossier-next-attention";
 export { fetchDossierSuggestions, streamChat, AiUnavailableError } from "./assistant.service";
 export type { ChatMessage } from "./assistant.service";
 export { claimLocalData } from "./claim-local-data";
