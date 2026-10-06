@@ -148,6 +148,8 @@ export const en = {
     typeLabel: "Type",
     kb: "KB",
     proofAdded: "Proof added",
+    proofVerified: "Verified",
+    proofNeedsVerification: "Verification still needed",
     participantsSoon: "Inviting relatives is coming soon.",
   },
   visitor: {
