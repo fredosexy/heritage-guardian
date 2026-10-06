@@ -173,10 +173,6 @@ export default function CreateDossierPage() {
             <p className="text-sm font-semibold">{t("create.terrainProgressTitle")}</p>
             <p className="text-xs text-muted-foreground mt-1">{t("create.terrainProgressHint", { completed: completedSections, total: sectionKeys.length })}</p>
           </div>
-          <span className="text-sm font-semibold text-primary">{Math.round((completedSections / sectionKeys.length) * 100)}%</span>
-        </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden mt-3">
-          <div className="h-full bg-primary transition-all" style={{ width: `${(completedSections / sectionKeys.length) * 100}%` }} />
         </div>
       </section>
 
