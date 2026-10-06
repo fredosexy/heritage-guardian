@@ -4,10 +4,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AppLayout, EmptyState, PageHeader } from "@/features/shell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronRight, CircleCheck, CircleDot, Loader2, MapPin, Sparkles, Trash2, Users } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, ChevronRight, CircleCheck, CircleDot, Loader2, MapPin, Pencil, Save, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useDossierDetail } from "../hooks/useDossierDetail";
-import { proceduresRepo } from "@/data";
+import { dossiersRepo, proceduresRepo } from "@/data";
 import type { DossierStep } from "@/core/types/domain";
 import { ProofsTab } from "../components/ProofsTab";
 import { typeLabelKey } from "../components/dossierTypeMeta";
@@ -20,10 +21,41 @@ export default function DossierDetailPage() {
     useDossierDetail(id);
   const [journey, setJourney] = useState<DossierStep[]>([]);
   const [transitioning, setTransitioning] = useState(false);
+  const [editingTerrain, setEditingTerrain] = useState(false);
+  const [savingTerrain, setSavingTerrain] = useState(false);
+  const [terrainSections, setTerrainSections] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (id) void proceduresRepo.getDossierSteps(id).then(setJourney).catch(() => setJourney([]));
   }, [id]);
+
+  useEffect(() => {
+    if (!dossier || dossier.type !== "terrain") return;
+    const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+      ? dossier.metadata as { terrain?: { sections?: Record<string, string> } }
+      : {};
+    setTerrainSections(metadata.terrain?.sections ?? {});
+  }, [dossier?.id, dossier?.metadata, dossier?.type]);
+
+  const saveTerrainSections = async () => {
+    if (!dossier) return;
+    setSavingTerrain(true);
+    try {
+      const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+        ? dossier.metadata as Record<string, unknown>
+        : {};
+      await dossiersRepo.updateDossierMetadata(dossier.id, {
+        ...metadata,
+        terrain: { version: 1, sections: terrainSections },
+      });
+      setEditingTerrain(false);
+      toast.success(t("create.terrainSaved"));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("auth.error"));
+    } finally {
+      setSavingTerrain(false);
+    }
+  };
 
   const transitionStep = async (step: DossierStep, target: "en_cours" | "terminee") => {
     setTransitioning(true);
@@ -124,28 +156,42 @@ export default function DossierDetailPage() {
               <p className="text-sm font-semibold">{t("create.terrainFormTitle")}</p>
               <p className="text-xs text-muted-foreground mt-1">{t("create.terrainFormHint")}</p>
             </div>
-            <MapPin className="size-4 text-primary shrink-0" />
+            <Button variant="outline" size="sm" onClick={() => setEditingTerrain((value) => !value)} className="rounded-xl">
+              <Pencil className="size-3.5 mr-1.5" />{editingTerrain ? t("create.cancel") : t("create.editTerrain")}
+            </Button>
           </div>
           <div className="grid gap-2">
             {(["histoire","provenance","proprietaires","ayantsDroit","documentation","localisation","dimensions","etat","miseEnValeur"] as const).map((key, index) => {
-              const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
-                ? dossier.metadata as { terrain?: { sections?: Record<string, string> } }
-                : {};
-              const value = metadata.terrain?.sections?.[key];
+              const value = terrainSections[key] ?? "";
               return (
                 <div key={key} className="rounded-2xl border border-border p-3">
                   <div className="flex items-center gap-3">
                     <span className="size-7 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-xs font-semibold">{index + 1}</span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium">{t(`create.terrainSections.${key}.title`)}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{value || t(`create.terrainSections.${key}.hint`)}</p>
+                      <p className="text-sm font-medium">{t("create.terrainSections." + key + ".title")}</p>
+                      {!editingTerrain && <p className="text-xs text-muted-foreground mt-0.5">{value || t("create.terrainSections." + key + ".hint")}</p>}
                     </div>
-                    {value ? <CircleCheck className="size-4 text-primary shrink-0" /> : null}
+                    {!editingTerrain && value ? <CircleCheck className="size-4 text-primary shrink-0" /> : null}
                   </div>
+                  {editingTerrain && (
+                    <Textarea
+                      value={value}
+                      onChange={(e) => setTerrainSections((current) => ({ ...current, [key]: e.target.value }))}
+                      placeholder={t("create.terrainSections." + key + ".placeholder")}
+                      rows={3}
+                      className="rounded-xl mt-3"
+                    />
+                  )}
                 </div>
               );
             })}
           </div>
+          {editingTerrain && (
+            <Button onClick={() => void saveTerrainSections()} disabled={savingTerrain} className="w-full rounded-xl mt-4">
+              {savingTerrain ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}
+              {t("create.saveTerrainChanges")}
+            </Button>
+          )}
         </section>
       )}
 
