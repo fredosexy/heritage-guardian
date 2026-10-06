@@ -151,6 +151,12 @@ export const en = {
     proofVerified: "Verified",
     proofNeedsVerification: "Verification still needed",
     participantsSoon: "Inviting relatives is coming soon.",
+    peopleConcerned: "People concerned",
+    peopleConcernedHint: "People already attached to this dossier, with the role stored in the data.",
+    unnamedPerson: "Unnamed person",
+    personConnected: "Participation confirmed",
+    personInvitationPending: "Invitation pending",
+    participantRoles: { owner: "Owner", heir: "Heir", witness: "Witness", expert: "Expert", viewer: "View only" },
   },
   visitor: {
     title: "You are exploring Mémoire",
