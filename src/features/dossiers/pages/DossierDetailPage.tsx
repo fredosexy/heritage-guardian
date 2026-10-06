@@ -114,9 +114,6 @@ export default function DossierDetailPage() {
     );
   }
 
-  const barColor =
-    dossier.status === "secure" ? "bg-success" : dossier.status === "incomplete" ? "bg-warning" : "bg-destructive";
-
   return (
     <AppLayout>
       <PageHeader title={dossier.title} parentLabel={t("dossiers.title")} showBack />
@@ -138,15 +135,7 @@ export default function DossierDetailPage() {
             {dossier.location_name}
           </p>
         )}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">{t("dossier.completion")}</span>
-            <span className="font-medium">{dossier.completion_score}%</span>
-          </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div className={`h-full ${barColor} transition-all`} style={{ width: `${dossier.completion_score}%` }} />
-          </div>
-        </div>
+        <p className="text-sm text-muted-foreground">{t(`dossier.state.${dossier.status}`)}</p>
       </div>
 
       {dossier.type === "terrain" && (
@@ -200,7 +189,7 @@ export default function DossierDetailPage() {
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
               <p className="text-sm font-semibold">{t("modules.stepsTitle")}</p>
-              <p className="text-caption mt-1">{t("modules.journeyProgress", { percent: Math.round((journey.filter((step) => step.status === "terminee").length / journey.length) * 100) })}</p>
+              <p className="text-caption mt-1">{journey.some((step) => step.status === "bloquee") ? t("modules.journeyBlocked") : journey.some((step) => step.status === "en_cours") ? t("modules.journeyCurrent") : t("modules.journeyCompleteHint")}</p>
             </div>
             <Sparkles className="size-4 text-primary" />
           </div>
