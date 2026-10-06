@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { dossiersRepo, listLocalDrafts, participantsRepo, countProofsByDossier, proceduresRepo } from "@/data";
-import type { Dossier, DossierStatus } from "@/core/types/domain";
+import type { Dossier, DossierStatus, DossierStep } from "@/core/types/domain";
 import { getNextDossierAttention, getJourneySummary } from "@/services";
 import { useIdentity } from "@/features/identity";
 import { usePendingSync } from "@/features/offline";
@@ -53,7 +53,7 @@ export function useDossiers() {
     Promise.all([dossiersRepo.listDossiers(userId), countProofsByDossier(userId)])
       .then(async ([data, proofCounts]) => {
         const participantCounts = await participantsRepo.countParticipantsByDossier(data.map((d) => d.id));
-        let journeySteps: Record<string, Awaited<ReturnType<typeof proceduresRepo.getDossierStepsByDossierIds>>[string]> = {};
+        let journeySteps: Record<string, DossierStep[]> = {};
         try {
           journeySteps = await proceduresRepo.getDossierStepsByDossierIds(data.map((d) => d.id));
         } catch {
