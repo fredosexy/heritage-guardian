@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppLayout, EmptyState, PageHeader } from "@/features/shell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2, MapPin, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useDossierDetail } from "../hooks/useDossierDetail";
