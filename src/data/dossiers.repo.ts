@@ -64,3 +64,18 @@ export async function deleteDossier(id: string): Promise<void> {
   const { error } = await supabase.from("dossiers").delete().eq("id", id);
   if (error) throw error;
 }
+
+
+export async function updateDossierMetadata(
+  id: string,
+  metadata: Record<string, unknown>
+): Promise<Dossier> {
+  const { data, error } = await supabase
+    .from("dossiers")
+    .update({ metadata })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
