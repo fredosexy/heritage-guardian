@@ -12,3 +12,4 @@ export { buildGreeting, dayPartFor, type Greeting, type GreetingInput, type DayP
 export { buildScreenTip, type ScreenTip, type ScreenTipInput } from "./screen-assistant";
 export { computeAlertCandidates, type AlertCandidate, type AlertRulesInput } from "./alert-rules";
 export { syncAlerts } from "./alert-sync";
+export { getJourneySummary, type JourneyStepLike, type JourneyStepStatus } from "./journey-engine";
