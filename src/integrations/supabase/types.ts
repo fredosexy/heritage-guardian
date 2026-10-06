@@ -148,7 +148,6 @@ export type Database = {
           updated_at: string
           user_id: string
           visibility: Database["public"]["Enums"]["dossier_visibility"]
-          procedure_definition_id: string | null
         }
         Insert: {
           completion_score?: number
@@ -165,7 +164,6 @@ export type Database = {
           updated_at?: string
           user_id: string
           visibility?: Database["public"]["Enums"]["dossier_visibility"]
-          procedure_definition_id?: string | null
         }
         Update: {
           completion_score?: number
@@ -182,7 +180,6 @@ export type Database = {
           updated_at?: string
           user_id?: string
           visibility?: Database["public"]["Enums"]["dossier_visibility"]
-          procedure_definition_id?: string | null
         }
         Relationships: []
       }
@@ -328,27 +325,6 @@ export type Database = {
           },
         ]
       }
-      procedure_definitions: {
-        Row: { code: string; created_at: string; dossier_type: Database["public"]["Enums"]["dossier_type"]; id: string; source_reference: string | null; status: string; territory: string; updated_at: string; valid_from: string | null; valid_until: string | null; verified_at: string | null; verified_by: string | null; version: number }
-        Insert: { code: string; created_at?: string; dossier_type: Database["public"]["Enums"]["dossier_type"]; id?: string; source_reference?: string | null; status?: string; territory: string; updated_at?: string; valid_from?: string | null; valid_until?: string | null; verified_at?: string | null; verified_by?: string | null; version: number }
-        Update: { code?: string; created_at?: string; dossier_type?: Database["public"]["Enums"]["dossier_type"]; id?: string; source_reference?: string | null; status?: string; territory?: string; updated_at?: string; valid_from?: string | null; valid_until?: string | null; verified_at?: string | null; verified_by?: string | null; version?: number }
-        Relationships: []
-      }
-      procedure_steps: {
-        Row: { code: string; created_at: string; id: string; is_optional: boolean; procedure_id: string; required_competence: string | null; rules_json: Json | null; short_description: string; step_order: number; territorial_level: string; title: string; updated_at: string }
-        Insert: { code: string; created_at?: string; id?: string; is_optional?: boolean; procedure_id: string; required_competence?: string | null; rules_json?: Json | null; short_description: string; step_order: number; territorial_level: string; title: string; updated_at?: string }
-        Update: { code?: string; created_at?: string; id?: string; is_optional?: boolean; procedure_id?: string; required_competence?: string | null; rules_json?: Json | null; short_description?: string; step_order?: number; territorial_level?: string; title?: string; updated_at?: string }
-        Relationships: [{ foreignKeyName: "procedure_steps_procedure_id_fkey"; columns: ["procedure_id"]; isOneToOne: false; referencedRelation: "procedure_definitions"; referencedColumns: ["id"] }]
-      }
-      dossier_steps: {
-        Row: { blocked_reason: string | null; completed_at: string | null; created_at: string; dossier_id: string; id: string; procedure_step_id: string | null; short_description: string; started_at: string | null; status: string; step_order: number; territorial_level: string; title: string; updated_at: string }
-        Insert: { blocked_reason?: string | null; completed_at?: string | null; created_at?: string; dossier_id: string; id?: string; procedure_step_id?: string | null; short_description: string; started_at?: string | null; status?: string; step_order: number; territorial_level: string; title: string; updated_at?: string }
-        Update: { blocked_reason?: string | null; completed_at?: string | null; created_at?: string; dossier_id?: string; id?: string; procedure_step_id?: string | null; short_description?: string; started_at?: string | null; status?: string; step_order?: number; territorial_level?: string; title?: string; updated_at?: string }
-        Relationships: [
-          { foreignKeyName: "dossier_steps_dossier_id_fkey"; columns: ["dossier_id"]; isOneToOne: false; referencedRelation: "dossiers"; referencedColumns: ["id"] },
-          { foreignKeyName: "dossier_steps_procedure_step_id_fkey"; columns: ["procedure_step_id"]; isOneToOne: false; referencedRelation: "procedure_steps"; referencedColumns: ["id"] }
-        ]
-      }
       user_roles: {
         Row: {
           created_at: string
@@ -389,14 +365,6 @@ export type Database = {
       owns_dossier: {
         Args: { _dossier_id: string; _user_id: string }
         Returns: boolean
-      }
-      initialize_dossier_journey: {
-        Args: { p_dossier_id: string; p_procedure_id?: string | null }
-        Returns: string
-      }
-      transition_dossier_step: {
-        Args: { p_step_id: string; p_target_status: string; p_blocked_reason?: string | null }
-        Returns: undefined
       }
     }
     Enums: {
