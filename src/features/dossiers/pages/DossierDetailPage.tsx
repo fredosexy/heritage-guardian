@@ -238,12 +238,38 @@ export default function DossierDetailPage() {
         </TabsContent>
 
         <TabsContent value="participants" className="mt-4">
-          <div className="card-soft p-4 text-center">
-            <Users className="size-8 mx-auto text-muted-foreground mb-2" />
-            <p className="text-sm text-muted-foreground">
-              {participants.length === 0 ? t("dossier.noParticipants") : `${participants.length}`}
-            </p>
-            <p className="text-caption mt-2">{t("dossier.participantsSoon")}</p>
+          <div className="card-soft p-4">
+            <div className="flex items-start gap-3 mb-4">
+              <Users className="size-5 text-primary mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold">{t("dossier.peopleConcerned")}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t("dossier.peopleConcernedHint")}</p>
+              </div>
+            </div>
+            {participants.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border p-4 text-center">
+                <p className="text-sm text-muted-foreground">{t("dossier.noParticipants")}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t("dossier.participantsSoon")}</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {participants.map((participant) => {
+                  const name = participant.contact_name || participant.contact_email || participant.contact_phone || t("dossier.unnamedPerson");
+                  return (
+                    <div key={participant.id} className="rounded-2xl border border-border p-3">
+                      <div className="flex items-start gap-3">
+                        <div className="size-9 rounded-full bg-accent text-primary flex items-center justify-center shrink-0"><Users className="size-4" /></div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{t("dossier.participantRoles." + participant.role)}</p>
+                          <p className="text-[11px] text-muted-foreground mt-1">{participant.accepted_at ? t("dossier.personConnected") : t("dossier.personInvitationPending")}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </TabsContent>
 
