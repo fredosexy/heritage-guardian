@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthPage, OnboardingPage, ProtectedRoute } from "@/features/identity";
 import { HomePage, ModulePage } from "@/features/home";
 import { CreateDossierPage, DossierDetailPage, DossiersPage } from "@/features/dossiers";
@@ -18,6 +18,8 @@ export function AppRoutes() {
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
       <Route path="/" element={<HomePage />} />
+      <Route path="/index" element={<Navigate to="/" replace />} />
+      <Route path="/index.html" element={<Navigate to="/" replace />} />
       <Route path="/modules/:moduleId" element={<ModulePage />} />
       <Route path="/dossiers" element={<DossiersPage />} />
       <Route path="/dossiers/:id" element={<DossierDetailPage />} />
