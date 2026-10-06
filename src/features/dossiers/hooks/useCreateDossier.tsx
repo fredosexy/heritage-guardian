@@ -7,6 +7,7 @@ export interface CreateDossierForm {
   title: string;
   description?: string;
   location_name?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export type CreateResult =
