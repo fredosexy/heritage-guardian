@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { AppLayout, NextActionCard } from "@/features/shell";
+import { AppLayout } from "@/features/shell";
 import { useProfile, ProfileCompletionCard } from "@/features/profile";
 import { FirstStepDialog, VisitorBanner, useIdentity } from "@/features/identity";
 import { useUnreadAlerts } from "@/features/alerts/hooks/useAlerts";
@@ -109,7 +109,29 @@ export default function HomePage() {
       <section className="mb-6">
         <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.continueTitle")}</h2><p className="text-caption mt-1">{t("home.continueHint")}</p></div><button onClick={() => navigate(continueRoute)} className="text-xs text-primary font-medium tap focus-ring">{t("home.open")}</button></div>
         <button onClick={() => navigate(continueRoute)} className="w-full rounded-3xl bg-gradient-hero p-5 text-left text-primary-foreground shadow-elegant tap focus-ring">
-          <div className="flex items-start justify-between gap-4"><div><p className="text-xs uppercase tracking-wide opacity-75">{t("home.nextModuleLabel")}</p><p className="text-xl font-serif mt-1">{t(`modules.${firstActiveModule.id}.title`)}</p><p className="text-sm opacity-85 mt-2 leading-relaxed">{firstActiveModule.riskCount > 0 ? t("home.continueRisk", { count: firstActiveModule.riskCount }) : firstActiveModule.dossierCount > 0 ? t("home.continueExisting", { count: firstActiveModule.dossierCount }) : t("home.continueNew")}</p></div><ChevronRight className="size-5 shrink-0" /></div>
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-xs uppercase tracking-wide opacity-75">{t("home.nextModuleLabel")}</p>
+              <p className="text-xl font-serif mt-1">{t(`modules.${firstActiveModule.id}.title`)}</p>
+              <p className="text-sm opacity-85 mt-2 leading-relaxed">
+                {firstActiveModule.blockedStepTitle
+                  ? t("modules.journeyBlocked") + ": " + firstActiveModule.blockedStepTitle
+                  : firstActiveModule.currentStepTitle
+                    ? t("modules.journeyCurrent") + ": " + firstActiveModule.currentStepTitle
+                    : firstActiveModule.riskCount > 0
+                      ? t("home.continueRisk", { count: firstActiveModule.riskCount })
+                      : firstActiveModule.dossierCount > 0
+                        ? t("home.continueExisting", { count: firstActiveModule.dossierCount })
+                        : t("home.continueNew")}
+              </p>
+              {firstActiveModule.nextStepTitle && !firstActiveModule.blockedStepTitle && (
+                <p className="text-xs opacity-75 mt-2">
+                  {t("modules.journeyNext")}: {firstActiveModule.nextStepTitle}
+                </p>
+              )}
+            </div>
+            <ChevronRight className="size-5 shrink-0" />
+          </div>
         </button>
       </section>
       <section className="mb-6">
@@ -120,7 +142,6 @@ export default function HomePage() {
         <h2 className="text-base font-serif mb-3 flex items-center justify-between"><span>{t("home.alerts")}</span>{alerts.length > 0 && <button onClick={() => navigate("/alerts")} className="text-xs text-primary font-sans flex items-center gap-0.5">{alerts.length} <ChevronRight className="size-3" /></button>}</h2>
         {alerts.length === 0 ? <div className="card-soft p-4 text-sm text-muted-foreground text-center">{t("home.noAlerts")}</div> : <div className="space-y-2">{alerts.slice(0, 3).map((a) => <button key={a.id} onClick={() => a.action_route && navigate(a.action_route)} className={`w-full text-left rounded-xl border-l-4 p-3 ${severityClass(a.severity)}`}><p className="text-sm font-medium">{a.title}</p><p className="text-caption mt-0.5">{a.message}</p></button>)}</div>}
       </section>
-      <NextActionCard className="mb-6" />
       <Button onClick={() => navigate("/assistant")} variant="outline" className="w-full justify-between rounded-2xl py-6"><span className="flex items-center gap-2"><Sparkles className="size-4 text-primary" /> {t("ai.title")}</span><ChevronRight className="size-4" /></Button>
     </AppLayout>
   );
