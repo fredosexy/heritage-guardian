@@ -173,6 +173,8 @@ export const fr = {
     typeLabel: "Type",
     kb: "Ko",
     proofAdded: "Preuve ajoutée",
+    proofVerified: "Vérifiée",
+    proofNeedsVerification: "Vérification à poursuivre",
     participantsSoon: "L'invitation de proches arrive bientôt.",
   },
   visitor: {
