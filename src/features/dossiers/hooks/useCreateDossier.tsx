@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { dossiersRepo, enqueueCreateDossier, saveLocalDraft } from "@/data";
+import { dossiersRepo, enqueueCreateDossier, proceduresRepo, saveLocalDraft } from "@/data";
 import { useIdentity } from "@/features/identity";
 
 export interface CreateDossierForm {
@@ -7,6 +7,7 @@ export interface CreateDossierForm {
   title: string;
   description?: string;
   location_name?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export type CreateResult =
@@ -51,6 +52,7 @@ export function useCreateDossier() {
             description: form.description || null,
             location_name: form.location_name || null,
           });
+          try { await proceduresRepo.initializeDossierJourney(dossier.id); } catch { /* No published journey yet. */ }
           return { mode: "online", id: dossier.id };
         }
 

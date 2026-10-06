@@ -1,10 +1,15 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppLayout, EmptyState, PageHeader } from "@/features/shell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2, MapPin, Sparkles, Trash2, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, ChevronRight, CircleCheck, CircleDot, FileCheck2, Loader2, MapPin, Pencil, Save, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useDossierDetail } from "../hooks/useDossierDetail";
+import { dossiersRepo, proceduresRepo } from "@/data";
+import type { DossierStep } from "@/core/types/domain";
 import { ProofsTab } from "../components/ProofsTab";
 import { typeLabelKey } from "../components/dossierTypeMeta";
 
@@ -14,6 +19,62 @@ export default function DossierDetailPage() {
   const navigate = useNavigate();
   const { dossier, proofs, participants, suggestions, loading, uploading, addProof, remove } =
     useDossierDetail(id);
+  const [journey, setJourney] = useState<DossierStep[]>([]);
+  const [transitioning, setTransitioning] = useState(false);
+  const [editingTerrain, setEditingTerrain] = useState(false);
+  const [savingTerrain, setSavingTerrain] = useState(false);
+  const [terrainSections, setTerrainSections] = useState<Record<string, string>>({});
+  const terrainSectionKeys = ["histoire","provenance","proprietaires","ayantsDroit","documentation","localisation","dimensions","etat","miseEnValeur"] as const;
+  const terrainSectionProofs = (sectionKey: string) => proofs.filter((proof) => {
+    const metadata = proof.metadata && typeof proof.metadata === "object" && !Array.isArray(proof.metadata)
+      ? proof.metadata as { terrainSectionKey?: string }
+      : {};
+    return metadata.terrainSectionKey === sectionKey;
+  });
+
+  useEffect(() => {
+    if (id) void proceduresRepo.getDossierSteps(id).then(setJourney).catch(() => setJourney([]));
+  }, [id]);
+
+  useEffect(() => {
+    if (!dossier || dossier.type !== "terrain") return;
+    const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+      ? dossier.metadata as { terrain?: { sections?: Record<string, string> } }
+      : {};
+    setTerrainSections(metadata.terrain?.sections ?? {});
+  }, [dossier?.id, dossier?.metadata, dossier?.type]);
+
+  const saveTerrainSections = async () => {
+    if (!dossier) return;
+    setSavingTerrain(true);
+    try {
+      const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+        ? dossier.metadata as Record<string, unknown>
+        : {};
+      await dossiersRepo.updateDossierMetadata(dossier.id, {
+        ...metadata,
+        terrain: { version: 1, sections: terrainSections },
+      });
+      setEditingTerrain(false);
+      toast.success(t("create.terrainSaved"));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("auth.error"));
+    } finally {
+      setSavingTerrain(false);
+    }
+  };
+
+  const transitionStep = async (step: DossierStep, target: "en_cours" | "terminee") => {
+    setTransitioning(true);
+    try {
+      await proceduresRepo.transitionStep(step.id, target);
+      setJourney(await proceduresRepo.getDossierSteps(step.dossier_id));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("auth.error"));
+    } finally {
+      setTransitioning(false);
+    }
+  };
 
   const handleUpload = async (file: File) => {
     try {
@@ -60,9 +121,6 @@ export default function DossierDetailPage() {
     );
   }
 
-  const barColor =
-    dossier.status === "secure" ? "bg-success" : dossier.status === "incomplete" ? "bg-warning" : "bg-destructive";
-
   return (
     <AppLayout>
       <PageHeader title={dossier.title} parentLabel={t("dossiers.title")} showBack />
@@ -84,17 +142,90 @@ export default function DossierDetailPage() {
             {dossier.location_name}
           </p>
         )}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">{t("dossier.completion")}</span>
-            <span className="font-medium">{dossier.completion_score}%</span>
-          </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div className={`h-full ${barColor} transition-all`} style={{ width: `${dossier.completion_score}%` }} />
-          </div>
-        </div>
+        <p className="text-sm text-muted-foreground">{t(`dossier.state.${dossier.status}`)}</p>
       </div>
 
+      {dossier.type === "terrain" && (
+        <section className="card-soft p-5 mb-4">
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <p className="text-sm font-semibold">{t("create.terrainFormTitle")}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t("create.terrainFormHint")}</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => setEditingTerrain((value) => !value)} className="rounded-xl">
+              <Pencil className="size-3.5 mr-1.5" />{editingTerrain ? t("create.cancel") : t("create.editTerrain")}
+            </Button>
+          </div>
+          <div className="grid gap-3">
+            {terrainSectionKeys.map((key, index) => {
+              const value = terrainSections[key] ?? "";
+              const sectionProofs = terrainSectionProofs(key);
+              const verifiedProof = sectionProofs.some((proof) => proof.verified);
+              return (
+                <div key={key} className="rounded-2xl border border-border p-4">
+                  <div className="flex items-start gap-3">
+                    <span className="size-7 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-xs font-semibold shrink-0">{index + 1}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">{t("create.terrainSections." + key + ".title")}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {verifiedProof ? t("dossier.proofVerified") : sectionProofs.length > 0 || value ? t("dossier.proofNeedsVerification") : t("create.terrainSections." + key + ".hint")}
+                      </p>
+                    </div>
+                    {verifiedProof ? <FileCheck2 className="size-4 text-primary shrink-0" /> : value || sectionProofs.length > 0 ? <CircleCheck className="size-4 text-muted-foreground shrink-0" /> : null}
+                  </div>
+                  {!editingTerrain && value && <p className="text-sm mt-3 whitespace-pre-wrap">{value}</p>}
+                  {editingTerrain && (
+                    <Textarea value={value} onChange={(e) => setTerrainSections((current) => ({ ...current, [key]: e.target.value }))} placeholder={t("create.terrainSections." + key + ".placeholder")} rows={3} className="rounded-xl mt-3" />
+                  )}
+                  <div className="mt-3 pt-3 border-t border-border/70">
+                    <ProofsTab proofs={sectionProofs} uploading={uploading} onUpload={(file) => void handleUpload(file, key)} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {editingTerrain && (
+            <Button onClick={() => void saveTerrainSections()} disabled={savingTerrain} className="w-full rounded-xl mt-4">
+              {savingTerrain ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}
+              {t("create.saveTerrainChanges")}
+            </Button>
+          )}
+        </section>
+      )}
+
+      {journey.length > 0 && (
+        <section className="card-soft p-5 mb-4">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <p className="text-sm font-semibold">{t("modules.stepsTitle")}</p>
+              <p className="text-caption mt-1">{journey.some((step) => step.status === "bloquee") ? t("modules.journeyBlocked") : journey.some((step) => step.status === "en_cours") ? t("modules.journeyCurrent") : t("modules.journeyCompleteHint")}</p>
+            </div>
+            <Sparkles className="size-4 text-primary" />
+          </div>
+          <div className="space-y-2">
+            {journey.map((step, index) => {
+              const active = step.status === "en_cours";
+              const done = step.status === "terminee";
+              const blocked = step.status === "bloquee";
+              return (
+                <div key={step.id} className="rounded-2xl border border-border p-3">
+                  <div className="flex items-start gap-3">
+                    <span className="size-7 rounded-full bg-accent text-primary flex items-center justify-center shrink-0">
+                      {done ? <CircleCheck className="size-4" /> : active ? <CircleDot className="size-4" /> : index + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">{step.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{step.short_description}</p>{step.procedure_step?.territorial_level && <p className="text-[11px] text-primary mt-1">{t("modules.territorialLevel")}: {t("modules.territorialLevels." + step.procedure_step.territorial_level)}</p>}{step.procedure_step?.required_competence && <p className="text-[11px] text-muted-foreground mt-0.5">{t("modules.requiredCompetence")}: {step.procedure_step.required_competence}</p>}
+                      {blocked && step.blocked_reason && <p className="text-xs text-destructive mt-1">{step.blocked_reason}</p>}
+                    </div>
+                  </div>
+                  {active && <Button onClick={() => void transitionStep(step, "terminee")} disabled={transitioning} size="sm" className="mt-3 w-full rounded-xl">{t("modules.journeyCompleteStep")}<ChevronRight className="size-4 ml-auto" /></Button>}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
       <Tabs defaultValue="proofs">
         <TabsList className="grid grid-cols-3 w-full">
           <TabsTrigger value="proofs">{t("dossier.proofs")}</TabsTrigger>
@@ -107,12 +238,38 @@ export default function DossierDetailPage() {
         </TabsContent>
 
         <TabsContent value="participants" className="mt-4">
-          <div className="card-soft p-4 text-center">
-            <Users className="size-8 mx-auto text-muted-foreground mb-2" />
-            <p className="text-sm text-muted-foreground">
-              {participants.length === 0 ? t("dossier.noParticipants") : `${participants.length}`}
-            </p>
-            <p className="text-caption mt-2">{t("dossier.participantsSoon")}</p>
+          <div className="card-soft p-4">
+            <div className="flex items-start gap-3 mb-4">
+              <Users className="size-5 text-primary mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold">{t("dossier.peopleConcerned")}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t("dossier.peopleConcernedHint")}</p>
+              </div>
+            </div>
+            {participants.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border p-4 text-center">
+                <p className="text-sm text-muted-foreground">{t("dossier.noParticipants")}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t("dossier.participantsSoon")}</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {participants.map((participant) => {
+                  const name = participant.contact_name || participant.contact_email || participant.contact_phone || t("dossier.unnamedPerson");
+                  return (
+                    <div key={participant.id} className="rounded-2xl border border-border p-3">
+                      <div className="flex items-start gap-3">
+                        <div className="size-9 rounded-full bg-accent text-primary flex items-center justify-center shrink-0"><Users className="size-4" /></div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{t("dossier.participantRoles." + participant.role)}</p>
+                          <p className="text-[11px] text-muted-foreground mt-1">{participant.accepted_at ? t("dossier.personConnected") : t("dossier.personInvitationPending")}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </TabsContent>
 
