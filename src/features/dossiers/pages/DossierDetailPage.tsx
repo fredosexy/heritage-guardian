@@ -5,7 +5,7 @@ import { AppLayout, EmptyState, PageHeader } from "@/features/shell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, ChevronRight, CircleCheck, CircleDot, Loader2, MapPin, Pencil, Save, Sparkles, Trash2, Users } from "lucide-react";
+import { ArrowLeft, ChevronRight, CircleCheck, CircleDot, FileCheck2, Loader2, MapPin, Pencil, Save, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useDossierDetail } from "../hooks/useDossierDetail";
 import { dossiersRepo, proceduresRepo } from "@/data";
@@ -24,6 +24,13 @@ export default function DossierDetailPage() {
   const [editingTerrain, setEditingTerrain] = useState(false);
   const [savingTerrain, setSavingTerrain] = useState(false);
   const [terrainSections, setTerrainSections] = useState<Record<string, string>>({});
+  const terrainSectionKeys = ["histoire","provenance","proprietaires","ayantsDroit","documentation","localisation","dimensions","etat","miseEnValeur"] as const;
+  const terrainSectionProofs = (sectionKey: string) => proofs.filter((proof) => {
+    const metadata = proof.metadata && typeof proof.metadata === "object" && !Array.isArray(proof.metadata)
+      ? proof.metadata as { terrainSectionKey?: string }
+      : {};
+    return metadata.terrainSectionKey === sectionKey;
+  });
 
   useEffect(() => {
     if (id) void proceduresRepo.getDossierSteps(id).then(setJourney).catch(() => setJourney([]));
@@ -149,28 +156,30 @@ export default function DossierDetailPage() {
               <Pencil className="size-3.5 mr-1.5" />{editingTerrain ? t("create.cancel") : t("create.editTerrain")}
             </Button>
           </div>
-          <div className="grid gap-2">
-            {(["histoire","provenance","proprietaires","ayantsDroit","documentation","localisation","dimensions","etat","miseEnValeur"] as const).map((key, index) => {
+          <div className="grid gap-3">
+            {terrainSectionKeys.map((key, index) => {
               const value = terrainSections[key] ?? "";
+              const sectionProofs = terrainSectionProofs(key);
+              const verifiedProof = sectionProofs.some((proof) => proof.verified);
               return (
-                <div key={key} className="rounded-2xl border border-border p-3">
-                  <div className="flex items-center gap-3">
-                    <span className="size-7 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-xs font-semibold">{index + 1}</span>
+                <div key={key} className="rounded-2xl border border-border p-4">
+                  <div className="flex items-start gap-3">
+                    <span className="size-7 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-xs font-semibold shrink-0">{index + 1}</span>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">{t("create.terrainSections." + key + ".title")}</p>
-                      {!editingTerrain && <p className="text-xs text-muted-foreground mt-0.5">{value || t("create.terrainSections." + key + ".hint")}</p>}
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {verifiedProof ? t("dossier.proofVerified") : sectionProofs.length > 0 || value ? t("dossier.proofNeedsVerification") : t("create.terrainSections." + key + ".hint")}
+                      </p>
                     </div>
-                    {!editingTerrain && value ? <CircleCheck className="size-4 text-primary shrink-0" /> : null}
+                    {verifiedProof ? <FileCheck2 className="size-4 text-primary shrink-0" /> : value || sectionProofs.length > 0 ? <CircleCheck className="size-4 text-muted-foreground shrink-0" /> : null}
                   </div>
+                  {!editingTerrain && value && <p className="text-sm mt-3 whitespace-pre-wrap">{value}</p>}
                   {editingTerrain && (
-                    <Textarea
-                      value={value}
-                      onChange={(e) => setTerrainSections((current) => ({ ...current, [key]: e.target.value }))}
-                      placeholder={t("create.terrainSections." + key + ".placeholder")}
-                      rows={3}
-                      className="rounded-xl mt-3"
-                    />
+                    <Textarea value={value} onChange={(e) => setTerrainSections((current) => ({ ...current, [key]: e.target.value }))} placeholder={t("create.terrainSections." + key + ".placeholder")} rows={3} className="rounded-xl mt-3" />
                   )}
+                  <div className="mt-3 pt-3 border-t border-border/70">
+                    <ProofsTab proofs={sectionProofs} uploading={uploading} onUpload={(file) => void handleUpload(file, key)} />
+                  </div>
                 </div>
               );
             })}
