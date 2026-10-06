@@ -77,7 +77,7 @@ export const en = {
   },
   modules: {
     label: "Journey", progressTitle: "Your progress", progressHint: "The state changes with actions actually completed.",
-    dossiersCount: "{{count}} dossier(s)", secureCount: "{{count}} secured", riskCount: "{{count}} at risk", nextAttention: "Next attention", journeyCurrent: "Current step", journeyNext: "Next", journeyBlocked: "Journey blocked", journeyProgress: "{{percent}}% of journey", journeyCompleteStep: "Mark this step complete", journeyStartStep: "Start this step", people: "people", proofs: "proofs", inProgressHint: "{{count}} item(s) still need an action.",
+    dossiersCount: "{{count}} dossier(s)", secureCount: "{{count}} secured", riskCount: "{{count}} at risk", nextAttention: "Next attention", journeyCurrent: "Current step", journeyNext: "Next", journeyBlocked: "Journey blocked", journeyCompleteHint: "The journey advances through actions that are actually completed.", journeyCompleteStep: "Mark this step complete", journeyStartStep: "Start this step", people: "people", proofs: "proofs", inProgressHint: "{{count}} item(s) still need an action.", completionHintAdvanced: "Well advanced", completionHintToComplete: "A few things still need to be clarified",
     openPath: "View journey", visitorStart: "Start with the assistant", guidedHint: "Mémoire guides you step by step.",
     state: { new: "Discover", progress: "In progress", risk: "Needs attention", secure: "Well advanced" },
     cta: { new: "Take the first step", progress: "Continue", risk: "Handle the warning", secure: "Strengthen and prepare next" },
@@ -135,7 +135,8 @@ export const en = {
     history: "History",
     addProof: "Add proof",
     addParticipant: "Invite a person",
-    completion: "Completion",
+    completion: "Dossier state",
+    state: { incomplete: "Taking shape", secure: "Well advanced", draft: "Being prepared" },
     location: "Location",
     noProofs: "No proofs yet. Add some to secure your dossier.",
     noParticipants: "No participants.",
