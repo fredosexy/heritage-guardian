@@ -217,7 +217,7 @@ export default function DossierDetailPage() {
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">{step.title}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{step.short_description}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{step.short_description}</p>{step.procedure_step?.territorial_level && <p className="text-[11px] text-primary mt-1">{t("modules.territorialLevel")}: {t("modules.territorialLevels." + step.procedure_step.territorial_level)}</p>}{step.procedure_step?.required_competence && <p className="text-[11px] text-muted-foreground mt-0.5">{t("modules.requiredCompetence")}: {step.procedure_step.required_competence}</p>}
                       {blocked && step.blocked_reason && <p className="text-xs text-destructive mt-1">{step.blocked_reason}</p>}
                     </div>
                   </div>
