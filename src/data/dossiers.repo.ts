@@ -9,6 +9,7 @@ export interface NewDossierInput {
   location_name?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  metadata?: Record<string, unknown>;
 }
 
 export async function listDossiers(userId: string): Promise<Dossier[]> {
@@ -38,6 +39,7 @@ export async function createDossier(input: NewDossierInput): Promise<Dossier> {
       location_name: input.location_name ?? null,
       latitude: input.latitude ?? null,
       longitude: input.longitude ?? null,
+      metadata: input.metadata ?? {},
       status: "incomplete",
     })
     .select()
