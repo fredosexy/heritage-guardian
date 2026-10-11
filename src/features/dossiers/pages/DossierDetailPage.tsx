@@ -51,9 +51,12 @@ export default function DossierDetailPage() {
       const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
         ? dossier.metadata as Record<string, unknown>
         : {};
+      const existingTerrain = metadata.terrain && typeof metadata.terrain === "object" && !Array.isArray(metadata.terrain)
+        ? metadata.terrain as Record<string, unknown>
+        : {};
       await dossiersRepo.updateDossierMetadata(dossier.id, {
         ...metadata,
-        terrain: { version: 1, sections: terrainSections },
+        terrain: { ...existingTerrain, version: 1, sections: terrainSections },
       });
       setEditingTerrain(false);
       toast.success(t("create.terrainSaved"));
@@ -168,7 +171,7 @@ export default function DossierDetailPage() {
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">{t("create.terrainSections." + key + ".title")}</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {verifiedProof ? t("dossier.proofVerified") : sectionProofs.length > 0 || value ? t("dossier.proofNeedsVerification") : t("create.terrainSections." + key + ".hint")}
+                        {verifiedProof ? t("dossier.sectionHasVerifiedProof") : sectionProofs.length > 0 ? t("dossier.proofNeedsVerification") : value ? t("dossier.sectionInfoNeedsVerification") : t("create.terrainSections." + key + ".hint")}
                       </p>
                     </div>
                     {verifiedProof ? <FileCheck2 className="size-4 text-primary shrink-0" /> : value || sectionProofs.length > 0 ? <CircleCheck className="size-4 text-muted-foreground shrink-0" /> : null}
