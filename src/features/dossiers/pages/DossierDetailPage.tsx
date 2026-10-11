@@ -76,9 +76,9 @@ export default function DossierDetailPage() {
     }
   };
 
-  const handleUpload = async (file: File) => {
+  const handleUpload = async (file: File, sectionKey?: string) => {
     try {
-      await addProof(file);
+      await addProof(file, sectionKey);
       toast.success(t("dossier.proofAdded"));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("auth.error"));
