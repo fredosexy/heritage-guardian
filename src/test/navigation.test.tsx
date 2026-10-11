@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { describe, expect, it, vi } from "vitest";
-import "@/core/i18n";
+import { beforeAll, describe, expect, it, vi } from "vitest";
+import i18n from "@/core/i18n";
 import { AuthProvider } from "@/features/identity";
 
 /**
