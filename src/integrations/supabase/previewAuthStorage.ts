@@ -29,7 +29,7 @@ export function brokeredPreviewStorage() {
     : (dev ? ['https://lovable.dev', 'http://localhost:3000'] : ['https://lovable.dev']);
   const RESULT = 'lovable-preview-auth:result';
   const TIMEOUT = 2000;
-  const newId = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+  const newId = () => crypto.randomUUID();
 
   const request = (type: string, key: string, value?: string): Promise<{ ok: boolean; value?: string | null } | null> =>
     new Promise((resolve) => {
@@ -68,26 +68,25 @@ export function brokeredPreviewStorage() {
         res = await request('lovable-preview-auth:get', key);
       }
       firstGet = false;
-      // '' is the logout tombstone: clear the local copy too so it can't resurrect if
-      // the broker later goes silent. A null reply means never-synced -> keep local.
-      if (res && res.ok && typeof res.value === 'string') {
-        if (res.value === '') { localStorage.removeItem(key); return null; }
-        return res.value;
-      }
-      return localStorage.getItem(key);
+
+      // In brokered preview mode, the editor is the session authority. Never fall
+      // back to localStorage after a broker timeout: doing so could resurrect a
+      // stale access/refresh token after logout or session revocation.
+      if (!res || !res.ok || typeof res.value !== 'string') return null;
+      // '' is the logout tombstone.
+      if (res.value === '') return null;
+      return res.value;
     },
-    setItem: (key: string, value: string) => {
-      localStorage.setItem(key, value);
-      return request('lovable-preview-auth:set', key, value).then((res) => {
-        if (res && res.ok && typeof res.value === 'string' && localStorage.getItem(key) === value) {
-          if (res.value === '') localStorage.removeItem(key);
-          else localStorage.setItem(key, res.value);
-        }
-      });
+    setItem: async (key: string, value: string) => {
+      // Do not persist auth material locally in brokered preview mode. A failed
+      // broker write must fail closed rather than leaving a token that can later
+      // be resurrected independently of the broker.
+      const res = await request('lovable-preview-auth:set', key, value);
+      if (!res || !res.ok) throw new Error('Preview auth broker unavailable');
     },
-    removeItem: (key: string) => {
-      localStorage.removeItem(key);
-      return request('lovable-preview-auth:remove', key).then(() => undefined);
+    removeItem: async (key: string) => {
+      const res = await request('lovable-preview-auth:remove', key);
+      if (!res || !res.ok) throw new Error('Preview auth broker unavailable');
     },
   };
 }
