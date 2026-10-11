@@ -64,6 +64,10 @@ function renderRoutes(initialEntry: string) {
 }
 
 describe("navigation", () => {
+  beforeAll(async () => {
+    await i18n.changeLanguage("fr");
+  });
+
   it("l'accueil s'ouvre depuis /", async () => {
     renderRoutes("/");
     expect(await screen.findByText(HOME_TITLE)).toBeInTheDocument();
