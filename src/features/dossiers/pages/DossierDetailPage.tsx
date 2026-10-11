@@ -181,7 +181,17 @@ export default function DossierDetailPage() {
                     <Textarea value={value} onChange={(e) => setTerrainSections((current) => ({ ...current, [key]: e.target.value }))} placeholder={t("create.terrainSections." + key + ".placeholder")} rows={3} className="rounded-xl mt-3" />
                   )}
                   <div className="mt-3 pt-3 border-t border-border/70">
-                    <ProofsTab proofs={sectionProofs} uploading={uploading} onUpload={(file) => void handleUpload(file, key)} />
+                    <p className="text-xs text-muted-foreground mb-2">
+                      {sectionProofs.length > 0
+                        ? t("dossier.sectionProofCount", { count: sectionProofs.length })
+                        : t("dossier.sectionNoProofs")}
+                    </p>
+                    <ProofsTab
+                      proofs={sectionProofs}
+                      uploading={uploading}
+                      uploadLabel={t("dossier.addProofToSection")}
+                      onUpload={(file) => void handleUpload(file, key)}
+                    />
                   </div>
                 </div>
               );
