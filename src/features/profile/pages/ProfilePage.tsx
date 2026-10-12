@@ -17,6 +17,11 @@ import {
   LogOut,
   Moon,
   Paperclip,
+  MapPin,
+  Users,
+  Scale,
+  ScrollText,
+  Sparkles,
   Settings2,
   ShieldCheck,
   Sun,
@@ -28,11 +33,11 @@ import i18n from "@/core/i18n";
 import { profilesRepo } from "@/data";
 import { useProfile } from "../hooks/useProfile";
 
-export default function ProfilePage() {
+const activityOptions = [\n  { id: "terrain", icon: MapPin },\n  { id: "heritage", icon: Users },\n  { id: "conflit", icon: Scale },\n  { id: "volonte", icon: ScrollText },\n] as const;\n\nexport default function ProfilePage() {
   const { t } = useTranslation();
   const profileSections = [
     { id: "personal-info", label: t("profile.sectionIdentity"), icon: UserRound },
-    { id: "my-spaces", label: t("profile.sectionSpaces"), icon: FolderOpen },
+    { id: "my-spaces", label: t("profile.sectionSpaces"), icon: FolderOpen },\n    { id: "my-activities", label: t("profile.sectionActivities"), icon: Sparkles },
     { id: "preferences", label: t("profile.sectionPreferences"), icon: Settings2 },
     { id: "security", label: t("profile.sectionSecurity"), icon: ShieldCheck },
   ];
@@ -41,14 +46,14 @@ export default function ProfilePage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
-  const [settingsBusy, setSettingsBusy] = useState(false);
+  const [settingsBusy, setSettingsBusy] = useState(false);\n  const [activeActivities, setActiveActivities] = useState<string[]>(activityOptions.map((item) => item.id));\n  const [activitiesSaving, setActivitiesSaving] = useState(false);
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"));
 
   useEffect(() => {
     if (!profile) return;
     setName(profile.full_name ?? "");
-    setPhone(profile.phone ?? "");
+    setPhone(profile.phone ?? "");\n    const savedActivities = profile.activity_preferences;\n    setActiveActivities(Array.isArray(savedActivities) && savedActivities.every((item) => typeof item === "string")\n      ? savedActivities.filter((item) => activityOptions.some((option) => option.id === item))\n      : activityOptions.map((item) => item.id));
   }, [profile]);
 
   const save = async () => {
@@ -65,7 +70,7 @@ export default function ProfilePage() {
     }
   };
 
-  const setLanguage = async (language: "fr" | "en") => {
+  const toggleActivity = async (activityId: string) => {\n    const next = activeActivities.includes(activityId)\n      ? activeActivities.filter((id) => id !== activityId)\n      : [...activeActivities, activityId];\n    if (next.length === 0) {\n      toast.error(t("profile.keepOneActivity"));\n      return;\n    }\n    const previous = activeActivities;\n    setActiveActivities(next);\n    if (!user) return;\n    setActivitiesSaving(true);\n    try {\n      await profilesRepo.updateProfile(user.id, { activity_preferences: next });\n      await refresh();\n      toast.success(t("profile.activitiesSaved"));\n    } catch (error) {\n      setActiveActivities(previous);\n      toast.error(error instanceof Error ? error.message : t("auth.error"));\n    } finally {\n      setActivitiesSaving(false);\n    }\n  };\n\n  const setLanguage = async (language: "fr" | "en") => {
     setSettingsBusy(true);
     try {
       await i18n.changeLanguage(language);
@@ -115,7 +120,7 @@ export default function ProfilePage() {
         <AssistantTip className="mb-0" />
         <ProfileCompletionCard />
 
-        <nav aria-label="Rubriques du profil" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <nav aria-label="Rubriques du profil" className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           {profileSections.map(({ id, label, icon: Icon }) => (
             <a
               key={id}
@@ -196,6 +201,37 @@ export default function ProfilePage() {
           <p className="text-xs leading-5 text-muted-foreground">
             {t("profile.modulesNote")}
           </p>
+        </section>
+
+        <section id="my-activities" className="scroll-mt-4 space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold">{t("profile.activitiesHeading")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("profile.activitiesHint")}</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {activityOptions.map(({ id, icon: Icon }) => {
+              const checked = activeActivities.includes(id);
+              return (
+                <label key={id} className={`card-soft flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-colors hover:border-primary/40 ${checked ? "border-primary/40 bg-accent/30" : "border-border/70"}`}>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    disabled={activitiesSaving || (!checked && activitiesSaving)}
+                    onChange={() => void toggleActivity(id)}
+                    className="mt-1 size-4 accent-primary"
+                    aria-label={t(`profile.activity.${id}.title`)}
+                  />
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent text-primary"><Icon className="size-5" /></span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold">{t(`profile.activity.${id}.title`)}</span>
+                    <span className="mt-1 block text-xs leading-5 text-muted-foreground">{t(`profile.activity.${id}.description`)}</span>
+                    <span className="mt-2 block text-xs font-medium text-primary">{checked ? t("profile.activityEnabled") : t("profile.activityDisabled")}</span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+          <p className="text-xs leading-5 text-muted-foreground">{activitiesSaving ? t("profile.activitiesSaving") : user ? t("profile.activitiesControlHint") : t("profile.signInToSave")}</p>
         </section>
 
         <section id="preferences" className="scroll-mt-4 space-y-4">
