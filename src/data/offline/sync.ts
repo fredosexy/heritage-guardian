@@ -54,6 +54,7 @@ export async function processQueue(): Promise<void> {
               description: draft.description || null,
               location_name: draft.location_name || null,
               latitude: draft.latitude ?? null,
+              metadata: draft.metadata ?? {},
               longitude: draft.longitude ?? null,
               status: "incomplete",
             })
