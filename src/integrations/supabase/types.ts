@@ -438,6 +438,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          activity_preferences?: Json | null
           avatar_url?: string | null
           created_at?: string
           email_alerts?: boolean
