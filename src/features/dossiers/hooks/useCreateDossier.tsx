@@ -35,6 +35,7 @@ export function useCreateDossier() {
           title: form.title,
           description: form.description || null,
           location_name: form.location_name || null,
+          metadata: form.metadata ?? {},
         };
 
         // Visiteur : tout reste sur l'appareil jusqu'à la création du compte.
@@ -51,6 +52,7 @@ export function useCreateDossier() {
             title: form.title,
             description: form.description || null,
             location_name: form.location_name || null,
+            metadata: form.metadata ?? {},
           });
           try { await proceduresRepo.initializeDossierJourney(dossier.id); } catch { /* No published journey yet. */ }
           return { mode: "online", id: dossier.id };
