@@ -177,7 +177,7 @@ export const fr = {
     proofAdded: "Preuve ajoutée",
     proofVerified: "Statut indiqué comme vérifié",
     proofNeedsVerification: "Vérification à poursuivre",
-    sectionHasVerifiedProof: "Une pièce est marquée comme vérifiée",
+    sectionHasVerifiedProof: "Statut indiqué comme vérifié — contrôle indépendant à confirmer",
     sectionInfoNeedsVerification: "Information renseignée — vérification à poursuivre",
     sectionProofCount: "{{count}} pièce(s) rattachée(s) à cette section",
     sectionNoProofs: "Aucune pièce rattachée à cette section pour le moment.",
