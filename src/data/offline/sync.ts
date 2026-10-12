@@ -7,7 +7,7 @@ const listeners = new Set<() => void>();
 
 export function onSyncChange(cb: () => void) {
   listeners.add(cb);
-  return () => listeners.delete(cb);
+  return () => { listeners.delete(cb); };
 }
 function emit() {
   listeners.forEach((l) => l());
