@@ -100,6 +100,11 @@ export default function CreateDossierPage() {
       if (!result) return;
       if (result.mode === "online") {
         toast.success(t("create.created"));
+        if (result.journeyStatus === "procedure_unavailable") {
+          toast.info(t("create.journeyUnavailable"));
+        } else if (result.journeyStatus === "attention") {
+          toast.warning(t("create.journeyNeedsAttention"));
+        }
         navigate(`/dossiers/${result.id}`);
       } else {
         toast.success(t(result.mode === "local" ? "create.savedLocal" : "create.savedOffline"));
