@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ChevronRight, CircleAlert, CircleCheck, CircleDot, Loader2, MapPin, Pencil, Save, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useDossierDetail } from "../hooks/useDossierDetail";
-import { dossiersRepo, proceduresRepo } from "@/data";
+import { dossiersRepo, enqueueUpdateDossierMetadata, proceduresRepo } from "@/data";
 import type { DossierStep } from "@/core/types/domain";
 import { ProofsTab } from "../components/ProofsTab";
 import { typeLabelKey } from "../components/dossierTypeMeta";
@@ -54,12 +54,30 @@ export default function DossierDetailPage() {
       const existingTerrain = metadata.terrain && typeof metadata.terrain === "object" && !Array.isArray(metadata.terrain)
         ? metadata.terrain as Record<string, unknown>
         : {};
-      await dossiersRepo.updateDossierMetadata(dossier.id, {
+      const updatedMetadata = {
         ...metadata,
         terrain: { ...existingTerrain, version: 1, sections: terrainSections },
-      });
-      setEditingTerrain(false);
-      toast.success(t("create.terrainSaved"));
+      };
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        await enqueueUpdateDossierMetadata(dossier.id, updatedMetadata);
+        setEditingTerrain(false);
+        toast.success(t("create.terrainSaved") + " — " + t("offline.savedForSync", "Sauvegardé sur cet appareil, en attente de synchronisation"));
+      } else {
+        try {
+          await dossiersRepo.updateDossierMetadata(dossier.id, updatedMetadata);
+          setEditingTerrain(false);
+          toast.success(t("create.terrainSaved"));
+        } catch (error) {
+          const message = error instanceof Error ? error.message.toLowerCase() : "";
+          if (message.includes("fetch") || message.includes("network") || message.includes("failed to") || message.includes("load failed")) {
+            await enqueueUpdateDossierMetadata(dossier.id, updatedMetadata);
+            setEditingTerrain(false);
+            toast.success(t("offline.savedForSync", "Sauvegardé sur cet appareil, en attente de synchronisation"));
+          } else {
+            throw error;
+          }
+        }
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("auth.error"));
     } finally {
