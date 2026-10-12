@@ -410,6 +410,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          activity_preferences: Json | null
           avatar_url: string | null
           created_at: string
           email_alerts: boolean
@@ -423,6 +424,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          activity_preferences?: Json | null
           avatar_url?: string | null
           created_at?: string
           email_alerts?: boolean
