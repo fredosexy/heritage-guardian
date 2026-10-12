@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { dossiersRepo, participantsRepo, proofsRepo } from "@/data";
+import { dossiersRepo, enqueueProofUpload, participantsRepo, proofsRepo } from "@/data";
 import type { Dossier, Participant, Proof } from "@/core/types/domain";
 import { scoreDossier } from "@/services";
 import { fetchDossierSuggestions } from "@/services";
@@ -33,14 +33,28 @@ export function useDossierDetail(id?: string) {
     return () => { cancelled = true; };
   }, [dossier?.id, proofs.length, participants.length]);
 
-  const addProof = useCallback(async (file: File, sectionKey?: string) => {
-    if (!user || !dossier) return;
+  const addProof = useCallback(async (file: File, sectionKey?: string): Promise<"uploaded" | "queued" | ""> => {
+    if (!user || !dossier) return "";
     setUploading(true);
     try {
-      await proofsRepo.uploadProof({ file, dossierId: dossier.id, userId: user.id, sectionKey });
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        await enqueueProofUpload({ file, dossierId: dossier.id, userId: user.id, sectionKey });
+        return "queued";
+      }
+      try {
+        await proofsRepo.uploadProof({ file, dossierId: dossier.id, userId: user.id, sectionKey });
+      } catch (error) {
+        const message = error instanceof Error ? error.message.toLowerCase() : "";
+        const networkFailure = typeof navigator !== "undefined" && !navigator.onLine ||
+          message.includes("fetch") || message.includes("network") || message.includes("failed to") || message.includes("load failed");
+        if (!networkFailure) throw error;
+        await enqueueProofUpload({ file, dossierId: dossier.id, userId: user.id, sectionKey });
+        return "queued";
+      }
       const { score, status } = scoreDossier(dossier, proofs.length + 1, participants.length);
       await dossiersRepo.updateDossierScore(dossier.id, score, status);
       await load();
+      return "uploaded";
     } finally {
       setUploading(false);
     }
