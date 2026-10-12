@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { proceduresRepo } from "@/data";
 import { db, DraftDossier } from "./db";
 
 let syncing = false;
@@ -61,12 +62,44 @@ export async function processQueue(): Promise<void> {
             .select()
             .single();
           if (error) throw error;
+          // Persist the remote ID before journey initialization: if that step fails,
+          // a retry must never create a second dossier.
           await db.drafts.update(draft.id!, { synced: 1, remote_id: data.id });
           await db.queue.delete(op.id!);
           emit();
-        } else {
-          // Other kinds not implemented yet — drop
+
+          try {
+            await proceduresRepo.initializeDossierJourney(data.id);
+          } catch (journeyError: any) {
+            const code = journeyError?.code;
+            const message = journeyError?.message || String(journeyError);
+            // No published procedure is an expected state, not a transient sync failure.
+            if (code !== "P0002" && !message.includes("published_procedure_not_found")) {
+              await db.queue.add({
+                kind: "initialize_journey",
+                payload: { dossierId: data.id },
+                created_at: Date.now(),
+                attempts: 0,
+                last_error: message,
+              });
+            }
+          }
+        } else if (op.kind === "initialize_journey") {
+          const dossierId = op.payload?.dossierId;
+          if (!dossierId) {
+            await db.queue.delete(op.id!);
+            continue;
+          }
+          await proceduresRepo.initializeDossierJourney(dossierId);
           await db.queue.delete(op.id!);
+          emit();
+        } else {
+          // Do not silently discard unsupported queued mutations; retain them for a future handler.
+          await db.queue.update(op.id!, {
+            attempts: (op.attempts || 0) + 1,
+            last_error: "Unsupported queued operation",
+          });
+          break;
         }
       } catch (e: any) {
         await db.queue.update(op.id!, {
