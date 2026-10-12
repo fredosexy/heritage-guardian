@@ -152,7 +152,7 @@ export const en = {
     proofAdded: "Proof added",
     proofVerified: "Marked as verified — review not independently confirmed",
     proofNeedsVerification: "Verification still needed",
-    sectionHasVerifiedProof: "One item is marked as verified",
+    sectionHasVerifiedProof: "Marked as verified — independent review still needs confirmation",
     sectionInfoNeedsVerification: "Information added — verification still needed",
     sectionProofCount: "{{count}} item(s) linked to this section",
     sectionNoProofs: "No item linked to this section yet.",
