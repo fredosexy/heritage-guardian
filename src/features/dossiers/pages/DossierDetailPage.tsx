@@ -5,7 +5,7 @@ import { AppLayout, EmptyState, PageHeader } from "@/features/shell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, ChevronRight, CircleCheck, CircleDot, FileCheck2, Loader2, MapPin, Pencil, Save, Sparkles, Trash2, Users } from "lucide-react";
+import { ArrowLeft, ChevronRight, CircleAlert, CircleCheck, CircleDot, Loader2, MapPin, Pencil, Save, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useDossierDetail } from "../hooks/useDossierDetail";
 import { dossiersRepo, proceduresRepo } from "@/data";
@@ -174,7 +174,7 @@ export default function DossierDetailPage() {
                         {verifiedProof ? t("dossier.sectionHasVerifiedProof") : sectionProofs.length > 0 ? t("dossier.proofNeedsVerification") : value ? t("dossier.sectionInfoNeedsVerification") : t("create.terrainSections." + key + ".hint")}
                       </p>
                     </div>
-                    {verifiedProof ? <FileCheck2 className="size-4 text-primary shrink-0" /> : value || sectionProofs.length > 0 ? <CircleCheck className="size-4 text-muted-foreground shrink-0" /> : null}
+                    {verifiedProof ? <CircleAlert className="size-4 text-muted-foreground shrink-0" /> : value || sectionProofs.length > 0 ? <CircleCheck className="size-4 text-muted-foreground shrink-0" /> : null}
                   </div>
                   {!editingTerrain && value && <p className="text-sm mt-3 whitespace-pre-wrap">{value}</p>}
                   {editingTerrain && (
