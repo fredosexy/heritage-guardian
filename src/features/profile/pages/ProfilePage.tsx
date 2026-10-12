@@ -33,11 +33,19 @@ import i18n from "@/core/i18n";
 import { profilesRepo } from "@/data";
 import { useProfile } from "../hooks/useProfile";
 
-const activityOptions = [\n  { id: "terrain", icon: MapPin },\n  { id: "heritage", icon: Users },\n  { id: "conflit", icon: Scale },\n  { id: "volonte", icon: ScrollText },\n] as const;\n\nexport default function ProfilePage() {
+const activityOptions = [
+  { id: "terrain", icon: MapPin },
+  { id: "heritage", icon: Users },
+  { id: "conflit", icon: Scale },
+  { id: "volonte", icon: ScrollText },
+] as const;
+
+export default function ProfilePage() {
   const { t } = useTranslation();
   const profileSections = [
     { id: "personal-info", label: t("profile.sectionIdentity"), icon: UserRound },
-    { id: "my-spaces", label: t("profile.sectionSpaces"), icon: FolderOpen },\n    { id: "my-activities", label: t("profile.sectionActivities"), icon: Sparkles },
+    { id: "my-spaces", label: t("profile.sectionSpaces"), icon: FolderOpen },
+    { id: "my-activities", label: t("profile.sectionActivities"), icon: Sparkles },
     { id: "preferences", label: t("profile.sectionPreferences"), icon: Settings2 },
     { id: "security", label: t("profile.sectionSecurity"), icon: ShieldCheck },
   ];
@@ -46,14 +54,20 @@ const activityOptions = [\n  { id: "terrain", icon: MapPin },\n  { id: "heritage
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
-  const [settingsBusy, setSettingsBusy] = useState(false);\n  const [activeActivities, setActiveActivities] = useState<string[]>(activityOptions.map((item) => item.id));\n  const [activitiesSaving, setActivitiesSaving] = useState(false);
+  const [settingsBusy, setSettingsBusy] = useState(false);
+  const [activeActivities, setActiveActivities] = useState<string[]>(activityOptions.map((item) => item.id));
+  const [activitiesSaving, setActivitiesSaving] = useState(false);
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"));
 
   useEffect(() => {
     if (!profile) return;
     setName(profile.full_name ?? "");
-    setPhone(profile.phone ?? "");\n    const savedActivities = profile.activity_preferences;\n    setActiveActivities(Array.isArray(savedActivities) && savedActivities.every((item) => typeof item === "string")\n      ? savedActivities.filter((item) => activityOptions.some((option) => option.id === item))\n      : activityOptions.map((item) => item.id));
+    setPhone(profile.phone ?? "");
+    const savedActivities = profile.activity_preferences;
+    setActiveActivities(Array.isArray(savedActivities) && savedActivities.every((item) => typeof item === "string")
+      ? savedActivities.filter((item) => activityOptions.some((option) => option.id === item))
+      : activityOptions.map((item) => item.id));
   }, [profile]);
 
   const save = async () => {
@@ -70,7 +84,31 @@ const activityOptions = [\n  { id: "terrain", icon: MapPin },\n  { id: "heritage
     }
   };
 
-  const toggleActivity = async (activityId: string) => {\n    const next = activeActivities.includes(activityId)\n      ? activeActivities.filter((id) => id !== activityId)\n      : [...activeActivities, activityId];\n    if (next.length === 0) {\n      toast.error(t("profile.keepOneActivity"));\n      return;\n    }\n    const previous = activeActivities;\n    setActiveActivities(next);\n    if (!user) return;\n    setActivitiesSaving(true);\n    try {\n      await profilesRepo.updateProfile(user.id, { activity_preferences: next });\n      await refresh();\n      toast.success(t("profile.activitiesSaved"));\n    } catch (error) {\n      setActiveActivities(previous);\n      toast.error(error instanceof Error ? error.message : t("auth.error"));\n    } finally {\n      setActivitiesSaving(false);\n    }\n  };\n\n  const setLanguage = async (language: "fr" | "en") => {
+  const toggleActivity = async (activityId: string) => {
+    const next = activeActivities.includes(activityId)
+      ? activeActivities.filter((id) => id !== activityId)
+      : [...activeActivities, activityId];
+    if (next.length === 0) {
+      toast.error(t("profile.keepOneActivity"));
+      return;
+    }
+    const previous = activeActivities;
+    setActiveActivities(next);
+    if (!user) return;
+    setActivitiesSaving(true);
+    try {
+      await profilesRepo.updateProfile(user.id, { activity_preferences: next });
+      await refresh();
+      toast.success(t("profile.activitiesSaved"));
+    } catch (error) {
+      setActiveActivities(previous);
+      toast.error(error instanceof Error ? error.message : t("auth.error"));
+    } finally {
+      setActivitiesSaving(false);
+    }
+  };
+
+  const setLanguage = async (language: "fr" | "en") => {
     setSettingsBusy(true);
     try {
       await i18n.changeLanguage(language);
