@@ -150,7 +150,7 @@ export const en = {
     typeLabel: "Type",
     kb: "KB",
     proofAdded: "Proof added",
-    proofVerified: "Proof marked as verified",
+    proofVerified: "Marked as verified — review not independently confirmed",
     proofNeedsVerification: "Verification still needed",
     sectionHasVerifiedProof: "One item is marked as verified",
     sectionInfoNeedsVerification: "Information added — verification still needed",
