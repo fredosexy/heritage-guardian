@@ -175,7 +175,7 @@ export const fr = {
     typeLabel: "Type",
     kb: "Ko",
     proofAdded: "Preuve ajoutée",
-    proofVerified: "Pièce vérifiée",
+    proofVerified: "Statut indiqué comme vérifié",
     proofNeedsVerification: "Vérification à poursuivre",
     sectionHasVerifiedProof: "Une pièce est marquée comme vérifiée",
     sectionInfoNeedsVerification: "Information renseignée — vérification à poursuivre",
