@@ -19,10 +19,11 @@ export async function claimLocalData(userId: string): Promise<ClaimResult> {
   let claimedDossiers: number;
   try {
     claimedDossiers = await claimLocalDrafts(guest.id, userId);
-  } catch (error) {
+  } catch {
     // Ne pas réinitialiser l'identité visiteur : la reprise doit pouvoir
-    // retrouver les brouillons encore associés à cette identité.
-    throw error;
+    // retrouver les brouillons encore associés à cette identité. Ne pas
+    // propager l'erreur depuis le listener d'authentification.
+    return { claimedDossiers: 0 };
   }
 
   if (guest.firstName) {
