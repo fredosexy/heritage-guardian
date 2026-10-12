@@ -131,7 +131,7 @@ export const fr = {
     terrainFormTitle: "Créer la fiche complète du terrain",
     terrainFormHint: "Toutes les informations importantes sont regroupées ici. Vous pourrez les compléter progressivement sans perdre votre avancée.",
     terrainProgressTitle: "État de la fiche",
-    terrainProgressHint: "{{completed}} section(s) renseignée(s) sur {{total}}. Les validations professionnelles viendront ensuite, selon le parcours applicable.",
+    terrainProgressHint: "Votre fiche prend forme. Les informations pourront être précisées au fil du parcours ; les validations professionnelles viendront ensuite, selon la procédure applicable.",
     terrainDocumentationHint: "Ajoutez ici les références connues. Les fichiers et preuves pourront être ajoutés dans le dossier après sa création.",
     terrainValidationTitle: "Validation progressive",
     terrainValidationHint: "Une fiche complète ne signifie pas encore qu'elle est validée. Les étapes professionnelles seront affichées ici lorsqu'une procédure officielle publiée sera disponible.",
