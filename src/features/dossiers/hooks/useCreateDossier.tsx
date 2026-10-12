@@ -11,7 +11,7 @@ export interface CreateDossierForm {
 }
 
 export type CreateResult =
-  | { mode: "online"; id: string }
+  | { mode: "online"; id: string; journeyStatus: "ready" | "procedure_unavailable" | "attention" }
   | { mode: "offline" }
   | { mode: "local" };
 
@@ -54,8 +54,17 @@ export function useCreateDossier() {
             location_name: form.location_name || null,
             metadata: form.metadata ?? {},
           });
-          try { await proceduresRepo.initializeDossierJourney(dossier.id); } catch { /* No published journey yet. */ }
-          return { mode: "online", id: dossier.id };
+          let journeyStatus: "ready" | "procedure_unavailable" | "attention" = "ready";
+          try {
+            await proceduresRepo.initializeDossierJourney(dossier.id);
+          } catch (error) {
+            const procedureError = error as { code?: string; message?: string };
+            journeyStatus = procedureError.code === "P0002" ||
+              procedureError.message?.includes("published_procedure_not_found")
+              ? "procedure_unavailable"
+              : "attention";
+          }
+          return { mode: "online", id: dossier.id, journeyStatus };
         }
 
         await enqueueCreateDossier(draft);
