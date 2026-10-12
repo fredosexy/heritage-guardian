@@ -23,12 +23,24 @@ export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "syn
 
 /** Met en attente la sauvegarde des sections d'un dossier Terrain existant. */
 export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: Record<string, unknown>) {
-  await db.queue.add({
-    kind: "update_dossier",
-    payload: { dossierId, metadata },
-    created_at: Date.now(),
-    attempts: 0,
-  });
+  // Keep only the latest pending snapshot for this dossier to avoid replaying stale edits.
+  const pending = await db.queue.where("kind").equals("update_dossier").toArray();
+  const existing = pending.find((op) => op.payload?.dossierId === dossierId);
+  if (existing?.id) {
+    await db.queue.update(existing.id, {
+      payload: { dossierId, metadata },
+      created_at: Date.now(),
+      attempts: 0,
+      last_error: undefined,
+    });
+  } else {
+    await db.queue.add({
+      kind: "update_dossier",
+      payload: { dossierId, metadata },
+      created_at: Date.now(),
+      attempts: 0,
+    });
+  }
   emit();
   if (typeof navigator === "undefined" || navigator.onLine) void processQueue();
 }
@@ -110,7 +122,41 @@ export async function processQueue(): Promise<void> {
             await db.queue.update(op.id!, { attempts: (op.attempts || 0) + 1, last_error: "Invalid queued dossier update" });
             break;
           }
-          const { error } = await supabase.from("dossiers").update({ metadata }).eq("id", dossierId);
+          // Merge with the latest server metadata so unrelated concurrent changes survive.
+          const { data: currentDossier, error: readError } = await supabase
+            .from("dossiers")
+            .select("metadata")
+            .eq("id", dossierId)
+            .single();
+          if (readError) throw readError;
+          const currentMetadata = currentDossier?.metadata && typeof currentDossier.metadata === "object" && !Array.isArray(currentDossier.metadata)
+            ? currentDossier.metadata as Record<string, unknown>
+            : {};
+          const queuedMetadata = metadata as Record<string, unknown>;
+          const currentTerrain = currentMetadata.terrain && typeof currentMetadata.terrain === "object" && !Array.isArray(currentMetadata.terrain)
+            ? currentMetadata.terrain as Record<string, unknown>
+            : {};
+          const queuedTerrain = queuedMetadata.terrain && typeof queuedMetadata.terrain === "object" && !Array.isArray(queuedMetadata.terrain)
+            ? queuedMetadata.terrain as Record<string, unknown>
+            : {};
+          const currentSections = currentTerrain.sections && typeof currentTerrain.sections === "object" && !Array.isArray(currentTerrain.sections)
+            ? currentTerrain.sections as Record<string, unknown>
+            : {};
+          const queuedSections = queuedTerrain.sections && typeof queuedTerrain.sections === "object" && !Array.isArray(queuedTerrain.sections)
+            ? queuedTerrain.sections as Record<string, unknown>
+            : {};
+          const mergedMetadata = {
+            ...currentMetadata,
+            ...queuedMetadata,
+            ...(queuedMetadata.terrain ? {
+              terrain: {
+                ...currentTerrain,
+                ...queuedTerrain,
+                ...(queuedTerrain.sections ? { sections: { ...currentSections, ...queuedSections } } : {}),
+              },
+            } : {}),
+          };
+          const { error } = await supabase.from("dossiers").update({ metadata: mergedMetadata }).eq("id", dossierId);
           if (error) throw error;
           await db.queue.delete(op.id!);
           emit();
