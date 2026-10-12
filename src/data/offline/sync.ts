@@ -158,7 +158,15 @@ export async function processQueue(): Promise<void> {
           };
           const { error } = await supabase.from("dossiers").update({ metadata: mergedMetadata }).eq("id", dossierId);
           if (error) throw error;
-          await db.queue.delete(op.id!);
+          // A newer edit may have replaced this queue entry while the request was in flight.
+          // Delete only if the queued payload is still the one we just synchronized.
+          const latestQueued = await db.queue.get(op.id!);
+          const latestMetadata = latestQueued?.payload?.metadata;
+          if (latestQueued && latestQueued.kind === "update_dossier" &&
+              latestQueued.payload?.dossierId === dossierId &&
+              JSON.stringify(latestMetadata) === JSON.stringify(metadata)) {
+            await db.queue.delete(op.id!);
+          }
           emit();
         } else if (op.kind === "upload_proof") {
           const payload = op.payload;
