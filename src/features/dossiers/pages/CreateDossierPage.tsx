@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/features/shell";
@@ -61,7 +61,7 @@ export default function CreateDossierPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [sections, setSections] = useState<TerrainSections>(emptyTerrain);
-  const [openSection, setOpenSection] = useState<(typeof sectionKeys)[number]>("histoire");
+  const [openSection, setOpenSection] = useState<(typeof sectionKeys)[number] | null>("histoire");
   const { create, saving } = useCreateDossier();
   const { needsFirstStep } = useIdentity();
   const [firstStepOpen, setFirstStepOpen] = useState(false);
@@ -69,11 +69,6 @@ export default function CreateDossierPage() {
   useEffect(() => {
     if (needsFirstStep) setFirstStepOpen(true);
   }, [needsFirstStep]);
-
-  const completedSections = useMemo(
-    () => sectionKeys.filter((key) => sections[key].trim().length > 0).length,
-    [sections]
-  );
 
   const updateSection = (key: (typeof sectionKeys)[number], value: string) =>
     setSections((current) => ({ ...current, [key]: value }));
@@ -176,7 +171,7 @@ export default function CreateDossierPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold">{t("create.terrainProgressTitle")}</p>
-            <p className="text-xs text-muted-foreground mt-1">{t("create.terrainProgressHint", { completed: completedSections, total: sectionKeys.length })}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t("create.terrainProgressHint")}</p>
           </div>
         </div>
       </section>
@@ -195,7 +190,7 @@ export default function CreateDossierPage() {
             const done = sections[key].trim().length > 0;
             return (
               <section key={key} className={`rounded-2xl border bg-card overflow-hidden ${open ? "border-primary/40" : "border-border"}`}>
-                <button type="button" onClick={() => setOpenSection(open ? key : key)} className="w-full p-4 flex items-center gap-3 text-left">
+                <button type="button" onClick={() => setOpenSection(open ? null : key)} className="w-full p-4 flex items-center gap-3 text-left">
                   <span className={`size-8 rounded-full flex items-center justify-center shrink-0 text-xs font-semibold ${done ? "bg-accent text-primary" : "bg-muted text-muted-foreground"}`}>
                     {done ? <CircleCheck className="size-4" /> : index + 1}
                   </span>
