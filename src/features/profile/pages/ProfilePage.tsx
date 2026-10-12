@@ -29,10 +29,10 @@ import { profilesRepo } from "@/data";
 import { useProfile } from "../hooks/useProfile";
 
 const profileSections = [
-  { id: "personal-info", label: "Identité", icon: UserRound },
-  { id: "my-spaces", label: "Mes espaces", icon: FolderOpen },
-  { id: "preferences", label: "Préférences", icon: Settings2 },
-  { id: "security", label: "Sécurité", icon: ShieldCheck },
+  { id: "personal-info", label: t("profile.sectionIdentity"), icon: UserRound },
+  { id: "my-spaces", label: t("profile.sectionSpaces"), icon: FolderOpen },
+  { id: "preferences", label: t("profile.sectionPreferences"), icon: Settings2 },
+  { id: "security", label: t("profile.sectionSecurity"), icon: ShieldCheck },
 ];
 
 export default function ProfilePage() {
@@ -103,11 +103,11 @@ export default function ProfilePage() {
           <div className="absolute -right-10 -top-12 size-40 rounded-full bg-primary/10 blur-2xl" aria-hidden="true" />
           <div className="relative">
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-              Heritis · Espace personnel
+              {t("profile.eyebrow")}
             </p>
             <h1 className="text-display">{t("profile.title")}</h1>
             <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-              Organisez vos informations, retrouvez vos dossiers et gardez la maîtrise de vos préférences.
+              {t("profile.intro")}
             </p>
           </div>
         </header>
@@ -131,9 +131,9 @@ export default function ProfilePage() {
 
         <section id="personal-info" className="scroll-mt-4 space-y-4">
           <div>
-            <h2 className="text-lg font-semibold">Identité et informations personnelles</h2>
+            <h2 className="text-lg font-semibold">{t("profile.identityHeading")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Gérez les informations qui vous identifient dans Heritis.
+              {t("profile.identityHint")}
             </p>
           </div>
 
@@ -151,7 +151,7 @@ export default function ProfilePage() {
             <div>
               <Label htmlFor="pmail">{t("auth.email")}</Label>
               <Input id="pmail" autoComplete="email" value={user?.email ?? ""} disabled className="mt-1 rounded-xl" />
-              <p className="mt-1 text-xs text-muted-foreground">L’adresse email du compte est affichée ici ; sa modification n’est pas proposée dans cette rubrique.</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("profile.emailHint")}</p>
             </div>
             {user ? (
               <Button onClick={save} disabled={saving} className="w-full sm:w-auto">
@@ -160,7 +160,7 @@ export default function ProfilePage() {
               </Button>
             ) : (
               <p className="rounded-xl bg-muted/60 p-3 text-sm text-muted-foreground">
-                Connectez-vous pour enregistrer ces informations dans votre profil.
+                {t("profile.signInToSave")}
               </p>
             )}
           </div>
@@ -168,9 +168,9 @@ export default function ProfilePage() {
 
         <section id="my-spaces" className="scroll-mt-4 space-y-4">
           <div>
-            <h2 className="text-lg font-semibold">Mes espaces et mes modules</h2>
+            <h2 className="text-lg font-semibold">{t("profile.spacesHeading")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Accédez séparément à vos dossiers et aux documents que vous avez ajoutés.
+              {t("profile.spacesHint")}
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -195,15 +195,15 @@ export default function ProfilePage() {
             ))}
           </div>
           <p className="text-xs leading-5 text-muted-foreground">
-            Les modules gardent leurs propres dossiers et étapes. Les choix d’activités personnalisables seront raccordés à leurs préférences dédiées, sans modifier vos dossiers existants.
+            {t("profile.modulesNote")}
           </p>
         </section>
 
         <section id="preferences" className="scroll-mt-4 space-y-4">
           <div>
-            <h2 className="text-lg font-semibold">Paramètres et préférences</h2>
+            <h2 className="text-lg font-semibold">{t("profile.preferencesHeading")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Adaptez l’affichage et la langue à votre manière d’utiliser Heritis.
+              {t("profile.preferencesHint")}
             </p>
           </div>
 
@@ -212,7 +212,7 @@ export default function ProfilePage() {
               <h3 className="flex items-center gap-2 text-sm font-semibold">
                 <Globe className="size-4 text-primary" /> {t("profile.language")}
               </h3>
-              <p className="mt-1 text-xs text-muted-foreground">Vous pouvez changer de langue à tout moment.</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("profile.languageHint")}</p>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <Button disabled={settingsBusy} variant={i18n.language.startsWith("fr") ? "default" : "outline"} onClick={() => void setLanguage("fr")}>
                   Français
@@ -239,9 +239,9 @@ export default function ProfilePage() {
         {user && (
           <section id="security" className="scroll-mt-4 space-y-4">
             <div>
-              <h2 className="text-lg font-semibold">Notifications et sécurité</h2>
+              <h2 className="text-lg font-semibold">{t("profile.securityHeading")}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Gérez les alertes reçues et retrouvez les options de sécurité de votre compte.
+                {t("profile.securityHint")}
               </p>
             </div>
             <EmailAlertsCard userId={user.id} profile={profile} onChanged={refresh} />
