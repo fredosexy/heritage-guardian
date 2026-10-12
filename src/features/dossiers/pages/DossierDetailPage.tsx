@@ -99,8 +99,12 @@ export default function DossierDetailPage() {
 
   const handleUpload = async (file: File, sectionKey?: string) => {
     try {
-      await addProof(file, sectionKey);
-      toast.success(t("dossier.proofAdded"));
+      const result = await addProof(file, sectionKey);
+      if (result === "queued") {
+        toast.success(t("offline.proofSavedForSync", "Pièce conservée sur cet appareil, en attente d’envoi"));
+      } else if (result === "uploaded") {
+        toast.success(t("dossier.proofAdded"));
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("auth.error"));
     }
