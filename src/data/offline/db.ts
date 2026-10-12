@@ -19,7 +19,7 @@ export interface DraftDossier {
 
 export interface QueuedOp {
   id?: number;
-  kind: "create_dossier" | "update_dossier" | "delete_dossier";
+  kind: "create_dossier" | "initialize_journey" | "update_dossier" | "delete_dossier";
   payload: any;
   created_at: number;
   attempts: number;
