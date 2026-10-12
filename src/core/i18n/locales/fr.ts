@@ -124,6 +124,8 @@ export const fr = {
     create: "Créer le dossier",
     cancel: "Annuler",
     created: "Dossier créé !",
+    journeyUnavailable: "Le dossier est créé. Le parcours guidé n’est pas encore disponible pour ce type de dossier ou cette localisation.",
+    journeyNeedsAttention: "Le dossier est créé, mais le parcours guidé n’a pas pu être initialisé. Vous pouvez continuer à consulter la fiche ; une vérification technique est nécessaire.",
     savedLocal: "Enregistré sur cet appareil",
     savedOffline: "Enregistré hors ligne — sera synchronisé automatiquement.",
     terrainFormTitle: "Créer la fiche complète du terrain",
