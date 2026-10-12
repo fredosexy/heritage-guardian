@@ -8,6 +8,7 @@ export interface DraftDossier {
   title: string;
   description?: string | null;
   location_name?: string | null;
+  metadata?: Record<string, unknown>;
   latitude?: number | null;
   longitude?: number | null;
   created_at: number;
