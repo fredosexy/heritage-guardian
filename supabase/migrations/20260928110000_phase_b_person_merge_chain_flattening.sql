@@ -118,3 +118,111 @@ BEGIN
   );
   RETURN target.id;
 END $$;
+
+-- Apply the same single-hop redirect invariant to account claims as to merges.
+CREATE OR REPLACE FUNCTION public.claim_person_record(
+  p_person_id uuid,p_correlation_id uuid
+) RETURNS uuid
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=public SET row_security=off AS $$
+DECLARE
+  current_user_id uuid:=auth.uid();
+  item public.persons;
+  existing public.persons;
+  account_email text;
+  profile_phone text;
+  canonical_id uuid:=public.resolve_person_id(p_person_id);
+  brh record;
+  dp record;
+  mapped_role text;
+BEGIN
+  IF current_user_id IS NULL OR canonical_id IS NULL THEN
+    RAISE EXCEPTION 'person_claim_forbidden' USING ERRCODE='42501';
+  END IF;
+
+  SELECT * INTO item FROM public.persons WHERE id=canonical_id FOR UPDATE;
+  IF item.linked_profile_id IS NOT NULL THEN
+    IF item.linked_profile_id=current_user_id THEN RETURN item.id; END IF;
+    RAISE EXCEPTION 'person_already_linked' USING ERRCODE='42501';
+  END IF;
+
+  SELECT lower(email) INTO account_email FROM auth.users WHERE id=current_user_id;
+  SELECT phone INTO profile_phone FROM public.profiles WHERE id=current_user_id;
+
+  IF NOT (
+    (item.email IS NOT NULL AND account_email IS NOT NULL AND lower(item.email)=account_email)
+    OR (item.phone IS NOT NULL AND profile_phone IS NOT NULL AND item.phone=profile_phone)
+  ) THEN
+    RAISE EXCEPTION 'person_claim_identity_mismatch' USING ERRCODE='42501';
+  END IF;
+
+  SELECT * INTO existing
+  FROM public.persons
+  WHERE linked_profile_id=current_user_id AND id<>item.id
+  FOR UPDATE;
+
+  IF existing.id IS NOT NULL THEN
+    INSERT INTO public.person_aliases(person_id,alias_name,alias_type,source_type,created_by)
+    VALUES(item.id,existing.display_name,'MERGED_RECORD','DECLARATION',current_user_id)
+    ON CONFLICT DO NOTHING;
+
+    -- Keep historical aliases attached directly to the claimed canonical Person.
+    UPDATE public.persons
+    SET merged_into_person_id=item.id
+    WHERE merged_into_person_id=existing.id;
+
+    UPDATE public.persons
+    SET linked_profile_id=NULL,merged_into_person_id=item.id,merged_at=now(),merged_by=current_user_id,
+        identity_status='DUPLICATE_SUSPECTED'
+    WHERE id=existing.id;
+  END IF;
+
+  UPDATE public.persons SET linked_profile_id=current_user_id WHERE id=item.id;
+
+  -- Synchronize authority from historical references without rewriting them.
+  FOR brh IN
+    SELECT b.bien_id,b.role
+    FROM public.bien_right_holders b
+    JOIN public.persons p ON p.id=b.person_id
+    WHERE COALESCE(p.merged_into_person_id,p.id)=item.id
+      AND b.status<>'revoque'
+      AND b.role IN ('titulaire','co_titulaire')
+  LOOP
+    PERFORM public.ensure_role_assignment_internal(
+      current_user_id,'TITULAIRE','ASSET',brh.bien_id,current_user_id
+    );
+  END LOOP;
+
+  FOR dp IN
+    SELECT d.dossier_id,d.role,d.status,d.invited_by
+    FROM public.dossier_participants d
+    JOIN public.persons p ON p.id=d.person_id
+    WHERE COALESCE(p.merged_into_person_id,p.id)=item.id
+      AND d.status<>'revoque'
+  LOOP
+    mapped_role:=CASE dp.role
+      WHEN 'declarant' THEN 'CONTRIBUTOR'
+      WHEN 'accompagnateur' THEN 'COMPANION'
+      WHEN 'temoin' THEN 'WITNESS'
+      WHEN 'professionnel' THEN 'PROFESSIONAL'
+      WHEN 'service' THEN 'ADMINISTRATIVE_ACTOR'
+      WHEN 'autorite' THEN 'ADMINISTRATIVE_ACTOR'
+      ELSE 'PARTICIPANT'
+    END;
+
+    IF dp.status='actif' THEN
+      PERFORM public.ensure_role_assignment_internal(
+        current_user_id,mapped_role,'CASE',dp.dossier_id,dp.invited_by
+      );
+    ELSE
+      INSERT INTO public.role_assignments(user_id,role,scope_type,scope_id,status,assigned_by)
+      VALUES(current_user_id,mapped_role,'CASE',dp.dossier_id,'SUSPENDED',dp.invited_by)
+      ON CONFLICT DO NOTHING;
+    END IF;
+  END LOOP;
+
+  PERFORM public.phase_b_record_change(
+    'person.person.updated','Person',item.id,'ClaimPerson',p_correlation_id,
+    jsonb_build_object('person_id',item.id,'linked_account',true)
+  );
+  RETURN item.id;
+END $$;
