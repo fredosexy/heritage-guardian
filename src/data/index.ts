@@ -10,6 +10,7 @@ export type { DraftDossier } from "./offline/db";
 export {
   enqueueCreateDossier,
   enqueueUpdateDossierMetadata,
+  enqueueProofUpload,
   processQueue,
   initSyncListeners,
   onSyncChange,
