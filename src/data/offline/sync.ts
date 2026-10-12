@@ -33,6 +33,22 @@ export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: 
   if (typeof navigator === "undefined" || navigator.onLine) void processQueue();
 }
 
+/** Stocke le fichier lui-même dans IndexedDB avant de confirmer sa mise en attente. */
+export async function enqueueProofUpload(params: { file: File; dossierId: string; userId: string; sectionKey?: string }) {
+  const { file, dossierId, userId, sectionKey } = params;
+  const opId = await db.queue.add({
+    kind: "upload_proof",
+    payload: { file, fileName: file.name, mimeType: file.type || "application/octet-stream", sizeBytes: file.size, dossierId, userId, sectionKey, storagePath: "" },
+    created_at: Date.now(), attempts: 0,
+  });
+  await db.queue.update(opId, { payload: {
+    file, fileName: file.name, mimeType: file.type || "application/octet-stream", sizeBytes: file.size, dossierId, userId, sectionKey,
+    storagePath: `${userId}/${dossierId}/queued-${opId}-${encodeURIComponent(file.name)}`,
+  }});
+  emit();
+  if (typeof navigator === "undefined" || navigator.onLine) void processQueue();
+}
+
 export async function processQueue(): Promise<void> {
   if (syncing) return;
   if (typeof navigator !== "undefined" && !navigator.onLine) return;
@@ -96,6 +112,29 @@ export async function processQueue(): Promise<void> {
           }
           const { error } = await supabase.from("dossiers").update({ metadata }).eq("id", dossierId);
           if (error) throw error;
+          await db.queue.delete(op.id!);
+          emit();
+        } else if (op.kind === "upload_proof") {
+          const payload = op.payload;
+          const file = payload?.file as Blob | undefined;
+          const { dossierId, userId, fileName, mimeType, sizeBytes, sectionKey, storagePath } = payload ?? {};
+          if (!file || !dossierId || !userId || !storagePath) {
+            await db.queue.update(op.id!, { attempts: (op.attempts || 0) + 1, last_error: "Invalid queued proof upload" });
+            break;
+          }
+          const { data: existing, error: existingError } = await supabase.from("proofs").select("id").eq("storage_path", storagePath).maybeSingle();
+          if (existingError) throw existingError;
+          if (!existing) {
+            const { error: uploadError } = await supabase.storage.from("dossier-proofs").upload(storagePath, file, { contentType: mimeType, upsert: true });
+            if (uploadError) throw uploadError;
+            const proofMetadata = sectionKey ? { terrainSectionKey: sectionKey } : {};
+            const { error: insertError } = await supabase.from("proofs").insert({
+              dossier_id: dossierId, uploaded_by: userId,
+              type: mimeType.startsWith("image/") ? "image" : mimeType.startsWith("video/") ? "video" : mimeType.startsWith("audio/") ? "audio" : "document",
+              title: fileName, storage_path: storagePath, mime_type: mimeType, size_bytes: sizeBytes, metadata: proofMetadata,
+            });
+            if (insertError) throw insertError;
+          }
           await db.queue.delete(op.id!);
           emit();
         } else {
