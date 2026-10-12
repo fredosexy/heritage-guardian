@@ -124,6 +124,8 @@ export const en = {
     create: "Create dossier",
     cancel: "Cancel",
     created: "Dossier created!",
+    journeyUnavailable: "The dossier is created. A guided journey is not yet available for this dossier type or location.",
+    journeyNeedsAttention: "The dossier is created, but its guided journey could not be initialized. You can still view the dossier; a technical check is needed.",
     savedLocal: "Saved on this device",
     savedOffline: "Saved offline — will sync automatically.",
   },
