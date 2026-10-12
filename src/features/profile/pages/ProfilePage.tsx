@@ -28,15 +28,14 @@ import i18n from "@/core/i18n";
 import { profilesRepo } from "@/data";
 import { useProfile } from "../hooks/useProfile";
 
-const profileSections = [
-  { id: "personal-info", label: t("profile.sectionIdentity"), icon: UserRound },
-  { id: "my-spaces", label: t("profile.sectionSpaces"), icon: FolderOpen },
-  { id: "preferences", label: t("profile.sectionPreferences"), icon: Settings2 },
-  { id: "security", label: t("profile.sectionSecurity"), icon: ShieldCheck },
-];
-
 export default function ProfilePage() {
   const { t } = useTranslation();
+  const profileSections = [
+    { id: "personal-info", label: t("profile.sectionIdentity"), icon: UserRound },
+    { id: "my-spaces", label: t("profile.sectionSpaces"), icon: FolderOpen },
+    { id: "preferences", label: t("profile.sectionPreferences"), icon: Settings2 },
+    { id: "security", label: t("profile.sectionSecurity"), icon: ShieldCheck },
+  ];
   const { user, signOut } = useAuth();
   const { profile, refresh } = useProfile();
   const [name, setName] = useState("");
