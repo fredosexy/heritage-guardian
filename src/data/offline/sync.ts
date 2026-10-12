@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { proceduresRepo } from "@/data";
+import * as proceduresRepo from "@/data/procedures.repo";
 import { db, DraftDossier } from "./db";
 
 let syncing = false;
