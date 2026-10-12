@@ -19,7 +19,7 @@ export interface DraftDossier {
 
 export interface QueuedOp {
   id?: number;
-  kind: "create_dossier" | "initialize_journey" | "update_dossier" | "delete_dossier";
+  kind: "create_dossier" | "initialize_journey" | "update_dossier" | "upload_proof" | "delete_dossier";
   payload: any;
   created_at: number;
   attempts: number;
@@ -41,6 +41,11 @@ class MemoireDB extends Dexie {
   constructor() {
     super("memoire-offline");
     this.version(1).stores({
+      drafts: "++id, localId, user_id, synced, updated_at",
+      queue: "++id, kind, created_at",
+      cachedDossiers: "id, user_id, cached_at",
+    });
+    this.version(2).stores({
       drafts: "++id, localId, user_id, synced, updated_at",
       queue: "++id, kind, created_at",
       cachedDossiers: "id, user_id, cached_at",
