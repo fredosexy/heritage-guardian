@@ -254,7 +254,7 @@ export default function ProfilePage() {
                   <input
                     type="checkbox"
                     checked={checked}
-                    disabled={activitiesSaving || (!checked && activitiesSaving)}
+                    disabled={!user || activitiesSaving}
                     onChange={() => void toggleActivity(id)}
                     className="mt-1 size-4 accent-primary"
                     aria-label={t(`profile.activity.${id}.title`)}
