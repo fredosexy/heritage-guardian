@@ -24,6 +24,7 @@ export default function DossierDetailPage() {
   const [editingTerrain, setEditingTerrain] = useState(false);
   const [savingTerrain, setSavingTerrain] = useState(false);
   const [terrainSections, setTerrainSections] = useState<Record<string, string>>({});
+  const [initialTerrainSections, setInitialTerrainSections] = useState<Record<string, string>>({});
   const terrainSectionKeys = ["histoire","provenance","proprietaires","ayantsDroit","documentation","localisation","dimensions","etat","miseEnValeur"] as const;
   const terrainSectionProofs = (sectionKey: string) => proofs.filter((proof) => {
     const metadata = proof.metadata && typeof proof.metadata === "object" && !Array.isArray(proof.metadata)
@@ -41,7 +42,9 @@ export default function DossierDetailPage() {
     const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
       ? dossier.metadata as { terrain?: { sections?: Record<string, string> } }
       : {};
-    setTerrainSections(metadata.terrain?.sections ?? {});
+    const sections = metadata.terrain?.sections ?? {};
+    setTerrainSections(sections);
+    setInitialTerrainSections(sections);
   }, [dossier?.id, dossier?.metadata, dossier?.type]);
 
   const saveTerrainSections = async () => {
@@ -54,9 +57,16 @@ export default function DossierDetailPage() {
       const existingTerrain = metadata.terrain && typeof metadata.terrain === "object" && !Array.isArray(metadata.terrain)
         ? metadata.terrain as Record<string, unknown>
         : {};
+      // Envoyer uniquement les sections modifiées évite qu'une fiche ouverte plus tôt
+      // n'écrase les changements récents faits dans une autre session/appareil.
+      const changedSections = Object.fromEntries(
+        terrainSectionKeys
+          .filter((key) => (terrainSections[key] ?? "") !== (initialTerrainSections[key] ?? ""))
+          .map((key) => [key, terrainSections[key] ?? ""]),
+      ) as Record<string, string>;
       const updatedMetadata = {
         ...metadata,
-        terrain: { ...existingTerrain, version: 1, sections: terrainSections },
+        terrain: { ...existingTerrain, version: 1, sections: changedSections },
       };
       if (typeof navigator !== "undefined" && !navigator.onLine) {
         await enqueueUpdateDossierMetadata(dossier.id, updatedMetadata);
@@ -81,16 +91,18 @@ export default function DossierDetailPage() {
             terrain: {
               ...latestTerrain,
               version: 1,
-              sections: { ...latestSections, ...terrainSections },
+              sections: { ...latestSections, ...changedSections },
             },
           };
           await dossiersRepo.updateDossierMetadata(dossier.id, metadataToSave);
+          setInitialTerrainSections((current) => ({ ...current, ...changedSections }));
           setEditingTerrain(false);
           toast.success(t("create.terrainSaved"));
         } catch (error) {
           const message = error instanceof Error ? error.message.toLowerCase() : "";
           if (message.includes("fetch") || message.includes("network") || message.includes("failed to") || message.includes("load failed")) {
             await enqueueUpdateDossierMetadata(dossier.id, updatedMetadata);
+            setInitialTerrainSections((current) => ({ ...current, ...changedSections }));
             setEditingTerrain(false);
             toast.success(t("offline.savedForSync", "Sauvegardé sur cet appareil, en attente de synchronisation"));
           } else {
