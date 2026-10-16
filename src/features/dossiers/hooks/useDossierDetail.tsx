@@ -4,6 +4,7 @@ import type { Dossier, Participant, Proof } from "@/core/types/domain";
 import { scoreDossier } from "@/services";
 import { fetchDossierSuggestions } from "@/services";
 import { useAuth } from "@/features/identity";
+import { onSyncChange } from "@/data/offline/sync";
 
 export function useDossierDetail(id?: string) {
   const { user } = useAuth();
@@ -24,6 +25,13 @@ export function useDossierDetail(id?: string) {
   }, [id, user]);
 
   useEffect(() => { void load(); }, [load]);
+
+  // Refresh an open dossier when offline queue processing changes state. In particular,
+  // a proof queued while offline must appear in its Terrain section after sync succeeds.
+  useEffect(() => {
+    if (!id || !user) return;
+    return onSyncChange(() => { void load().catch(() => undefined); });
+  }, [id, user, load]);
 
   useEffect(() => {
     if (!dossier) return;
