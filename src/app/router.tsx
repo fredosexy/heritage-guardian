@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthPage, OnboardingPage, ProtectedRoute } from "@/features/identity";
 import { HomePage, ModulePage } from "@/features/home";
-import { CreateDossierPage, DossierDetailPage, DossiersPage } from "@/features/dossiers";
+import { EditDossierPage, CreateDossierPage, DossierDetailPage, DossiersPage } from "@/features/dossiers";
 import { AlertsPage } from "@/features/alerts";
 import { AssistantPage } from "@/features/assistant";
 import { ProfilePage } from "@/features/profile";
@@ -24,6 +24,7 @@ export function AppRoutes() {
       <Route path="/modules/:moduleId" element={<ModulePage />} />
       <Route path="/dossiers" element={<DossiersPage />} />
       <Route path="/dossiers/:id" element={<DossierDetailPage />} />
+      <Route path="/dossiers/:id/edit" element={<EditDossierPage />} />
       <Route path="/create" element={<CreateDossierPage />} />
       <Route path="/alerts" element={<AlertsPage />} />
       <Route path="/profile" element={<ProfilePage />} />

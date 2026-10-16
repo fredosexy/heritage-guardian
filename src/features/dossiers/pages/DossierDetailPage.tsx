@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppLayout, EmptyState, PageHeader } from "@/features/shell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2, MapPin, Sparkles, Trash2, Users } from "lucide-react";
+import { ArrowLeft, Loader2, Pencil, MapPin, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useDossierDetail } from "../hooks/useDossierDetail";
 import { ProofsTab } from "../components/ProofsTab";
@@ -70,6 +70,10 @@ export default function DossierDetailPage() {
       <div className="card-soft p-5 mb-4">
         <div className="flex items-start justify-between gap-2 mb-2">
           <p className="text-sm text-muted-foreground">{t(typeLabelKey(dossier.type))}</p>
+          <div className="flex items-center gap-1">
+          <button onClick={() => navigate(`/dossiers/${dossier.id}/edit`)} aria-label={t("sync.edit")} className="text-muted-foreground hover:text-primary p-1">
+            <Pencil className="size-4" />
+          </button>
           <button
             onClick={handleRemove}
             aria-label={t("dossier.delete")}
@@ -77,6 +81,7 @@ export default function DossierDetailPage() {
           >
             <Trash2 className="size-4" />
           </button>
+          </div>
         </div>
         {dossier.location_name && (
           <p className="text-sm text-muted-foreground flex items-center gap-1.5 mb-3">
