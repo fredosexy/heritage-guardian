@@ -3,6 +3,20 @@ import type { Proof, ProofType } from "@/core/types/domain";
 
 const BUCKET = "dossier-proofs";
 
+/** The file is already in Storage, but its database record still needs retrying. */
+export class ProofPersistenceError extends Error {
+  readonly storagePath: string;
+  readonly cause: unknown;
+
+  constructor(storagePath: string, cause: unknown) {
+    const detail = cause instanceof Error ? cause.message : String(cause);
+    super(`Proof file uploaded but record persistence failed: ${detail}`);
+    this.name = "ProofPersistenceError";
+    this.storagePath = storagePath;
+    this.cause = cause;
+  }
+}
+
 export async function listProofs(dossierId: string): Promise<Proof[]> {
   const { data, error } = await supabase.from("proofs").select("*").eq("dossier_id", dossierId).order("created_at", { ascending: false });
   if (error) throw error;
@@ -38,7 +52,7 @@ export async function uploadProof(params: {
     size_bytes: file.size,
     metadata,
   }).select().single();
-  if (error) throw error;
+  if (error) throw new ProofPersistenceError(path, error);
   return data;
 }
 
