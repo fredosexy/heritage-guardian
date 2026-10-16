@@ -64,7 +64,27 @@ export default function DossierDetailPage() {
         toast.success(t("create.terrainSaved") + " — " + t("offline.savedForSync", "Sauvegardé sur cet appareil, en attente de synchronisation"));
       } else {
         try {
-          await dossiersRepo.updateDossierMetadata(dossier.id, updatedMetadata);
+          // Relire la version serveur juste avant l'écriture afin de conserver les
+          // métadonnées et les autres sections modifiées depuis l'ouverture de la fiche.
+          const latestDossier = await dossiersRepo.getDossier(dossier.id);
+          const latestMetadata = latestDossier?.metadata && typeof latestDossier.metadata === "object" && !Array.isArray(latestDossier.metadata)
+            ? latestDossier.metadata as Record<string, unknown>
+            : metadata;
+          const latestTerrain = latestMetadata.terrain && typeof latestMetadata.terrain === "object" && !Array.isArray(latestMetadata.terrain)
+            ? latestMetadata.terrain as Record<string, unknown>
+            : existingTerrain;
+          const latestSections = latestTerrain.sections && typeof latestTerrain.sections === "object" && !Array.isArray(latestTerrain.sections)
+            ? latestTerrain.sections as Record<string, string>
+            : {};
+          const metadataToSave = {
+            ...latestMetadata,
+            terrain: {
+              ...latestTerrain,
+              version: 1,
+              sections: { ...latestSections, ...terrainSections },
+            },
+          };
+          await dossiersRepo.updateDossierMetadata(dossier.id, metadataToSave);
           setEditingTerrain(false);
           toast.success(t("create.terrainSaved"));
         } catch (error) {
