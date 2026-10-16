@@ -194,19 +194,18 @@ export async function processQueue(): Promise<void> {
             await db.queue.update(op.id!, { attempts: (op.attempts || 0) + 1, last_error: "Invalid queued proof upload" });
             break;
           }
-          const { data: existing, error: existingError } = await supabase.from("proofs").select("id").eq("storage_path", storagePath).maybeSingle();
-          if (existingError) throw existingError;
-          if (!existing) {
-            const { error: uploadError } = await supabase.storage.from("dossier-proofs").upload(storagePath, file, { contentType: mimeType, upsert: true });
-            if (uploadError) throw uploadError;
-            const proofMetadata = sectionKey ? { terrainSectionKey: sectionKey } : {};
-            const { error: insertError } = await supabase.from("proofs").insert({
-              dossier_id: dossierId, uploaded_by: userId,
-              type: mimeType.startsWith("image/") ? "image" : mimeType.startsWith("video/") ? "video" : mimeType.startsWith("audio/") ? "audio" : "document",
-              title: fileName, storage_path: storagePath, mime_type: mimeType, size_bytes: sizeBytes, metadata: proofMetadata,
-            });
-            if (insertError) throw insertError;
-          }
+          // Multiple tabs may process the same queued operation at once. Storage upsert
+          // makes the object write repeatable; the unique storage_path index plus DB upsert
+          // ensures that all workers converge on one proof row.
+          const { error: uploadError } = await supabase.storage.from("dossier-proofs").upload(storagePath, file, { contentType: mimeType, upsert: true });
+          if (uploadError) throw uploadError;
+          const proofMetadata = sectionKey ? { terrainSectionKey: sectionKey } : {};
+          const { error: upsertError } = await supabase.from("proofs").upsert({
+            dossier_id: dossierId, uploaded_by: userId,
+            type: mimeType.startsWith("image/") ? "image" : mimeType.startsWith("video/") ? "video" : mimeType.startsWith("audio/") ? "audio" : "document",
+            title: fileName, storage_path: storagePath, mime_type: mimeType, size_bytes: sizeBytes, metadata: proofMetadata,
+          }, { onConflict: "storage_path" });
+          if (upsertError) throw upsertError;
           await db.queue.delete(op.id!);
           emit();
         } else {
