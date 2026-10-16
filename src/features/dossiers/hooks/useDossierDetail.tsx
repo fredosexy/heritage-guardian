@@ -44,6 +44,18 @@ export function useDossierDetail(id?: string) {
       try {
         await proofsRepo.uploadProof({ file, dossierId: dossier.id, userId: user.id, sectionKey });
       } catch (error) {
+        // Storage succeeded but the proofs row failed: retry the same object path,
+        // rather than creating a second object and leaving the first one orphaned.
+        if (error instanceof proofsRepo.ProofPersistenceError) {
+          await enqueueProofUpload({
+            file,
+            dossierId: dossier.id,
+            userId: user.id,
+            sectionKey,
+            storagePath: error.storagePath,
+          });
+          return "queued";
+        }
         const message = error instanceof Error ? error.message.toLowerCase() : "";
         const networkFailure = typeof navigator !== "undefined" && !navigator.onLine ||
           message.includes("fetch") || message.includes("network") || message.includes("failed to") || message.includes("load failed");
