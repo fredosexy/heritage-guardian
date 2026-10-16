@@ -25,6 +25,17 @@ export interface QueuedOp {
   last_error?: string | null;
 }
 
+export interface SyncConflict {
+  id?: number;
+  dossier_id: string;
+  title: string;
+  fields: string[];
+  mine: Record<string, string | null>;
+  theirs: Record<string, string | null>;
+  remote_updated_at: string;
+  created_at: number;
+}
+
 export interface CachedDossier {
   id: string;
   user_id: string;
@@ -36,6 +47,7 @@ class MemoireDB extends Dexie {
   drafts!: Table<DraftDossier, number>;
   queue!: Table<QueuedOp, number>;
   cachedDossiers!: Table<CachedDossier, string>;
+  conflicts!: Table<SyncConflict, number>;
 
   constructor() {
     super("memoire-offline");
@@ -43,6 +55,12 @@ class MemoireDB extends Dexie {
       drafts: "++id, localId, user_id, synced, updated_at",
       queue: "++id, kind, created_at",
       cachedDossiers: "id, user_id, cached_at",
+    });
+    this.version(2).stores({
+      drafts: "++id, localId, user_id, synced, updated_at",
+      queue: "++id, kind, created_at",
+      cachedDossiers: "id, user_id, cached_at",
+      conflicts: "++id, dossier_id, created_at",
     });
   }
 }
