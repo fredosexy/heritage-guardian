@@ -45,18 +45,32 @@ export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: 
   if (typeof navigator === "undefined" || navigator.onLine) void processQueue();
 }
 
-/** Stocke le fichier lui-même dans IndexedDB avant de confirmer sa mise en attente. */
-export async function enqueueProofUpload(params: { file: File; dossierId: string; userId: string; sectionKey?: string }) {
+/** Stocke le fichier et son chemin de destination dans une seule écriture IndexedDB. */
+export async function enqueueProofUpload(params: {
+  file: File;
+  dossierId: string;
+  userId: string;
+  sectionKey?: string;
+  storagePath?: string;
+}) {
   const { file, dossierId, userId, sectionKey } = params;
-  const opId = await db.queue.add({
+  const storagePath = params.storagePath ??
+    `${userId}/${dossierId}/queued-${Date.now()}-${Math.random().toString(36).slice(2)}-${encodeURIComponent(file.name)}`;
+  await db.queue.add({
     kind: "upload_proof",
-    payload: { file, fileName: file.name, mimeType: file.type || "application/octet-stream", sizeBytes: file.size, dossierId, userId, sectionKey, storagePath: "" },
-    created_at: Date.now(), attempts: 0,
+    payload: {
+      file,
+      fileName: file.name,
+      mimeType: file.type || "application/octet-stream",
+      sizeBytes: file.size,
+      dossierId,
+      userId,
+      sectionKey,
+      storagePath,
+    },
+    created_at: Date.now(),
+    attempts: 0,
   });
-  await db.queue.update(opId, { payload: {
-    file, fileName: file.name, mimeType: file.type || "application/octet-stream", sizeBytes: file.size, dossierId, userId, sectionKey,
-    storagePath: `${userId}/${dossierId}/queued-${opId}-${encodeURIComponent(file.name)}`,
-  }});
   emit();
   if (typeof navigator === "undefined" || navigator.onLine) void processQueue();
 }
