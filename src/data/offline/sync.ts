@@ -145,17 +145,21 @@ export async function processQueue(): Promise<void> {
           const queuedSections = queuedTerrain.sections && typeof queuedTerrain.sections === "object" && !Array.isArray(queuedTerrain.sections)
             ? queuedTerrain.sections as Record<string, unknown>
             : {};
-          const mergedMetadata = {
-            ...currentMetadata,
-            ...queuedMetadata,
-            ...(queuedMetadata.terrain ? {
-              terrain: {
-                ...currentTerrain,
-                ...queuedTerrain,
-                ...(queuedTerrain.sections ? { sections: { ...currentSections, ...queuedSections } } : {}),
-              },
-            } : {}),
-          };
+          // Terrain section edits must not replay a stale snapshot of unrelated dossier metadata.
+          // This queue entry is produced by the Terrain editor; keep the server's current top-level
+          // metadata and merge only the Terrain branch and its section keys.
+          const mergedMetadata = queuedMetadata.terrain
+            ? {
+                ...currentMetadata,
+                terrain: {
+                  ...currentTerrain,
+                  ...queuedTerrain,
+                  ...(queuedTerrain.sections
+                    ? { sections: { ...currentSections, ...queuedSections } }
+                    : {}),
+                },
+              }
+            : { ...currentMetadata, ...queuedMetadata };
           const { error } = await supabase.from("dossiers").update({ metadata: mergedMetadata }).eq("id", dossierId);
           if (error) throw error;
           // A newer edit may have replaced this queue entry while the request was in flight.
