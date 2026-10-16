@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { db, DraftDossier } from "./db";
+import { detectConflictFields, type DossierChanges } from "@/services/sync-conflicts";
 
 let syncing = false;
 const listeners = new Set<() => void>();
@@ -61,6 +62,21 @@ export async function processQueue(): Promise<void> {
             .single();
           if (error) throw error;
           await db.drafts.update(draft.id!, { synced: 1, remote_id: data.id });
+          await db.queue.delete(op.id!);
+          emit();
+        } else if (op.kind === "update_dossier") {
+          const { dossierId, changes, baseUpdatedAt } = op.payload as { dossierId: string; changes: DossierChanges; baseUpdatedAt: string };
+          const { data: remote, error: e1 } = await supabase.from("dossiers").select("*").eq("id", dossierId).single();
+          if (e1) throw e1;
+          const fields = detectConflictFields(baseUpdatedAt, remote, changes);
+          if (fields.length > 0) {
+            const theirs: Record<string, string | null> = {};
+            for (const f of Object.keys(changes)) theirs[f] = (remote as any)[f] ?? null;
+            await db.conflicts.add({ dossier_id: dossierId, title: remote.title, fields, mine: changes as any, theirs, remote_updated_at: remote.updated_at, created_at: Date.now() });
+          } else {
+            const { error } = await supabase.from("dossiers").update(changes).eq("id", dossierId);
+            if (error) throw error;
+          }
           await db.queue.delete(op.id!);
           emit();
         } else {
@@ -132,4 +148,26 @@ export async function claimLocalDrafts(fromUserId: string, toUserId: string): Pr
   emit();
   if (drafts.length > 0) void processQueue();
   return drafts.length;
+}
+
+/** Met en file une modification de dossier faite (éventuellement) hors ligne. */
+export async function enqueueUpdateDossier(dossierId: string, changes: DossierChanges, baseUpdatedAt: string) {
+  await db.queue.add({ kind: "update_dossier", payload: { dossierId, changes, baseUpdatedAt }, created_at: Date.now(), attempts: 0 });
+  emit();
+  void processQueue();
+}
+
+export async function discardQueuedOp(id: number) {
+  await db.queue.delete(id);
+  emit();
+}
+
+/** Applique la version retenue par l'utilisateur et ferme le conflit. */
+export async function resolveConflict(conflictId: number, values: DossierChanges) {
+  const c = await db.conflicts.get(conflictId);
+  if (!c) return;
+  const { error } = await supabase.from("dossiers").update(values).eq("id", c.dossier_id);
+  if (error) throw error;
+  await db.conflicts.delete(conflictId);
+  emit();
 }

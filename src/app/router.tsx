@@ -7,6 +7,7 @@ import { AssistantPage } from "@/features/assistant";
 import { ProfilePage } from "@/features/profile";
 import { MyFilesPage } from "@/features/files";
 import { NotFoundPage } from "@/features/shell";
+import { SyncCenterPage } from "@/features/offline";
 
 /**
  * Mode visiteur : toutes les pages sont consultables sans compte.
@@ -27,6 +28,7 @@ export function AppRoutes() {
       <Route path="/alerts" element={<AlertsPage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/files" element={<MyFilesPage />} />
+      <Route path="/sync" element={<SyncCenterPage />} />
       <Route path="/assistant" element={<AssistantPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

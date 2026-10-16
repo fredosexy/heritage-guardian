@@ -42,6 +42,7 @@ export default function DossiersPage() {
           <button onClick={() => triggerSync()} className="text-xs font-medium inline-flex items-center gap-1 hover:underline">
             <RefreshCw className="size-3" /> {t("dossiers.syncNow")}
           </button>
+          <button onClick={() => navigate("/sync")} className="text-xs font-medium hover:underline">{t("sync.open")}</button>
         </div>
       )}
 
