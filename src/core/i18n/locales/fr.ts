@@ -330,6 +330,12 @@ export const fr = {
     offline: "Hors ligne",
   },
   sync: {
+    edit: "Modifier",
+    editTitle: "Modifier le dossier",
+    save: "Enregistrer",
+    savedOffline: "Modification enregistrée. Elle sera envoyée dès que possible.",
+    noChange: "Aucun changement à enregistrer.",
+    unavailable: "Ce dossier n'est pas disponible hors ligne. Ouvrez-le une fois avec du réseau.",
     open: "Voir le détail",
     title: "Synchronisation",
     subtitle: "Ce qui attend d'être envoyé, et les désaccords à trancher.",

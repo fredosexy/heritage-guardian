@@ -330,6 +330,12 @@ export const en = {
     offline: "Offline",
   },
   sync: {
+    edit: "Edit",
+    editTitle: "Edit dossier",
+    save: "Save",
+    savedOffline: "Change saved. It will be sent as soon as possible.",
+    noChange: "No change to save.",
+    unavailable: "This dossier isn't available offline. Open it once with a connection.",
     open: "See details",
     title: "Sync",
     subtitle: "What is waiting to be sent, and disagreements to settle.",
