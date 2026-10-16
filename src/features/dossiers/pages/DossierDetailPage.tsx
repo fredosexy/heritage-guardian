@@ -70,6 +70,7 @@ export default function DossierDetailPage() {
       };
       if (typeof navigator !== "undefined" && !navigator.onLine) {
         await enqueueUpdateDossierMetadata(dossier.id, updatedMetadata);
+        setInitialTerrainSections((current) => ({ ...current, ...changedSections }));
         setEditingTerrain(false);
         toast.success(t("create.terrainSaved") + " — " + t("offline.savedForSync", "Sauvegardé sur cet appareil, en attente de synchronisation"));
       } else {
