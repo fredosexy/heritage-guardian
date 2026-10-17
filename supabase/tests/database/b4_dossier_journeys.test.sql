@@ -50,14 +50,14 @@ SELECT throws_ok(
   'un utilisateur non administrateur ne peut pas créer une procédure'
 );
 
+UPDATE public.procedure_definitions
+SET status = 'archivee'
+WHERE id = '30000000-0000-0000-0000-000000000001';
 SELECT is(
   (SELECT status FROM public.procedure_definitions WHERE id = '30000000-0000-0000-0000-000000000001'),
   'publiee',
   'un utilisateur non administrateur ne peut pas modifier une procédure publiée'
 );
-UPDATE public.procedure_definitions
-SET status = 'archivee'
-WHERE id = '30000000-0000-0000-0000-000000000001';
 
 SELECT lives_ok(
   $$ SELECT public.initialize_dossier_journey('20000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001') $$,
@@ -133,11 +133,12 @@ SELECT lives_ok(
      ) $$,
   'une étape bloquée peut reprendre son parcours'
 );
+SELECT set_config('request.jwt.claim.sub', '', true);
 SELECT throws_ok(
-  $$ SELECT public.transition_dossier_step(
+  $ SELECT public.transition_dossier_step(
        (SELECT id FROM public.dossier_steps WHERE dossier_id = '20000000-0000-0000-0000-000000000001' AND step_order = 2),
        'terminee'
-     ) $$,
+     ) $,
   '42501', 'step_transition_forbidden',
   'une transition est refusée sans identité'
 );
