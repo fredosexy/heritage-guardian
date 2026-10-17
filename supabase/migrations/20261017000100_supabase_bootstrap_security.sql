@@ -70,6 +70,8 @@ CREATE TABLE IF NOT EXISTS public.ai_request_events (
 );
 CREATE INDEX IF NOT EXISTS ai_request_events_user_function_created_idx
   ON public.ai_request_events (user_id, function_name, created_at DESC);
+CREATE INDEX IF NOT EXISTS ai_request_events_created_at_idx
+  ON public.ai_request_events (created_at);
 ALTER TABLE public.ai_request_events ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.ai_request_events FROM PUBLIC, anon, authenticated;
 GRANT ALL ON TABLE public.ai_request_events TO service_role;
@@ -95,6 +97,7 @@ BEGIN
   END IF;
 
   IF p_user_id IS NULL
+    OR p_function_name IS NULL
     OR p_function_name NOT IN ('ai-chat', 'ai-context')
     OR p_limit < 1 OR p_limit > 100
     OR p_window_seconds < 1 OR p_window_seconds > 3600
