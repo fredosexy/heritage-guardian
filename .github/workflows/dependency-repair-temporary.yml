@@ -34,6 +34,8 @@ jobs:
         run: |
           rm -f package-lock.json
           npm install --package-lock-only --ignore-scripts --no-audit --no-fund --legacy-peer-deps
+      - name: Apply non-breaking dependency security fixes
+        run: npm audit fix --ignore-scripts --no-fund || true
       - name: Commit synchronized lockfile
         run: |
           if ! git diff --quiet -- package-lock.json; then
