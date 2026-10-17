@@ -29,7 +29,9 @@ jobs:
           node-version: 22
           cache: npm
       - name: Regenerate lockfile without lifecycle scripts
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+        run: |
+          rm -f package-lock.json
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
       - name: Commit synchronized lockfile
         run: |
           if ! git diff --quiet -- package-lock.json; then
