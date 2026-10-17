@@ -267,6 +267,7 @@ export const fr = {
     thinking: "Réflexion…",
     rateLimit: "Trop de requêtes, réessayez dans un instant.",
     creditsOut: "Crédits IA épuisés. Ajoutez des crédits dans votre espace Lovable.",
+    authRequired: "Connectez-vous pour utiliser l’assistant Mémoire.",
     error: "L'assistant n'a pas pu répondre. Réessayez.",
     welcome: "Bonjour ! Posez-moi vos questions sur vos terres, héritages ou volontés.",
   },
