@@ -19,6 +19,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Temporary dependency audit
+        run: npm audit --json || true
       - run: npm test
       - run: npm run lint
       - run: npm run build
