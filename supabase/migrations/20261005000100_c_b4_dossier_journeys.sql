@@ -108,7 +108,14 @@ CREATE POLICY "owners view dossier steps"
   USING (public.owns_dossier(dossier_id, auth.uid()) OR public.is_dossier_participant(dossier_id, auth.uid()));
 
 REVOKE ALL ON public.procedure_definitions, public.procedure_steps, public.dossier_steps FROM anon, authenticated;
+
+-- Reading published procedures is public; writes are granted only to authenticated
+-- users and then constrained to administrators by the RLS policies above.
 GRANT SELECT ON public.procedure_definitions, public.procedure_steps TO anon, authenticated;
+GRANT INSERT, UPDATE ON public.procedure_definitions, public.procedure_steps TO authenticated;
+
+-- Dossier steps are read-only through table access. Mutations must go through
+-- transition_dossier_step(), which verifies dossier ownership and allowed transitions.
 GRANT SELECT ON public.dossier_steps TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.initialize_dossier_journey(
