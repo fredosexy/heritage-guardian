@@ -142,3 +142,62 @@ BEGIN
   END IF;
 END;
 $block$;
+
+-- Harden the SECURITY DEFINER helpers inherited from the base schema. Their
+-- second argument must never let a caller inspect another user's ownership,
+-- participation, or role. Existing RLS policies pass auth.uid(), so this keeps
+-- their intended behavior while preventing cross-user probing.
+CREATE OR REPLACE FUNCTION public.has_role(_user_id uuid, _role public.app_role)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+AS $function$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.user_roles ur
+    WHERE ur.user_id = auth.uid()
+      AND ur.user_id = _user_id
+      AND ur.role = _role
+  );
+$function$;
+
+CREATE OR REPLACE FUNCTION public.is_dossier_participant(_dossier_id uuid, _user_id uuid)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+AS $function$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.participants p
+    WHERE p.dossier_id = _dossier_id
+      AND p.user_id = auth.uid()
+      AND p.user_id = _user_id
+  );
+$function$;
+
+CREATE OR REPLACE FUNCTION public.owns_dossier(_dossier_id uuid, _user_id uuid)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+AS $function$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.dossiers d
+    WHERE d.id = _dossier_id
+      AND d.user_id = auth.uid()
+      AND d.user_id = _user_id
+  );
+$function$;
+
+REVOKE ALL ON FUNCTION public.has_role(uuid, public.app_role) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.is_dossier_participant(uuid, uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.owns_dossier(uuid, uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.is_dossier_participant(uuid, uuid) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.owns_dossier(uuid, uuid) TO anon, authenticated, service_role;
