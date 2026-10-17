@@ -50,9 +50,9 @@ jobs:
       - name: Capture dependency audit
         if: always()
         run: |
-          timeout 120s npm audit --json > npm-audit.json || echo '{"error":"npm audit timed out or failed"}' > npm-audit.json
-          timeout 120s npm outdated --json > npm-outdated.json || echo '{"error":"npm outdated timed out or failed"}' > npm-outdated.json
-          timeout 120s npx --yes depcheck --json > depcheck.json || echo '{"error":"depcheck timed out or failed"}' > depcheck.json
+          timeout 120s npm audit --json > npm-audit.json || true
+          timeout 120s npm outdated --json > npm-outdated.json || true
+          timeout 120s npx --yes depcheck --json > depcheck.json || true
       - name: Run Vitest
         run: npm test
       - name: Build application
