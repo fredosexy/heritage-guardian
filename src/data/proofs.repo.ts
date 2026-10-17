@@ -73,7 +73,11 @@ export async function renameProof(proofId: string, title: string): Promise<void>
 }
 
 export async function deleteProof(proof: Pick<Proof, "id" | "storage_path">): Promise<void> {
-  await supabase.storage.from(BUCKET).remove([proof.storage_path]);
+  const { error: storageError } = await supabase.storage.from(BUCKET).remove([proof.storage_path]);
+  // Keep the database record if Storage did not confirm deletion; otherwise the UI
+  // could hide a proof whose file still exists and make recovery unnecessarily hard.
+  if (storageError) throw storageError;
+
   const { error } = await supabase.from("proofs").delete().eq("id", proof.id);
   if (error) throw error;
 }
