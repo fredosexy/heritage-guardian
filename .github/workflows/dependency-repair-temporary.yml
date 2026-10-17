@@ -26,7 +26,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - name: Regenerate lockfile without lifecycle scripts
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
@@ -46,9 +46,9 @@ jobs:
       - name: Capture dependency audit
         if: always()
         run: |
-          npm audit --json > npm-audit.json || true
-          npm outdated --json > npm-outdated.json || true
-          npx --yes depcheck --json > depcheck.json || true
+          timeout 120s npm audit --json > npm-audit.json || echo '{"error":"npm audit timed out or failed"}' > npm-audit.json
+          timeout 120s npm outdated --json > npm-outdated.json || echo '{"error":"npm outdated timed out or failed"}' > npm-outdated.json
+          timeout 120s npx --yes depcheck --json > depcheck.json || echo '{"error":"depcheck timed out or failed"}' > depcheck.json
       - name: Run Vitest
         run: npm test
       - name: Build application
