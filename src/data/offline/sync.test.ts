@@ -58,7 +58,7 @@ describe("offline sync auth revalidation", () => {
       title: "Test",
     };
     state.mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: "user-a" },
+      data: { user: { id: "user-a" } },
       error: null,
     });
     state.mockSupabase.from.mockReset();
