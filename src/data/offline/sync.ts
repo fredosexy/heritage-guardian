@@ -36,12 +36,19 @@ export async function processQueue(): Promise<void> {
     const ops = await db.queue.orderBy("created_at").toArray();
     for (const op of ops) {
       try {
+        // Offline authorization can expire or change while an operation waits.
+        // Revalidate the current identity before touching any queued operation.
+        const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
+        if (sessionError || !currentUser) break;
+
         if (op.kind === "create_dossier") {
           const draft = await db.drafts.where("localId").equals(op.payload.localId).first();
           if (!draft) {
             await db.queue.delete(op.id!);
             continue;
           }
+          // Never replay a visitor's queued draft under a different account.
+          if (draft.user_id !== currentUser.id) break;
           if (draft.synced) {
             await db.queue.delete(op.id!);
             continue;
@@ -66,15 +73,27 @@ export async function processQueue(): Promise<void> {
           emit();
         } else if (op.kind === "update_dossier") {
           const { dossierId, changes, baseUpdatedAt } = op.payload as { dossierId: string; changes: DossierChanges; baseUpdatedAt: string };
-          const { data: remote, error: e1 } = await supabase.from("dossiers").select("*").eq("id", dossierId).single();
+          // Scope the lookup to the current identity as well as the dossier ID.
+          // If the account changed while offline, leave the operation queued.
+          const { data: remote, error: e1 } = await supabase
+            .from("dossiers")
+            .select("*")
+            .eq("id", dossierId)
+            .eq("user_id", currentUser.id)
+            .single();
           if (e1) throw e1;
+          if (remote.user_id !== currentUser.id) break;
           const fields = detectConflictFields(baseUpdatedAt, remote, changes);
           if (fields.length > 0) {
             const theirs: Record<string, string | null> = {};
             for (const f of Object.keys(changes)) theirs[f] = (remote as any)[f] ?? null;
             await db.conflicts.add({ dossier_id: dossierId, title: remote.title, fields, mine: changes as any, theirs, remote_updated_at: remote.updated_at, created_at: Date.now() });
           } else {
-            const { error } = await supabase.from("dossiers").update(changes).eq("id", dossierId);
+            const { error } = await supabase
+              .from("dossiers")
+              .update(changes)
+              .eq("id", dossierId)
+              .eq("user_id", currentUser.id);
             if (error) throw error;
           }
           await db.queue.delete(op.id!);
