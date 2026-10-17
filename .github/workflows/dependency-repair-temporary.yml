@@ -1,0 +1,65 @@
+name: Heritis dependency repair (temporary)
+
+on:
+  push:
+    branches:
+      - codex/terrain-module-foundation
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dependency-repair-{{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  repair-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: codex/terrain-module-foundation
+          token: ${'{'}{ secrets.GITHUB_TOKEN }${'}'}
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Regenerate lockfile without lifecycle scripts
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Commit synchronized lockfile
+        run: |
+          if ! git diff --quiet -- package-lock.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add package-lock.json
+            git commit -m "fix(deps): synchronize npm lockfile"
+            git push origin HEAD:codex/terrain-module-foundation
+          else
+            echo "Lockfile already synchronized."
+          fi
+      - name: Install from the regenerated lockfile
+        run: npm ci --no-audit --no-fund
+      - name: Capture dependency audit
+        if: always()
+        run: |
+          npm audit --json > npm-audit.json || true
+          npm outdated --json > npm-outdated.json || true
+          npx --yes depcheck --json > depcheck.json || true
+      - name: Run Vitest
+        run: npm test
+      - name: Build application
+        run: npm run build
+      - name: Upload dependency reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: heritis-dependency-reports
+          path: |
+            npm-audit.json
+            npm-outdated.json
+            depcheck.json
+          if-no-files-found: warn
