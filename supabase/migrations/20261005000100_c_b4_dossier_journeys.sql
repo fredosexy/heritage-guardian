@@ -56,10 +56,13 @@ CREATE TABLE public.dossier_steps (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (dossier_id, step_order),
-  UNIQUE NULLS NOT DISTINCT (dossier_id, procedure_step_id),
   CHECK ((status = 'terminee') = (completed_at IS NOT NULL)),
   CHECK ((status = 'bloquee') = (blocked_reason IS NOT NULL))
 );
+
+CREATE UNIQUE INDEX dossier_steps_dossier_procedure_step_uidx
+  ON public.dossier_steps (dossier_id, procedure_step_id)
+  WHERE procedure_step_id IS NOT NULL;
 
 CREATE INDEX procedure_definitions_type_idx ON public.procedure_definitions(dossier_type);
 CREATE INDEX procedure_definitions_status_idx ON public.procedure_definitions(status);
