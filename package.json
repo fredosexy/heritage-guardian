@@ -96,9 +96,5 @@
     "vite": "^6.4.1",
     "vitest": "^4.1.11",
     "vite-plugin-pwa": "^0.21.2"
-  },
-  "overrides": {
-    "braces": "^3.0.4",
-    "fast-glob": "^3.3.3"
   }
 }
