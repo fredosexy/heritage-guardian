@@ -28,10 +28,12 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Use stable npm lockfile resolver
+        run: npm install --global npm@9.9.4
       - name: Regenerate lockfile without lifecycle scripts
         run: |
           rm -f package-lock.json
-          npm install --package-lock-only --ignore-scripts --no-audit --no-fund --force
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
       - name: Commit synchronized lockfile
         run: |
           if ! git diff --quiet -- package-lock.json; then
