@@ -2,11 +2,11 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AuthProvider, useAuth } from "./useAuth";
 
-const auth = {
+const auth = vi.hoisted(() => ({
   onAuthStateChange: vi.fn(),
   getSession: vi.fn(),
   signOut: vi.fn(),
-};
+}));
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: { auth },
