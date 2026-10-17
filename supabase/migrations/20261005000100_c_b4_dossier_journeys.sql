@@ -132,7 +132,7 @@ DECLARE
   dossier_row public.dossiers;
 BEGIN
   SELECT * INTO dossier_row FROM public.dossiers WHERE id = p_dossier_id FOR UPDATE;
-  IF NOT FOUND OR dossier_row.user_id <> current_user_id THEN
+  IF NOT FOUND OR current_user_id IS NULL OR dossier_row.user_id IS DISTINCT FROM current_user_id THEN
     RAISE EXCEPTION 'journey_initialization_forbidden' USING ERRCODE = '42501';
   END IF;
 
@@ -203,7 +203,7 @@ BEGIN
   SELECT status, dossier_id INTO current_status, dossier_ref
   FROM public.dossier_steps WHERE id = p_step_id FOR UPDATE;
 
-  IF NOT FOUND OR NOT public.owns_dossier(dossier_ref, current_user_id) THEN
+  IF NOT FOUND OR current_user_id IS NULL OR NOT public.owns_dossier(dossier_ref, current_user_id) THEN
     RAISE EXCEPTION 'step_transition_forbidden' USING ERRCODE = '42501';
   END IF;
 
