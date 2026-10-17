@@ -2,6 +2,44 @@ import { corsHeaders } from "@supabase/supabase-js/cors";
 
 const jsonHeaders = { ...corsHeaders, "Content-Type": "application/json" };
 
+async function readJsonBody(req: Request, maxBytes: number): Promise<
+  { kind: "ok"; value: unknown } | { kind: "too_large" } | { kind: "invalid" }
+> {
+  const declaredLength = Number(req.headers.get("content-length"));
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { kind: "too_large" };
+  if (!req.body) return { kind: "invalid" };
+
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        await reader.cancel();
+        return { kind: "too_large" };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { kind: "invalid" };
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try {
+    return { kind: "ok", value: JSON.parse(new TextDecoder().decode(bytes)) };
+  } catch {
+    return { kind: "invalid" };
+  }
+}
+
 function emptySuggestions(status = 200, error?: string) {
   return new Response(JSON.stringify(error ? { suggestions: [], error } : { suggestions: [] }), {
     status,
@@ -19,12 +57,10 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return emptySuggestions(405, "method_not_allowed");
 
-  let payload: unknown;
-  try {
-    payload = await req.json();
-  } catch {
-    return emptySuggestions(400, "invalid_json");
-  }
+  const parsedBody = await readJsonBody(req, 16 * 1024);
+  if (parsedBody.kind === "too_large") return emptySuggestions(413, "request_too_large");
+  if (parsedBody.kind === "invalid") return emptySuggestions(400, "invalid_json");
+  const payload = parsedBody.value;
 
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     return emptySuggestions(400, "invalid_payload");
