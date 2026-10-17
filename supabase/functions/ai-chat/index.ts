@@ -9,16 +9,52 @@ function errorResponse(message: string, status: number) {
   return new Response(JSON.stringify({ error: message }), { status, headers: jsonHeaders });
 }
 
+async function readJsonBody(req: Request, maxBytes: number): Promise<
+  { kind: "ok"; value: unknown } | { kind: "too_large" } | { kind: "invalid" }
+> {
+  const declaredLength = Number(req.headers.get("content-length"));
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { kind: "too_large" };
+  if (!req.body) return { kind: "invalid" };
+
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        await reader.cancel();
+        return { kind: "too_large" };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { kind: "invalid" };
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try {
+    return { kind: "ok", value: JSON.parse(new TextDecoder().decode(bytes)) };
+  } catch {
+    return { kind: "invalid" };
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return errorResponse("method_not_allowed", 405);
 
-  let payload: unknown;
-  try {
-    payload = await req.json();
-  } catch {
-    return errorResponse("invalid_json", 400);
-  }
+  const parsedBody = await readJsonBody(req, 131072);
+  if (parsedBody.kind === "too_large") return errorResponse("request_too_large", 413);
+  if (parsedBody.kind === "invalid") return errorResponse("invalid_json", 400);
+  const payload = parsedBody.value;
 
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     return errorResponse("invalid_payload", 400);
