@@ -7,7 +7,7 @@ export interface ChatMessage {
 }
 
 export class AiUnavailableError extends Error {
-  constructor(public reason: "rate_limit" | "credits" | "unknown") {
+  constructor(public reason: "rate_limit" | "credits" | "auth_required" | "unknown") {
     super(reason);
   }
 }
@@ -35,13 +35,17 @@ export async function streamChat(params: {
   language: string;
   onDelta: (fullText: string) => void;
 }): Promise<void> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) throw new AiUnavailableError("auth_required");
+
   const response = await fetch(
     `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({ messages: params.messages, language: params.language }),
     }
