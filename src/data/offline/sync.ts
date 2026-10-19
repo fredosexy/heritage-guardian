@@ -154,6 +154,8 @@ export async function deleteLocalDraft(localId: string): Promise<void> {
  */
 export async function claimLocalDrafts(fromUserId: string, toUserId: string): Promise<number> {
   if (!fromUserId || fromUserId === toUserId) return 0;
+  const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError || !currentUser || currentUser.id !== toUserId) return 0;
   const drafts = await db.drafts.where({ user_id: fromUserId, synced: 0 }).toArray();
   for (const draft of drafts) {
     await db.drafts.update(draft.id!, { user_id: toUserId, updated_at: Date.now() });
@@ -185,7 +187,23 @@ export async function discardQueuedOp(id: number) {
 export async function resolveConflict(conflictId: number, values: DossierChanges) {
   const c = await db.conflicts.get(conflictId);
   if (!c) return;
-  const { error } = await supabase.from("dossiers").update(values).eq("id", c.dossier_id);
+
+  const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError || !currentUser) throw new Error("Session requise pour résoudre ce conflit");
+
+  const { error: lookupError } = await supabase
+    .from("dossiers")
+    .select("id")
+    .eq("id", c.dossier_id)
+    .eq("user_id", currentUser.id)
+    .single();
+  if (lookupError) throw lookupError;
+
+  const { error } = await supabase
+    .from("dossiers")
+    .update(values)
+    .eq("id", c.dossier_id)
+    .eq("user_id", currentUser.id);
   if (error) throw error;
   await db.conflicts.delete(conflictId);
   emit();
