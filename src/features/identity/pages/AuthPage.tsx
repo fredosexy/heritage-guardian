@@ -74,8 +74,8 @@ export default function Auth() {
       if (error) throw error;
       toast.success(t("auth.signedIn"));
       navigate("/");
-    } catch (e: any) {
-      toast.error(e.message || t("auth.error"));
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : t("auth.error"));
     } finally {
       setLoading(false);
     }
