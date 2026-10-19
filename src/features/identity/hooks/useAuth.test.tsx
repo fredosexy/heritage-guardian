@@ -2,6 +2,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AuthProvider, useAuth } from "./useAuth";
 
+type TestSession = { user: { id: string } };
+
 const auth = vi.hoisted(() => ({
   onAuthStateChange: vi.fn(),
   getSession: vi.fn(),
@@ -27,7 +29,7 @@ function Probe() {
 }
 
 describe("AuthProvider session lifecycle", () => {
-  let authListener: ((event: string, session: any) => void) | undefined;
+  let authListener: ((event: string, session: TestSession | null) => void) | undefined;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -51,8 +53,10 @@ describe("AuthProvider session lifecycle", () => {
   });
 
   it("does not restore a stale session after a newer auth event", async () => {
-    let resolveSession!: (value: any) => void;
-    auth.getSession.mockReturnValue(new Promise((resolve) => { resolveSession = resolve; }));
+    let resolveSession!: (value: { data: { session: TestSession | null }; error: null }) => void;
+    auth.getSession.mockReturnValue(new Promise<{ data: { session: TestSession | null }; error: null }>((resolve) => {
+      resolveSession = resolve;
+    }));
 
     render(<AuthProvider><Probe /></AuthProvider>);
 
