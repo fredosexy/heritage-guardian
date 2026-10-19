@@ -1,15 +1,48 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+type TestDraft = {
+  id: number;
+  localId: string;
+  user_id: string;
+  synced: 0 | 1;
+  type: string;
+  title: string;
+  created_at: number;
+  updated_at: number;
+};
+
+type TestQueuedOp =
+  | {
+      id: number;
+      kind: "create_dossier";
+      payload: { localId: string };
+      created_at: number;
+      attempts: number;
+    }
+  | {
+      id: number;
+      kind: "update_dossier";
+      payload: {
+        dossierId: string;
+        changes: { title: string };
+        baseUpdatedAt: string;
+      };
+      created_at: number;
+      attempts: number;
+    };
+
 const state = vi.hoisted(() => ({
-  queuedOps: [] as any[],
+  queuedOps: [] as TestQueuedOp[],
   draft: {
     id: 10,
     localId: "draft-1",
     user_id: "user-a",
-    synced: 0,
+    synced: 0 as const,
     type: "family",
     title: "Test",
-  } as any,
+    created_at: 1,
+    updated_at: 1,
+  } as TestDraft,
   mockDb: {
     queue: {
       orderBy: vi.fn(),
@@ -56,6 +89,8 @@ describe("offline sync auth revalidation", () => {
       synced: 0,
       type: "family",
       title: "Test",
+      created_at: 1,
+      updated_at: 1,
     };
     state.mockSupabase.auth.getUser.mockResolvedValue({
       data: { user: { id: "user-a" } },
@@ -115,7 +150,11 @@ describe("offline sync auth revalidation", () => {
     state.queuedOps = [{
       id: 2,
       kind: "update_dossier",
-      payload: { dossierId: "dossier-owned-by-a", changes: { title: "Changed" }, baseUpdatedAt: "2026-01-01T00:00:00Z" },
+      payload: {
+        dossierId: "dossier-owned-by-a",
+        changes: { title: "Changed" },
+        baseUpdatedAt: "2026-01-01T00:00:00Z",
+      },
       created_at: 1,
       attempts: 0,
     }];
