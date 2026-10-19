@@ -57,7 +57,7 @@ export async function processQueue(): Promise<void> {
             .from("dossiers")
             .insert({
               user_id: draft.user_id,
-              type: draft.type as any,
+              type: draft.type,
               title: draft.title,
               description: draft.description || null,
               location_name: draft.location_name || null,
@@ -86,8 +86,8 @@ export async function processQueue(): Promise<void> {
           const fields = detectConflictFields(baseUpdatedAt, remote, changes);
           if (fields.length > 0) {
             const theirs: Record<string, string | null> = {};
-            for (const f of Object.keys(changes)) theirs[f] = (remote as any)[f] ?? null;
-            await db.conflicts.add({ dossier_id: dossierId, title: remote.title, fields, mine: changes as any, theirs, remote_updated_at: remote.updated_at, created_at: Date.now() });
+            for (const f of Object.keys(changes) as (keyof DossierChanges)[]) theirs[f] = remote[f] ?? null;
+            await db.conflicts.add({ dossier_id: dossierId, title: remote.title, fields, mine: Object.fromEntries(Object.entries(changes).map(([key, value]) => [key, value ?? null])), theirs, remote_updated_at: remote.updated_at, created_at: Date.now() });
           } else {
             const { error } = await supabase
               .from("dossiers")
@@ -102,10 +102,10 @@ export async function processQueue(): Promise<void> {
           // Other kinds not implemented yet — drop
           await db.queue.delete(op.id!);
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         await db.queue.update(op.id!, {
           attempts: (op.attempts || 0) + 1,
-          last_error: e?.message || String(e),
+          last_error: e instanceof Error ? e.message : String(e),
         });
         // Stop loop on first failure to retry later
         break;
