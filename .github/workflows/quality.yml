@@ -18,7 +18,13 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - name: Install dependencies
+        id: install-dependencies
+        run: npm ci
       - run: npm test
       - run: npm run lint
-      - run: npm run build
+      # Keep build diagnostics available even when lint or tests fail, provided
+      # dependencies were installed successfully.
+      - name: Run production build
+        if: always() && steps.install-dependencies.outcome == 'success'
+        run: npm run build
