@@ -87,7 +87,7 @@ export async function processQueue(): Promise<void> {
           if (fields.length > 0) {
             const theirs: Record<string, string | null> = {};
             for (const f of Object.keys(changes) as (keyof DossierChanges)[]) theirs[f] = remote[f] ?? null;
-            await db.conflicts.add({ dossier_id: dossierId, title: remote.title, fields, mine: Object.fromEntries(Object.entries(changes).map(([key, value]) => [key, value ?? null])), theirs, remote_updated_at: remote.updated_at, created_at: Date.now() });
+            await db.conflicts.add({ dossier_id: dossierId, title: remote.title, fields, mine: Object.fromEntries(Object.entries(changes).map(([key, value]) => [key, value ?? null])) as Record<string, string | null>, theirs, remote_updated_at: remote.updated_at, created_at: Date.now() });
           } else {
             const { error } = await supabase
               .from("dossiers")
