@@ -105,7 +105,7 @@ export async function processQueue(): Promise<void> {
       } catch (e: unknown) {
         await db.queue.update(op.id!, {
           attempts: (op.attempts || 0) + 1,
-          last_error: e instanceof Error ? e.message : String(e),
+          last_error: e instanceof Error ? e.message : typeof e === "object" && e !== null && "message" in e && typeof e.message === "string" ? e.message : String(e),
         });
         // Stop loop on first failure to retry later
         break;
