@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,7 +26,7 @@ export default function Auth() {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
-  const handleEmail = async (e: React.FormEvent) => {
+  const handleEmail = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -45,8 +46,8 @@ export default function Auth() {
         toast.success(t("auth.signedIn"));
       }
       navigate("/");
-    } catch (e: any) {
-      toast.error(e.message || t("auth.error"));
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : t("auth.error"));
     } finally {
       setLoading(false);
     }
@@ -59,8 +60,8 @@ export default function Auth() {
       if (error) throw error;
       setOtpSent(true);
       toast.success("Code envoyé");
-    } catch (e: any) {
-      toast.error(e.message || t("auth.error"));
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : t("auth.error"));
     } finally {
       setLoading(false);
     }
