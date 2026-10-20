@@ -1,22 +1,103 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   storageRemove: vi.fn(),
+  storageUpload: vi.fn(),
   proofDelete: vi.fn(),
   proofDeleteEq: vi.fn(),
+  proofInsert: vi.fn(),
+  proofSelect: vi.fn(),
+  proofSingle: vi.fn(),
   from: vi.fn(),
 }));
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     storage: {
-      from: vi.fn(() => ({ remove: mocks.storageRemove })),
+      from: vi.fn(() => ({ remove: mocks.storageRemove, upload: mocks.storageUpload })),
     },
     from: mocks.from,
   },
 }));
 
-import { deleteProof } from "@/data/proofs.repo";
+import { ProofPersistenceError, deleteProof, uploadProof } from "@/data/proofs.repo";
+
+describe("proof persistence", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.from.mockReturnValue({ delete: mocks.proofDelete });
+    mocks.proofDelete.mockReturnValue({ eq: mocks.proofDeleteEq });
+    mocks.proofDeleteEq.mockResolvedValue({ error: null });
+    mocks.storageUpload.mockResolvedValue({ error: null });
+    mocks.proofInsert.mockReturnValue({ select: mocks.proofSelect });
+    mocks.proofSelect.mockReturnValue({ single: mocks.proofSingle });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("uploads the object and persists a proof attached to the requested Terrain section", async () => {
+    vi.spyOn(Date, "now").mockReturnValue(123456);
+    const file = new File(["acte"], "titre.pdf", { type: "application/pdf" });
+    const savedProof = {
+      id: "proof-1",
+      dossier_id: "dossier-1",
+      storage_path: "user-1/dossier-1/123456-titre.pdf",
+      metadata: { terrainSectionKey: "documentation" },
+    };
+    mocks.from.mockReturnValue({ insert: mocks.proofInsert });
+    mocks.proofSingle.mockResolvedValue({ data: savedProof, error: null });
+
+    await expect(uploadProof({
+      file,
+      dossierId: "dossier-1",
+      userId: "user-1",
+      sectionKey: "documentation",
+    })).resolves.toEqual(savedProof);
+
+    expect(mocks.storageUpload).toHaveBeenCalledWith(
+      "user-1/dossier-1/123456-titre.pdf",
+      file,
+    );
+    expect(mocks.from).toHaveBeenCalledWith("proofs");
+    expect(mocks.proofInsert).toHaveBeenCalledWith(expect.objectContaining({
+      dossier_id: "dossier-1",
+      uploaded_by: "user-1",
+      type: "document",
+      title: "titre.pdf",
+      storage_path: "user-1/dossier-1/123456-titre.pdf",
+      metadata: { terrainSectionKey: "documentation" },
+    }));
+  });
+
+  it("preserves the Storage path when the proof row cannot be persisted", async () => {
+    vi.spyOn(Date, "now").mockReturnValue(123456);
+    const file = new File(["acte"], "titre.pdf", { type: "application/pdf" });
+    const databaseError = new Error("database unavailable");
+    mocks.from.mockReturnValue({ insert: mocks.proofInsert });
+    mocks.proofSingle.mockResolvedValue({ data: null, error: databaseError });
+
+    let thrown: unknown;
+    try {
+      await uploadProof({
+        file,
+        dossierId: "dossier-1",
+        userId: "user-1",
+        sectionKey: "documentation",
+      });
+    } catch (error) {
+      thrown = error;
+    }
+
+    expect(thrown).toBeInstanceOf(ProofPersistenceError);
+    expect(thrown).toMatchObject({
+      storagePath: "user-1/dossier-1/123456-titre.pdf",
+      cause: databaseError,
+    });
+    expect(mocks.storageUpload).toHaveBeenCalledOnce();
+  });
+});
 
 describe("deleteProof", () => {
   beforeEach(() => {
