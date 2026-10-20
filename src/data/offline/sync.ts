@@ -15,6 +15,14 @@ function emit() {
   listeners.forEach((l) => l());
 }
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "object" && error !== null && "message" in error && typeof error.message === "string") {
+    return error.message;
+  }
+  return String(error);
+}
+
 export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "synced" | "created_at" | "updated_at"> & { localId: string }) {
   const now = Date.now();
   await db.drafts.add({ ...draft, created_at: now, updated_at: now, synced: 0 });
@@ -148,9 +156,9 @@ export async function processQueue(): Promise<void> {
           emit();
           try {
             await proceduresRepo.initializeDossierJourney(data.id);
-          } catch (journeyError: any) {
-            const code = journeyError?.code;
-            const message = journeyError?.message || String(journeyError);
+          } catch (journeyError: unknown) {
+            const code = typeof journeyError === "object" && journeyError !== null && "code" in journeyError ? journeyError.code : undefined;
+            const message = getErrorMessage(journeyError);
             if (code !== "P0002" && !message.includes("published_procedure_not_found")) {
               await db.queue.add({
                 kind: "initialize_journey",
@@ -315,10 +323,10 @@ export async function processQueue(): Promise<void> {
           });
           break;
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         await db.queue.update(op.id!, {
           attempts: (op.attempts || 0) + 1,
-          last_error: e?.message || String(e),
+          last_error: getErrorMessage(e),
         });
         break;
       }
