@@ -241,3 +241,65 @@ describe("proof upload queue retry", () => {
     expect(mocks.queued.has(42)).toBe(true);
   });
 });
+
+
+describe("Terrain section persistence after offline replay", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
+  });
+
+  it("writes all nine saved sections while preserving unrelated server metadata", async () => {
+    const sections = {
+      histoire: "Historique familial",
+      provenance: "Acte de provenance",
+      proprietaires: "Deux propriétaires déclarés",
+      ayantsDroit: "Ayants droit recensés",
+      documentation: "Titre foncier",
+      localisation: "Village et repères",
+      dimensions: "Surface mesurée",
+      etat: "Terrain cultivé",
+      miseEnValeur: "Plantations existantes",
+    };
+    const updates: any[] = [];
+
+    mocks.supabaseFrom.mockImplementation(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          single: vi.fn().mockResolvedValue({
+            data: {
+              metadata: {
+                dossierNote: "ne pas écraser",
+                terrain: { sections: { histoire: "Ancienne valeur", champServeur: "conserver" } },
+              },
+            },
+            error: null,
+          }),
+        })),
+      })),
+      update: vi.fn((values: any) => ({
+        eq: vi.fn(async () => {
+          updates.push(values.metadata);
+          return { error: null };
+        }),
+      })),
+    }));
+
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { version: 1, sections },
+    });
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+    await processQueue();
+
+    expect(updates).toHaveLength(1);
+    expect(updates[0]).toEqual({
+      dossierNote: "ne pas écraser",
+      terrain: {
+        sections: { ...sections, champServeur: "conserver" },
+        version: 1,
+      },
+    });
+    expect(mocks.queued.size).toBe(0);
+  });
+});
