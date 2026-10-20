@@ -10,6 +10,22 @@ permissions:
   contents: read
 
 jobs:
+  database-migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.81.3
+      - name: Start isolated local Supabase stack
+        run: supabase start
+      - name: Apply every migration to a fresh local database
+        run: supabase db reset --local
+      - name: Stop local Supabase stack
+        if: always()
+        run: supabase stop --no-backup
+
   test:
     runs-on: ubuntu-latest
     steps:
