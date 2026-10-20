@@ -155,7 +155,9 @@ export async function deleteLocalDraft(localId: string): Promise<void> {
 export async function claimLocalDrafts(fromUserId: string, toUserId: string): Promise<number> {
   if (!fromUserId || fromUserId === toUserId) return 0;
   const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
-  if (sessionError || !currentUser || currentUser.id !== toUserId) return 0;
+  if (sessionError || !currentUser || currentUser.id !== toUserId) {
+    throw new Error("Session active du compte cible requise pour rattacher les brouillons");
+  }
   const drafts = await db.drafts.where({ user_id: fromUserId, synced: 0 }).toArray();
   for (const draft of drafts) {
     await db.drafts.update(draft.id!, { user_id: toUserId, updated_at: Date.now() });
