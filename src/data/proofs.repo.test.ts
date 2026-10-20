@@ -74,6 +74,7 @@ describe("proof persistence", () => {
 
   it("preserves the Storage path when the proof row cannot be persisted", async () => {
     vi.spyOn(Date, "now").mockReturnValue(123456);
+    vi.spyOn(Math, "random").mockReturnValue(0.5);
     const file = new File(["acte"], "titre.pdf", { type: "application/pdf" });
     const databaseError = new Error("database unavailable");
     mocks.from.mockReturnValue({ insert: mocks.proofInsert });
