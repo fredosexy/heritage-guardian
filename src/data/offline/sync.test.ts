@@ -42,6 +42,7 @@ vi.mock("@/data/offline/db", () => ({
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
+    auth: { getUser: vi.fn(async () => ({ data: { user: { id: "user-1" } }, error: null })) },
     storage: { from: vi.fn(() => ({ upload: mocks.storageUpload })) },
     from: mocks.supabaseFrom,
   },
@@ -93,8 +94,9 @@ describe("sync queue concurrency", () => {
     const updatePayloads: any[] = [];
 
     mocks.supabaseFrom.mockImplementation(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
+      select: vi.fn(() => {
+        const query: any = {
+          eq: vi.fn(() => query),
           single: vi.fn(() => {
             readCount += 1;
             if (readCount === 1) {
@@ -102,12 +104,13 @@ describe("sync queue concurrency", () => {
               return firstRead;
             }
             return Promise.resolve({
-              data: { metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
+              data: { user_id: "user-1", metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
               error: null,
             });
           }),
-        })),
-      })),
+        };
+        return query;
+      }),
       update: vi.fn((values: any) => ({
         eq: vi.fn(async () => {
           updatePayloads.push(values.metadata);
@@ -129,7 +132,7 @@ describe("sync queue concurrency", () => {
     });
 
     releaseFirstRead({
-      data: { metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
+      data: { user_id: "user-1", metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
       error: null,
     });
     await firstPass;
@@ -158,7 +161,16 @@ describe("proof upload queue retry", () => {
     Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
     mocks.storageUpload.mockResolvedValue({ error: null });
     mocks.proofUpsert.mockResolvedValue({ error: null });
-    mocks.supabaseFrom.mockReturnValue({ upsert: mocks.proofUpsert });
+    mocks.supabaseFrom.mockImplementation((table: string) => {
+      if (table === "dossiers") {
+        const query: any = {
+          eq: vi.fn(() => query),
+          single: vi.fn().mockResolvedValue({ data: { id: "dossier-1", user_id: "user-1" }, error: null }),
+        };
+        return { select: vi.fn(() => query) };
+      }
+      return { upsert: mocks.proofUpsert };
+    });
   });
 
   it("keeps a failed proof operation and retries with the same storage path", async () => {
@@ -315,10 +327,12 @@ describe("Terrain section persistence after offline replay", () => {
     const updates: any[] = [];
 
     mocks.supabaseFrom.mockImplementation(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
+      select: vi.fn(() => {
+        const query: any = {
+          eq: vi.fn(() => query),
           single: vi.fn().mockResolvedValue({
             data: {
+              user_id: "user-1",
               metadata: {
                 dossierNote: "ne pas écraser",
                 terrain: { sections: { histoire: "Ancienne valeur", champServeur: "conserver" } },
@@ -326,8 +340,9 @@ describe("Terrain section persistence after offline replay", () => {
             },
             error: null,
           }),
-        })),
-      })),
+        };
+        return query;
+      }),
       update: vi.fn((values: any) => ({
         eq: vi.fn(async () => {
           updates.push(values.metadata);
