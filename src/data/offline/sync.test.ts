@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => {
       return id;
     }),
     queueGet: vi.fn(async (id: number) => queued.get(id)),
+    conflictAdd: vi.fn(async (conflict: any) => conflict),
     storageUpload: vi.fn(),
     proofUpsert: vi.fn(),
     supabaseFrom: vi.fn(),
@@ -33,6 +34,7 @@ vi.mock("@/data/offline/db", () => ({
       add: mocks.queueAdd,
       get: mocks.queueGet,
     },
+    conflicts: { add: mocks.conflictAdd },
     drafts: {
       where: vi.fn(),
       update: vi.fn(),
@@ -374,5 +376,58 @@ describe("Terrain section persistence after offline replay", () => {
       },
     });
     expect(mocks.queued.size).toBe(0);
+  });
+});
+
+
+describe("offline field conflict detection", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+  });
+
+  it("persists an overlapping edit for Sync Center instead of overwriting the server", async () => {
+    mocks.queued.set(51, {
+      id: 51,
+      kind: "update_dossier",
+      created_at: 100,
+      attempts: 0,
+      payload: {
+        dossierId: "dossier-1",
+        changes: { title: "Titre local" },
+        baseUpdatedAt: "2026-01-01T00:00:00Z",
+      },
+    });
+    const update = vi.fn();
+    const query: any = {
+      eq: vi.fn(() => query),
+      single: vi.fn().mockResolvedValue({
+        data: {
+          id: "dossier-1",
+          user_id: "user-1",
+          title: "Titre serveur",
+          description: null,
+          location_name: null,
+          updated_at: "2026-01-02T00:00:00Z",
+        },
+        error: null,
+      }),
+    };
+    mocks.supabaseFrom.mockImplementation(() => ({
+      select: vi.fn(() => query),
+      update,
+    }));
+
+    await processQueue();
+
+    expect(mocks.conflictAdd).toHaveBeenCalledWith(expect.objectContaining({
+      dossier_id: "dossier-1",
+      fields: ["title"],
+      mine: { title: "Titre local" },
+      theirs: { title: "Titre serveur" },
+    }));
+    expect(update).not.toHaveBeenCalled();
+    expect(mocks.queued.has(51)).toBe(false);
   });
 });
