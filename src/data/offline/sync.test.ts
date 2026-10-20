@@ -81,7 +81,7 @@ describe("sync queue concurrency", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.queued.clear();
-    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
   });
 
   it("replays a section edit queued while an earlier sync request is in flight", async () => {
@@ -119,7 +119,8 @@ describe("sync queue concurrency", () => {
     await enqueueUpdateDossierMetadata("dossier-1", {
       terrain: { sections: { histoire: "Historique" } },
     });
-    // Start the first pass explicitly after the enqueue has created the operation.
+    // Prevent enqueue from starting the first pass until the mock network is ready.
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
     const firstPass = processQueue();
     await firstReadStarted;
 
