@@ -13,11 +13,12 @@ export async function claimLocalData(userId: string): Promise<ClaimResult> {
   const guest = getGuestIdentity();
   if (guest.id === userId) return { claimedDossiers: 0 };
 
-  let claimedDossiers = 0;
+  let claimedDossiers: number;
   try {
     claimedDossiers = await claimLocalDrafts(guest.id, userId);
   } catch {
-    /* la file réessaiera plus tard */
+    // Keep the guest identity so the same local drafts can be claimed on a later attempt.
+    return { claimedDossiers: 0 };
   }
 
   if (guest.firstName) {
