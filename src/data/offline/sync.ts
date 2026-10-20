@@ -48,7 +48,7 @@ export async function enqueueUpdateDossier(dossierId: string, changes: DossierCh
 export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: Record<string, unknown>) {
   // Coalesce pending edits without dropping sections saved by an earlier offline edit.
   const pending = await db.queue.where("kind").equals("update_dossier").toArray();
-  const existing = pending.find((op) => op.payload?.dossierId === dossierId);
+  const existing = pending.find((op) => op.payload?.dossierId === dossierId && op.payload?.metadata && typeof op.payload.metadata === "object" && !Array.isArray(op.payload.metadata));
   if (existing?.id) {
     const previous = existing.payload?.metadata && typeof existing.payload.metadata === "object" && !Array.isArray(existing.payload.metadata)
       ? existing.payload.metadata as Record<string, unknown>
