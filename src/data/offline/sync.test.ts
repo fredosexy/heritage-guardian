@@ -191,4 +191,66 @@ describe("offline sync auth revalidation", () => {
       expect.objectContaining({ attempts: 1 }),
     );
   });
+
+  it("does not claim visitor drafts unless the current session matches the target account", async () => {
+    state.mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: "different-user" } },
+      error: null,
+    });
+
+    const claimed = await claimLocalDrafts("guest-user", "user-b");
+
+    expect(claimed).toBe(0);
+    expect(state.mockDb.drafts.update).not.toHaveBeenCalled();
+    expect(state.mockDb.queue.add).not.toHaveBeenCalled();
+  });
+
+  it("claims visitor drafts only for the authenticated target account", async () => {
+    state.draft.user_id = "guest-user";
+    state.mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: "user-b" } },
+      error: null,
+    });
+
+    const claimed = await claimLocalDrafts("guest-user", "user-b");
+
+    expect(claimed).toBe(1);
+    expect(state.mockDb.drafts.update).toHaveBeenCalledWith(10, expect.objectContaining({ user_id: "user-b" }));
+    expect(state.mockDb.queue.add).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "create_dossier",
+      payload: { localId: "draft-1" },
+    }));
+  });
+
+  it("does not resolve a local conflict when the current account cannot access its dossier", async () => {
+    state.mockDb.conflicts.get.mockResolvedValue({
+      id: 7,
+      dossier_id: "dossier-owned-by-a",
+      title: "Private dossier",
+      fields: ["title"],
+      mine: { title: "mine" },
+      theirs: { title: "theirs" },
+      remote_updated_at: "2026-01-01T00:00:00Z",
+      created_at: 1,
+    });
+    state.mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: "user-b" } },
+      error: null,
+    });
+    const selectChain = {
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: null, error: { message: "Not found" } }),
+    };
+    const update = vi.fn();
+    state.mockSupabase.from.mockReturnValue({
+      select: vi.fn(() => selectChain),
+      update,
+    });
+
+    await expect(resolveConflict(7, { title: "chosen" })).rejects.toThrow("Not found");
+
+    expect(update).not.toHaveBeenCalled();
+    expect(state.mockDb.conflicts.delete).not.toHaveBeenCalled();
+  });
+
 });
