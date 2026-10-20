@@ -11,19 +11,19 @@ import { AuthProvider } from "@/features/identity";
  * toujours avec un tableau vide.
  */
 vi.mock("@/integrations/supabase/client", () => {
-  const makeChain = (): any => {
+  const makeChain = () => {
     const promise = Promise.resolve({ data: [], error: null });
-    const target: any = {
+    const target: Record<string, unknown> = {
       then: promise.then.bind(promise),
       catch: promise.catch.bind(promise),
       finally: promise.finally.bind(promise),
     };
-    const proxy: any = new Proxy(target, {
+    const proxy = new Proxy(target, {
       get(t, prop) {
-        if (prop in t) return t[prop];
+        if (typeof prop === "string" && prop in t) return t[prop];
         return () => proxy;
       },
-    });
+    }) as Record<string, unknown>;
     return proxy;
   };
   return {

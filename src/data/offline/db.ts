@@ -1,10 +1,12 @@
 import Dexie, { Table } from "dexie";
+import type { Database, Json } from "@/integrations/supabase/types";
+import type { DossierChanges } from "@/services/sync-conflicts";
 
 export interface DraftDossier {
   id?: number;
   localId: string;
   user_id: string;
-  type: string;
+  type: Database["public"]["Enums"]["dossier_type"];
   title: string;
   description?: string | null;
   location_name?: string | null;
@@ -16,14 +18,10 @@ export interface DraftDossier {
   remote_id?: string | null;
 }
 
-export interface QueuedOp {
-  id?: number;
-  kind: "create_dossier" | "update_dossier" | "delete_dossier";
-  payload: any;
-  created_at: number;
-  attempts: number;
-  last_error?: string | null;
-}
+export type QueuedOp =
+  | { id?: number; kind: "create_dossier"; payload: { localId: string }; created_at: number; attempts: number; last_error?: string | null }
+  | { id?: number; kind: "update_dossier"; payload: { dossierId: string; changes: DossierChanges; baseUpdatedAt: string }; created_at: number; attempts: number; last_error?: string | null }
+  | { id?: number; kind: "delete_dossier"; payload: { dossierId: string }; created_at: number; attempts: number; last_error?: string | null };
 
 export interface SyncConflict {
   id?: number;
@@ -39,7 +37,7 @@ export interface SyncConflict {
 export interface CachedDossier {
   id: string;
   user_id: string;
-  data: any;
+  data: Json;
   cached_at: number;
 }
 

@@ -109,6 +109,8 @@ CREATE POLICY "owners view dossier steps"
 
 REVOKE ALL ON public.procedure_definitions, public.procedure_steps, public.dossier_steps FROM anon, authenticated;
 GRANT SELECT ON public.procedure_definitions, public.procedure_steps TO anon, authenticated;
+-- RLS admin policies authorize writes; SQL privileges must also permit those operations.
+GRANT INSERT, UPDATE ON public.procedure_definitions, public.procedure_steps TO authenticated;
 GRANT SELECT ON public.dossier_steps TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.initialize_dossier_journey(

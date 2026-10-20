@@ -36,12 +36,19 @@ export async function processQueue(): Promise<void> {
     const ops = await db.queue.orderBy("created_at").toArray();
     for (const op of ops) {
       try {
+        // Offline authorization can expire or change while an operation waits.
+        // Revalidate the current identity before touching any queued operation.
+        const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
+        if (sessionError || !currentUser) break;
+
         if (op.kind === "create_dossier") {
           const draft = await db.drafts.where("localId").equals(op.payload.localId).first();
           if (!draft) {
             await db.queue.delete(op.id!);
             continue;
           }
+          // Never replay a visitor's queued draft under a different account.
+          if (draft.user_id !== currentUser.id) break;
           if (draft.synced) {
             await db.queue.delete(op.id!);
             continue;
@@ -50,7 +57,7 @@ export async function processQueue(): Promise<void> {
             .from("dossiers")
             .insert({
               user_id: draft.user_id,
-              type: draft.type as any,
+              type: draft.type,
               title: draft.title,
               description: draft.description || null,
               location_name: draft.location_name || null,
@@ -66,15 +73,27 @@ export async function processQueue(): Promise<void> {
           emit();
         } else if (op.kind === "update_dossier") {
           const { dossierId, changes, baseUpdatedAt } = op.payload as { dossierId: string; changes: DossierChanges; baseUpdatedAt: string };
-          const { data: remote, error: e1 } = await supabase.from("dossiers").select("*").eq("id", dossierId).single();
+          // Scope the lookup to the current identity as well as the dossier ID.
+          // If the account changed while offline, leave the operation queued.
+          const { data: remote, error: e1 } = await supabase
+            .from("dossiers")
+            .select("*")
+            .eq("id", dossierId)
+            .eq("user_id", currentUser.id)
+            .single();
           if (e1) throw e1;
+          if (remote.user_id !== currentUser.id) break;
           const fields = detectConflictFields(baseUpdatedAt, remote, changes);
           if (fields.length > 0) {
             const theirs: Record<string, string | null> = {};
-            for (const f of Object.keys(changes)) theirs[f] = (remote as any)[f] ?? null;
-            await db.conflicts.add({ dossier_id: dossierId, title: remote.title, fields, mine: changes as any, theirs, remote_updated_at: remote.updated_at, created_at: Date.now() });
+            for (const f of Object.keys(changes) as (keyof DossierChanges)[]) theirs[f] = remote[f] ?? null;
+            await db.conflicts.add({ dossier_id: dossierId, title: remote.title, fields, mine: Object.fromEntries(Object.entries(changes).map(([key, value]) => [key, value ?? null])) as Record<string, string | null>, theirs, remote_updated_at: remote.updated_at, created_at: Date.now() });
           } else {
-            const { error } = await supabase.from("dossiers").update(changes).eq("id", dossierId);
+            const { error } = await supabase
+              .from("dossiers")
+              .update(changes)
+              .eq("id", dossierId)
+              .eq("user_id", currentUser.id);
             if (error) throw error;
           }
           await db.queue.delete(op.id!);
@@ -83,10 +102,10 @@ export async function processQueue(): Promise<void> {
           // Other kinds not implemented yet — drop
           await db.queue.delete(op.id!);
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         await db.queue.update(op.id!, {
           attempts: (op.attempts || 0) + 1,
-          last_error: e?.message || String(e),
+          last_error: e instanceof Error ? e.message : typeof e === "object" && e !== null && "message" in e && typeof e.message === "string" ? e.message : String(e),
         });
         // Stop loop on first failure to retry later
         break;
@@ -135,6 +154,10 @@ export async function deleteLocalDraft(localId: string): Promise<void> {
  */
 export async function claimLocalDrafts(fromUserId: string, toUserId: string): Promise<number> {
   if (!fromUserId || fromUserId === toUserId) return 0;
+  const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError || !currentUser || currentUser.id !== toUserId) {
+    throw new Error("Session active du compte cible requise pour rattacher les brouillons");
+  }
   const drafts = await db.drafts.where({ user_id: fromUserId, synced: 0 }).toArray();
   for (const draft of drafts) {
     await db.drafts.update(draft.id!, { user_id: toUserId, updated_at: Date.now() });
@@ -166,7 +189,23 @@ export async function discardQueuedOp(id: number) {
 export async function resolveConflict(conflictId: number, values: DossierChanges) {
   const c = await db.conflicts.get(conflictId);
   if (!c) return;
-  const { error } = await supabase.from("dossiers").update(values).eq("id", c.dossier_id);
+
+  const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError || !currentUser) throw new Error("Session requise pour résoudre ce conflit");
+
+  const { error: lookupError } = await supabase
+    .from("dossiers")
+    .select("id")
+    .eq("id", c.dossier_id)
+    .eq("user_id", currentUser.id)
+    .single();
+  if (lookupError) throw lookupError;
+
+  const { error } = await supabase
+    .from("dossiers")
+    .update(values)
+    .eq("id", c.dossier_id)
+    .eq("user_id", currentUser.id);
   if (error) throw error;
   await db.conflicts.delete(conflictId);
   emit();
