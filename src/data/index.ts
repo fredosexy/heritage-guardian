@@ -6,9 +6,11 @@ export * as alertsRepo from "./alerts.repo";
 export * as profilesRepo from "./profiles.repo";
 export * as proceduresRepo from "./procedures.repo";
 export { db } from "./offline/db";
-export type { DraftDossier, SyncConflict, QueuedOp } from "./offline/db";
+export type { DraftDossier } from "./offline/db";
 export {
   enqueueCreateDossier,
+  enqueueUpdateDossierMetadata,
+  enqueueProofUpload,
   processQueue,
   initSyncListeners,
   onSyncChange,
@@ -16,7 +18,4 @@ export {
   listLocalDrafts,
   deleteLocalDraft,
   claimLocalDrafts,
-  enqueueUpdateDossier,
-  discardQueuedOp,
-  resolveConflict,
 } from "./offline/sync";

@@ -6,21 +6,24 @@ export interface DraftDossier {
   id?: number;
   localId: string;
   user_id: string;
-  type: Database["public"]["Enums"]["dossier_type"];
+  type: Database["public"]["Enums"]["dossier_type"] | string;
   title: string;
   description?: string | null;
   location_name?: string | null;
+  metadata?: Record<string, unknown>;
   latitude?: number | null;
   longitude?: number | null;
   created_at: number;
   updated_at: number;
-  synced: 0 | 1; // Dexie indexes booleans poorly; use 0/1
+  synced: 0 | 1;
   remote_id?: string | null;
 }
 
 export type QueuedOp =
   | { id?: number; kind: "create_dossier"; payload: { localId: string }; created_at: number; attempts: number; last_error?: string | null }
-  | { id?: number; kind: "update_dossier"; payload: { dossierId: string; changes: DossierChanges; baseUpdatedAt: string }; created_at: number; attempts: number; last_error?: string | null }
+  | { id?: number; kind: "update_dossier"; payload: { dossierId: string; changes?: DossierChanges; baseUpdatedAt?: string; metadata?: Record<string, unknown> }; created_at: number; attempts: number; last_error?: string | null }
+  | { id?: number; kind: "initialize_journey"; payload: { dossierId: string }; created_at: number; attempts: number; last_error?: string | null }
+  | { id?: number; kind: "upload_proof"; payload: { file: Blob; fileName: string; mimeType: string; sizeBytes: number; dossierId: string; userId: string; sectionKey?: string; storagePath: string }; created_at: number; attempts: number; last_error?: string | null }
   | { id?: number; kind: "delete_dossier"; payload: { dossierId: string }; created_at: number; attempts: number; last_error?: string | null };
 
 export interface SyncConflict {
@@ -37,7 +40,7 @@ export interface SyncConflict {
 export interface CachedDossier {
   id: string;
   user_id: string;
-  data: Json;
+  data: Json | Record<string, unknown>;
   cached_at: number;
 }
 
@@ -54,7 +57,14 @@ class MemoireDB extends Dexie {
       queue: "++id, kind, created_at",
       cachedDossiers: "id, user_id, cached_at",
     });
+    // Keep the original v2 schema for already-installed Terrain clients.
     this.version(2).stores({
+      drafts: "++id, localId, user_id, synced, updated_at",
+      queue: "++id, kind, created_at",
+      cachedDossiers: "id, user_id, cached_at",
+    });
+    // Add conflict persistence as a new version so existing v2 databases upgrade safely.
+    this.version(3).stores({
       drafts: "++id, localId, user_id, synced, updated_at",
       queue: "++id, kind, created_at",
       cachedDossiers: "id, user_id, cached_at",
