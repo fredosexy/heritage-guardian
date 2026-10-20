@@ -32,6 +32,18 @@ export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "syn
 }
 
 /** Met en attente la sauvegarde des sections d'un dossier Terrain existant. */
+/** Queue a field-level dossier edit with its base timestamp for conflict detection. */
+export async function enqueueUpdateDossier(dossierId: string, changes: DossierChanges, baseUpdatedAt: string) {
+  await db.queue.add({
+    kind: "update_dossier",
+    payload: { dossierId, changes, baseUpdatedAt },
+    created_at: Date.now(),
+    attempts: 0,
+  });
+  emit();
+  void processQueue();
+}
+
 export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: Record<string, unknown>) {
   // Coalesce pending edits without dropping sections saved by an earlier offline edit.
   const pending = await db.queue.where("kind").equals("update_dossier").toArray();
