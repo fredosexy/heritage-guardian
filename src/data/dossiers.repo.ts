@@ -9,6 +9,7 @@ export interface NewDossierInput {
   location_name?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  metadata?: Record<string, unknown>;
 }
 
 export async function listDossiers(userId: string): Promise<Dossier[]> {
@@ -38,6 +39,7 @@ export async function createDossier(input: NewDossierInput): Promise<Dossier> {
       location_name: input.location_name ?? null,
       latitude: input.latitude ?? null,
       longitude: input.longitude ?? null,
+      metadata: input.metadata ?? {},
       status: "incomplete",
     })
     .select()
@@ -61,4 +63,19 @@ export async function updateDossierScore(
 export async function deleteDossier(id: string): Promise<void> {
   const { error } = await supabase.from("dossiers").delete().eq("id", id);
   if (error) throw error;
+}
+
+
+export async function updateDossierMetadata(
+  id: string,
+  metadata: Record<string, unknown>
+): Promise<Dossier> {
+  const { data, error } = await supabase
+    .from("dossiers")
+    .update({ metadata })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
 }

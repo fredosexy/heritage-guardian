@@ -9,6 +9,9 @@ export { db } from "./offline/db";
 export type { DraftDossier, SyncConflict, QueuedOp } from "./offline/db";
 export {
   enqueueCreateDossier,
+  enqueueUpdateDossier,
+  enqueueUpdateDossierMetadata,
+  enqueueProofUpload,
   processQueue,
   initSyncListeners,
   onSyncChange,
@@ -16,7 +19,6 @@ export {
   listLocalDrafts,
   deleteLocalDraft,
   claimLocalDrafts,
-  enqueueUpdateDossier,
   discardQueuedOp,
   resolveConflict,
 } from "./offline/sync";

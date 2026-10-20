@@ -26,7 +26,7 @@ export function HomeModuleCard({ id, icon: Icon, dossierCount, secureCount, risk
           <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
             <span className="rounded-full bg-muted px-2.5 py-1 font-medium">{t(`modules.state.${state}`)}</span>
             {dossierCount > 0 && <span className="rounded-full border border-border px-2.5 py-1 text-muted-foreground">{t("modules.dossiersCount", { count: dossierCount })}</span>}
-            {journeyProgress > 0 && <span className="rounded-full border border-border px-2.5 py-1">{t("modules.journeyProgress", { percent: journeyProgress })}</span>}{bestCompletion > 0 && bestCompletion < 100 && <span className="rounded-full border border-border px-2.5 py-1">{bestCompletion}%</span>}
+            {bestCompletion >= 75 && bestCompletion < 100 && <span className="rounded-full border border-border px-2.5 py-1">{t("modules.completionHintAdvanced")}</span>}{bestCompletion > 0 && bestCompletion < 75 && <span className="rounded-full border border-border px-2.5 py-1">{t("modules.completionHintToComplete")}</span>}
             {participantsCount > 0 && <span className="rounded-full border border-border px-2.5 py-1 text-muted-foreground">{participantsCount} {t("modules.people")}</span>}
             {proofsCount > 0 && <span className="rounded-full border border-border px-2.5 py-1 text-muted-foreground">{proofsCount} {t("modules.proofs")}</span>}
             {riskCount > 0 && <span className="inline-flex items-center gap-1 font-medium text-destructive"><CircleAlert className="size-3.5" />{t("modules.riskCount", { count: riskCount })}</span>}

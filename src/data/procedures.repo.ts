@@ -1,6 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { DossierStep, ProcedureDefinition, ProcedureStep } from "@/core/types/domain";
 
+export interface DossierJourneyStep extends DossierStep { procedure_step: ProcedureStep | null; }
+
 export interface ProcedureDefinitionWithSteps extends ProcedureDefinition {
   procedure_steps: ProcedureStep[];
 }
@@ -28,14 +30,14 @@ export async function initializeDossierJourney(dossierId: string, procedureId?: 
   return data;
 }
 
-export async function getDossierSteps(dossierId: string): Promise<DossierStep[]> {
+export async function getDossierSteps(dossierId: string): Promise<DossierJourneyStep[]> {
   const { data, error } = await supabase
     .from("dossier_steps")
-    .select("*")
+    .select("*, procedure_step:procedure_steps(*)")
     .eq("dossier_id", dossierId)
     .order("step_order");
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as DossierJourneyStep[];
 }
 
 export async function getDossierStepsByDossierIds(dossierIds: string[]): Promise<Record<string, DossierStep[]>> {

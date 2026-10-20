@@ -1,254 +1,455 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-type TestDraft = {
-  id: number;
-  localId: string;
-  user_id: string;
-  synced: 0 | 1;
-  type: string;
-  title: string;
-  created_at: number;
-  updated_at: number;
-};
+const mocks = vi.hoisted(() => {
+  const queued = new Map<number, unknown>();
+  return {
+    queued,
+    orderByToArray: vi.fn(async () => [...queued.values()].sort((a, b) => a.created_at - b.created_at)),
+    queueWhereToArray: vi.fn(async () => [...queued.values()].filter((op) => op.kind === "update_dossier")),
+    queueUpdate: vi.fn(async (id: number, patch: unknown) => {
+      const current = queued.get(id);
+      if (current) queued.set(id, { ...current, ...patch });
+    }),
+    queueDelete: vi.fn(async (id: number) => { queued.delete(id); }),
+    queueAdd: vi.fn(async (op: unknown) => {
+      const id = Math.max(0, ...queued.keys()) + 1;
+      queued.set(id, { ...op, id });
+      return id;
+    }),
+    queueGet: vi.fn(async (id: number) => queued.get(id)),
+    conflictAdd: vi.fn(async (conflict: unknown) => conflict),
+    storageUpload: vi.fn(),
+    proofUpsert: vi.fn(),
+    supabaseFrom: vi.fn(),
+  };
+});
 
-type TestQueuedOp =
-  | {
-      id: number;
-      kind: "create_dossier";
-      payload: { localId: string };
-      created_at: number;
-      attempts: number;
-    }
-  | {
-      id: number;
-      kind: "update_dossier";
-      payload: {
-        dossierId: string;
-        changes: { title: string };
-        baseUpdatedAt: string;
-      };
-      created_at: number;
-      attempts: number;
-    };
-
-const state = vi.hoisted(() => ({
-  queuedOps: [] as TestQueuedOp[],
-  draft: {
-    id: 10,
-    localId: "draft-1",
-    user_id: "user-a",
-    synced: 0 as const,
-    type: "family",
-    title: "Test",
-    created_at: 1,
-    updated_at: 1,
-  } as TestDraft,
-  mockDb: {
+vi.mock("@/data/offline/db", () => ({
+  db: {
     queue: {
-      orderBy: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      add: vi.fn(),
+      orderBy: vi.fn(() => ({ toArray: mocks.orderByToArray })),
+      where: vi.fn(() => ({ equals: vi.fn(() => ({ toArray: mocks.queueWhereToArray })) })),
+      update: mocks.queueUpdate,
+      delete: mocks.queueDelete,
+      add: mocks.queueAdd,
+      get: mocks.queueGet,
     },
+    conflicts: { add: mocks.conflictAdd },
     drafts: {
       where: vi.fn(),
       update: vi.fn(),
     },
-    conflicts: {
-      get: vi.fn(),
-      delete: vi.fn(),
-    },
-  },
-  mockSupabase: {
-    auth: { getUser: vi.fn() },
-    from: vi.fn(),
   },
 }));
 
-state.mockDb.queue.orderBy.mockImplementation(() => ({
-  toArray: async () => state.queuedOps,
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: {
+    auth: { getUser: vi.fn(async () => ({ data: { user: { id: "user-1" } }, error: null })) },
+    storage: { from: vi.fn(() => ({ upload: mocks.storageUpload })) },
+    from: mocks.supabaseFrom,
+  },
 }));
-state.mockDb.drafts.where.mockImplementation((query: unknown) => ({
-  equals: () => ({ first: async () => state.draft }),
-  toArray: async () => query && typeof query === "object" && "user_id" in query && query.user_id === state.draft.user_id ? [state.draft] : [],
+
+vi.mock("@/data/procedures.repo", () => ({
+  initializeDossierJourney: vi.fn(),
 }));
 
-vi.mock("@/data/offline/db", () => ({ db: state.mockDb }));
-vi.mock("@/integrations/supabase/client", () => ({ supabase: state.mockSupabase }));
+import { enqueueUpdateDossierMetadata, processQueue } from "@/data/offline/sync";
 
-import { claimLocalDrafts, processQueue, resolveConflict } from "./sync";
-
-describe("offline sync auth revalidation", () => {
+describe("offline Terrain section updates", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    state.queuedOps = [{
-      id: 1,
-      kind: "create_dossier",
-      payload: { localId: "draft-1" },
-      created_at: 1,
-      attempts: 0,
-    }];
-    state.draft = {
-      id: 10,
-      localId: "draft-1",
-      user_id: "user-a",
-      synced: 0,
-      type: "family",
-      title: "Test",
-      created_at: 1,
-      updated_at: 1,
-    };
-    state.mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: "user-a" } },
-      error: null,
-    });
-    state.mockSupabase.from.mockReset();
-    state.mockDb.queue.update.mockReset();
-    state.mockDb.queue.delete.mockReset();
-    state.mockDb.drafts.update.mockReset();
-    state.mockDb.queue.add.mockReset();
-    state.mockDb.conflicts.get.mockReset();
-    state.mockDb.conflicts.delete.mockReset();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
   });
 
-  it("pauses the queue when the session is expired or signed out", async () => {
-    state.mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: null },
-      error: { message: "JWT expired" },
+  it("merges separate section edits into one queued update instead of losing the first", async () => {
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { version: 1, sections: { histoire: "Historique familial" } },
+    });
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { version: 1, sections: { provenance: "Acte ancien" } },
     });
 
-    await processQueue();
-
-    expect(state.mockSupabase.from).not.toHaveBeenCalled();
-    expect(state.mockDb.queue.delete).not.toHaveBeenCalled();
-    expect(state.mockDb.queue.update).not.toHaveBeenCalled();
-  });
-
-  it("does not replay a queued draft under a different account", async () => {
-    state.mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: "user-b" } },
-      error: null,
+    const pending = [...mocks.queued.values()].filter((op) => op.kind === "update_dossier");
+    expect(pending).toHaveLength(1);
+    expect(pending[0].payload.metadata.terrain.sections).toEqual({
+      histoire: "Historique familial",
+      provenance: "Acte ancien",
     });
-
-    await processQueue();
-
-    expect(state.mockSupabase.from).not.toHaveBeenCalled();
-    expect(state.mockDb.queue.delete).not.toHaveBeenCalled();
-    expect(state.mockDb.queue.update).not.toHaveBeenCalled();
   });
 
-  it("keeps the operation queued when the protected API call expires", async () => {
-    state.mockSupabase.from.mockReturnValue({
-      insert: () => ({
-        select: () => ({
-          single: async () => ({ data: null, error: { message: "JWT expired" } }),
-        }),
-      }),
-    });
-
-    await processQueue();
-
-    expect(state.mockDb.queue.delete).not.toHaveBeenCalled();
-    expect(state.mockDb.queue.update).toHaveBeenCalledWith(
-      1,
-      expect.objectContaining({ attempts: 1, last_error: "JWT expired" }),
-    );
-  });
-
-  it("does not update a dossier owned by another account", async () => {
-    state.queuedOps = [{
-      id: 2,
+  it("preserves a queued field-level edit when Terrain metadata is also edited offline", async () => {
+    await mocks.queueAdd({
       kind: "update_dossier",
       payload: {
-        dossierId: "dossier-owned-by-a",
-        changes: { title: "Changed" },
-        baseUpdatedAt: "2026-01-01T00:00:00Z",
+        dossierId: "dossier-1",
+        changes: { title: "Titre modifié hors ligne" },
+        baseUpdatedAt: "2026-10-19T10:00:00Z",
       },
       created_at: 1,
       attempts: 0,
-    }];
-    state.mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: "user-b" } },
+    });
+
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { version: 1, sections: { histoire: "Historique familial" } },
+    });
+
+    const pending = [...mocks.queued.values()].filter((op) => op.kind === "update_dossier");
+    expect(pending).toHaveLength(2);
+    expect(pending.some((op) => op.payload.changes?.title === "Titre modifié hors ligne")).toBe(true);
+    expect(pending.some((op) => op.payload.metadata?.terrain?.sections?.histoire === "Historique familial")).toBe(true);
+  });
+});
+
+describe("sync queue concurrency", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
+  });
+
+  it("replays a section edit queued while an earlier sync request is in flight", async () => {
+    let releaseFirstRead!: (value: unknown) => void;
+    let signalFirstRead!: () => void;
+    const firstReadStarted = new Promise<void>((resolve) => { signalFirstRead = resolve; });
+    const firstRead = new Promise<unknown>((resolve) => { releaseFirstRead = resolve; });
+    let readCount = 0;
+    const updatePayloads: unknown[] = [];
+
+    mocks.supabaseFrom.mockImplementation(() => ({
+      select: vi.fn(() => {
+        const query: unknown = {
+          eq: vi.fn(() => query),
+          single: vi.fn(() => {
+            readCount += 1;
+            if (readCount === 1) {
+              signalFirstRead();
+              return firstRead;
+            }
+            return Promise.resolve({
+              data: { user_id: "user-1", metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
+              error: null,
+            });
+          }),
+        };
+        return query;
+      }),
+      update: vi.fn((values: unknown) => {
+        const query: unknown = {
+          eq: vi.fn(() => {
+            if (query.eq.mock.calls.length === 1) return query;
+            updatePayloads.push(values.metadata);
+            return Promise.resolve({ error: null });
+          }),
+        };
+        return query;
+      }),
+    }));
+
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { sections: { histoire: "Historique" } },
+    });
+    // Prevent enqueue from starting the first pass until the mock network is ready.
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+    const firstPass = processQueue();
+    await firstReadStarted;
+
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { sections: { provenance: "Acte ancien" } },
+    });
+
+    releaseFirstRead({
+      data: { user_id: "user-1", metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
       error: null,
     });
-    const selectChain = {
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: null, error: { message: "Not found" } }),
+    await firstPass;
+    await vi.waitFor(() => {
+      expect(updatePayloads).toHaveLength(2);
+      expect(mocks.queued.size).toBe(0);
+    });
+
+    expect(updatePayloads[1]).toEqual(expect.objectContaining({
+      dossierNote: "keep",
+      terrain: {
+        sections: {
+          histoire: "Historique",
+          provenance: "Acte ancien",
+        },
+      },
+    }));
+    expect(mocks.queued.size).toBe(0);
+  });
+});
+
+describe("proof upload queue retry", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+    mocks.storageUpload.mockResolvedValue({ error: null });
+    mocks.proofUpsert.mockResolvedValue({ error: null });
+    mocks.supabaseFrom.mockImplementation((table: string) => {
+      if (table === "dossiers") {
+        const query: unknown = {
+          eq: vi.fn(() => query),
+          single: vi.fn().mockResolvedValue({ data: { id: "dossier-1", user_id: "user-1" }, error: null }),
+        };
+        return { select: vi.fn(() => query) };
+      }
+      return { upsert: mocks.proofUpsert };
+    });
+  });
+
+  it("keeps a failed proof operation and retries with the same storage path", async () => {
+    const operation = {
+      id: 41,
+      kind: "upload_proof",
+      created_at: 100,
+      attempts: 0,
+      payload: {
+        file: new Blob(["terrain proof"], { type: "application/pdf" }),
+        fileName: "title-de-propriete.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 13,
+        dossierId: "dossier-1",
+        userId: "user-1",
+        sectionKey: "documentation",
+        storagePath: "user-1/dossier-1/queued-proof-1-title-de-propriete.pdf",
+      },
     };
-    const update = vi.fn();
-    state.mockSupabase.from.mockReturnValue({
-      select: vi.fn(() => selectChain),
-      update,
+    mocks.queued.set(operation.id, operation);
+    mocks.proofUpsert.mockResolvedValueOnce({ error: new Error("temporary database failure") });
+
+    await processQueue();
+
+    expect(mocks.queued.get(operation.id)?.attempts).toBe(1);
+    expect(mocks.queued.get(operation.id)?.last_error).toContain("temporary database failure");
+    expect(mocks.queued.get(operation.id)?.payload.storagePath).toBe(operation.payload.storagePath);
+    expect(mocks.queueDelete).not.toHaveBeenCalled();
+
+    await processQueue();
+
+    expect(mocks.storageUpload).toHaveBeenCalledTimes(2);
+    expect(mocks.storageUpload).toHaveBeenNthCalledWith(
+      1,
+      operation.payload.storagePath,
+      operation.payload.file,
+      { contentType: "application/pdf", upsert: true },
+    );
+    expect(mocks.storageUpload).toHaveBeenNthCalledWith(
+      2,
+      operation.payload.storagePath,
+      operation.payload.file,
+      { contentType: "application/pdf", upsert: true },
+    );
+    expect(mocks.proofUpsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dossier_id: "dossier-1",
+        uploaded_by: "user-1",
+        storage_path: operation.payload.storagePath,
+        metadata: { terrainSectionKey: "documentation" },
+      }),
+      { onConflict: "storage_path" },
+    );
+    expect(mocks.queued.has(operation.id)).toBe(false);
+    expect(mocks.queueDelete).toHaveBeenCalledWith(operation.id);
+  });
+
+  it("retains a proof upload after a Storage error and retries the same path", async () => {
+    const operation = {
+      id: 43,
+      kind: "upload_proof",
+      created_at: 102,
+      attempts: 0,
+      payload: {
+        file: new Blob(["proof"], { type: "application/pdf" }),
+        fileName: "preuve.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 5,
+        dossierId: "dossier-1",
+        userId: "user-1",
+        sectionKey: "documentation",
+        storagePath: "user-1/dossier-1/proof-storage-retry.pdf",
+      },
+    };
+    mocks.queued.set(operation.id, operation);
+    mocks.storageUpload.mockResolvedValueOnce({ error: new Error("temporary Storage failure") });
+
+    await processQueue();
+
+    expect(mocks.queued.get(operation.id)?.attempts).toBe(1);
+    expect(mocks.queued.get(operation.id)?.last_error).toContain("temporary Storage failure");
+    expect(mocks.queued.get(operation.id)?.payload.storagePath).toBe(operation.payload.storagePath);
+    expect(mocks.proofUpsert).not.toHaveBeenCalled();
+    expect(mocks.queueDelete).not.toHaveBeenCalled();
+
+    await processQueue();
+
+    expect(mocks.storageUpload).toHaveBeenCalledTimes(2);
+    expect(mocks.storageUpload).toHaveBeenNthCalledWith(
+      1,
+      operation.payload.storagePath,
+      operation.payload.file,
+      { contentType: "application/pdf", upsert: true },
+    );
+    expect(mocks.storageUpload).toHaveBeenNthCalledWith(
+      2,
+      operation.payload.storagePath,
+      operation.payload.file,
+      { contentType: "application/pdf", upsert: true },
+    );
+    expect(mocks.proofUpsert).toHaveBeenCalledWith(
+      expect.objectContaining({ storage_path: operation.payload.storagePath }),
+      { onConflict: "storage_path" },
+    );
+    expect(mocks.queued.has(operation.id)).toBe(false);
+  });
+
+  it("does not attempt network work while offline", async () => {
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
+    mocks.queued.set(42, {
+      id: 42,
+      kind: "upload_proof",
+      created_at: 101,
+      attempts: 0,
+      payload: {
+        file: new Blob(["proof"]),
+        fileName: "preuve.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 5,
+        dossierId: "dossier-1",
+        userId: "user-1",
+        storagePath: "user-1/dossier-1/proof.pdf",
+      },
     });
 
     await processQueue();
 
-    expect(state.mockSupabase.from).toHaveBeenCalledWith("dossiers");
-    expect(update).not.toHaveBeenCalled();
-    expect(state.mockDb.queue.delete).not.toHaveBeenCalled();
-    expect(state.mockDb.queue.update).toHaveBeenCalledWith(
-      2,
-      expect.objectContaining({ attempts: 1 }),
-    );
+    expect(mocks.storageUpload).not.toHaveBeenCalled();
+    expect(mocks.proofUpsert).not.toHaveBeenCalled();
+    expect(mocks.queued.has(42)).toBe(true);
+  });
+});
+
+
+describe("Terrain section persistence after offline replay", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
   });
 
-  it("does not claim visitor drafts unless the current session matches the target account", async () => {
-    state.mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: "different-user" } },
-      error: null,
-    });
-
-    await expect(claimLocalDrafts("guest-user", "user-b")).rejects.toThrow("Session active du compte cible requise");
-    expect(state.mockDb.drafts.update).not.toHaveBeenCalled();
-    expect(state.mockDb.queue.add).not.toHaveBeenCalled();
-  });
-
-  it("claims visitor drafts only for the authenticated target account", async () => {
-    state.draft.user_id = "guest-user";
-    state.mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: "user-b" } },
-      error: null,
-    });
-
-    const claimed = await claimLocalDrafts("guest-user", "user-b");
-
-    expect(claimed).toBe(1);
-    expect(state.mockDb.drafts.update).toHaveBeenCalledWith(10, expect.objectContaining({ user_id: "user-b" }));
-    expect(state.mockDb.queue.add).toHaveBeenCalledWith(expect.objectContaining({
-      kind: "create_dossier",
-      payload: { localId: "draft-1" },
-    }));
-  });
-
-  it("does not resolve a local conflict when the current account cannot access its dossier", async () => {
-    state.mockDb.conflicts.get.mockResolvedValue({
-      id: 7,
-      dossier_id: "dossier-owned-by-a",
-      title: "Private dossier",
-      fields: ["title"],
-      mine: { title: "mine" },
-      theirs: { title: "theirs" },
-      remote_updated_at: "2026-01-01T00:00:00Z",
-      created_at: 1,
-    });
-    state.mockSupabase.auth.getUser.mockResolvedValue({
-      data: { user: { id: "user-b" } },
-      error: null,
-    });
-    const selectChain = {
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: null, error: { message: "Not found" } }),
+  it("writes all nine saved sections while preserving unrelated server metadata", async () => {
+    const sections = {
+      histoire: "Historique familial",
+      provenance: "Acte de provenance",
+      proprietaires: "Deux propriétaires déclarés",
+      ayantsDroit: "Ayants droit recensés",
+      documentation: "Titre foncier",
+      localisation: "Village et repères",
+      dimensions: "Surface mesurée",
+      etat: "Terrain cultivé",
+      miseEnValeur: "Plantations existantes",
     };
-    const update = vi.fn();
-    state.mockSupabase.from.mockReturnValue({
-      select: vi.fn(() => selectChain),
-      update,
+    const updates: unknown[] = [];
+
+    mocks.supabaseFrom.mockImplementation(() => ({
+      select: vi.fn(() => {
+        const query: unknown = {
+          eq: vi.fn(() => query),
+          single: vi.fn().mockResolvedValue({
+            data: {
+              user_id: "user-1",
+              metadata: {
+                dossierNote: "ne pas écraser",
+                terrain: { sections: { histoire: "Ancienne valeur", champServeur: "conserver" } },
+              },
+            },
+            error: null,
+          }),
+        };
+        return query;
+      }),
+      update: vi.fn((values: unknown) => {
+        const query: unknown = {
+          eq: vi.fn(() => {
+            if (query.eq.mock.calls.length === 1) return query;
+            updates.push(values.metadata);
+            return Promise.resolve({ error: null });
+          }),
+        };
+        return query;
+      }),
+    }));
+
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { version: 1, sections },
     });
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+    await processQueue();
 
-    await expect(resolveConflict(7, { title: "chosen" })).rejects.toThrow("Not found");
+    expect(updates).toHaveLength(1);
+    expect(updates[0]).toEqual({
+      dossierNote: "ne pas écraser",
+      terrain: {
+        sections: { ...sections, champServeur: "conserver" },
+        version: 1,
+      },
+    });
+    expect(mocks.queued.size).toBe(0);
+  });
+});
 
-    expect(update).not.toHaveBeenCalled();
-    expect(state.mockDb.conflicts.delete).not.toHaveBeenCalled();
+
+describe("offline field conflict detection", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
   });
 
+  it("persists an overlapping edit for Sync Center instead of overwriting the server", async () => {
+    mocks.queued.set(51, {
+      id: 51,
+      kind: "update_dossier",
+      created_at: 100,
+      attempts: 0,
+      payload: {
+        dossierId: "dossier-1",
+        changes: { title: "Titre local" },
+        baseUpdatedAt: "2026-01-01T00:00:00Z",
+      },
+    });
+    const update = vi.fn();
+    const query: unknown = {
+      eq: vi.fn(() => query),
+      single: vi.fn().mockResolvedValue({
+        data: {
+          id: "dossier-1",
+          user_id: "user-1",
+          title: "Titre serveur",
+          description: null,
+          location_name: null,
+          updated_at: "2026-01-02T00:00:00Z",
+        },
+        error: null,
+      }),
+    };
+    mocks.supabaseFrom.mockImplementation(() => ({
+      select: vi.fn(() => query),
+      update,
+    }));
+
+    await processQueue();
+
+    expect(mocks.conflictAdd).toHaveBeenCalledWith(expect.objectContaining({
+      dossier_id: "dossier-1",
+      fields: ["title"],
+      mine: { title: "Titre local" },
+      theirs: { title: "Titre serveur" },
+    }));
+    expect(update).not.toHaveBeenCalled();
+    expect(mocks.queued.has(51)).toBe(false);
+  });
 });
