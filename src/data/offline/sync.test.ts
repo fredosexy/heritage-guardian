@@ -198,9 +198,7 @@ describe("offline sync auth revalidation", () => {
       error: null,
     });
 
-    const claimed = await claimLocalDrafts("guest-user", "user-b");
-
-    expect(claimed).toBe(0);
+    await expect(claimLocalDrafts("guest-user", "user-b")).rejects.toThrow("Session active du compte cible requise");
     expect(state.mockDb.drafts.update).not.toHaveBeenCalled();
     expect(state.mockDb.queue.add).not.toHaveBeenCalled();
   });
