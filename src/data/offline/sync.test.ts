@@ -1,23 +1,23 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => {
-  const queued = new Map<number, any>();
+  const queued = new Map<number, unknown>();
   return {
     queued,
     orderByToArray: vi.fn(async () => [...queued.values()].sort((a, b) => a.created_at - b.created_at)),
     queueWhereToArray: vi.fn(async () => [...queued.values()].filter((op) => op.kind === "update_dossier")),
-    queueUpdate: vi.fn(async (id: number, patch: any) => {
+    queueUpdate: vi.fn(async (id: number, patch: unknown) => {
       const current = queued.get(id);
       if (current) queued.set(id, { ...current, ...patch });
     }),
     queueDelete: vi.fn(async (id: number) => { queued.delete(id); }),
-    queueAdd: vi.fn(async (op: any) => {
+    queueAdd: vi.fn(async (op: unknown) => {
       const id = Math.max(0, ...queued.keys()) + 1;
       queued.set(id, { ...op, id });
       return id;
     }),
     queueGet: vi.fn(async (id: number) => queued.get(id)),
-    conflictAdd: vi.fn(async (conflict: any) => conflict),
+    conflictAdd: vi.fn(async (conflict: unknown) => conflict),
     storageUpload: vi.fn(),
     proofUpsert: vi.fn(),
     supabaseFrom: vi.fn(),
@@ -88,16 +88,16 @@ describe("sync queue concurrency", () => {
   });
 
   it("replays a section edit queued while an earlier sync request is in flight", async () => {
-    let releaseFirstRead!: (value: any) => void;
+    let releaseFirstRead!: (value: unknown) => void;
     let signalFirstRead!: () => void;
     const firstReadStarted = new Promise<void>((resolve) => { signalFirstRead = resolve; });
-    const firstRead = new Promise<any>((resolve) => { releaseFirstRead = resolve; });
+    const firstRead = new Promise<unknown>((resolve) => { releaseFirstRead = resolve; });
     let readCount = 0;
-    const updatePayloads: any[] = [];
+    const updatePayloads: unknown[] = [];
 
     mocks.supabaseFrom.mockImplementation(() => ({
       select: vi.fn(() => {
-        const query: any = {
+        const query: unknown = {
           eq: vi.fn(() => query),
           single: vi.fn(() => {
             readCount += 1;
@@ -113,8 +113,8 @@ describe("sync queue concurrency", () => {
         };
         return query;
       }),
-      update: vi.fn((values: any) => {
-        const query: any = {
+      update: vi.fn((values: unknown) => {
+        const query: unknown = {
           eq: vi.fn(() => {
             if (query.eq.mock.calls.length === 1) return query;
             updatePayloads.push(values.metadata);
@@ -169,7 +169,7 @@ describe("proof upload queue retry", () => {
     mocks.proofUpsert.mockResolvedValue({ error: null });
     mocks.supabaseFrom.mockImplementation((table: string) => {
       if (table === "dossiers") {
-        const query: any = {
+        const query: unknown = {
           eq: vi.fn(() => query),
           single: vi.fn().mockResolvedValue({ data: { id: "dossier-1", user_id: "user-1" }, error: null }),
         };
@@ -330,11 +330,11 @@ describe("Terrain section persistence after offline replay", () => {
       etat: "Terrain cultivé",
       miseEnValeur: "Plantations existantes",
     };
-    const updates: any[] = [];
+    const updates: unknown[] = [];
 
     mocks.supabaseFrom.mockImplementation(() => ({
       select: vi.fn(() => {
-        const query: any = {
+        const query: unknown = {
           eq: vi.fn(() => query),
           single: vi.fn().mockResolvedValue({
             data: {
@@ -349,8 +349,8 @@ describe("Terrain section persistence after offline replay", () => {
         };
         return query;
       }),
-      update: vi.fn((values: any) => {
-        const query: any = {
+      update: vi.fn((values: unknown) => {
+        const query: unknown = {
           eq: vi.fn(() => {
             if (query.eq.mock.calls.length === 1) return query;
             updates.push(values.metadata);
@@ -400,7 +400,7 @@ describe("offline field conflict detection", () => {
       },
     });
     const update = vi.fn();
-    const query: any = {
+    const query: unknown = {
       eq: vi.fn(() => query),
       single: vi.fn().mockResolvedValue({
         data: {
