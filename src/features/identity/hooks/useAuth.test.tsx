@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AuthProvider, useAuth } from "./useAuth";
 
@@ -44,7 +44,9 @@ describe("AuthProvider session lifecycle", () => {
   it("accepts the fresh session emitted by TOKEN_REFRESHED", async () => {
     render(<AuthProvider><Probe /></AuthProvider>);
 
-    authListener?.("TOKEN_REFRESHED", { user: { id: "refreshed-user" } });
+    await act(async () => {
+      authListener?.("TOKEN_REFRESHED", { user: { id: "refreshed-user" } });
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId("loading")).toHaveTextContent("false");
@@ -60,8 +62,10 @@ describe("AuthProvider session lifecycle", () => {
 
     render(<AuthProvider><Probe /></AuthProvider>);
 
-    authListener?.("SIGNED_OUT", null);
-    resolveSession({ data: { session: { user: { id: "stale-user" } } }, error: null });
+    await act(async () => {
+      authListener?.("SIGNED_OUT", null);
+      resolveSession({ data: { session: { user: { id: "stale-user" } } }, error: null });
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId("loading")).toHaveTextContent("false");
@@ -74,9 +78,11 @@ describe("AuthProvider session lifecycle", () => {
     const { claimLocalData } = await import("@/services/claim-local-data");
     render(<AuthProvider><Probe /></AuthProvider>);
 
-    authListener?.("SIGNED_IN", { user: { id: "user-a" } });
-    authListener?.("SIGNED_OUT", null);
-    await vi.runAllTimersAsync();
+    await act(async () => {
+      authListener?.("SIGNED_IN", { user: { id: "user-a" } });
+      authListener?.("SIGNED_OUT", null);
+      await vi.runAllTimersAsync();
+    });
 
     expect(claimLocalData).not.toHaveBeenCalled();
     vi.useRealTimers();
