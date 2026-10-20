@@ -216,6 +216,56 @@ describe("proof upload queue retry", () => {
     expect(mocks.queueDelete).toHaveBeenCalledWith(operation.id);
   });
 
+  it("retains a proof upload after a Storage error and retries the same path", async () => {
+    const operation = {
+      id: 43,
+      kind: "upload_proof",
+      created_at: 102,
+      attempts: 0,
+      payload: {
+        file: new Blob(["proof"], { type: "application/pdf" }),
+        fileName: "preuve.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 5,
+        dossierId: "dossier-1",
+        userId: "user-1",
+        sectionKey: "documentation",
+        storagePath: "user-1/dossier-1/proof-storage-retry.pdf",
+      },
+    };
+    mocks.queued.set(operation.id, operation);
+    mocks.storageUpload.mockResolvedValueOnce({ error: new Error("temporary Storage failure") });
+
+    await processQueue();
+
+    expect(mocks.queued.get(operation.id)?.attempts).toBe(1);
+    expect(mocks.queued.get(operation.id)?.last_error).toContain("temporary Storage failure");
+    expect(mocks.queued.get(operation.id)?.payload.storagePath).toBe(operation.payload.storagePath);
+    expect(mocks.proofUpsert).not.toHaveBeenCalled();
+    expect(mocks.queueDelete).not.toHaveBeenCalled();
+
+    await processQueue();
+
+    expect(mocks.storageUpload).toHaveBeenCalledTimes(2);
+    expect(mocks.storageUpload).toHaveBeenNthCalledWith(
+      1,
+      operation.payload.storagePath,
+      operation.payload.file,
+      { contentType: "application/pdf", upsert: true },
+    );
+    expect(mocks.storageUpload).toHaveBeenNthCalledWith(
+      2,
+      operation.payload.storagePath,
+      operation.payload.file,
+      { contentType: "application/pdf", upsert: true },
+    );
+    expect(mocks.proofUpsert).toHaveBeenCalledWith(
+      expect.objectContaining({ storage_path: operation.payload.storagePath }),
+      { onConflict: "storage_path" },
+    );
+    expect(mocks.queued.has(operation.id)).toBe(false);
+  });
+
   it("does not attempt network work while offline", async () => {
     Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
     mocks.queued.set(42, {
