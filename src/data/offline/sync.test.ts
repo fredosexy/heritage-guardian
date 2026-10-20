@@ -133,7 +133,10 @@ describe("sync queue concurrency", () => {
       error: null,
     });
     await firstPass;
-    await vi.waitFor(() => expect(updatePayloads).toHaveLength(2));
+    await vi.waitFor(() => {
+      expect(updatePayloads).toHaveLength(2);
+      expect(mocks.queued.size).toBe(0);
+    });
 
     expect(updatePayloads[1]).toEqual(expect.objectContaining({
       dossierNote: "keep",
