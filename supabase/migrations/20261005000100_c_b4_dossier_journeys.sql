@@ -56,10 +56,13 @@ CREATE TABLE public.dossier_steps (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (dossier_id, step_order),
-  UNIQUE NULLS NOT DISTINCT (dossier_id, procedure_step_id),
   CHECK ((status = 'terminee') = (completed_at IS NOT NULL)),
   CHECK ((status = 'bloquee') = (blocked_reason IS NOT NULL))
 );
+
+CREATE UNIQUE INDEX dossier_steps_dossier_procedure_step_uidx
+  ON public.dossier_steps (dossier_id, procedure_step_id)
+  WHERE procedure_step_id IS NOT NULL;
 
 CREATE INDEX procedure_definitions_type_idx ON public.procedure_definitions(dossier_type);
 CREATE INDEX procedure_definitions_status_idx ON public.procedure_definitions(status);
@@ -108,7 +111,14 @@ CREATE POLICY "owners view dossier steps"
   USING (public.owns_dossier(dossier_id, auth.uid()) OR public.is_dossier_participant(dossier_id, auth.uid()));
 
 REVOKE ALL ON public.procedure_definitions, public.procedure_steps, public.dossier_steps FROM anon, authenticated;
+
+-- Reading published procedures is public; writes are granted only to authenticated
+-- users and then constrained to administrators by the RLS policies above.
 GRANT SELECT ON public.procedure_definitions, public.procedure_steps TO anon, authenticated;
+GRANT INSERT, UPDATE ON public.procedure_definitions, public.procedure_steps TO authenticated;
+
+-- Dossier steps are read-only through table access. Mutations must go through
+-- transition_dossier_step(), which verifies dossier ownership and allowed transitions.
 GRANT SELECT ON public.dossier_steps TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.initialize_dossier_journey(
@@ -122,7 +132,7 @@ DECLARE
   dossier_row public.dossiers;
 BEGIN
   SELECT * INTO dossier_row FROM public.dossiers WHERE id = p_dossier_id FOR UPDATE;
-  IF NOT FOUND OR dossier_row.user_id <> current_user_id THEN
+  IF NOT FOUND OR current_user_id IS NULL OR dossier_row.user_id IS DISTINCT FROM current_user_id THEN
     RAISE EXCEPTION 'journey_initialization_forbidden' USING ERRCODE = '42501';
   END IF;
 
@@ -193,7 +203,7 @@ BEGIN
   SELECT status, dossier_id INTO current_status, dossier_ref
   FROM public.dossier_steps WHERE id = p_step_id FOR UPDATE;
 
-  IF NOT FOUND OR NOT public.owns_dossier(dossier_ref, current_user_id) THEN
+  IF NOT FOUND OR current_user_id IS NULL OR NOT public.owns_dossier(dossier_ref, current_user_id) THEN
     RAISE EXCEPTION 'step_transition_forbidden' USING ERRCODE = '42501';
   END IF;
 
