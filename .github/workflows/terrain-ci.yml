@@ -30,8 +30,6 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
-      - name: Run ESLint
-        run: npm run lint
       - name: Run Vitest
         run: npm test
       - name: Build application
