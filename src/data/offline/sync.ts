@@ -23,12 +23,40 @@ export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "syn
 
 /** Met en attente la sauvegarde des sections d'un dossier Terrain existant. */
 export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: Record<string, unknown>) {
-  // Keep only the latest pending snapshot for this dossier to avoid replaying stale edits.
+  // Coalesce pending edits without dropping sections saved by an earlier offline edit.
   const pending = await db.queue.where("kind").equals("update_dossier").toArray();
   const existing = pending.find((op) => op.payload?.dossierId === dossierId);
   if (existing?.id) {
+    const previous = existing.payload?.metadata && typeof existing.payload.metadata === "object" && !Array.isArray(existing.payload.metadata)
+      ? existing.payload.metadata as Record<string, unknown>
+      : {};
+    const previousTerrain = previous.terrain && typeof previous.terrain === "object" && !Array.isArray(previous.terrain)
+      ? previous.terrain as Record<string, unknown>
+      : {};
+    const nextTerrain = metadata.terrain && typeof metadata.terrain === "object" && !Array.isArray(metadata.terrain)
+      ? metadata.terrain as Record<string, unknown>
+      : {};
+    const previousSections = previousTerrain.sections && typeof previousTerrain.sections === "object" && !Array.isArray(previousTerrain.sections)
+      ? previousTerrain.sections as Record<string, unknown>
+      : {};
+    const nextSections = nextTerrain.sections && typeof nextTerrain.sections === "object" && !Array.isArray(nextTerrain.sections)
+      ? nextTerrain.sections as Record<string, unknown>
+      : {};
+    const mergedMetadata = metadata.terrain
+      ? {
+          ...previous,
+          ...metadata,
+          terrain: {
+            ...previousTerrain,
+            ...nextTerrain,
+            ...(previousTerrain.sections || nextTerrain.sections
+              ? { sections: { ...previousSections, ...nextSections } }
+              : {}),
+          },
+        }
+      : { ...previous, ...metadata };
     await db.queue.update(existing.id, {
-      payload: { dossierId, metadata },
+      payload: { dossierId, metadata: mergedMetadata },
       created_at: Date.now(),
       attempts: 0,
       last_error: undefined,
