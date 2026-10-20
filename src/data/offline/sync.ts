@@ -383,3 +383,36 @@ export async function claimLocalDrafts(fromUserId: string, toUserId: string): Pr
   if (drafts.length > 0) void processQueue();
   return drafts.length;
 }
+
+
+// Remove a queued operation only when the user explicitly discards it in Sync Center.
+export async function discardQueuedOp(id: number) {
+  await db.queue.delete(id);
+  emit();
+}
+
+/** Apply the user's field-by-field choice after verifying ownership of the dossier. */
+export async function resolveConflict(conflictId: number, values: DossierChanges) {
+  const conflict = await db.conflicts.get(conflictId);
+  if (!conflict) return;
+
+  const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError || !currentUser) throw new Error("Session requise pour résoudre ce conflit");
+
+  const { error: lookupError } = await supabase
+    .from("dossiers")
+    .select("id")
+    .eq("id", conflict.dossier_id)
+    .eq("user_id", currentUser.id)
+    .single();
+  if (lookupError) throw lookupError;
+
+  const { error } = await supabase
+    .from("dossiers")
+    .update(values)
+    .eq("id", conflict.dossier_id)
+    .eq("user_id", currentUser.id);
+  if (error) throw error;
+  await db.conflicts.delete(conflictId);
+  emit();
+}
