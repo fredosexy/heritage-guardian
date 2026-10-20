@@ -111,12 +111,16 @@ describe("sync queue concurrency", () => {
         };
         return query;
       }),
-      update: vi.fn((values: any) => ({
-        eq: vi.fn(async () => {
-          updatePayloads.push(values.metadata);
-          return { error: null };
-        }),
-      })),
+      update: vi.fn((values: any) => {
+        const query: any = {
+          eq: vi.fn(() => {
+            if (query.eq.mock.calls.length === 1) return query;
+            updatePayloads.push(values.metadata);
+            return Promise.resolve({ error: null });
+          }),
+        };
+        return query;
+      }),
     }));
 
     await enqueueUpdateDossierMetadata("dossier-1", {
@@ -343,12 +347,16 @@ describe("Terrain section persistence after offline replay", () => {
         };
         return query;
       }),
-      update: vi.fn((values: any) => ({
-        eq: vi.fn(async () => {
-          updates.push(values.metadata);
-          return { error: null };
-        }),
-      })),
+      update: vi.fn((values: any) => {
+        const query: any = {
+          eq: vi.fn(() => {
+            if (query.eq.mock.calls.length === 1) return query;
+            updates.push(values.metadata);
+            return Promise.resolve({ error: null });
+          }),
+        };
+        return query;
+      }),
     }));
 
     await enqueueUpdateDossierMetadata("dossier-1", {
