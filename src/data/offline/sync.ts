@@ -3,6 +3,7 @@ import * as proceduresRepo from "@/data/procedures.repo";
 import { db, DraftDossier } from "./db";
 
 let syncing = false;
+let rerunRequested = false;
 const listeners = new Set<() => void>();
 
 export function onSyncChange(cb: () => void) {
@@ -104,7 +105,12 @@ export async function enqueueProofUpload(params: {
 }
 
 export async function processQueue(): Promise<void> {
-  if (syncing) return;
+  if (syncing) {
+    // A mutation may be queued while this pass is awaiting the network. Request one
+    // fresh pass after the current one finishes so the newer payload is not stranded.
+    rerunRequested = true;
+    return;
+  }
   if (typeof navigator !== "undefined" && !navigator.onLine) return;
 
   syncing = true;
