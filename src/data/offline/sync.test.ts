@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => {
   return {
     queued,
     orderByToArray: vi.fn(async () => [...queued.values()].sort((a, b) => a.created_at - b.created_at)),
+    queueWhereToArray: vi.fn(async () => [...queued.values()].filter((op) => op.kind === "update_dossier")),
     queueUpdate: vi.fn(async (id: number, patch: any) => {
       const current = queued.get(id);
       if (current) queued.set(id, { ...current, ...patch });
@@ -26,6 +27,7 @@ vi.mock("@/data/offline/db", () => ({
   db: {
     queue: {
       orderBy: vi.fn(() => ({ toArray: mocks.orderByToArray })),
+      where: vi.fn(() => ({ equals: vi.fn(() => ({ toArray: mocks.queueWhereToArray })) })),
       update: mocks.queueUpdate,
       delete: mocks.queueDelete,
       add: mocks.queueAdd,
@@ -49,7 +51,31 @@ vi.mock("@/data/procedures.repo", () => ({
   initializeDossierJourney: vi.fn(),
 }));
 
-import { processQueue } from "@/data/offline/sync";
+import { enqueueUpdateDossierMetadata, processQueue } from "@/data/offline/sync";
+
+describe("offline Terrain section updates", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
+  });
+
+  it("merges separate section edits into one queued update instead of losing the first", async () => {
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { version: 1, sections: { histoire: "Historique familial" } },
+    });
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { version: 1, sections: { provenance: "Acte ancien" } },
+    });
+
+    const pending = [...mocks.queued.values()].filter((op) => op.kind === "update_dossier");
+    expect(pending).toHaveLength(1);
+    expect(pending[0].payload.metadata.terrain.sections).toEqual({
+      histoire: "Historique familial",
+      provenance: "Acte ancien",
+    });
+  });
+});
 
 describe("proof upload queue retry", () => {
   beforeEach(() => {
