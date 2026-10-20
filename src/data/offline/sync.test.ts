@@ -77,6 +77,76 @@ describe("offline Terrain section updates", () => {
   });
 });
 
+describe("sync queue concurrency", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+  });
+
+  it("replays a section edit queued while an earlier sync request is in flight", async () => {
+    let releaseFirstRead!: (value: any) => void;
+    let signalFirstRead!: () => void;
+    const firstReadStarted = new Promise<void>((resolve) => { signalFirstRead = resolve; });
+    const firstRead = new Promise<any>((resolve) => { releaseFirstRead = resolve; });
+    let readCount = 0;
+    const updatePayloads: any[] = [];
+
+    mocks.supabaseFrom.mockImplementation(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          single: vi.fn(() => {
+            readCount += 1;
+            if (readCount === 1) {
+              signalFirstRead();
+              return firstRead;
+            }
+            return Promise.resolve({
+              data: { metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
+              error: null,
+            });
+          }),
+        })),
+      })),
+      update: vi.fn((values: any) => ({
+        eq: vi.fn(async () => {
+          updatePayloads.push(values.metadata);
+          return { error: null };
+        }),
+      })),
+    }));
+
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { sections: { histoire: "Historique" } },
+    });
+    // Start the first pass explicitly after the enqueue has created the operation.
+    const firstPass = processQueue();
+    await firstReadStarted;
+
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { sections: { provenance: "Acte ancien" } },
+    });
+
+    releaseFirstRead({
+      data: { metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
+      error: null,
+    });
+    await firstPass;
+    await vi.waitFor(() => expect(updatePayloads).toHaveLength(2));
+
+    expect(updatePayloads[1]).toEqual(expect.objectContaining({
+      dossierNote: "keep",
+      terrain: {
+        sections: {
+          histoire: "Historique",
+          provenance: "Acte ancien",
+        },
+      },
+    }));
+    expect(mocks.queued.size).toBe(0);
+  });
+});
+
 describe("proof upload queue retry", () => {
   beforeEach(() => {
     vi.clearAllMocks();
