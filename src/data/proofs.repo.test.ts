@@ -20,7 +20,7 @@ vi.mock("@/integrations/supabase/client", () => ({
   },
 }));
 
-import { ProofPersistenceError, deleteProof, uploadProof } from "@/data/proofs.repo";
+import { ProofPersistenceError, deleteProof, listProofs, uploadProof } from "@/data/proofs.repo";
 
 describe("proof persistence", () => {
   beforeEach(() => {
@@ -136,5 +136,33 @@ describe("deleteProof", () => {
     await expect(
       deleteProof({ id: "proof-1", storage_path: "user-1/dossier-1/file.pdf" }),
     ).rejects.toBe(databaseError);
+  });
+});
+
+
+describe("listProofs reload", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("restores the persisted proof and its Terrain section attachment from the database", async () => {
+    const savedProof = {
+      id: "proof-1",
+      dossier_id: "dossier-1",
+      title: "titre.pdf",
+      storage_path: "user-1/dossier-1/123456-titre.pdf",
+      metadata: { terrainSectionKey: "documentation" },
+      verified: false,
+    };
+    const order = vi.fn().mockResolvedValue({ data: [savedProof], error: null });
+    const select = vi.fn(() => ({
+      eq: vi.fn(() => ({ order })),
+    }));
+    mocks.from.mockReturnValue({ select });
+
+    await expect(listProofs("dossier-1")).resolves.toEqual([savedProof]);
+    expect(mocks.from).toHaveBeenCalledWith("proofs");
+    expect(select).toHaveBeenCalledWith("*");
+    expect(order).toHaveBeenCalledWith("created_at", { ascending: false });
   });
 });
