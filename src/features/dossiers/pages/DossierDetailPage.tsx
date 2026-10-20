@@ -229,7 +229,7 @@ export default function DossierDetailPage() {
                         {verifiedProof ? t("dossier.sectionHasVerifiedProof") : sectionProofs.length > 0 ? t("dossier.proofNeedsVerification") : value ? t("dossier.sectionInfoNeedsVerification") : t("create.terrainSections." + key + ".hint")}
                       </p>
                     </div>
-                    {verifiedProof ? <CircleAlert className="size-4 text-muted-foreground shrink-0" /> : value || sectionProofs.length > 0 ? <CircleCheck className="size-4 text-muted-foreground shrink-0" /> : null}
+                    {verifiedProof ? <CircleCheck className="size-4 text-muted-foreground shrink-0" /> : value || sectionProofs.length > 0 ? <CircleAlert className="size-4 text-muted-foreground shrink-0" /> : null}
                   </div>
                   {!editingTerrain && value && <p className="text-sm mt-3 whitespace-pre-wrap">{value}</p>}
                   {editingTerrain && (
