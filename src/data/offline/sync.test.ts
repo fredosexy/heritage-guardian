@@ -48,10 +48,15 @@ const state = vi.hoisted(() => ({
       orderBy: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      add: vi.fn(),
     },
     drafts: {
       where: vi.fn(),
       update: vi.fn(),
+    },
+    conflicts: {
+      get: vi.fn(),
+      delete: vi.fn(),
     },
   },
   mockSupabase: {
@@ -63,14 +68,15 @@ const state = vi.hoisted(() => ({
 state.mockDb.queue.orderBy.mockImplementation(() => ({
   toArray: async () => state.queuedOps,
 }));
-state.mockDb.drafts.where.mockImplementation(() => ({
+state.mockDb.drafts.where.mockImplementation((query: unknown) => ({
   equals: () => ({ first: async () => state.draft }),
+  toArray: async () => query && typeof query === "object" && "user_id" in query && query.user_id === state.draft.user_id ? [state.draft] : [],
 }));
 
 vi.mock("@/data/offline/db", () => ({ db: state.mockDb }));
 vi.mock("@/integrations/supabase/client", () => ({ supabase: state.mockSupabase }));
 
-import { processQueue } from "./sync";
+import { claimLocalDrafts, processQueue, resolveConflict } from "./sync";
 
 describe("offline sync auth revalidation", () => {
   beforeEach(() => {
@@ -100,6 +106,9 @@ describe("offline sync auth revalidation", () => {
     state.mockDb.queue.update.mockReset();
     state.mockDb.queue.delete.mockReset();
     state.mockDb.drafts.update.mockReset();
+    state.mockDb.queue.add.mockReset();
+    state.mockDb.conflicts.get.mockReset();
+    state.mockDb.conflicts.delete.mockReset();
   });
 
   it("pauses the queue when the session is expired or signed out", async () => {
