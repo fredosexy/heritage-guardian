@@ -78,6 +78,28 @@ describe("offline Terrain section updates", () => {
       provenance: "Acte ancien",
     });
   });
+
+  it("preserves a queued field-level edit when Terrain metadata is also edited offline", async () => {
+    await mocks.queueAdd({
+      kind: "update_dossier",
+      payload: {
+        dossierId: "dossier-1",
+        changes: { title: "Titre modifié hors ligne" },
+        baseUpdatedAt: "2026-10-19T10:00:00Z",
+      },
+      created_at: 1,
+      attempts: 0,
+    });
+
+    await enqueueUpdateDossierMetadata("dossier-1", {
+      terrain: { version: 1, sections: { histoire: "Historique familial" } },
+    });
+
+    const pending = [...mocks.queued.values()].filter((op) => op.kind === "update_dossier");
+    expect(pending).toHaveLength(2);
+    expect(pending.some((op) => op.payload.changes?.title === "Titre modifié hors ligne")).toBe(true);
+    expect(pending.some((op) => op.payload.metadata?.terrain?.sections?.histoire === "Historique familial")).toBe(true);
+  });
 });
 
 describe("sync queue concurrency", () => {
