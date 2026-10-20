@@ -261,6 +261,12 @@ export async function processQueue(): Promise<void> {
   } finally {
     syncing = false;
     emit();
+    if (rerunRequested) {
+      rerunRequested = false;
+      if (typeof navigator === "undefined" || navigator.onLine) {
+        void processQueue();
+      }
+    }
   }
 }
 
