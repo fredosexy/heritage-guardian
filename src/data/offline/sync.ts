@@ -118,12 +118,18 @@ export async function processQueue(): Promise<void> {
     const ops = await db.queue.orderBy("created_at").toArray();
     for (const op of ops) {
       try {
+        // An operation can outlive the session that queued it. Never replay it
+        // under a missing or different identity.
+        const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
+        if (sessionError || !currentUser) break;
+
         if (op.kind === "create_dossier") {
           const draft = await db.drafts.where("localId").equals(op.payload.localId).first();
           if (!draft || draft.synced) {
             await db.queue.delete(op.id!);
             continue;
           }
+          if (draft.user_id !== currentUser.id) break;
           const { data, error } = await supabase.from("dossiers").insert({
             user_id: draft.user_id,
             type: draft.type as any,
@@ -160,6 +166,14 @@ export async function processQueue(): Promise<void> {
             await db.queue.delete(op.id!);
             continue;
           }
+          const { data: ownedDossier, error: ownershipError } = await supabase
+            .from("dossiers")
+            .select("id")
+            .eq("id", dossierId)
+            .eq("user_id", currentUser.id)
+            .single();
+          if (ownershipError) throw ownershipError;
+          if (!ownedDossier) break;
           await proceduresRepo.initializeDossierJourney(dossierId);
           await db.queue.delete(op.id!);
           emit();
@@ -173,10 +187,12 @@ export async function processQueue(): Promise<void> {
           // Merge with the latest server metadata so unrelated concurrent changes survive.
           const { data: currentDossier, error: readError } = await supabase
             .from("dossiers")
-            .select("metadata")
+            .select("metadata, user_id")
             .eq("id", dossierId)
+            .eq("user_id", currentUser.id)
             .single();
           if (readError) throw readError;
+          if (currentDossier.user_id !== currentUser.id) break;
           const currentMetadata = currentDossier?.metadata && typeof currentDossier.metadata === "object" && !Array.isArray(currentDossier.metadata)
             ? currentDossier.metadata as Record<string, unknown>
             : {};
@@ -208,7 +224,7 @@ export async function processQueue(): Promise<void> {
                 },
               }
             : { ...currentMetadata, ...queuedMetadata };
-          const { error } = await supabase.from("dossiers").update({ metadata: mergedMetadata }).eq("id", dossierId);
+          const { error } = await supabase.from("dossiers").update({ metadata: mergedMetadata }).eq("id", dossierId).eq("user_id", currentUser.id);
           if (error) throw error;
           // A newer edit may have replaced this queue entry while the request was in flight.
           // Delete only if the queued payload is still the one we just synchronized.
@@ -228,6 +244,15 @@ export async function processQueue(): Promise<void> {
             await db.queue.update(op.id!, { attempts: (op.attempts || 0) + 1, last_error: "Invalid queued proof upload" });
             break;
           }
+          if (userId !== currentUser.id) break;
+          const { data: ownedDossier, error: ownershipError } = await supabase
+            .from("dossiers")
+            .select("id")
+            .eq("id", dossierId)
+            .eq("user_id", currentUser.id)
+            .single();
+          if (ownershipError) throw ownershipError;
+          if (!ownedDossier) break;
           // Multiple tabs may process the same queued operation at once. Storage upsert
           // makes the object write repeatable; the unique storage_path index plus DB upsert
           // ensures that all workers converge on one proof row.
@@ -300,6 +325,10 @@ export async function deleteLocalDraft(localId: string): Promise<void> {
 
 export async function claimLocalDrafts(fromUserId: string, toUserId: string): Promise<number> {
   if (!fromUserId || fromUserId === toUserId) return 0;
+  const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError || !currentUser || currentUser.id !== toUserId) {
+    throw new Error("Session active du compte cible requise pour rattacher les brouillons");
+  }
   const drafts = await db.drafts.where({ user_id: fromUserId, synced: 0 }).toArray();
   for (const draft of drafts) {
     await db.drafts.update(draft.id!, { user_id: toUserId, updated_at: Date.now() });
