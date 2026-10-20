@@ -37,7 +37,9 @@ export async function uploadProof(params: {
   sectionKey?: string;
 }): Promise<Proof> {
   const { file, dossierId, userId, sectionKey } = params;
-  const path = `${userId}/${dossierId}/${Date.now()}-${file.name}`;
+  // Keep simultaneous uploads of same-named files distinct; retries reuse this stored path.
+  const uploadId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const path = `${userId}/${dossierId}/${uploadId}-${file.name}`;
   const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file);
   if (upErr) throw upErr;
 
