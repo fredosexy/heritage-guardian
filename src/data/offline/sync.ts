@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import * as proceduresRepo from "@/data/procedures.repo";
 import { detectConflictFields, type DossierChanges } from "@/services/sync-conflicts";
 import { db, DraftDossier } from "./db";
+import type { Database } from "@/integrations/supabase/types";
 
 let syncing = false;
 let rerunRequested = false;
@@ -153,7 +154,7 @@ export async function processQueue(): Promise<void> {
           if (draft.user_id !== currentUser.id) break;
           const { data, error } = await supabase.from("dossiers").insert({
             user_id: draft.user_id,
-            type: draft.type as any,
+            type: draft.type as Database["public"]["Enums"]["dossier_type"],
             title: draft.title,
             description: draft.description || null,
             location_name: draft.location_name || null,
