@@ -39,11 +39,12 @@ describe("proof persistence", () => {
 
   it("uploads the object and persists a proof attached to the requested Terrain section", async () => {
     vi.spyOn(Date, "now").mockReturnValue(123456);
+    vi.spyOn(Math, "random").mockReturnValue(0.5);
     const file = new File(["acte"], "titre.pdf", { type: "application/pdf" });
     const savedProof = {
       id: "proof-1",
       dossier_id: "dossier-1",
-      storage_path: "user-1/dossier-1/123456-titre.pdf",
+      storage_path: "user-1/dossier-1/123456-i-titre.pdf",
       metadata: { terrainSectionKey: "documentation" },
     };
     mocks.from.mockReturnValue({ insert: mocks.proofInsert });
@@ -57,7 +58,7 @@ describe("proof persistence", () => {
     })).resolves.toEqual(savedProof);
 
     expect(mocks.storageUpload).toHaveBeenCalledWith(
-      "user-1/dossier-1/123456-titre.pdf",
+      "user-1/dossier-1/123456-i-titre.pdf",
       file,
     );
     expect(mocks.from).toHaveBeenCalledWith("proofs");
@@ -66,7 +67,7 @@ describe("proof persistence", () => {
       uploaded_by: "user-1",
       type: "document",
       title: "titre.pdf",
-      storage_path: "user-1/dossier-1/123456-titre.pdf",
+      storage_path: "user-1/dossier-1/123456-i-titre.pdf",
       metadata: { terrainSectionKey: "documentation" },
     }));
   });
@@ -92,7 +93,7 @@ describe("proof persistence", () => {
 
     expect(thrown).toBeInstanceOf(ProofPersistenceError);
     expect(thrown).toMatchObject({
-      storagePath: "user-1/dossier-1/123456-titre.pdf",
+      storagePath: "user-1/dossier-1/123456-i-titre.pdf",
       cause: databaseError,
     });
     expect(mocks.storageUpload).toHaveBeenCalledOnce();
@@ -150,7 +151,7 @@ describe("listProofs reload", () => {
       id: "proof-1",
       dossier_id: "dossier-1",
       title: "titre.pdf",
-      storage_path: "user-1/dossier-1/123456-titre.pdf",
+      storage_path: "user-1/dossier-1/123456-i-titre.pdf",
       metadata: { terrainSectionKey: "documentation" },
       verified: false,
     };
