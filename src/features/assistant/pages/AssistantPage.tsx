@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2, Send, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { AiUnavailableError, streamChat, type ChatMessage } from "@/services";
-import { DOSSIER_TYPES } from "@/features/dossiers/components/dossierTypeMeta";
+import { DOSSIER_TYPES, typeLabelKey } from "@/features/dossiers/components/dossierTypeMeta";
 
 export default function AssistantPage() {
   const { t, i18n } = useTranslation();
@@ -126,7 +126,7 @@ export default function AssistantPage() {
         </header>
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
-          {moduleMeta && <section className="rounded-2xl border border-border bg-card p-3 space-y-2"><p className="text-xs uppercase tracking-wide text-primary font-medium">{t("modules.label")}</p><p className="font-semibold">{t("modules." + moduleId + ".title")}</p><p className="text-sm text-muted-foreground">{moduleId === "savoir" ? t(moduleMeta.descKey ?? "create.savoirDesc") : t("modules." + moduleId + ".longDescription")}</p>{moduleSteps.length > 0 && <div className="flex flex-wrap gap-2">{moduleSteps.slice(0, 4).map((step) => <Button key={step} type="button" variant="outline" size="sm" className="rounded-xl text-left whitespace-normal h-auto" onClick={() => setInput(step)}>{step}</Button>)}</div>}</section>}
+          {moduleMeta && <section className="rounded-2xl border border-border bg-card p-3 space-y-2"><p className="text-xs uppercase tracking-wide text-primary font-medium">{t("modules.label")}</p><p className="font-semibold">{moduleId === "savoir" ? t(typeLabelKey(moduleId)) : t("modules." + moduleId + ".title")}</p><p className="text-sm text-muted-foreground">{moduleId === "savoir" ? t(moduleMeta.descKey ?? "create.savoirDesc") : t("modules." + moduleId + ".longDescription")}</p>{moduleSteps.length > 0 && <div className="flex flex-wrap gap-2">{moduleSteps.slice(0, 4).map((step) => <Button key={step} type="button" variant="outline" size="sm" className="rounded-xl text-left whitespace-normal h-auto" onClick={() => setInput(step)}>{step}</Button>)}</div>}</section>}
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
