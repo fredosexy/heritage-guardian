@@ -60,8 +60,16 @@ USING (
     WHERE d.id::text = (storage.foldername(name))[2]
       AND d.user_id::text = (storage.foldername(name))[1]
       AND (
+        -- Owners retain access to their own dossier folder.
         d.user_id = auth.uid()
-        OR public.is_dossier_participant(d.id, auth.uid())
+        -- Participants may read only files represented by a proof row.
+        OR EXISTS (
+          SELECT 1
+          FROM public.proofs AS p
+          WHERE p.storage_path = storage.objects.name
+            AND p.dossier_id = d.id
+            AND public.is_dossier_participant(d.id, auth.uid())
+        )
       )
   )
 );
