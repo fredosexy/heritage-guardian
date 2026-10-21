@@ -23,6 +23,7 @@ describe("authorizeAiRequest", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.createClient.mockReset();
     env = {
       SUPABASE_URL: "https://project.example.test",
       SUPABASE_ANON_KEY: "anon-test-key",
