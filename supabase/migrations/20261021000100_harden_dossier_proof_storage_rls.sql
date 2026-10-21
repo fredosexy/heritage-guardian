@@ -68,7 +68,13 @@ USING (
           FROM public.proofs AS p
           WHERE p.storage_path = storage.objects.name
             AND p.dossier_id = d.id
-            AND public.is_dossier_participant(d.id, auth.uid())
+            AND EXISTS (
+              SELECT 1
+              FROM public.participants AS participant
+              WHERE participant.dossier_id = d.id
+                AND participant.user_id = auth.uid()
+                AND participant.accepted_at IS NOT NULL
+            )
         )
       )
   )
