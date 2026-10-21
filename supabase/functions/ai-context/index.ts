@@ -1,43 +1,6 @@
 import { corsHeaders } from "@supabase/supabase-js/cors";
 import { authorizeAiRequest } from "../_shared/ai-security.ts";
-
-async function readJsonBody(req: Request, maxBytes: number): Promise<
-  { kind: "ok"; value: unknown } | { kind: "too_large" } | { kind: "invalid" }
-> {
-  const declaredLength = Number(req.headers.get("content-length"));
-  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { kind: "too_large" };
-  if (!req.body) return { kind: "invalid" };
-
-  const reader = req.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let totalBytes = 0;
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      totalBytes += value.byteLength;
-      if (totalBytes > maxBytes) {
-        await reader.cancel();
-        return { kind: "too_large" };
-      }
-      chunks.push(value);
-    }
-  } catch {
-    return { kind: "invalid" };
-  }
-
-  const bytes = new Uint8Array(totalBytes);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  try {
-    return { kind: "ok", value: JSON.parse(new TextDecoder().decode(bytes)) };
-  } catch {
-    return { kind: "invalid" };
-  }
-}
+import { readBoundedJsonBody } from "../_shared/request-body.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -51,7 +14,7 @@ Deno.serve(async (req) => {
   const authorization = await authorizeAiRequest(req, "ai-context", 30);
   if ("response" in authorization) return authorization.response;
 
-  const parsedBody = await readJsonBody(req, 16 * 1024);
+  const parsedBody = await readBoundedJsonBody(req, 16 * 1024);
   if (parsedBody.kind === "too_large") {
     return new Response(JSON.stringify({ error: "request_too_large" }), {
       status: 413,
