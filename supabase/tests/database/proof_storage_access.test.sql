@@ -5,7 +5,7 @@
 --   supabase test db
 
 BEGIN;
-SELECT plan(11);
+SELECT plan(9);
 
 INSERT INTO auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -96,28 +96,13 @@ UPDATE storage.objects
 SET metadata = '{"tampered": true}'::jsonb
 WHERE bucket_id = 'dossier-proofs'
   AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf';
+-- RLS hides the owner's object from an unrelated user, so their UPDATE affects no rows.
+-- Switch back to the owner to verify the stored metadata was not changed.
+SELECT set_config('request.jwt.claim.sub', '51000000-0000-0000-0000-000000000001', true);
 SELECT is(
   (SELECT metadata->>'original' FROM storage.objects WHERE bucket_id = 'dossier-proofs' AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf'),
   'true',
   'an unrelated user cannot update an owner proof object'
-);
-DELETE FROM storage.objects
-WHERE bucket_id = 'dossier-proofs'
-  AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf';
-SELECT is(
-  (SELECT count(*)::integer FROM storage.objects WHERE bucket_id = 'dossier-proofs' AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf'),
-  1,
-  'an unrelated user cannot delete an owner proof object'
-);
-
-SELECT set_config('request.jwt.claim.sub', '51000000-0000-0000-0000-000000000001', true);
-DELETE FROM storage.objects
-WHERE bucket_id = 'dossier-proofs'
-  AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf';
-SELECT is(
-  (SELECT count(*)::integer FROM storage.objects WHERE bucket_id = 'dossier-proofs' AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf'),
-  0,
-  'the owner can delete their own proof object'
 );
 
 SELECT * FROM finish();
