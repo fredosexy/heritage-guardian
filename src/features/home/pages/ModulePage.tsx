@@ -5,8 +5,9 @@ import { ArrowLeft, ChevronRight, CircleCheck, LockKeyhole, Sparkles } from "luc
 import { AppLayout } from "@/features/shell";
 import { useDossiers } from "@/features/dossiers/hooks/useDossiers";
 import { useIdentity } from "@/features/identity";
+import { DOSSIER_TYPES, typeLabelKey } from "@/features/dossiers/components/dossierTypeMeta";
 
-const moduleIds = ["terrain", "heritage", "conflit", "volonte"] as const;
+const moduleIds = DOSSIER_TYPES.map(({ id }) => id);
 
 export default function ModulePage() {
   const { t } = useTranslation();
@@ -15,7 +16,11 @@ export default function ModulePage() {
   const { dossiers, loading } = useDossiers();
   const { isGuest } = useIdentity();
 
-  const id = moduleIds.includes(moduleId as (typeof moduleIds)[number]) ? moduleId! : "terrain";
+  const id = moduleIds.includes(moduleId ?? "") ? moduleId! : "terrain";
+  const moduleMeta = DOSSIER_TYPES.find((item) => item.id === id);
+  const available = moduleMeta?.available ?? false;
+  const translatedSteps = t(`modules.${id}.steps`, { returnObjects: true });
+  const steps = Array.isArray(translatedSteps) ? translatedSteps as string[] : [];
   const related = useMemo(() => dossiers.filter((d) => d.type === id), [dossiers, id]);
   const secure = related.filter((d) => d.status === "secure").length;
   const inProgress = related.filter((d) => d.status !== "secure").length;
@@ -36,8 +41,9 @@ export default function ModulePage() {
           </span>
           <div>
             <p className="text-xs uppercase tracking-wide text-primary font-medium">{t("modules.label")}</p>
-            <h1 className="text-display mt-1">{t(`modules.${id}.title`)}</h1>
-            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{t(`modules.${id}.longDescription`)}</p>
+            <h1 className="text-display mt-1">{id === "savoir" ? t(typeLabelKey(id)) : t(`modules.${id}.title`)}</h1>
+            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{id === "savoir" ? t(moduleMeta?.descKey ?? "create.savoirDesc") : t(`modules.${id}.longDescription`)}</p>
+            {!available && <p className="mt-3 inline-flex rounded-full bg-muted px-3 py-1.5 text-xs text-muted-foreground">{t("create.comingSoon")}</p>}
           </div>
         </div>
       </header>
@@ -77,7 +83,7 @@ export default function ModulePage() {
       <section className="mb-5">
         <h2 className="text-base font-serif mb-3">{t("modules.stepsTitle")}</h2>
         <div className="space-y-2">
-          {(t(`modules.${id}.steps`, { returnObjects: true }) as string[]).map((step, index) => (
+          {steps.map((step, index) => (
             <div key={step} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
               <span className="size-7 rounded-full bg-accent text-primary flex items-center justify-center text-xs font-semibold">
                 {index + 1}
@@ -96,7 +102,7 @@ export default function ModulePage() {
         <span className="flex items-center justify-between gap-3">
           <span>
             <span className="block font-semibold">
-              {isGuest ? t("modules.visitorStart") : t(`modules.cta.${secure > 0 ? "progress" : "new"}`)}
+              {!available ? t("create.comingSoon") : isGuest ? t("modules.visitorStart") : t(`modules.cta.${secure > 0 ? "progress" : "new"}`)}
             </span>
             <span className="block text-sm opacity-85 mt-1">{nextStep ? t("modules.nextStepExisting", { title: nextStep.title }) : t("modules.guidedHint")}</span>
           </span>
