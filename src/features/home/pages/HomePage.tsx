@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/features/shell";
 import { useProfile, ProfileCompletionCard } from "@/features/profile";
-import { FirstStepDialog, VisitorBanner, useIdentity } from "@/features/identity";
+import { useIdentity } from "@/features/identity";
 import { useUnreadAlerts } from "@/features/alerts/hooks/useAlerts";
 import { useDossiers } from "@/features/dossiers/hooks/useDossiers";
 import { HomeHeader } from "../components/HomeHeader";
@@ -27,9 +27,7 @@ export default function HomePage() {
   const { profile, loading: profileLoading } = useProfile();
   const { alerts, loading: alertsLoading } = useUnreadAlerts(5);
   const { dossiers, loading: dossiersLoading } = useDossiers();
-  const { isAuthenticated, displayName, guest, needsFirstStep } = useIdentity();
-  const [firstStepOpen, setFirstStepOpen] = useState(false);
-  const [pendingRoute, setPendingRoute] = useState<string | null>(null);
+  const { isAuthenticated, displayName, guest } = useIdentity();
 
   useEffect(() => {
     if (isAuthenticated && !profileLoading && profile && !profile.onboarding_completed) navigate("/onboarding", { replace: true });
@@ -64,15 +62,7 @@ export default function HomePage() {
     moduleStats.find((module) => module.dossierCount > 0) ??
     moduleStats[0];
 
-  const openModule = (route: string) => {
-    if (!isAuthenticated && needsFirstStep) {
-      setPendingRoute(route);
-      setFirstStepOpen(true);
-      return;
-    }
-    navigate(route);
-  };
-
+  const openModule = (route: string) => navigate(route);
   const continueRoute = `/modules/${firstActiveModule.id}`;
 
   if (profileLoading || alertsLoading || dossiersLoading) {
@@ -82,7 +72,6 @@ export default function HomePage() {
   if (!isAuthenticated) {
     return (
       <AppLayout>
-        <VisitorBanner />
         <section className="mb-7">
           <p className="text-xs uppercase tracking-[0.18em] text-primary font-medium">{t("home.visitorEyebrow")}</p>
           <h1 className="text-display mt-2">{t("home.visitorTitle")}</h1>
@@ -94,10 +83,8 @@ export default function HomePage() {
         </section>
         <section className="rounded-3xl bg-gradient-hero p-5 text-primary-foreground shadow-elegant mb-6">
           <div className="flex items-start gap-3"><Sparkles className="size-5 mt-0.5 shrink-0" /><div><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><p className="text-sm opacity-85 mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>
-          <Button onClick={() => openModule("/assistant")} variant="secondary" className="w-full mt-4 rounded-2xl justify-between">{t("home.visitorAssistantCta")}<ChevronRight className="size-4" /></Button>
+          <Button onClick={() => navigate("/assistant")} variant="secondary" className="w-full mt-4 rounded-2xl justify-between">{t("home.visitorAssistantCta")}<ChevronRight className="size-4" /></Button>
         </section>
-        <section className="rounded-3xl border border-border bg-card p-5 mb-4"><p className="text-sm font-semibold">{t("home.visitorIdentityTitle")}</p><p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{t("home.visitorIdentityHint")}</p><Button onClick={() => navigate("/auth")} className="w-full mt-4 rounded-2xl">{t("home.visitorAccountCta")}</Button></section>
-        <FirstStepDialog open={firstStepOpen} onClose={() => { setFirstStepOpen(false); if (pendingRoute) { const route = pendingRoute; setPendingRoute(null); navigate(route); } }} />
       </AppLayout>
     );
   }
