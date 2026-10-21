@@ -98,12 +98,12 @@ try {
 
   // ai-chat allows 12 requests/minute per user. The 13th must be rate-limited.
   let last;
-  for (let i = 1; i < 13; i++) {
+  for (let i = 2; i <= 12; i++) {
     last = await callFunction("ai-chat", rateUser.token, { messages: [{ role: "user", content: "test" }] });
-    if (i < 12) assert.equal(last.response.status, 503, `request ${i}: ${last.response.status} ${last.text}`);
+    assert.equal(last.response.status, 503, `request ${i}: ${last.response.status} ${last.text}`);
   }
   last = await callFunction("ai-chat", rateUser.token, { messages: [{ role: "user", content: "test" }] });
-  assert.equal(last.response.status, 429, `rate limit: ${last.response.status} ${last.text}`);
+  assert.equal(last.response.status, 429, `13th request rate limit: ${last.response.status} ${last.text}`);
 
   console.log("Edge integration passed: unauthenticated, owner, accepted participant, outsider, missing gateway key, rate limit.");
 } finally {
