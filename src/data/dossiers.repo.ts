@@ -14,11 +14,12 @@ export interface NewDossierInput {
   metadata?: Record<string, unknown>;
 }
 
-export async function listDossiers(userId: string): Promise<Dossier[]> {
+export async function listDossiers(): Promise<Dossier[]> {
   const { data, error } = await supabase
     .from("dossiers")
     .select("*")
-    .eq("user_id", userId)
+    // RLS filters this list to dossiers the current session is allowed to read.
+    // Do not filter by owner here: accepted participants can also see shared dossiers.
     .order("updated_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
