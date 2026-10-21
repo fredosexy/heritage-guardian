@@ -1,9 +1,9 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/features/shell";
 import { useProfile, ProfileCompletionCard } from "@/features/profile";
-import { useIdentity } from "@/features/identity";
+import { useIdentity, FirstStepDialog } from "@/features/identity";
 import { useUnreadAlerts } from "@/features/alerts/hooks/useAlerts";
 import { useDossiers } from "@/features/dossiers/hooks/useDossiers";
 import { HomeHeader } from "../components/HomeHeader";
@@ -28,6 +28,7 @@ export default function HomePage() {
   const { alerts, loading: alertsLoading } = useUnreadAlerts(5);
   const { dossiers, loading: dossiersLoading } = useDossiers();
   const { isAuthenticated, displayName, guest } = useIdentity();
+  const [personalizationOpen, setPersonalizationOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && !profileLoading && profile && !profile.onboarding_completed) navigate("/onboarding", { replace: true });
@@ -77,6 +78,16 @@ export default function HomePage() {
           <h1 className="text-display mt-2">{t("home.visitorTitle")}</h1>
           <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-xl">{t("home.visitorVision")}</p>
         </section>
+        <section className="mb-5 rounded-2xl border border-border/70 bg-card/70 p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="font-medium">{guest.firstName ? t("firstStep.title") : t("firstStep.subtitle")}</p>
+              <p className="text-sm text-muted-foreground mt-1">{guest.firstName ? guest.firstName : t("firstStep.namePlaceholder")}</p>
+            </div>
+            <Button variant="outline" className="shrink-0 rounded-xl" onClick={() => setPersonalizationOpen(true)}>{t("firstStep.continue")}</Button>
+          </div>
+        </section>
+        <FirstStepDialog open={personalizationOpen} onClose={() => setPersonalizationOpen(false)} />
         <section className="mb-7">
           <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.modulesTitle")}</h2><p className="text-caption mt-1">{t("home.modulesVisitorHint")}</p></div><Sparkles className="size-5 text-primary" /></div>
           <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} journeyProgress={module.journeyProgress} currentStepTitle={module.currentStepTitle} nextStepTitle={module.nextStepTitle} blockedStepTitle={module.blockedStepTitle} participantsCount={module.participantsCount} proofsCount={module.proofsCount} onFirstGesture={openModule} />)}</div>
