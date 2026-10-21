@@ -1,6 +1,46 @@
 import { corsHeaders } from "@supabase/supabase-js/cors";
 import { authorizeAiRequest } from "../_shared/ai-security.ts";
 
+const MAX_BODY_BYTES = 20_000;
+
+async function readJsonBody(req: Request): Promise<
+  { kind: "ok"; value: unknown } | { kind: "too_large" } | { kind: "invalid" }
+> {
+  const declaredLength = Number(req.headers.get("content-length"));
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_BODY_BYTES) return { kind: "too_large" };
+  if (!req.body) return { kind: "invalid" };
+
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > MAX_BODY_BYTES) {
+        await reader.cancel();
+        return { kind: "too_large" };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { kind: "invalid" };
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try {
+    return { kind: "ok", value: JSON.parse(new TextDecoder().decode(bytes)) };
+  } catch {
+    return { kind: "invalid" };
+  }
+}
+
 function jsonResponse(status: number, error: string): Response {
   return new Response(JSON.stringify({ error }), {
     status,
@@ -15,16 +55,14 @@ Deno.serve(async (req) => {
   const authorization = await authorizeAiRequest(req, "ai-chat", 12);
   if ("response" in authorization) return authorization.response;
 
-  let body: { messages?: unknown; language?: unknown };
-  try {
-    const rawBody = await req.text();
-    if (rawBody.length > 20000) return jsonResponse(413, "request_too_large");
-    body = JSON.parse(rawBody);
-  } catch {
+  const parsedBody = await readJsonBody(req);
+  if (parsedBody.kind === "too_large") return jsonResponse(413, "request_too_large");
+  if (parsedBody.kind === "invalid") return jsonResponse(400, "invalid_request");
+  if (!parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) {
     return jsonResponse(400, "invalid_request");
   }
-
-  const messages = body?.messages;
+  const body = parsedBody.value as { messages?: unknown; language?: unknown };
+  const messages = body.messages;
   const language = typeof body?.language === "string" && body.language.toLowerCase().startsWith("fr")
     ? "fr"
     : "en";
