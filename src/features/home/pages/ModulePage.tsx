@@ -25,7 +25,7 @@ export default function ModulePage() {
   const secure = related.filter((d) => d.status === "secure").length;
   const inProgress = related.filter((d) => d.status !== "secure").length;
 
-  const startRoute = id === "terrain" ? "/create?type=terrain" : "/assistant";
+  const startRoute = id === "terrain" ? "/create?type=terrain" : "/assistant?module=" + encodeURIComponent(id);
   const nextStep = related.find((d) => d.status !== "secure");
 
   return (
