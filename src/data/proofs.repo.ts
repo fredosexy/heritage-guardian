@@ -84,8 +84,10 @@ export async function deleteProof(proof: Pick<Proof, "id" | "storage_path">): Pr
   if (error) throw error;
 }
 
-export async function countProofsByDossier(userId: string): Promise<Record<string, number>> {
-  const { data, error } = await supabase.from("proofs").select("dossier_id").eq("uploaded_by", userId);
+export async function countProofsByDossier(): Promise<Record<string, number>> {
+  // RLS limits this query to proofs visible to the current session, including
+  // proofs shared with an accepted participant. Do not restrict counts to the uploader.
+  const { data, error } = await supabase.from("proofs").select("dossier_id");
   if (error) throw error;
   const out: Record<string, number> = {};
   for (const row of data ?? []) out[row.dossier_id] = (out[row.dossier_id] ?? 0) + 1;
