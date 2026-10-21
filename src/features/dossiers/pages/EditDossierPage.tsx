@@ -15,7 +15,7 @@ export default function EditDossierPage() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const { dossier, loading, save } = useEditDossier(id);
+  const { dossier, loading, save, canEdit } = useEditDossier(id);
   const [form, setForm] = useState({ title: "", description: "", location_name: "" });
   const [busy, setBusy] = useState(false);
 
@@ -32,7 +32,8 @@ export default function EditDossierPage() {
       if (!changed) { toast.info(t("sync.noChange")); return; }
       toast.success(t("sync.savedOffline"), { action: { label: t("sync.open"), onClick: () => navigate("/sync") } });
       navigate(`/dossiers/${id}`, { replace: true });
-    } finally { setBusy(false); }
+    } catch { toast.error(t("sync.error")); }
+    finally { setBusy(false); }
   };
 
   if (loading) return <AppLayout><div className="flex justify-center py-12"><Loader2 className="size-5 animate-spin text-primary" /></div></AppLayout>;
@@ -46,7 +47,9 @@ export default function EditDossierPage() {
   return (
     <AppLayout>
       <PageHeader title={t("sync.editTitle")} showBack />
+      {!canEdit && <p className="text-sm text-muted-foreground mb-4">{t("sync.ownerOnly")}</p>}
       <form onSubmit={submit} className="card-soft p-4 space-y-4">
+        <fieldset disabled={!canEdit || busy} className="space-y-4">
         <div className="space-y-1">
           <Label htmlFor="title">{t("sync.field_title")}</Label>
           <Input id="title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
@@ -60,6 +63,7 @@ export default function EditDossierPage() {
           <Input id="loc" value={form.location_name} onChange={(e) => setForm({ ...form, location_name: e.target.value })} />
         </div>
         <Button type="submit" className="w-full" disabled={busy}>{t("sync.save")}</Button>
+        </fieldset>
       </form>
     </AppLayout>
   );

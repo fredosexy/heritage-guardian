@@ -5,6 +5,7 @@ import { scoreDossier } from "@/services";
 import { fetchDossierSuggestions } from "@/services";
 import { useAuth } from "@/features/identity";
 import { onSyncChange } from "@/data/offline/sync";
+import { assertDossierOwner, canEditDossier } from "@/services/dossier-ownership";
 
 export function useDossierDetail(id?: string) {
   const { user } = useAuth();
@@ -43,6 +44,7 @@ export function useDossierDetail(id?: string) {
 
   const addProof = useCallback(async (file: File, sectionKey?: string): Promise<"uploaded" | "queued" | ""> => {
     if (!user || !dossier) return "";
+    assertDossierOwner(dossier, user.id);
     setUploading(true);
     try {
       if (typeof navigator !== "undefined" && !navigator.onLine) {
@@ -85,5 +87,5 @@ export function useDossierDetail(id?: string) {
     await dossiersRepo.deleteDossier(dossier.id);
   }, [dossier]);
 
-  return { dossier, proofs, participants, suggestions, loading, uploading, addProof, remove, reload: load };
+  return { dossier, proofs, participants, suggestions, loading, uploading, addProof, remove, reload: load, canEdit: canEditDossier(dossier, user?.id) };
 }
