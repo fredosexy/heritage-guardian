@@ -438,19 +438,45 @@ export async function resolveConflict(conflictId: number, values: DossierChanges
   const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
   if (sessionError || !currentUser) throw new Error("Session requise pour résoudre ce conflit");
 
-  const { error: lookupError } = await supabase
+  const { data: remote, error: lookupError } = await supabase
     .from("dossiers")
-    .select("id")
+    .select("id, title, description, location_name, updated_at, user_id")
     .eq("id", conflict.dossier_id)
     .eq("user_id", currentUser.id)
     .single();
   if (lookupError) throw lookupError;
+  assertDossierOwner(remote, currentUser.id);
+
+  if (remote.updated_at !== conflict.remote_updated_at) {
+    const fields = (Object.keys(conflict.mine) as (keyof DossierChanges)[]).filter(
+      (field) => (remote[field] ?? null) !== (conflict.mine[field] ?? null)
+    );
+    if (fields.length === 0) {
+      await db.conflicts.delete(conflictId);
+      emit();
+      return;
+    }
+
+    const theirs: Record<string, string | null> = {};
+    for (const field of Object.keys(conflict.mine) as (keyof DossierChanges)[]) {
+      theirs[field] = remote[field] ?? null;
+    }
+    await db.conflicts.update(conflictId, {
+      title: remote.title,
+      fields,
+      theirs,
+      remote_updated_at: remote.updated_at,
+    });
+    emit();
+    throw new Error("Le dossier a changé depuis l'affichage du conflit. Vérifiez les valeurs actualisées.");
+  }
 
   const { error } = await supabase
     .from("dossiers")
     .update(values)
     .eq("id", conflict.dossier_id)
-    .eq("user_id", currentUser.id);
+    .eq("user_id", currentUser.id)
+    .eq("updated_at", conflict.remote_updated_at);
   if (error) throw error;
   await db.conflicts.delete(conflictId);
   emit();
