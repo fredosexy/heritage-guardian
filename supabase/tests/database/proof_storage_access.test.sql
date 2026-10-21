@@ -5,7 +5,7 @@
 --   supabase test db
 
 BEGIN;
-SELECT plan(6);
+SELECT plan(11);
 
 INSERT INTO auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -70,6 +70,54 @@ SELECT is(
   (SELECT count(*)::integer FROM storage.objects WHERE bucket_id = 'dossier-proofs' AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/shared.pdf'),
   1,
   'the owner retains access to their own proof object'
+);
+
+INSERT INTO storage.objects (bucket_id, name, metadata)
+VALUES (
+  'dossier-proofs',
+  '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf',
+  '{"original": true}'::jsonb
+);
+SELECT is(
+  (SELECT count(*)::integer FROM storage.objects WHERE bucket_id = 'dossier-proofs' AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf'),
+  1,
+  'the owner can upload an object for their own dossier'
+);
+
+SELECT set_config('request.jwt.claim.sub', '51000000-0000-0000-0000-000000000003', true);
+SELECT throws_ok(
+  $INSERT INTO storage.objects (bucket_id, name)
+    VALUES ('dossier-proofs', '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/outsider-upload.pdf')$,
+  '42501',
+  'new row violates row-level security policy for table "objects"',
+  'an unrelated user cannot upload into another owner folder'
+);
+UPDATE storage.objects
+SET metadata = '{"tampered": true}'::jsonb
+WHERE bucket_id = 'dossier-proofs'
+  AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf';
+SELECT is(
+  (SELECT metadata->>'original' FROM storage.objects WHERE bucket_id = 'dossier-proofs' AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf'),
+  'true',
+  'an unrelated user cannot update an owner proof object'
+);
+DELETE FROM storage.objects
+WHERE bucket_id = 'dossier-proofs'
+  AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf';
+SELECT is(
+  (SELECT count(*)::integer FROM storage.objects WHERE bucket_id = 'dossier-proofs' AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf'),
+  1,
+  'an unrelated user cannot delete an owner proof object'
+);
+
+SELECT set_config('request.jwt.claim.sub', '51000000-0000-0000-0000-000000000001', true);
+DELETE FROM storage.objects
+WHERE bucket_id = 'dossier-proofs'
+  AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf';
+SELECT is(
+  (SELECT count(*)::integer FROM storage.objects WHERE bucket_id = 'dossier-proofs' AND name = '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/owner-upload.pdf'),
+  0,
+  'the owner can delete their own proof object'
 );
 
 SELECT * FROM finish();
