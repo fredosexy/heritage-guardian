@@ -1,6 +1,6 @@
 begin;
 
-select plan(10);
+select plan(15);
 
 select ok(
   NOT has_function_privilege('anon', 'public.consume_ai_request(uuid,text,integer,integer)', 'EXECUTE'),
@@ -61,6 +61,42 @@ select throws_ok(
   '22023',
   'invalid_ai_rate_limit_arguments',
   'windows above one hour are rejected'
+);
+
+-- Use a real local auth.users row so the FK and rate-limit ledger are exercised.
+insert into auth.users (
+  id, aud, role, email, encrypted_password, email_confirmed_at,
+  raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+) values (
+  '00000000-0000-4000-8000-000000000001',
+  'authenticated', 'authenticated', 'rate-limit-test@example.invalid', '',
+  now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()
+);
+
+select is(
+  public.consume_ai_request('00000000-0000-4000-8000-000000000001', 'ai-chat', 2, 60),
+  true,
+  'first request is allowed under a quota of two'
+);
+select is(
+  public.consume_ai_request('00000000-0000-4000-8000-000000000001', 'ai-chat', 2, 60),
+  true,
+  'second request is allowed under a quota of two'
+);
+select is(
+  public.consume_ai_request('00000000-0000-4000-8000-000000000001', 'ai-chat', 2, 60),
+  false,
+  'third request is rejected after the quota is reached'
+);
+select is(
+  public.consume_ai_request('00000000-0000-4000-8000-000000000001', 'ai-context', 1, 60),
+  true,
+  'ai-context has an independent quota from ai-chat'
+);
+select is(
+  public.consume_ai_request('00000000-0000-4000-8000-000000000002', 'ai-chat', 1, 60),
+  true,
+  'a different user has an independent quota'
 );
 
 select * from finish();
