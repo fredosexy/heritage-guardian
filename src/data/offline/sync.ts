@@ -306,7 +306,28 @@ async function runQueue(): Promise<void> {
               await db.queue.delete(opId);
             }
             emit();
-          }        } else if (op.kind === "upload_proof") {
+          }        } else if (op.kind === "delete_dossier") {
+          const dossierId = op.payload?.dossierId;
+          if (!dossierId) throw new Error("Invalid queued dossier deletion");
+
+          const { data: ownedDossier, error: ownershipError } = await supabase
+            .from("dossiers")
+            .select("id")
+            .eq("id", dossierId)
+            .eq("user_id", currentUser.id)
+            .single();
+          if (ownershipError) throw ownershipError;
+          if (!ownedDossier) throw new Error("Only the dossier owner can modify this dossier");
+
+          const { error } = await supabase
+            .from("dossiers")
+            .delete()
+            .eq("id", dossierId)
+            .eq("user_id", currentUser.id);
+          if (error) throw error;
+          await db.queue.delete(opId);
+          emit();
+        } else if (op.kind === "upload_proof") {
           const payload = op.payload;
           const file = payload?.file as Blob | undefined;
           const { dossierId, userId, fileName, mimeType, sizeBytes, sectionKey, storagePath } = payload ?? {};
