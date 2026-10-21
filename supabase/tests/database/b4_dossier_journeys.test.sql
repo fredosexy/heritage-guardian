@@ -76,7 +76,7 @@ SELECT is(
 
 SELECT throws_ok(
   $$ UPDATE public.dossier_steps SET status = 'terminee'
-     WHERE dossier_id = '20000000-0000-0000-0000-000000000001' AND step_order = 1 $,
+     WHERE dossier_id = '20000000-0000-0000-0000-000000000001' AND step_order = 1 $$,
   '42501', NULL,
   'les étapes ne peuvent pas être modifiées directement par le client'
 );
@@ -85,7 +85,7 @@ SELECT throws_ok(
   $$ SELECT public.transition_dossier_step(
        (SELECT id FROM public.dossier_steps WHERE dossier_id = '20000000-0000-0000-0000-000000000001' AND step_order = 1),
        'terminee'
-     ) $,
+     ) $$,
   '42501', 'step_transition_forbidden',
   'un utilisateur ne peut pas faire avancer le parcours d’un autre'
 );
@@ -155,7 +155,7 @@ SELECT throws_ok(
   $$ SELECT public.transition_dossier_step(
        (SELECT id FROM public.dossier_steps WHERE dossier_id = '20000000-0000-0000-0000-000000000001' AND step_order = 2),
        'terminee'
-     ) $,
+     ) $$,
   '42501', 'step_transition_forbidden',
   'une transition est refusée sans identité'
 );
