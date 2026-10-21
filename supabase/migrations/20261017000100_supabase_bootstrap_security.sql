@@ -179,6 +179,7 @@ AS $function$
     WHERE p.dossier_id = _dossier_id
       AND p.user_id = auth.uid()
       AND p.user_id = _user_id
+      AND p.accepted_at IS NOT NULL
   );
 $function$;
 
