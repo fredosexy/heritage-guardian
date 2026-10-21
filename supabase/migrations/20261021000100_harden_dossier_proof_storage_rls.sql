@@ -8,6 +8,7 @@ DROP POLICY IF EXISTS "users delete own files" ON storage.objects;
 -- cannot write objects for a missing or foreign dossier.
 DROP POLICY IF EXISTS "users update own proof files" ON storage.objects;
 DROP POLICY IF EXISTS "dossier participants read proof files" ON storage.objects;
+DROP POLICY IF EXISTS "dossier owners and participants read proof files" ON storage.objects;
 
 -- Invitation-pending users must not be treated as dossier participants by RLS.
 CREATE OR REPLACE FUNCTION public.is_dossier_participant(_dossier_id uuid, _user_id uuid)
