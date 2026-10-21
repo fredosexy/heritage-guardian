@@ -608,10 +608,12 @@ describe("sync conflict resolution freshness", () => {
       created_at: 100,
     });
 
-    const query: MockQuery & {
+    type ResolveQuery = MockQuery & {
       select: ReturnType<typeof vi.fn>;
       update: ReturnType<typeof vi.fn>;
-    } = {
+      single: ReturnType<typeof vi.fn>;
+    };
+    const query: ResolveQuery = {
       select: vi.fn(() => query),
       update: vi.fn(() => query),
       eq: vi.fn(() => query),
