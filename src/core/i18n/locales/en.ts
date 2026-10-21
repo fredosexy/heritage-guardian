@@ -311,6 +311,7 @@ export const en = {
     thinking: "Thinking…",
     rateLimit: "Too many requests, try again shortly.",
     creditsOut: "AI credits exhausted. Add credits in your Lovable workspace.",
+    authRequired: "Sign in to use Mémoire Assistant.",
     error: "The assistant could not reply. Please try again.",
     welcome: "Hello! Ask me anything about your land, heritage or wills.",
   },

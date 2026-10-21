@@ -1,14 +1,103 @@
 import { corsHeaders } from "@supabase/supabase-js/cors";
+import { authorizeAiRequest } from "../_shared/ai-security.ts";
+
+const MAX_BODY_BYTES = 20_000;
+
+async function readJsonBody(req: Request): Promise<
+  { kind: "ok"; value: unknown } | { kind: "too_large" } | { kind: "invalid" }
+> {
+  const declaredLength = Number(req.headers.get("content-length"));
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_BODY_BYTES) return { kind: "too_large" };
+  if (!req.body) return { kind: "invalid" };
+
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > MAX_BODY_BYTES) {
+        await reader.cancel();
+        return { kind: "too_large" };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { kind: "invalid" };
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try {
+    return { kind: "ok", value: JSON.parse(new TextDecoder().decode(bytes)) };
+  } catch {
+    return { kind: "invalid" };
+  }
+}
+
+function jsonResponse(status: number, error: string): Response {
+  return new Response(JSON.stringify({ error }), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") return jsonResponse(405, "method_not_allowed");
 
-  try {
-    const { messages, language = "fr" } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
+  const authorization = await authorizeAiRequest(req, "ai-chat", 12);
+  if ("response" in authorization) return authorization.response;
 
-    const systemPrompt = language.startsWith("fr") ? `Tu es l'assistant Mémoire, un guide patrimonial bienveillant et concret pour les utilisateurs africains. Tu aides à sécuriser des terres, organiser des héritages, et enregistrer des volontés.
+  const parsedBody = await readJsonBody(req);
+  if (parsedBody.kind === "too_large") return jsonResponse(413, "request_too_large");
+  if (parsedBody.kind === "invalid") return jsonResponse(400, "invalid_request");
+  if (!parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) {
+    return jsonResponse(400, "invalid_request");
+  }
+  const body = parsedBody.value as { messages?: unknown; language?: unknown };
+  const messages = body.messages;
+  const language = typeof body?.language === "string" && body.language.toLowerCase().startsWith("fr")
+    ? "fr"
+    : "en";
+
+  if (!Array.isArray(messages) || messages.length < 1 || messages.length > 20) {
+    return jsonResponse(400, "invalid_messages");
+  }
+
+  let totalCharacters = 0;
+  const safeMessages: Array<{ role: "user" | "assistant"; content: string }> = [];
+  for (const message of messages) {
+    if (
+      !message ||
+      typeof message !== "object" ||
+      !("role" in message) ||
+      !("content" in message) ||
+      (message.role !== "user" && message.role !== "assistant") ||
+      typeof message.content !== "string" ||
+      message.content.trim().length === 0 ||
+      message.content.length > 4000
+    ) {
+      return jsonResponse(400, "invalid_message");
+    }
+    totalCharacters += message.content.length;
+    if (totalCharacters > 12000) return jsonResponse(413, "message_limit_exceeded");
+    safeMessages.push({ role: message.role, content: message.content });
+  }
+
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY) {
+    console.error("LOVABLE_API_KEY is not configured");
+    return jsonResponse(503, "service_unavailable");
+  }
+
+  const systemPrompt = language === "fr" ? `Tu es l'assistant Mémoire, un guide patrimonial bienveillant et concret pour les utilisateurs africains. Tu aides à sécuriser des terres, organiser des héritages, et enregistrer des volontés.
 
 Règles :
 - Réponses courtes (max 3-4 phrases), claires, sans jargon juridique.
@@ -19,12 +108,14 @@ Règles :
 
 Rules:
 - Short answers (max 3-4 sentences), clear, no legal jargon.
-- Always action-oriented: suggest one concrete next step.
+- Always action-oriented: suggest one concrete step in every answer.
 - Empathetic, human, never condescending.
 - If an official procedure (notary, town hall, court) is needed, explain it simply.
 - You are not a lawyer; recommend consulting an expert for important legal decisions.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+  let response: Response;
+  try {
+    response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
@@ -32,22 +123,23 @@ Rules:
       },
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
-        messages: [{ role: "system", content: systemPrompt }, ...messages],
+        messages: [{ role: "system", content: systemPrompt }, ...safeMessages],
         stream: true,
       }),
     });
-
-    if (response.status === 429) return new Response(JSON.stringify({ error: "rate_limit" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    if (response.status === 402) return new Response(JSON.stringify({ error: "credits" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    if (!response.ok) {
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      return new Response(JSON.stringify({ error: "ai_error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
-  } catch (e) {
-    console.error("ai-chat error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "unknown" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  } catch (error) {
+    console.error("AI gateway connection failed:", error instanceof Error ? error.message : "unknown");
+    return jsonResponse(502, "ai_error");
   }
+
+  if (response.status === 429) return jsonResponse(429, "rate_limit");
+  if (response.status === 402) return jsonResponse(402, "credits");
+  if (!response.ok || !response.body) {
+    console.error("AI gateway returned an unsuccessful response:", response.status);
+    return jsonResponse(502, "ai_error");
+  }
+
+  return new Response(response.body, {
+    headers: { ...corsHeaders, "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
+  });
 });
