@@ -1,6 +1,7 @@
 -- Consolidate proof-file reads into one policy: owners retain access to their
 -- dossier folder, while accepted participants can read only registered proofs.
 DROP POLICY IF EXISTS "users read own files" ON storage.objects;
+DROP POLICY IF EXISTS "dossier participants read proof files" ON storage.objects;
 DROP POLICY IF EXISTS "participants read shared proof files" ON storage.objects;
 DROP POLICY IF EXISTS "dossier owners and participants read proof files" ON storage.objects;
 
