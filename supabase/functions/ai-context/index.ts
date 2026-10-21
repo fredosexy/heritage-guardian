@@ -1,6 +1,44 @@
 import { corsHeaders } from "@supabase/supabase-js/cors";
 import { authorizeAiRequest } from "../_shared/ai-security.ts";
 
+async function readJsonBody(req: Request, maxBytes: number): Promise<
+  { kind: "ok"; value: unknown } | { kind: "too_large" } | { kind: "invalid" }
+> {
+  const declaredLength = Number(req.headers.get("content-length"));
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return { kind: "too_large" };
+  if (!req.body) return { kind: "invalid" };
+
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        await reader.cancel();
+        return { kind: "too_large" };
+      }
+      chunks.push(value);
+    }
+  } catch {
+    return { kind: "invalid" };
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try {
+    return { kind: "ok", value: JSON.parse(new TextDecoder().decode(bytes)) };
+  } catch {
+    return { kind: "invalid" };
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") {
@@ -13,8 +51,22 @@ Deno.serve(async (req) => {
   const authorization = await authorizeAiRequest(req, "ai-context", 30);
   if ("response" in authorization) return authorization.response;
 
+  const parsedBody = await readJsonBody(req, 16 * 1024);
+  if (parsedBody.kind === "too_large") {
+    return new Response(JSON.stringify({ error: "request_too_large" }), {
+      status: 413,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  if (parsedBody.kind === "invalid" || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) {
+    return new Response(JSON.stringify({ error: "invalid_request" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
-    const body = await req.json();
+    const body = parsedBody.value as { dossier?: { id?: unknown } };
     const dossierId = body?.dossier?.id;
     if (typeof dossierId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(dossierId)) {
       return new Response(JSON.stringify({ error: "invalid_dossier" }), {
