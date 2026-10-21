@@ -20,7 +20,7 @@ vi.mock("@/integrations/supabase/client", () => ({
   },
 }));
 
-import { ProofPersistenceError, deleteProof, listProofs, uploadProof } from "@/data/proofs.repo";
+import { ProofPersistenceError, countProofsByDossier, deleteProof, listProofs, uploadProof } from "@/data/proofs.repo";
 
 describe("proof persistence", () => {
   beforeEach(() => {
@@ -166,5 +166,32 @@ describe("listProofs reload", () => {
     expect(mocks.from).toHaveBeenCalledWith("proofs");
     expect(select).toHaveBeenCalledWith("*");
     expect(order).toHaveBeenCalledWith("created_at", { ascending: false });
+  });
+});
+
+
+describe("countProofsByDossier", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("counts every proof visible through RLS, including proofs uploaded by other accepted participants", async () => {
+    const select = vi.fn().mockResolvedValue({
+      data: [
+        { dossier_id: "owned-dossier" },
+        { dossier_id: "shared-dossier" },
+        { dossier_id: "shared-dossier" },
+      ],
+      error: null,
+    });
+    mocks.from.mockReturnValue({ select });
+
+    await expect(countProofsByDossier()).resolves.toEqual({
+      "owned-dossier": 1,
+      "shared-dossier": 2,
+    });
+
+    expect(mocks.from).toHaveBeenCalledWith("proofs");
+    expect(select).toHaveBeenCalledWith("dossier_id");
   });
 });
