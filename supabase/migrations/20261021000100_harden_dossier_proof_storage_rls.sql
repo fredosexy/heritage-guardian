@@ -1,0 +1,54 @@
+-- Scope private proof objects to a real dossier and its access rules.
+-- Owners may upload/delete objects for their own dossiers; participants may read
+-- those objects only when they are listed on the corresponding dossier.
+DROP POLICY IF EXISTS "users upload to own folder" ON storage.objects;
+DROP POLICY IF EXISTS "users read own files" ON storage.objects;
+DROP POLICY IF EXISTS "users delete own files" ON storage.objects;
+
+CREATE POLICY "owners upload proofs for own dossiers"
+ON storage.objects
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'dossier-proofs'
+  AND auth.uid()::text = (storage.foldername(name))[1]
+  AND EXISTS (
+    SELECT 1
+    FROM public.dossiers AS d
+    WHERE d.id::text = (storage.foldername(name))[2]
+      AND d.user_id = auth.uid()
+  )
+);
+
+CREATE POLICY "dossier owners and participants read proof files"
+ON storage.objects
+FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'dossier-proofs'
+  AND EXISTS (
+    SELECT 1
+    FROM public.dossiers AS d
+    WHERE d.id::text = (storage.foldername(name))[2]
+      AND d.user_id::text = (storage.foldername(name))[1]
+      AND (
+        d.user_id = auth.uid()
+        OR public.is_dossier_participant(d.id, auth.uid())
+      )
+  )
+);
+
+CREATE POLICY "owners delete proofs for own dossiers"
+ON storage.objects
+FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'dossier-proofs'
+  AND auth.uid()::text = (storage.foldername(name))[1]
+  AND EXISTS (
+    SELECT 1
+    FROM public.dossiers AS d
+    WHERE d.id::text = (storage.foldername(name))[2]
+      AND d.user_id = auth.uid()
+  )
+);
