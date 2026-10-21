@@ -480,3 +480,84 @@ describe("offline field conflict detection", () => {
     expect(mocks.queued.has(51)).toBe(false);
   });
 });
+
+
+describe("queued dossier deletion", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+    mocks.getUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null });
+  });
+
+  it("deletes only an owned dossier and removes the operation after success", async () => {
+    const operation: TestOp = {
+      id: 71,
+      kind: "delete_dossier",
+      created_at: 100,
+      attempts: 0,
+      payload: { dossierId: "dossier-1" },
+    };
+    mocks.queued.set(operation.id!, operation);
+
+    const ownershipQuery: MockQuery = {
+      eq: vi.fn(() => ownershipQuery),
+      single: vi.fn().mockResolvedValue({
+        data: { id: "dossier-1" },
+        error: null,
+      }),
+    };
+    let deleteFilters = 0;
+    const deletionQuery: MockQuery = {
+      eq: vi.fn(() => {
+        deleteFilters += 1;
+        return deleteFilters === 2 ? Promise.resolve({ error: null }) : deletionQuery;
+      }),
+    };
+    const deleteDossier = vi.fn(() => deletionQuery);
+    mocks.supabaseFrom.mockImplementation(() => ({
+      select: vi.fn(() => ownershipQuery),
+      delete: deleteDossier,
+    }));
+
+    await processQueue();
+
+    expect(mocks.supabaseFrom).toHaveBeenCalledWith("dossiers");
+    expect(ownershipQuery.eq).toHaveBeenNthCalledWith(1, "id", "dossier-1");
+    expect(ownershipQuery.eq).toHaveBeenNthCalledWith(2, "user_id", "user-1");
+    expect(deleteDossier).toHaveBeenCalledTimes(1);
+    expect(deletionQuery.eq).toHaveBeenNthCalledWith(1, "id", "dossier-1");
+    expect(deletionQuery.eq).toHaveBeenNthCalledWith(2, "user_id", "user-1");
+    expect(mocks.queued.has(operation.id!)).toBe(false);
+    expect(mocks.queueDelete).toHaveBeenCalledWith(operation.id);
+  });
+
+  it("keeps the queued deletion when the ownership check fails", async () => {
+    const operation: TestOp = {
+      id: 72,
+      kind: "delete_dossier",
+      created_at: 101,
+      attempts: 0,
+      payload: { dossierId: "dossier-foreign" },
+    };
+    mocks.queued.set(operation.id!, operation);
+    const ownershipQuery: MockQuery = {
+      eq: vi.fn(() => ownershipQuery),
+      single: vi.fn().mockResolvedValue({
+        data: null,
+        error: new Error("row not found"),
+      }),
+    };
+    const deleteDossier = vi.fn();
+    mocks.supabaseFrom.mockImplementation(() => ({
+      select: vi.fn(() => ownershipQuery),
+      delete: deleteDossier,
+    }));
+
+    await processQueue();
+
+    expect(deleteDossier).not.toHaveBeenCalled();
+    expect(mocks.queued.has(operation.id!)).toBe(true);
+    expect(mocks.queued.get(operation.id!)?.attempts).toBe(1);
+  });
+});
