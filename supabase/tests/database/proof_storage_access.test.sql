@@ -86,8 +86,8 @@ SELECT is(
 
 SELECT set_config('request.jwt.claim.sub', '51000000-0000-0000-0000-000000000003', true);
 SELECT throws_ok(
-  $INSERT INTO storage.objects (bucket_id, name)
-    VALUES ('dossier-proofs', '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/outsider-upload.pdf')$,
+  $sql$INSERT INTO storage.objects (bucket_id, name)
+    VALUES ('dossier-proofs', '51000000-0000-0000-0000-000000000001/52000000-0000-0000-0000-000000000001/outsider-upload.pdf')$sql$,
   '42501',
   'new row violates row-level security policy for table "objects"',
   'an unrelated user cannot upload into another owner folder'
