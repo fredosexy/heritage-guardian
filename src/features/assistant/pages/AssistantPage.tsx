@@ -49,6 +49,8 @@ export default function AssistantPage() {
               ? t("ai.rateLimit")
               : error.reason === "credits"
               ? t("ai.creditsOut")
+              : error.reason === "auth_required"
+              ? t("ai.authRequired")
               : t("ai.error")
           );
         } else {
@@ -94,6 +96,8 @@ export default function AssistantPage() {
             ? t("ai.rateLimit")
             : error.reason === "credits"
             ? t("ai.creditsOut")
+            : error.reason === "auth_required"
+            ? t("ai.authRequired")
             : t("ai.error")
         );
       } else {
