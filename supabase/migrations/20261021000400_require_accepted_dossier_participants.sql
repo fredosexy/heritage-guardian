@@ -5,7 +5,7 @@ RETURNS BOOLEAN
 LANGUAGE SQL
 STABLE
 SECURITY DEFINER
-SET search_path = public
+SET search_path = pg_catalog, public
 AS $$
   SELECT _user_id = auth.uid()
     AND EXISTS (
