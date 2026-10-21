@@ -147,7 +147,11 @@ export default function DossierDetailPage() {
     if (!confirm(t("dossier.deleteConfirm"))) return;
     try {
       await remove();
-      toast.success(t("dossier.deleted"));
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        toast.success(t("offline.savedForSync", "Suppression enregistrée sur cet appareil, en attente de synchronisation"));
+      } else {
+        toast.success(t("dossier.deleted"));
+      }
       navigate("/dossiers");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("auth.error"));

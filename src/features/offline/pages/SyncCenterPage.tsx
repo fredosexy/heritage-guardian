@@ -73,7 +73,7 @@ export default function SyncCenterPage() {
         <section className="mb-6 space-y-3">
           <h2 className="text-sm font-semibold">{t("sync.conflicts")} ({conflicts.length})</h2>
           {conflicts.map((c) => (
-            <ConflictCard key={c.id} c={c} onResolve={async (ch) => {
+            <ConflictCard key={`${c.id}-${c.remote_updated_at}`} c={c} onResolve={async (ch) => {
               if (c.id === undefined) throw new Error("Missing conflict identity");
               await resolve(c.id, c.mine, c.theirs, ch);
             }} />

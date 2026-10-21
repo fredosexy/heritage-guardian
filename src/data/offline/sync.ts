@@ -37,6 +37,19 @@ export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "syn
 
 /** Met en attente la sauvegarde des sections d'un dossier Terrain existant. */
 /** Queue a field-level dossier edit with its base timestamp for conflict detection. */
+/** Queue a dossier deletion when the device is offline. */
+export async function enqueueDeleteDossier(dossierId: string): Promise<void> {
+  if (!dossierId.trim()) throw new Error("Invalid dossier id");
+  await db.queue.add({
+    kind: "delete_dossier",
+    payload: { dossierId },
+    created_at: Date.now(),
+    attempts: 0,
+  });
+  emit();
+  if (typeof navigator === "undefined" || navigator.onLine) void processQueue();
+}
+
 export async function enqueueUpdateDossier(dossierId: string, changes: DossierChanges, baseUpdatedAt: string) {
   await db.queue.add({
     kind: "update_dossier",
@@ -306,7 +319,28 @@ async function runQueue(): Promise<void> {
               await db.queue.delete(opId);
             }
             emit();
-          }        } else if (op.kind === "upload_proof") {
+          }        } else if (op.kind === "delete_dossier") {
+          const dossierId = op.payload?.dossierId;
+          if (!dossierId) throw new Error("Invalid queued dossier deletion");
+
+          const { data: ownedDossier, error: ownershipError } = await supabase
+            .from("dossiers")
+            .select("id")
+            .eq("id", dossierId)
+            .eq("user_id", currentUser.id)
+            .single();
+          if (ownershipError) throw ownershipError;
+          if (!ownedDossier) throw new Error("Only the dossier owner can modify this dossier");
+
+          const { error } = await supabase
+            .from("dossiers")
+            .delete()
+            .eq("id", dossierId)
+            .eq("user_id", currentUser.id);
+          if (error) throw error;
+          await db.queue.delete(opId);
+          emit();
+        } else if (op.kind === "upload_proof") {
           const payload = op.payload;
           const file = payload?.file as Blob | undefined;
           const { dossierId, userId, fileName, mimeType, sizeBytes, sectionKey, storagePath } = payload ?? {};
@@ -417,19 +451,47 @@ export async function resolveConflict(conflictId: number, values: DossierChanges
   const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
   if (sessionError || !currentUser) throw new Error("Session requise pour résoudre ce conflit");
 
-  const { error: lookupError } = await supabase
+  const { data: remote, error: lookupError } = await supabase
     .from("dossiers")
-    .select("id")
+    .select("id, title, description, location_name, updated_at, user_id")
     .eq("id", conflict.dossier_id)
     .eq("user_id", currentUser.id)
     .single();
   if (lookupError) throw lookupError;
+  assertDossierOwner(remote, currentUser.id);
+
+  if (remote.updated_at !== conflict.remote_updated_at) {
+    const fields = (Object.keys(conflict.mine) as (keyof DossierChanges)[]).filter(
+      (field) => (remote[field] ?? null) !== (conflict.mine[field] ?? null)
+    );
+    if (fields.length === 0) {
+      await db.conflicts.delete(conflictId);
+      emit();
+      return;
+    }
+
+    const theirs: Record<string, string | null> = {};
+    for (const field of Object.keys(conflict.mine) as (keyof DossierChanges)[]) {
+      theirs[field] = remote[field] ?? null;
+    }
+    await db.conflicts.update(conflictId, {
+      title: remote.title,
+      fields,
+      theirs,
+      remote_updated_at: remote.updated_at,
+    });
+    emit();
+    throw new Error("Le dossier a changé depuis l'affichage du conflit. Vérifiez les valeurs actualisées.");
+  }
 
   const { error } = await supabase
     .from("dossiers")
     .update(values)
     .eq("id", conflict.dossier_id)
-    .eq("user_id", currentUser.id);
+    .eq("user_id", currentUser.id)
+    .eq("updated_at", conflict.remote_updated_at)
+    .select("id")
+    .single();
   if (error) throw error;
   await db.conflicts.delete(conflictId);
   emit();

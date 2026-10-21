@@ -1,5 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+interface TestConflict {
+  id?: number;
+  dossier_id: string;
+  title: string;
+  fields: string[];
+  mine: Record<string, string | null>;
+  theirs: Record<string, string | null>;
+  remote_updated_at: string;
+  created_at: number;
+}
+
 interface TestOp {
   id?: number;
   kind: string;
@@ -20,8 +31,16 @@ type MockQuery = { eq: ReturnType<typeof vi.fn>; single?: ReturnType<typeof vi.f
 
 const mocks = vi.hoisted(() => {
   const queued = new Map<number, TestOp>();
+  const conflicts = new Map<number, TestConflict>();
   return {
     queued,
+    conflicts,
+    conflictGet: vi.fn(async (id: number) => conflicts.get(id)),
+    conflictUpdate: vi.fn(async (id: number, patch: Partial<TestConflict>) => {
+      const current = conflicts.get(id);
+      if (current) conflicts.set(id, { ...current, ...patch });
+    }),
+    conflictDelete: vi.fn(async (id: number) => { conflicts.delete(id); }),
     orderByToArray: vi.fn(async () => [...queued.values()].sort((a, b) => a.created_at - b.created_at)),
     queueWhereToArray: vi.fn(async () => [...queued.values()].filter((op) => op.kind === "update_dossier")),
     queueUpdate: vi.fn(async (id: number, patch: Partial<TestOp>) => {
@@ -36,6 +55,7 @@ const mocks = vi.hoisted(() => {
     }),
     queueGet: vi.fn(async (id: number) => queued.get(id)),
     conflictAdd: vi.fn(async (conflict: unknown) => conflict),
+    authGetUser: vi.fn(async () => ({ data: { user: { id: "user-1" } }, error: null })),
     storageUpload: vi.fn(),
     proofUpsert: vi.fn(),
     proofRows: new Map<string, { id: string; dossier_id: string; uploaded_by: string; metadata: { terrainSectionKey?: string } }>(),
@@ -54,7 +74,12 @@ vi.mock("@/data/offline/db", () => ({
       get: mocks.queueGet,
     },
     transaction: vi.fn(async (_mode, _table, callback) => callback()),
-    conflicts: { add: mocks.conflictAdd },
+    conflicts: {
+      add: mocks.conflictAdd,
+      get: mocks.conflictGet,
+      update: mocks.conflictUpdate,
+      delete: mocks.conflictDelete,
+    },
     drafts: {
       where: vi.fn(),
       update: vi.fn(),
@@ -64,7 +89,7 @@ vi.mock("@/data/offline/db", () => ({
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
-    auth: { getUser: vi.fn(async () => ({ data: { user: { id: "user-1" } }, error: null })) },
+    auth: { getUser: mocks.authGetUser },
     storage: { from: vi.fn(() => ({ upload: mocks.storageUpload })) },
     from: mocks.supabaseFrom,
   },
@@ -74,7 +99,7 @@ vi.mock("@/data/procedures.repo", () => ({
   initializeDossierJourney: vi.fn(),
 }));
 
-import { enqueueUpdateDossierMetadata, processQueue } from "@/data/offline/sync";
+import { enqueueDeleteDossier, enqueueUpdateDossierMetadata, processQueue, resolveConflict } from "@/data/offline/sync";
 
 describe("offline Terrain section updates", () => {
   beforeEach(() => {
@@ -478,5 +503,171 @@ describe("offline field conflict detection", () => {
     }));
     expect(update).not.toHaveBeenCalled();
     expect(mocks.queued.has(51)).toBe(false);
+  });
+});
+
+
+describe("enqueue offline dossier deletion", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
+  });
+
+  it("queues a valid dossier deletion without attempting network work while offline", async () => {
+    await enqueueDeleteDossier("dossier-1");
+
+    expect(mocks.queueAdd).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "delete_dossier",
+      payload: { dossierId: "dossier-1" },
+      attempts: 0,
+    }));
+    expect(mocks.queued.size).toBe(1);
+    expect([...mocks.queued.values()][0].kind).toBe("delete_dossier");
+    expect(mocks.supabaseFrom).not.toHaveBeenCalled();
+  });
+
+  it("rejects an empty dossier identity", async () => {
+    await expect(enqueueDeleteDossier("  ")).rejects.toThrow("Invalid dossier id");
+    expect(mocks.queueAdd).not.toHaveBeenCalled();
+  });
+});
+
+describe("queued dossier deletion", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+    mocks.authGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null });
+  });
+
+  it("deletes only an owned dossier and removes the operation after success", async () => {
+    const operation: TestOp = {
+      id: 71,
+      kind: "delete_dossier",
+      created_at: 100,
+      attempts: 0,
+      payload: { dossierId: "dossier-1" },
+    };
+    mocks.queued.set(operation.id!, operation);
+
+    const ownershipQuery: MockQuery = {
+      eq: vi.fn(() => ownershipQuery),
+      single: vi.fn().mockResolvedValue({
+        data: { id: "dossier-1" },
+        error: null,
+      }),
+    };
+    let deleteFilters = 0;
+    const deletionQuery: MockQuery = {
+      eq: vi.fn(() => {
+        deleteFilters += 1;
+        return deleteFilters === 2 ? Promise.resolve({ error: null }) : deletionQuery;
+      }),
+    };
+    const deleteDossier = vi.fn(() => deletionQuery);
+    mocks.supabaseFrom.mockImplementation(() => ({
+      select: vi.fn(() => ownershipQuery),
+      delete: deleteDossier,
+    }));
+
+    await processQueue();
+
+    expect(mocks.supabaseFrom).toHaveBeenCalledWith("dossiers");
+    expect(ownershipQuery.eq).toHaveBeenNthCalledWith(1, "id", "dossier-1");
+    expect(ownershipQuery.eq).toHaveBeenNthCalledWith(2, "user_id", "user-1");
+    expect(deleteDossier).toHaveBeenCalledTimes(1);
+    expect(deletionQuery.eq).toHaveBeenNthCalledWith(1, "id", "dossier-1");
+    expect(deletionQuery.eq).toHaveBeenNthCalledWith(2, "user_id", "user-1");
+    expect(mocks.queued.has(operation.id!)).toBe(false);
+    expect(mocks.queueDelete).toHaveBeenCalledWith(operation.id);
+  });
+
+  it("keeps the queued deletion when the ownership check fails", async () => {
+    const operation: TestOp = {
+      id: 72,
+      kind: "delete_dossier",
+      created_at: 101,
+      attempts: 0,
+      payload: { dossierId: "dossier-foreign" },
+    };
+    mocks.queued.set(operation.id!, operation);
+    const ownershipQuery: MockQuery = {
+      eq: vi.fn(() => ownershipQuery),
+      single: vi.fn().mockResolvedValue({
+        data: null,
+        error: new Error("row not found"),
+      }),
+    };
+    const deleteDossier = vi.fn();
+    mocks.supabaseFrom.mockImplementation(() => ({
+      select: vi.fn(() => ownershipQuery),
+      delete: deleteDossier,
+    }));
+
+    await processQueue();
+
+    expect(deleteDossier).not.toHaveBeenCalled();
+    expect(mocks.queued.has(operation.id!)).toBe(true);
+    expect(mocks.queued.get(operation.id!)?.attempts).toBe(1);
+  });
+});
+
+
+describe("sync conflict resolution freshness", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    mocks.conflicts.clear();
+    mocks.authGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null });
+  });
+
+  it("refreshes a conflict instead of overwriting a dossier changed since review", async () => {
+    mocks.conflicts.set(9, {
+      id: 9,
+      dossier_id: "dossier-1",
+      title: "Titre distant initial",
+      fields: ["title"],
+      mine: { title: "Mon titre" },
+      theirs: { title: "Titre distant initial" },
+      remote_updated_at: "2026-10-20T10:00:00Z",
+      created_at: 100,
+    });
+
+    type ResolveQuery = MockQuery & {
+      select: ReturnType<typeof vi.fn>;
+      update: ReturnType<typeof vi.fn>;
+      single: ReturnType<typeof vi.fn>;
+    };
+    const query: ResolveQuery = {
+      select: vi.fn(() => query),
+      update: vi.fn(() => query),
+      eq: vi.fn(() => query),
+      single: vi.fn().mockResolvedValue({
+        data: {
+          id: "dossier-1",
+          user_id: "user-1",
+          title: "Titre distant plus récent",
+          description: null,
+          location_name: null,
+          updated_at: "2026-10-21T07:00:00Z",
+        },
+        error: null,
+      }),
+    };
+    mocks.supabaseFrom.mockReturnValue(query);
+
+    await expect(resolveConflict(9, { title: "Mon titre" })).rejects.toThrow(
+      "Le dossier a changé depuis l'affichage du conflit"
+    );
+
+    expect(query.update).not.toHaveBeenCalled();
+    expect(mocks.conflictUpdate).toHaveBeenCalledWith(9, expect.objectContaining({
+      title: "Titre distant plus récent",
+      fields: ["title"],
+      theirs: { title: "Titre distant plus récent" },
+      remote_updated_at: "2026-10-21T07:00:00Z",
+    }));
+    expect(mocks.conflicts.has(9)).toBe(true);
   });
 });
