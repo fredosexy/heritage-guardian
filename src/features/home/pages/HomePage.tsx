@@ -8,18 +8,14 @@ import { useUnreadAlerts } from "@/features/alerts/hooks/useAlerts";
 import { useDossiers } from "@/features/dossiers/hooks/useDossiers";
 import { HomeHeader } from "../components/HomeHeader";
 import { HomeModuleCard } from "../components/HomeModuleCard";
+import { DOSSIER_TYPES } from "@/features/dossiers/components/dossierTypeMeta";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Loader2, MapPin, Scale, ScrollText, Sparkles, Users } from "lucide-react";
+import { ChevronRight, Loader2, Sparkles } from "lucide-react";
 
 const severityClass = (severity: string) =>
   severity === "high" ? "border-l-destructive bg-destructive/5" : severity === "medium" ? "border-l-warning bg-warning/5" : "border-l-primary bg-primary/5";
 
-const modules = [
-  { id: "terrain", icon: MapPin },
-  { id: "heritage", icon: Users },
-  { id: "conflit", icon: Scale },
-  { id: "volonte", icon: ScrollText },
-] as const;
+const modules = DOSSIER_TYPES.map(({ id, icon, available }) => ({ id, icon, available }));
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -90,7 +86,7 @@ export default function HomePage() {
         <FirstStepDialog open={personalizationOpen} onClose={() => setPersonalizationOpen(false)} />
         <section className="mb-7">
           <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.modulesTitle")}</h2><p className="text-caption mt-1">{t("home.modulesVisitorHint")}</p></div><Sparkles className="size-5 text-primary" /></div>
-          <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} journeyProgress={module.journeyProgress} currentStepTitle={module.currentStepTitle} nextStepTitle={module.nextStepTitle} blockedStepTitle={module.blockedStepTitle} participantsCount={module.participantsCount} proofsCount={module.proofsCount} onFirstGesture={openModule} />)}</div>
+          <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} journeyProgress={module.journeyProgress} currentStepTitle={module.currentStepTitle} nextStepTitle={module.nextStepTitle} blockedStepTitle={module.blockedStepTitle} participantsCount={module.participantsCount} proofsCount={module.proofsCount} onFirstGesture={openModule} available={module.available} />)}</div>
         </section>
         <section className="rounded-3xl bg-gradient-hero p-5 text-primary-foreground shadow-elegant mb-6">
           <div className="flex items-start gap-3"><Sparkles className="size-5 mt-0.5 shrink-0" /><div><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><p className="text-sm opacity-85 mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>
@@ -134,7 +130,7 @@ export default function HomePage() {
       </section>
       <section className="mb-6">
         <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.modulesTitle")}</h2><p className="text-caption mt-1">{t("home.modulesConnectedHint")}</p></div></div>
-        <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} journeyProgress={module.journeyProgress} currentStepTitle={module.currentStepTitle} nextStepTitle={module.nextStepTitle} blockedStepTitle={module.blockedStepTitle} participantsCount={module.participantsCount} proofsCount={module.proofsCount} />)}</div>
+        <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} journeyProgress={module.journeyProgress} currentStepTitle={module.currentStepTitle} nextStepTitle={module.nextStepTitle} blockedStepTitle={module.blockedStepTitle} participantsCount={module.participantsCount} proofsCount={module.proofsCount} available={module.available} />)}</div>
       </section>
       <section className="mb-6">
         <h2 className="text-base font-serif mb-3 flex items-center justify-between"><span>{t("home.alerts")}</span>{alerts.length > 0 && <button onClick={() => navigate("/alerts")} className="text-xs text-primary font-sans flex items-center gap-0.5">{alerts.length} <ChevronRight className="size-3" /></button>}</h2>
