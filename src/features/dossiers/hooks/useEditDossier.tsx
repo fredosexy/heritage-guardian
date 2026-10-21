@@ -3,9 +3,12 @@ import { dossiersRepo, enqueueUpdateDossier } from "@/data";
 import { db } from "@/data/offline/db";
 import type { Dossier } from "@/core/types/domain";
 import { EDITABLE_FIELDS, type DossierChanges } from "@/services/sync-conflicts";
+import { useAuth } from "@/features/identity";
+import { assertDossierOwner, canEditDossier } from "@/services/dossier-ownership";
 
 /** Charge le dossier (réseau puis cache local) et met les changements en file. */
 export function useEditDossier(id?: string) {
+  const { user } = useAuth();
   const [dossier, setDossier] = useState<Dossier | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,6 +31,7 @@ export function useEditDossier(id?: string) {
   /** Renvoie false si rien n'a changé. */
   const save = async (values: DossierChanges): Promise<boolean> => {
     if (!dossier) return false;
+    assertDossierOwner(dossier, user?.id);
     const changes: DossierChanges = {};
     for (const f of EDITABLE_FIELDS) {
       const v = (values[f] ?? "").trim() || null;
@@ -38,5 +42,5 @@ export function useEditDossier(id?: string) {
     return true;
   };
 
-  return { dossier, loading, save };
+  return { dossier, loading, save, canEdit: canEditDossier(dossier, user?.id) };
 }

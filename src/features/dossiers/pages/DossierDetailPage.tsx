@@ -17,9 +17,9 @@ export default function DossierDetailPage() {
   const { id } = useParams();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { dossier, proofs, participants, suggestions, loading, uploading, addProof, remove } =
+  const { dossier, proofs, participants, suggestions, loading, uploading, addProof, remove, canEdit } =
     useDossierDetail(id);
-  const [journey, setJourney] = useState<DossierStep[]>([]);
+  const [journey, setJourney] = useState<proceduresRepo.DossierJourneyStep[]>([]);
   const [transitioning, setTransitioning] = useState(false);
   const [editingTerrain, setEditingTerrain] = useState(false);
   const [savingTerrain, setSavingTerrain] = useState(false);
@@ -48,7 +48,7 @@ export default function DossierDetailPage() {
   }, [dossier?.id, dossier?.metadata, dossier?.type]);
 
   const saveTerrainSections = async () => {
-    if (!dossier) return;
+    if (!dossier || !canEdit) return;
     setSavingTerrain(true);
     try {
       const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
@@ -210,7 +210,7 @@ export default function DossierDetailPage() {
               <p className="text-sm font-semibold">{t("create.terrainFormTitle")}</p>
               <p className="text-xs text-muted-foreground mt-1">{t("create.terrainFormHint")}</p>
             </div>
-            <Button variant="outline" size="sm" onClick={() => setEditingTerrain((value) => !value)} className="rounded-xl">
+            <Button disabled={!canEdit} variant="outline" size="sm" onClick={() => setEditingTerrain((value) => !value)} className="rounded-xl">
               <Pencil className="size-3.5 mr-1.5" />{editingTerrain ? t("create.cancel") : t("create.editTerrain")}
             </Button>
           </div>

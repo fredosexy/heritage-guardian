@@ -1,17 +1,35 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+interface TestOp {
+  id?: number;
+  kind: string;
+  created_at: number;
+  attempts: number;
+  last_error?: string | null;
+  payload: {
+    dossierId?: string;
+    changes?: { title?: string };
+    baseUpdatedAt?: string;
+    metadata?: { terrain?: { sections?: Record<string, string> } };
+    storagePath?: string;
+    proofId?: string;
+    [key: string]: unknown;
+  };
+}
+type MockQuery = { eq: ReturnType<typeof vi.fn>; single?: ReturnType<typeof vi.fn> };
+
 const mocks = vi.hoisted(() => {
-  const queued = new Map<number, unknown>();
+  const queued = new Map<number, TestOp>();
   return {
     queued,
     orderByToArray: vi.fn(async () => [...queued.values()].sort((a, b) => a.created_at - b.created_at)),
     queueWhereToArray: vi.fn(async () => [...queued.values()].filter((op) => op.kind === "update_dossier")),
-    queueUpdate: vi.fn(async (id: number, patch: unknown) => {
+    queueUpdate: vi.fn(async (id: number, patch: Partial<TestOp>) => {
       const current = queued.get(id);
       if (current) queued.set(id, { ...current, ...patch });
     }),
     queueDelete: vi.fn(async (id: number) => { queued.delete(id); }),
-    queueAdd: vi.fn(async (op: unknown) => {
+    queueAdd: vi.fn(async (op: TestOp) => {
       const id = Math.max(0, ...queued.keys()) + 1;
       queued.set(id, { ...op, id });
       return id;
@@ -20,6 +38,7 @@ const mocks = vi.hoisted(() => {
     conflictAdd: vi.fn(async (conflict: unknown) => conflict),
     storageUpload: vi.fn(),
     proofUpsert: vi.fn(),
+    proofRows: new Map<string, { id: string; dossier_id: string; uploaded_by: string; metadata: { terrainSectionKey?: string } }>(),
     supabaseFrom: vi.fn(),
   };
 });
@@ -34,6 +53,7 @@ vi.mock("@/data/offline/db", () => ({
       add: mocks.queueAdd,
       get: mocks.queueGet,
     },
+    transaction: vi.fn(async (_mode, _table, callback) => callback()),
     conflicts: { add: mocks.conflictAdd },
     drafts: {
       where: vi.fn(),
@@ -110,8 +130,8 @@ describe("sync queue concurrency", () => {
   });
 
   it("replays a section edit queued while an earlier sync request is in flight", async () => {
-    let releaseFirstRead!: (value: unknown) => void;
-    let signalFirstRead!: () => void;
+    let releaseFirstRead: (value: unknown) => void = () => { throw new Error("Read not initialized"); };
+    let signalFirstRead: () => void = () => { throw new Error("Signal not initialized"); };
     const firstReadStarted = new Promise<void>((resolve) => { signalFirstRead = resolve; });
     const firstRead = new Promise<unknown>((resolve) => { releaseFirstRead = resolve; });
     let readCount = 0;
@@ -119,7 +139,7 @@ describe("sync queue concurrency", () => {
 
     mocks.supabaseFrom.mockImplementation(() => ({
       select: vi.fn(() => {
-        const query: unknown = {
+        const query: MockQuery = {
           eq: vi.fn(() => query),
           single: vi.fn(() => {
             readCount += 1;
@@ -135,8 +155,8 @@ describe("sync queue concurrency", () => {
         };
         return query;
       }),
-      update: vi.fn((values: unknown) => {
-        const query: unknown = {
+      update: vi.fn((values: { metadata: unknown }) => {
+        const query: MockQuery = {
           eq: vi.fn(() => {
             if (query.eq.mock.calls.length === 1) return query;
             updatePayloads.push(values.metadata);
@@ -188,21 +208,28 @@ describe("proof upload queue retry", () => {
     mocks.queued.clear();
     Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
     mocks.storageUpload.mockResolvedValue({ error: null });
-    mocks.proofUpsert.mockResolvedValue({ error: null });
+    mocks.proofRows.clear();
+    mocks.proofUpsert.mockImplementation(async (row) => {
+      mocks.proofRows.set(row.storage_path, row);
+      return { error: null };
+    });
     mocks.supabaseFrom.mockImplementation((table: string) => {
       if (table === "dossiers") {
-        const query: unknown = {
+        const query: MockQuery = {
           eq: vi.fn(() => query),
           single: vi.fn().mockResolvedValue({ data: { id: "dossier-1", user_id: "user-1" }, error: null }),
         };
         return { select: vi.fn(() => query) };
       }
-      return { upsert: mocks.proofUpsert };
+      return {
+        upsert: mocks.proofUpsert,
+        select: vi.fn(() => ({ eq: vi.fn(async (_key, path) => ({ data: mocks.proofRows.has(path) ? [mocks.proofRows.get(path)] : [], error: null })) })),
+      };
     });
   });
 
   it("keeps a failed proof operation and retries with the same storage path", async () => {
-    const operation = {
+    const operation: TestOp = {
       id: 41,
       kind: "upload_proof",
       created_at: 100,
@@ -250,14 +277,14 @@ describe("proof upload queue retry", () => {
         storage_path: operation.payload.storagePath,
         metadata: { terrainSectionKey: "documentation" },
       }),
-      { onConflict: "storage_path" },
+      { onConflict: "id", ignoreDuplicates: true },
     );
     expect(mocks.queued.has(operation.id)).toBe(false);
     expect(mocks.queueDelete).toHaveBeenCalledWith(operation.id);
   });
 
   it("retains a proof upload after a Storage error and retries the same path", async () => {
-    const operation = {
+    const operation: TestOp = {
       id: 43,
       kind: "upload_proof",
       created_at: 102,
@@ -301,7 +328,7 @@ describe("proof upload queue retry", () => {
     );
     expect(mocks.proofUpsert).toHaveBeenCalledWith(
       expect.objectContaining({ storage_path: operation.payload.storagePath }),
-      { onConflict: "storage_path" },
+      { onConflict: "id", ignoreDuplicates: true },
     );
     expect(mocks.queued.has(operation.id)).toBe(false);
   });
@@ -356,7 +383,7 @@ describe("Terrain section persistence after offline replay", () => {
 
     mocks.supabaseFrom.mockImplementation(() => ({
       select: vi.fn(() => {
-        const query: unknown = {
+        const query: MockQuery = {
           eq: vi.fn(() => query),
           single: vi.fn().mockResolvedValue({
             data: {
@@ -371,8 +398,8 @@ describe("Terrain section persistence after offline replay", () => {
         };
         return query;
       }),
-      update: vi.fn((values: unknown) => {
-        const query: unknown = {
+      update: vi.fn((values: { metadata: unknown }) => {
+        const query: MockQuery = {
           eq: vi.fn(() => {
             if (query.eq.mock.calls.length === 1) return query;
             updates.push(values.metadata);
@@ -422,7 +449,7 @@ describe("offline field conflict detection", () => {
       },
     });
     const update = vi.fn();
-    const query: unknown = {
+    const query: MockQuery = {
       eq: vi.fn(() => query),
       single: vi.fn().mockResolvedValue({
         data: {

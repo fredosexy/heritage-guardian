@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import type { SyncConflict } from "@/data/offline/db";
 import type { EditableField } from "@/services/sync-conflicts";
 import { useSyncCenter } from "../hooks/useSyncCenter";
+import { syncErrorHint } from "@/services/sync-error";
 
 function ConflictCard({ c, onResolve }: { c: SyncConflict; onResolve: (choice: Partial<Record<EditableField, "mine" | "theirs">>) => Promise<void> }) {
   const { t } = useTranslation();
@@ -35,11 +36,11 @@ function ConflictCard({ c, onResolve }: { c: SyncConflict; onResolve: (choice: P
             <p className="text-xs font-medium text-muted-foreground">{t(`sync.field_${f}`)}</p>
             <div className="grid grid-cols-2 gap-2">
               {(["mine", "theirs"] as const).map((side) => (
-                <button key={side} onClick={() => setChoice({ ...choice, [field]: side })}
-                  className={`rounded-xl border p-2 text-left text-sm transition ${picked === side ? "border-primary bg-accent" : "border-border"}`}>
+                <Button key={side} variant="outline" aria-pressed={picked === side} onClick={() => setChoice({ ...choice, [field]: side })}
+                  className={`h-auto flex-col items-start whitespace-normal rounded-lg border p-2 text-left text-sm transition ${picked === side ? "border-primary bg-accent" : "border-border"}`}>
                   <span className="block text-xs text-muted-foreground">{t(`sync.${side}`)}</span>
                   <span className="break-words">{(side === "mine" ? c.mine[f] : c.theirs[f]) || t("sync.empty")}</span>
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -52,7 +53,17 @@ function ConflictCard({ c, onResolve }: { c: SyncConflict; onResolve: (choice: P
 
 export default function SyncCenterPage() {
   const { t } = useTranslation();
-  const { queue, conflicts, retry, discard, resolve } = useSyncCenter();
+  const { queue, conflicts, retry, retrying, discard, resolve } = useSyncCenter();
+  const retryNow = async () => {
+    if (!navigator.onLine) { toast.info(t("sync.errorNetwork")); return; }
+    try { await retry(); }
+    catch { toast.error(t("sync.error")); }
+  };
+  const discardConfirmed = async (id?: number) => {
+    if (id === undefined || retrying || !window.confirm(t("sync.discardConfirm"))) return;
+    try { await discard(id); }
+    catch { toast.error(t("sync.error")); }
+  };
 
   return (
     <AppLayout>
@@ -62,17 +73,20 @@ export default function SyncCenterPage() {
         <section className="mb-6 space-y-3">
           <h2 className="text-sm font-semibold">{t("sync.conflicts")} ({conflicts.length})</h2>
           {conflicts.map((c) => (
-            <ConflictCard key={c.id} c={c} onResolve={(ch) => resolve(c.id!, c.mine, c.theirs, ch)} />
+            <ConflictCard key={c.id} c={c} onResolve={async (ch) => {
+              if (c.id === undefined) throw new Error("Missing conflict identity");
+              await resolve(c.id, c.mine, c.theirs, ch);
+            }} />
           ))}
         </section>
       )}
 
       <section className="space-y-2">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold">{t("sync.pending")} ({queue.length})</h2>
           {queue.length > 0 && (
-            <Button size="sm" variant="outline" onClick={() => retry()}>
-              <RefreshCw className="size-3" /> {t("sync.retry")}
+            <Button size="sm" variant="outline" disabled={retrying} onClick={() => void retryNow()}>
+              <RefreshCw className={`size-3 ${retrying ? "animate-spin" : ""}`} /> {t(retrying ? "sync.retrying" : "sync.retry")}
             </Button>
           )}
         </div>
@@ -86,13 +100,16 @@ export default function SyncCenterPage() {
               <CloudOff className="size-4 text-muted-foreground shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">{t(`sync.kind_${op.kind}`)}</p>
-                <p className="text-caption truncate">
+                <p className="text-caption break-words">
                   {new Date(op.created_at).toLocaleString()}
-                  {op.attempts > 0 && ` · ${t("sync.attempts", { count: op.attempts })}`}
+                  {` · ${t("sync.attempts", { count: op.attempts })}`}
                 </p>
-                {op.last_error && <p className="text-xs text-destructive truncate">{t("sync.error")}</p>}
+                {op.last_error && <div role="status" className="mt-1 space-y-1 text-xs">
+                  <p className="text-destructive break-words">{t(syncErrorHint(op.last_error))}</p>
+                  <p className="text-muted-foreground whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{t("sync.lastError")}: {op.last_error}</p>
+                </div>}
               </div>
-              <Button size="icon" variant="ghost" aria-label={t("sync.discard")} onClick={() => discard(op.id!)}>
+              <Button size="icon" variant="ghost" disabled={retrying} aria-label={t("sync.discard")} onClick={() => void discardConfirmed(op.id)}>
                 <X className="size-4" />
               </Button>
             </div>

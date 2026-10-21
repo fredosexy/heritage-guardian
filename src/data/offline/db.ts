@@ -23,7 +23,7 @@ export type QueuedOp =
   | { id?: number; kind: "create_dossier"; payload: { localId: string }; created_at: number; attempts: number; last_error?: string | null }
   | { id?: number; kind: "update_dossier"; payload: { dossierId: string; changes?: DossierChanges; baseUpdatedAt?: string; metadata?: Record<string, unknown> }; created_at: number; attempts: number; last_error?: string | null }
   | { id?: number; kind: "initialize_journey"; payload: { dossierId: string }; created_at: number; attempts: number; last_error?: string | null }
-  | { id?: number; kind: "upload_proof"; payload: { file: Blob; fileName: string; mimeType: string; sizeBytes: number; dossierId: string; userId: string; sectionKey?: string; storagePath: string }; created_at: number; attempts: number; last_error?: string | null }
+  | { id?: number; kind: "upload_proof"; payload: { file: Blob; fileName: string; mimeType: string; sizeBytes: number; dossierId: string; userId: string; sectionKey?: string; storagePath: string; proofId?: string }; created_at: number; attempts: number; last_error?: string | null }
   | { id?: number; kind: "delete_dossier"; payload: { dossierId: string }; created_at: number; attempts: number; last_error?: string | null };
 
 export interface SyncConflict {
