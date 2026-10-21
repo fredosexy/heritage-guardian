@@ -190,6 +190,6 @@ describe("ai-context handler", () => {
     expect(body.suggestions).toHaveLength(3);
     expect(body.suggestions[0]).toBe("Première action");
     expect(body.suggestions[1]).toBe("A".repeat(300));
-    expect(body.suggestions[2]).toBeUndefined();
+    expect(body.suggestions[2]).toBe("Cinquième action");
   });
 });
