@@ -50,7 +50,7 @@ export function useDossiers() {
     }
     let cancelled = false;
     setLoadingRemote(true);
-    Promise.all([dossiersRepo.listDossiers(userId), countProofsByDossier(userId)])
+    Promise.all([dossiersRepo.listDossiers(), countProofsByDossier(userId)])
       .then(async ([data, proofCounts]) => {
         const participantCounts = await participantsRepo.countParticipantsByDossier(data.map((d) => d.id));
         let journeySteps: Record<string, DossierStep[]> = {};
