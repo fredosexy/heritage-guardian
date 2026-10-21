@@ -476,7 +476,9 @@ export async function resolveConflict(conflictId: number, values: DossierChanges
     .update(values)
     .eq("id", conflict.dossier_id)
     .eq("user_id", currentUser.id)
-    .eq("updated_at", conflict.remote_updated_at);
+    .eq("updated_at", conflict.remote_updated_at)
+    .select("id")
+    .single();
   if (error) throw error;
   await db.conflicts.delete(conflictId);
   emit();
