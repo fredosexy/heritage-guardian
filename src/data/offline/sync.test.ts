@@ -36,6 +36,7 @@ const mocks = vi.hoisted(() => {
     }),
     queueGet: vi.fn(async (id: number) => queued.get(id)),
     conflictAdd: vi.fn(async (conflict: unknown) => conflict),
+    authGetUser: vi.fn(async () => ({ data: { user: { id: "user-1" } }, error: null })),
     storageUpload: vi.fn(),
     proofUpsert: vi.fn(),
     proofRows: new Map<string, { id: string; dossier_id: string; uploaded_by: string; metadata: { terrainSectionKey?: string } }>(),
@@ -64,7 +65,7 @@ vi.mock("@/data/offline/db", () => ({
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
-    auth: { getUser: vi.fn(async () => ({ data: { user: { id: "user-1" } }, error: null })) },
+    auth: { getUser: mocks.authGetUser },
     storage: { from: vi.fn(() => ({ upload: mocks.storageUpload })) },
     from: mocks.supabaseFrom,
   },
@@ -487,7 +488,7 @@ describe("queued dossier deletion", () => {
     vi.clearAllMocks();
     mocks.queued.clear();
     Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
-    mocks.getUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null });
+    mocks.authGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null });
   });
 
   it("deletes only an owned dossier and removes the operation after success", async () => {
