@@ -26,8 +26,19 @@ import {
   updateDossierScore,
 } from "@/data/dossiers.repo";
 
+type Query = {
+  select: ReturnType<typeof vi.fn>;
+  eq: ReturnType<typeof vi.fn>;
+  maybeSingle: ReturnType<typeof vi.fn>;
+  single: ReturnType<typeof vi.fn>;
+  insert: ReturnType<typeof vi.fn>;
+  update: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
+  then: (resolve: (value: unknown) => unknown, reject: (reason: unknown) => unknown) => Promise<unknown>;
+};
+
 function makeQuery() {
-  const query: Record<string, any> = {};
+  const query = {} as Query;
   query.select = mocks.select.mockImplementation(() => query);
   query.eq = mocks.eq.mockImplementation(() => query);
   query.maybeSingle = mocks.maybeSingle;
