@@ -99,8 +99,8 @@ BEGIN
   IF p_user_id IS NULL
     OR p_function_name IS NULL
     OR p_function_name NOT IN ('ai-chat', 'ai-context')
-    OR p_limit < 1 OR p_limit > 100
-    OR p_window_seconds < 1 OR p_window_seconds > 3600
+    OR p_limit IS NULL OR p_limit < 1 OR p_limit > 100
+    OR p_window_seconds IS NULL OR p_window_seconds < 1 OR p_window_seconds > 3600
   THEN
     RAISE EXCEPTION 'invalid_ai_rate_limit_arguments' USING ERRCODE = '22023';
   END IF;
