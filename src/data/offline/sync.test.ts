@@ -1,5 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+interface TestConflict {
+  id?: number;
+  dossier_id: string;
+  title: string;
+  fields: string[];
+  mine: Record<string, string | null>;
+  theirs: Record<string, string | null>;
+  remote_updated_at: string;
+  created_at: number;
+}
+
 interface TestOp {
   id?: number;
   kind: string;
@@ -20,8 +31,16 @@ type MockQuery = { eq: ReturnType<typeof vi.fn>; single?: ReturnType<typeof vi.f
 
 const mocks = vi.hoisted(() => {
   const queued = new Map<number, TestOp>();
+  const conflicts = new Map<number, TestConflict>();
   return {
     queued,
+    conflicts,
+    conflictGet: vi.fn(async (id: number) => conflicts.get(id)),
+    conflictUpdate: vi.fn(async (id: number, patch: Partial<TestConflict>) => {
+      const current = conflicts.get(id);
+      if (current) conflicts.set(id, { ...current, ...patch });
+    }),
+    conflictDelete: vi.fn(async (id: number) => { conflicts.delete(id); }),
     orderByToArray: vi.fn(async () => [...queued.values()].sort((a, b) => a.created_at - b.created_at)),
     queueWhereToArray: vi.fn(async () => [...queued.values()].filter((op) => op.kind === "update_dossier")),
     queueUpdate: vi.fn(async (id: number, patch: Partial<TestOp>) => {
@@ -55,7 +74,12 @@ vi.mock("@/data/offline/db", () => ({
       get: mocks.queueGet,
     },
     transaction: vi.fn(async (_mode, _table, callback) => callback()),
-    conflicts: { add: mocks.conflictAdd },
+    conflicts: {
+      add: mocks.conflictAdd,
+      get: mocks.conflictGet,
+      update: mocks.conflictUpdate,
+      delete: mocks.conflictDelete,
+    },
     drafts: {
       where: vi.fn(),
       update: vi.fn(),
@@ -75,7 +99,7 @@ vi.mock("@/data/procedures.repo", () => ({
   initializeDossierJourney: vi.fn(),
 }));
 
-import { enqueueUpdateDossierMetadata, processQueue } from "@/data/offline/sync";
+import { enqueueUpdateDossierMetadata, processQueue, resolveConflict } from "@/data/offline/sync";
 
 describe("offline Terrain section updates", () => {
   beforeEach(() => {
@@ -560,5 +584,62 @@ describe("queued dossier deletion", () => {
     expect(deleteDossier).not.toHaveBeenCalled();
     expect(mocks.queued.has(operation.id!)).toBe(true);
     expect(mocks.queued.get(operation.id!)?.attempts).toBe(1);
+  });
+});
+
+
+describe("sync conflict resolution freshness", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    mocks.conflicts.clear();
+    mocks.authGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null });
+  });
+
+  it("refreshes a conflict instead of overwriting a dossier changed since review", async () => {
+    mocks.conflicts.set(9, {
+      id: 9,
+      dossier_id: "dossier-1",
+      title: "Titre distant initial",
+      fields: ["title"],
+      mine: { title: "Mon titre" },
+      theirs: { title: "Titre distant initial" },
+      remote_updated_at: "2026-10-20T10:00:00Z",
+      created_at: 100,
+    });
+
+    const query: MockQuery & {
+      select: ReturnType<typeof vi.fn>;
+      update: ReturnType<typeof vi.fn>;
+    } = {
+      select: vi.fn(() => query),
+      update: vi.fn(() => query),
+      eq: vi.fn(() => query),
+      single: vi.fn().mockResolvedValue({
+        data: {
+          id: "dossier-1",
+          user_id: "user-1",
+          title: "Titre distant plus récent",
+          description: null,
+          location_name: null,
+          updated_at: "2026-10-21T07:00:00Z",
+        },
+        error: null,
+      }),
+    };
+    mocks.supabaseFrom.mockReturnValue(query);
+
+    await expect(resolveConflict(9, { title: "Mon titre" })).rejects.toThrow(
+      "Le dossier a changé depuis l'affichage du conflit"
+    );
+
+    expect(query.update).not.toHaveBeenCalled();
+    expect(mocks.conflictUpdate).toHaveBeenCalledWith(9, expect.objectContaining({
+      title: "Titre distant plus récent",
+      fields: ["title"],
+      theirs: { title: "Titre distant plus récent" },
+      remote_updated_at: "2026-10-21T07:00:00Z",
+    }));
+    expect(mocks.conflicts.has(9)).toBe(true);
   });
 });
