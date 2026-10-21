@@ -37,6 +37,19 @@ export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "syn
 
 /** Met en attente la sauvegarde des sections d'un dossier Terrain existant. */
 /** Queue a field-level dossier edit with its base timestamp for conflict detection. */
+/** Queue a dossier deletion when the device is offline. */
+export async function enqueueDeleteDossier(dossierId: string): Promise<void> {
+  if (!dossierId.trim()) throw new Error("Invalid dossier id");
+  await db.queue.add({
+    kind: "delete_dossier",
+    payload: { dossierId },
+    created_at: Date.now(),
+    attempts: 0,
+  });
+  emit();
+  if (typeof navigator === "undefined" || navigator.onLine) void processQueue();
+}
+
 export async function enqueueUpdateDossier(dossierId: string, changes: DossierChanges, baseUpdatedAt: string) {
   await db.queue.add({
     kind: "update_dossier",
