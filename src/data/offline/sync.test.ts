@@ -99,7 +99,7 @@ vi.mock("@/data/procedures.repo", () => ({
   initializeDossierJourney: vi.fn(),
 }));
 
-import { enqueueUpdateDossierMetadata, processQueue, resolveConflict } from "@/data/offline/sync";
+import { enqueueDeleteDossier, enqueueUpdateDossierMetadata, processQueue, resolveConflict } from "@/data/offline/sync";
 
 describe("offline Terrain section updates", () => {
   beforeEach(() => {
@@ -506,6 +506,32 @@ describe("offline field conflict detection", () => {
   });
 });
 
+
+describe("enqueue offline dossier deletion", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
+  });
+
+  it("queues a valid dossier deletion without attempting network work while offline", async () => {
+    await enqueueDeleteDossier("dossier-1");
+
+    expect(mocks.queueAdd).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "delete_dossier",
+      payload: { dossierId: "dossier-1" },
+      attempts: 0,
+    }));
+    expect(mocks.queued.size).toBe(1);
+    expect([...mocks.queued.values()][0].kind).toBe("delete_dossier");
+    expect(mocks.supabaseFrom).not.toHaveBeenCalled();
+  });
+
+  it("rejects an empty dossier identity", async () => {
+    await expect(enqueueDeleteDossier("  ")).rejects.toThrow("Invalid dossier id");
+    expect(mocks.queueAdd).not.toHaveBeenCalled();
+  });
+});
 
 describe("queued dossier deletion", () => {
   beforeEach(() => {
