@@ -93,6 +93,15 @@ select is(
   true,
   'ai-context has an independent quota from ai-chat'
 );
+insert into auth.users (
+  id, aud, role, email, encrypted_password, email_confirmed_at,
+  raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+) values (
+  '00000000-0000-4000-8000-000000000002',
+  'authenticated', 'authenticated', 'rate-limit-test-2@example.invalid', '',
+  now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()
+);
+
 select is(
   public.consume_ai_request('00000000-0000-4000-8000-000000000002', 'ai-chat', 1, 60),
   true,
