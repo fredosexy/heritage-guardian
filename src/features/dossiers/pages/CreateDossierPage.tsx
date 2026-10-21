@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/features/shell";
@@ -9,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, CircleCheck, Loader2, MapPin, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { FirstStepDialog, useIdentity } from "@/features/identity";
 import { useCreateDossier } from "../hooks/useCreateDossier";
 import { DOSSIER_TYPES, typeLabelKey } from "../components/dossierTypeMeta";
 
@@ -63,12 +62,6 @@ export default function CreateDossierPage() {
   const [sections, setSections] = useState<TerrainSections>(emptyTerrain);
   const [openSection, setOpenSection] = useState<(typeof sectionKeys)[number] | null>("histoire");
   const { create, saving } = useCreateDossier();
-  const { needsFirstStep } = useIdentity();
-  const [firstStepOpen, setFirstStepOpen] = useState(false);
-
-  useEffect(() => {
-    if (needsFirstStep) setFirstStepOpen(true);
-  }, [needsFirstStep]);
 
   const updateSection = (key: (typeof sectionKeys)[number], value: string) =>
     setSections((current) => ({ ...current, [key]: value }));
@@ -113,7 +106,6 @@ export default function CreateDossierPage() {
   if (!type) {
     return (
       <AppLayout>
-        <FirstStepDialog open={firstStepOpen} onClose={() => setFirstStepOpen(false)} />
         <h1 className="text-display mb-2">{t("create.title")}</h1>
         <p className="text-sm text-muted-foreground mb-6">{t("create.chooseType")}</p>
         <div className="space-y-3">
@@ -151,7 +143,6 @@ export default function CreateDossierPage() {
 
   return (
     <AppLayout>
-      <FirstStepDialog open={firstStepOpen} onClose={() => setFirstStepOpen(false)} />
       <button onClick={() => setType(null)} className="text-sm text-muted-foreground mb-4">← {t("common.back")}</button>
 
       <header className="mb-5">

@@ -14,7 +14,11 @@ export async function listParticipants(dossierId: string): Promise<Participant[]
 /** Nombre de participants par dossier (dossiers fournis). */
 export async function countParticipantsByDossier(dossierIds: string[]): Promise<Record<string, number>> {
   if (dossierIds.length === 0) return {};
-  const { data, error } = await supabase.from("participants").select("dossier_id").in("dossier_id", dossierIds);
+  const { data, error } = await supabase
+    .from("participants")
+    .select("dossier_id")
+    .in("dossier_id", dossierIds)
+    .not("accepted_at", "is", null);
   if (error) throw error;
   const out: Record<string, number> = {};
   for (const row of data ?? []) out[row.dossier_id] = (out[row.dossier_id] ?? 0) + 1;
