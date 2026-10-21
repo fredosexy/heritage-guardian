@@ -1,12 +1,13 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthPage, OnboardingPage, ProtectedRoute } from "@/features/identity";
-import { HomePage } from "@/features/home";
-import { CreateDossierPage, DossierDetailPage, DossiersPage } from "@/features/dossiers";
+import { HomePage, ModulePage } from "@/features/home";
+import { EditDossierPage, CreateDossierPage, DossierDetailPage, DossiersPage } from "@/features/dossiers";
 import { AlertsPage } from "@/features/alerts";
 import { AssistantPage } from "@/features/assistant";
 import { ProfilePage } from "@/features/profile";
 import { MyFilesPage } from "@/features/files";
 import { NotFoundPage } from "@/features/shell";
+import { SyncCenterPage } from "@/features/offline";
 
 /**
  * Mode visiteur : toutes les pages sont consultables sans compte.
@@ -18,12 +19,17 @@ export function AppRoutes() {
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
       <Route path="/" element={<HomePage />} />
+      <Route path="/index" element={<Navigate to="/" replace />} />
+      <Route path="/index.html" element={<Navigate to="/" replace />} />
+      <Route path="/modules/:moduleId" element={<ModulePage />} />
       <Route path="/dossiers" element={<DossiersPage />} />
       <Route path="/dossiers/:id" element={<DossierDetailPage />} />
+      <Route path="/dossiers/:id/edit" element={<EditDossierPage />} />
       <Route path="/create" element={<CreateDossierPage />} />
       <Route path="/alerts" element={<AlertsPage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/files" element={<MyFilesPage />} />
+      <Route path="/sync" element={<SyncCenterPage />} />
       <Route path="/assistant" element={<AssistantPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Search, ShieldAlert } from "lucide-react";
@@ -18,9 +18,16 @@ export function HomeHeader({ firstName, zone, alertCount = 0, avatarUrl }: Props
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  const [hour, setHour] = useState(() => new Date().getHours());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setHour(new Date().getHours()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   const greeting = useMemo(
-    () => buildGreeting({ firstName, zone, urgentCount: alertCount, hour: new Date().getHours() }),
-    [firstName, zone, alertCount]
+    () => buildGreeting({ firstName, zone, urgentCount: alertCount, hour }),
+    [firstName, zone, alertCount, hour]
   );
 
   return (

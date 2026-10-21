@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { dossiersRepo, enqueueCreateDossier, saveLocalDraft } from "@/data";
+import { dossiersRepo, enqueueCreateDossier, proceduresRepo, saveLocalDraft } from "@/data";
 import { useIdentity } from "@/features/identity";
 
 export interface CreateDossierForm {
@@ -7,10 +7,11 @@ export interface CreateDossierForm {
   title: string;
   description?: string;
   location_name?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export type CreateResult =
-  | { mode: "online"; id: string }
+  | { mode: "online"; id: string; journeyStatus: "ready" | "procedure_unavailable" | "attention" }
   | { mode: "offline" }
   | { mode: "local" };
 
@@ -34,6 +35,7 @@ export function useCreateDossier() {
           title: form.title,
           description: form.description || null,
           location_name: form.location_name || null,
+          metadata: form.metadata ?? {},
         };
 
         // Visiteur : tout reste sur l'appareil jusqu'à la création du compte.
@@ -50,8 +52,19 @@ export function useCreateDossier() {
             title: form.title,
             description: form.description || null,
             location_name: form.location_name || null,
+            metadata: form.metadata ?? {},
           });
-          return { mode: "online", id: dossier.id };
+          let journeyStatus: "ready" | "procedure_unavailable" | "attention" = "ready";
+          try {
+            await proceduresRepo.initializeDossierJourney(dossier.id);
+          } catch (error) {
+            const procedureError = error as { code?: string; message?: string };
+            journeyStatus = procedureError.code === "P0002" ||
+              procedureError.message?.includes("published_procedure_not_found")
+              ? "procedure_unavailable"
+              : "attention";
+          }
+          return { mode: "online", id: dossier.id, journeyStatus };
         }
 
         await enqueueCreateDossier(draft);

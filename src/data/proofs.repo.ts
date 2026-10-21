@@ -3,12 +3,22 @@ import type { Proof, ProofType } from "@/core/types/domain";
 
 const BUCKET = "dossier-proofs";
 
+/** The file is already in Storage, but its database record still needs retrying. */
+export class ProofPersistenceError extends Error {
+  readonly storagePath: string;
+  readonly cause: unknown;
+
+  constructor(storagePath: string, cause: unknown) {
+    const detail = cause instanceof Error ? cause.message : String(cause);
+    super(`Proof file uploaded but record persistence failed: ${detail}`);
+    this.name = "ProofPersistenceError";
+    this.storagePath = storagePath;
+    this.cause = cause;
+  }
+}
+
 export async function listProofs(dossierId: string): Promise<Proof[]> {
-  const { data, error } = await supabase
-    .from("proofs")
-    .select("*")
-    .eq("dossier_id", dossierId)
-    .order("created_at", { ascending: false });
+  const { data, error } = await supabase.from("proofs").select("*").eq("dossier_id", dossierId).order("created_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
 }
@@ -24,26 +34,27 @@ export async function uploadProof(params: {
   file: File;
   dossierId: string;
   userId: string;
+  sectionKey?: string;
 }): Promise<Proof> {
-  const { file, dossierId, userId } = params;
-  const path = `${userId}/${dossierId}/${Date.now()}-${file.name}`;
+  const { file, dossierId, userId, sectionKey } = params;
+  // Keep simultaneous uploads of same-named files distinct; retries reuse this stored path.
+  const uploadId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const path = `${userId}/${dossierId}/${uploadId}-${file.name}`;
   const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file);
   if (upErr) throw upErr;
 
-  const { data, error } = await supabase
-    .from("proofs")
-    .insert({
-      dossier_id: dossierId,
-      uploaded_by: userId,
-      type: proofTypeForFile(file),
-      title: file.name,
-      storage_path: path,
-      mime_type: file.type,
-      size_bytes: file.size,
-    })
-    .select()
-    .single();
-  if (error) throw error;
+  const metadata = sectionKey ? { terrainSectionKey: sectionKey } : {};
+  const { data, error } = await supabase.from("proofs").insert({
+    dossier_id: dossierId,
+    uploaded_by: userId,
+    type: proofTypeForFile(file),
+    title: file.name,
+    storage_path: path,
+    mime_type: file.type,
+    size_bytes: file.size,
+    metadata,
+  }).select().single();
+  if (error) throw new ProofPersistenceError(path, error);
   return data;
 }
 
@@ -52,18 +63,10 @@ export async function getProofUrl(storagePath: string): Promise<string | null> {
   return data?.signedUrl ?? null;
 }
 
-/** Tous les fichiers de l'utilisateur, tous dossiers confondus. */
 export async function listUserProofs(userId: string): Promise<(Proof & { dossier_title?: string | null })[]> {
-  const { data, error } = await supabase
-    .from("proofs")
-    .select("*, dossiers(title)")
-    .eq("uploaded_by", userId)
-    .order("created_at", { ascending: false });
+  const { data, error } = await supabase.from("proofs").select("*, dossiers(title)").eq("uploaded_by", userId).order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []).map(({ dossiers, ...proof }) => ({
-    ...proof,
-    dossier_title: (dossiers as { title: string } | null)?.title ?? null,
-  }));
+  return (data ?? []).map(({ dossiers, ...proof }) => ({ ...proof, dossier_title: (dossiers as { title: string } | null)?.title ?? null }));
 }
 
 export async function renameProof(proofId: string, title: string): Promise<void> {
@@ -72,12 +75,15 @@ export async function renameProof(proofId: string, title: string): Promise<void>
 }
 
 export async function deleteProof(proof: Pick<Proof, "id" | "storage_path">): Promise<void> {
-  await supabase.storage.from(BUCKET).remove([proof.storage_path]);
+  const { error: storageError } = await supabase.storage.from(BUCKET).remove([proof.storage_path]);
+  // Keep the database record if Storage did not confirm deletion; otherwise the UI
+  // could hide a proof whose file still exists and make recovery unnecessarily hard.
+  if (storageError) throw storageError;
+
   const { error } = await supabase.from("proofs").delete().eq("id", proof.id);
   if (error) throw error;
 }
 
-/** Nombre de preuves par dossier pour un utilisateur. */
 export async function countProofsByDossier(userId: string): Promise<Record<string, number>> {
   const { data, error } = await supabase.from("proofs").select("dossier_id").eq("uploaded_by", userId);
   if (error) throw error;

@@ -4,20 +4,43 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, "security/auth-session-hardening"]
+    branches: [main, "codex/phase-1-session-security-mainline"]
+
+permissions:
+  contents: read
 
 jobs:
+  database-migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.81.3
+      - name: Start isolated local Supabase stack
+        run: supabase start
+      - name: Apply every migration to a fresh local database
+        run: supabase db reset --local
+      - name: Stop local Supabase stack
+        if: always()
+        run: supabase stop --no-backup
+
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - run: npm ci
+      - name: Install dependencies
+        id: install-dependencies
+        run: npm ci
       - run: npm test
       - run: npm run lint
-      - run: npm run build
+      # Keep build diagnostics available even when lint or tests fail, provided
+      # dependencies were installed successfully.
+      - name: Run production build
+        if: always() && steps.install-dependencies.outcome == 'success'
+        run: npm run build

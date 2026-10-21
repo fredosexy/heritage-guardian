@@ -1,4 +1,5 @@
 export { computeCompletionScore, statusFromScore, scoreDossier } from "./dossier-scoring";
+export { getNextDossierAttention, type DossierAttention } from "./dossier-next-attention";
 export { fetchDossierSuggestions, streamChat, AiUnavailableError } from "./assistant.service";
 export type { ChatMessage } from "./assistant.service";
 export { claimLocalData } from "./claim-local-data";
@@ -11,3 +12,4 @@ export { buildGreeting, dayPartFor, type Greeting, type GreetingInput, type DayP
 export { buildScreenTip, type ScreenTip, type ScreenTipInput } from "./screen-assistant";
 export { computeAlertCandidates, type AlertCandidate, type AlertRulesInput } from "./alert-rules";
 export { syncAlerts } from "./alert-sync";
+export { getJourneySummary, type JourneyStepLike, type JourneyStepStatus } from "./journey-engine";

@@ -1,10 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 import { useProfileCompletion } from "../hooks/useProfileCompletion";
 
-/** Jauge « profil complété » avec une relance douce, jamais bloquante. */
+/** Invitation douce à enrichir le profil, jamais bloquante. */
 export function ProfileCompletionCard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -16,9 +15,8 @@ export function ProfileCompletionCard() {
     <section className="card-soft p-4 mb-6">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm font-medium">{t("completion.title")}</p>
-        <span className="text-caption">{percent}%</span>
+        <span className="text-caption">{percent >= 75 ? t("completion.stateWellAdvanced") : percent >= 40 ? t("completion.stateTakingShape") : t("completion.stateToComplete")}</span>
       </div>
-      <Progress value={percent} className="h-2 mb-3" />
       {next && (
         <button
           onClick={() => navigate(next.route)}
