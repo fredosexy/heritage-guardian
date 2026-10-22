@@ -10,28 +10,36 @@ export function useAlerts() {
   const { t } = useTranslation();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const reload = useCallback(() => setReloadKey((key) => key + 1), []);
 
   useEffect(() => {
     if (!user) {
       setAlerts([]);
+      setLoadError(false);
       setLoading(false);
       return;
     }
     let cancelled = false;
     setLoading(true);
+    setLoadError(false);
     syncAlerts(user.id, (key, vars) => String(t(key, vars as never)))
       .catch(() => alertsRepo.listAlerts(user.id))
       .then((data) => {
         if (!cancelled && data) setAlerts(data);
       })
-      .catch(() => undefined)
+      .catch(() => {
+        if (!cancelled) setLoadError(true);
+      })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
     };
-  }, [user, t]);
+  }, [user, t, reloadKey]);
 
   const markRead = useCallback(async (id: string) => {
     const previous = alerts.find((alert) => alert.id === id);
@@ -48,28 +56,33 @@ export function useAlerts() {
     }
   }, [alerts]);
 
-  return { alerts, loading, markRead };
+  return { alerts, loading, loadError, reload, markRead };
 }
 
 export function useUnreadAlerts(limit = 5) {
   const { user } = useAuth();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     if (!user) {
       setAlerts([]);
+      setLoadError(false);
       setLoading(false);
       return;
     }
     let cancelled = false;
     setLoading(true);
+    setLoadError(false);
     alertsRepo
       .listUnreadAlerts(user.id, limit)
       .then((data) => {
         if (!cancelled) setAlerts(data);
       })
-      .catch(() => undefined)
+      .catch(() => {
+        if (!cancelled) setLoadError(true);
+      })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
@@ -78,5 +91,5 @@ export function useUnreadAlerts(limit = 5) {
     };
   }, [user, limit]);
 
-  return { alerts, loading };
+  return { alerts, loading, loadError };
 }
