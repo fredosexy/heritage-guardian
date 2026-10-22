@@ -12,12 +12,12 @@ type Translate = (key: string, vars?: Record<string, string | number>) => string
  */
 export async function syncAlerts(userId: string, t: Translate): Promise<Alert[]> {
   const [dossiers, profile] = await Promise.all([
-    dossiersRepo.listDossiers(userId),
+    dossiersRepo.listDossiers(),
     profilesRepo.getProfile(userId),
   ]);
 
   const [proofCountByDossier, participantCountByDossier] = await Promise.all([
-    proofsRepo.countProofsByDossier(userId),
+    proofsRepo.countProofsByDossier(),
     participantsRepo.countParticipantsByDossier(dossiers.map((d) => d.id)),
   ]);
 
