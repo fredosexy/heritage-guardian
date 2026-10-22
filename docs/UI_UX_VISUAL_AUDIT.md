@@ -63,3 +63,20 @@ Source : `src/index.css` et `tailwind.config.ts`.
 - Cet audit est fondé sur le code source ; aucune capture de navigateur n’a été prise et aucun rapport automatique de contraste n’a été exécuté dans cette étape.
 - Les constats formulés comme « risque » sont des risques à vérifier, pas des échecs WCAG déjà mesurés.
 - La partie 2 sera considérée documentée une fois ce rapport versionné. Les corrections de code attendront la fin des parties 3 et 4 afin de traiter les causes communes dans le bon ordre.
+
+## Vérification complémentaire — 22 octobre 2026
+
+Les fichiers concernés ont été relus directement sur `main` après l'inventaire des routes. Cette vérification confirme les points suivants :
+
+- **VIS-01 confirmé au niveau du code :** dans `AuthPage.tsx`, les actions e-mail et vérification OTP appliquent `bg-gradient-warm`. Le gradient clair est défini par `hsl(275 75% 88%)` vers `hsl(195 70% 88%)` dans le thème clair. Le bouton e-mail utilise le composant partagé `Button`, dont le rendu final doit être vérifié avant de figer une mesure WCAG ; le contraste blanc/pastel est un risque suffisamment fort pour être traité en priorité.
+- **VIS-02 confirmé :** le bouton « oui » de `OnboardingPage.tsx` réutilise `bg-gradient-warm`. L'icône d'en-tête utilise également `text-primary-foreground` sur ce gradient.
+- **VIS-03 confirmé :** le CTA principal de `ModulePage.tsx` associe explicitement `bg-gradient-warm` à `text-primary-foreground`, donc au blanc dans le thème clair.
+- **VIS-04 confirmé :** `AuthPage.tsx` emploie `font-serif` sur le titre de marque et `ModulePage.tsx` sur le titre de section. Le système global définit Inter pour les titres `h1`, `h2`, `h3`, tandis que Fraunces est disponible comme famille serif. Il s'agit d'une incohérence potentielle, pas nécessairement d'un défaut : l'intention éditoriale doit être conservée si elle est délibérée.
+- **VIS-05 confirmé :** les boutons de bascule connexion/inscription dans `AuthPage.tsx` n'ont ni classe `tap` ni classe `focus-ring` explicites, contrairement à plusieurs autres actions de l'application.
+- **Thème sombre :** les tokens du gradient sont plus foncés en mode sombre, tandis que `--primary-foreground` devient sombre. Le risque identifié concerne donc d'abord le thème clair ; ne pas appliquer une correction globale sans vérifier le comportement des deux thèmes.
+
+### Décision d'audit
+
+La prochaine correction de contraste devra privilégier une règle explicite et cohérente pour les actions : soit texte sombre sur le gradient pastel, soit fond d'action plus soutenu avec texte blanc. Ne pas assombrir globalement les gradients décoratifs du site : ils participent à l'identité pastel approuvée et peuvent être utilisés derrière du contenu non interactif.
+
+**Statut :** constats source confirmés ; contraste WCAG mesuré et rendu navigateur non encore validés. Aucune correction applicative n'est introduite dans cette PR documentaire.
