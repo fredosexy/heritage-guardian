@@ -16,7 +16,7 @@ interface TestOp {
     [key: string]: unknown;
   };
 }
-type MockQuery = { eq: ReturnType<typeof vi.fn>; single?: ReturnType<typeof vi.fn> };
+type MockQuery = { eq: ReturnType<typeof vi.fn>; single?: ReturnType<typeof vi.fn>; select?: ReturnType<typeof vi.fn>; maybeSingle?: ReturnType<typeof vi.fn> };
 
 const mocks = vi.hoisted(() => {
   const queued = new Map<number, TestOp>();
@@ -161,7 +161,7 @@ describe("sync queue concurrency", () => {
               return firstRead;
             }
             return Promise.resolve({
-              data: { user_id: "user-1", metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
+              data: { user_id: "user-1", updated_at: "2026-01-01T00:00:00Z", metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
               error: null,
             });
           }),
@@ -171,10 +171,12 @@ describe("sync queue concurrency", () => {
       update: vi.fn((values: { metadata: unknown }) => {
         const query: MockQuery = {
           eq: vi.fn(() => {
-            if (query.eq.mock.calls.length === 1) return query;
-            updatePayloads.push(values.metadata);
-            return Promise.resolve({ error: null });
+            if (query.eq.mock.calls.length === 3) updatePayloads.push(values.metadata);
+            return query;
           }),
+          select: vi.fn(() => ({
+            maybeSingle: vi.fn().mockResolvedValue({ data: { id: "dossier-1" }, error: null }),
+          })),
         };
         return query;
       }),
@@ -193,7 +195,7 @@ describe("sync queue concurrency", () => {
     });
 
     releaseFirstRead({
-      data: { user_id: "user-1", metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
+      data: { user_id: "user-1", updated_at: "2026-01-01T00:00:00Z", metadata: { terrain: { sections: {} }, dossierNote: "keep" } },
       error: null,
     });
     await firstPass;
@@ -401,6 +403,7 @@ describe("Terrain section persistence after offline replay", () => {
           single: vi.fn().mockResolvedValue({
             data: {
               user_id: "user-1",
+              updated_at: "2026-01-01T00:00:00Z",
               metadata: {
                 dossierNote: "ne pas écraser",
                 terrain: { sections: { histoire: "Ancienne valeur", champServeur: "conserver" } },
@@ -414,10 +417,12 @@ describe("Terrain section persistence after offline replay", () => {
       update: vi.fn((values: { metadata: unknown }) => {
         const query: MockQuery = {
           eq: vi.fn(() => {
-            if (query.eq.mock.calls.length === 1) return query;
-            updates.push(values.metadata);
-            return Promise.resolve({ error: null });
+            if (query.eq.mock.calls.length === 3) updates.push(values.metadata);
+            return query;
           }),
+          select: vi.fn(() => ({
+            maybeSingle: vi.fn().mockResolvedValue({ data: { id: "dossier-1" }, error: null }),
+          })),
         };
         return query;
       }),
@@ -447,6 +452,52 @@ describe("offline field conflict detection", () => {
     vi.clearAllMocks();
     mocks.queued.clear();
     Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+  });
+
+  it("keeps a field edit queued when the server changes after the conflict check", async () => {
+    mocks.queued.set(52, {
+      id: 52,
+      kind: "update_dossier",
+      created_at: 101,
+      attempts: 0,
+      payload: {
+        dossierId: "dossier-1",
+        changes: { title: "Titre local" },
+        baseUpdatedAt: "2026-01-02T00:00:00Z",
+      },
+    });
+    const updateQuery: MockQuery = {
+      eq: vi.fn(() => updateQuery),
+      select: vi.fn(() => ({
+        maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+      })),
+    };
+    const readQuery: MockQuery = {
+      eq: vi.fn(() => readQuery),
+      single: vi.fn().mockResolvedValue({
+        data: {
+          id: "dossier-1",
+          user_id: "user-1",
+          title: "Titre de base",
+          description: null,
+          location_name: null,
+          updated_at: "2026-01-02T00:00:00Z",
+        },
+        error: null,
+      }),
+    };
+    mocks.supabaseFrom.mockImplementation(() => ({
+      select: vi.fn(() => readQuery),
+      update: vi.fn(() => updateQuery),
+    }));
+
+    await processQueue();
+
+    expect(updateQuery.eq).toHaveBeenCalledWith("updated_at", "2026-01-02T00:00:00Z");
+    expect(mocks.queued.get(52)).toEqual(expect.objectContaining({
+      attempts: 1,
+      last_error: expect.stringContaining("changé pendant la synchronisation"),
+    }));
   });
 
   it("persists an overlapping edit for Sync Center instead of overwriting the server", async () => {
