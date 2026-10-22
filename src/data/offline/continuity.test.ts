@@ -44,16 +44,18 @@ describe("IndexedDB offline continuity", () => {
     first.unmount();
     db.close();
     await db.open();
-    let release: (result: { error: null }) => void = () => { throw new Error("not started"); };
-    const pending = new Promise<{ error: null }>((resolve) => { release = resolve; });
+    let release: (result: { data: { id: string }; error: null }) => void = () => { throw new Error("not started"); };
+    const pending = new Promise<{ data: { id: string }; error: null }>((resolve) => { release = resolve; });
     mocks.from.mockReturnValue({
       select: () => {
         const query = { eq: vi.fn(() => query), single: vi.fn(async () => ({ data: { user_id: "owner", metadata: {} }, error: null })) };
         return query;
       },
       update: mocks.update.mockImplementation(() => {
-        let count = 0;
-        const query = { eq: vi.fn(() => ++count === 2 ? pending : query) };
+        const query = {
+          eq: vi.fn(() => query),
+          select: vi.fn(() => ({ maybeSingle: vi.fn(() => pending) })),
+        };
         return query;
       }),
     });
@@ -63,7 +65,7 @@ describe("IndexedDB offline continuity", () => {
     act(() => { retry = reopened.result.current.retry(); });
     await waitFor(() => expect(mocks.update).toHaveBeenCalledOnce());
     expect((await db.queue.get(id))?.last_error).toBe("Storage/network temporarily unavailable");
-    await act(async () => { release({ error: null }); await retry; });
+    await act(async () => { release({ data: { id: "terrain-1" }, error: null }); await retry; });
     await waitFor(() => expect(reopened.result.current.queue).toEqual([]));
     reopened.unmount();
   });
