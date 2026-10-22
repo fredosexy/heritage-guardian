@@ -11,7 +11,7 @@ type Filter = "all" | "urgent" | "info" | "suggestion";
 export default function AlertsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { alerts, loading, markRead } = useAlerts();
+  const { alerts, loading, loadError, reload, markRead } = useAlerts();
   const [filter, setFilter] = useState<Filter>("all");
 
   const filtered = filter === "all" ? alerts : alerts.filter((a) => a.type === filter);
@@ -49,6 +49,13 @@ export default function AlertsPage() {
       {loading ? (
         <div className="flex justify-center py-12">
           <Loader2 className="size-5 animate-spin text-primary" />
+        </div>
+      ) : loadError ? (
+        <div role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
+          <p className="mb-3">{t("auth.error")}</p>
+          <button onClick={reload} className="tap focus-ring min-h-11 rounded-xl border border-border px-4 font-medium">
+            {t("common.retry", "Réessayer")}
+          </button>
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState
