@@ -94,12 +94,12 @@ export default function Auth() {
             <button
               onClick={() => setMode("signin")}
               aria-pressed={mode === "signin"}
-              className={`tap focus-ring flex-1 min-h-11 py-2 rounded-lg text-sm font-medium transition ${mode === "signin" ? "bg-card shadow-soft" : "text-muted-foreground"}`
+              className={`tap focus-ring flex-1 min-h-11 py-2 rounded-lg text-sm font-medium transition ${mode === "signin" ? "bg-card shadow-soft" : "text-muted-foreground"}`}
             >{t("auth.signIn")}</button>
             <button
               onClick={() => setMode("signup")}
               aria-pressed={mode === "signup"}
-              className={`tap focus-ring flex-1 min-h-11 py-2 rounded-lg text-sm font-medium transition ${mode === "signup" ? "bg-card shadow-soft" : "text-muted-foreground"}`
+              className={`tap focus-ring flex-1 min-h-11 py-2 rounded-lg text-sm font-medium transition ${mode === "signup" ? "bg-card shadow-soft" : "text-muted-foreground"}`}
             >{t("auth.signUp")}</button>
           </div>
 
