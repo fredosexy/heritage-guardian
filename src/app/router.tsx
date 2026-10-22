@@ -10,8 +10,8 @@ import { NotFoundPage } from "@/features/shell";
 import { SyncCenterPage } from "@/features/offline";
 
 /**
- * Mode visiteur : toutes les pages sont consultables sans compte.
- * Seul l'onboarding (lié à un profil réel) exige un compte.
+ * Les visiteurs peuvent découvrir Heritis et consulter les explications publiques.
+ * Les espaces de gestion et les données personnelles exigent une session.
  */
 export function AppRoutes() {
   return (
@@ -22,14 +22,14 @@ export function AppRoutes() {
       <Route path="/index" element={<Navigate to="/" replace />} />
       <Route path="/index.html" element={<Navigate to="/" replace />} />
       <Route path="/modules/:moduleId" element={<ModulePage />} />
-      <Route path="/dossiers" element={<DossiersPage />} />
-      <Route path="/dossiers/:id" element={<DossierDetailPage />} />
-      <Route path="/dossiers/:id/edit" element={<EditDossierPage />} />
-      <Route path="/create" element={<CreateDossierPage />} />
-      <Route path="/alerts" element={<AlertsPage />} />
+      <Route path="/dossiers" element={<ProtectedRoute><DossiersPage /></ProtectedRoute>} />
+      <Route path="/dossiers/:id" element={<ProtectedRoute><DossierDetailPage /></ProtectedRoute>} />
+      <Route path="/dossiers/:id/edit" element={<ProtectedRoute><EditDossierPage /></ProtectedRoute>} />
+      <Route path="/create" element={<ProtectedRoute><CreateDossierPage /></ProtectedRoute>} />
+      <Route path="/alerts" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/files" element={<MyFilesPage />} />
-      <Route path="/sync" element={<SyncCenterPage />} />
+      <Route path="/sync" element={<ProtectedRoute><SyncCenterPage /></ProtectedRoute>} />
       <Route path="/assistant" element={<AssistantPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Bell, FolderOpen, Home, Paperclip, Plus, User } from "lucide-react";
+import { Bell, FolderOpen, Home, MessageCircle, Paperclip, Plus, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { centralAction } from "@/services";
 import { profilesRepo } from "@/data";
 import { useAlerts } from "@/features/alerts/hooks/useAlerts";
 import { useProfile } from "@/features/profile";
+import { useIdentity } from "@/features/identity";
 import { cn } from "@/lib/utils";
 
 /**
@@ -16,6 +17,7 @@ export function BottomNav() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { isAuthenticated } = useIdentity();
   const central = centralAction(pathname);
   const CentralIcon = central.icon === "proof" ? Paperclip : Plus;
 
@@ -41,10 +43,15 @@ export function BottomNav() {
     };
   }, [profile?.avatar_url]);
 
-  const left = [
-    { to: "/", icon: Home, label: t("nav.home") },
-    { to: "/dossiers", icon: FolderOpen, label: t("nav.dossiers") },
-  ];
+  const left = isAuthenticated
+    ? [
+        { to: "/", icon: Home, label: t("nav.home") },
+        { to: "/dossiers", icon: FolderOpen, label: t("nav.dossiers") },
+      ]
+    : [
+        { to: "/", icon: Home, label: t("nav.home") },
+        { to: "/assistant", icon: MessageCircle, label: t("nav.assistant") },
+      ];
 
   const runCentral = () => {
     if (central.route.startsWith("#")) {
@@ -62,7 +69,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur border-t border-border shadow-elegant">
-      <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-5 gap-1">
+      <div className={cn("mx-auto max-w-md px-3 py-2 gap-1", isAuthenticated ? "grid grid-cols-5" : "grid grid-cols-3")}>
         {left.map(({ to, icon: Icon, label }) => (
           <NavLink key={to} to={to} end className={tabClass}>
             <Icon className="size-5" />
@@ -70,26 +77,30 @@ export function BottomNav() {
           </NavLink>
         ))}
 
-        <button
-          onClick={runCentral}
-          aria-label={t(central.labelKey)}
-          className="bg-gradient-warm text-primary-foreground shadow-warm -mt-4 mx-1 py-3 rounded-2xl flex items-center justify-center pressable focus-ring tap"
-        >
-          <CentralIcon className="size-6" />
-          <span className="sr-only">{t(central.labelKey)}</span>
-        </button>
+        {isAuthenticated && (
+          <>
+            <button
+              onClick={runCentral}
+              aria-label={t(central.labelKey)}
+              className="bg-gradient-warm text-primary-foreground shadow-warm -mt-4 mx-1 py-3 rounded-2xl flex items-center justify-center pressable focus-ring tap"
+            >
+              <CentralIcon className="size-6" />
+              <span className="sr-only">{t(central.labelKey)}</span>
+            </button>
 
-        <NavLink to="/alerts" className={tabClass}>
-          <span className="relative">
-            <Bell className="size-5" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 min-w-4 h-4 px-1 text-[9px] rounded-full bg-destructive text-destructive-foreground flex items-center justify-center font-bold">
-                {unreadCount > 9 ? "9+" : unreadCount}
+            <NavLink to="/alerts" className={tabClass}>
+              <span className="relative">
+                <Bell className="size-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2 min-w-4 h-4 px-1 text-[9px] rounded-full bg-destructive text-destructive-foreground flex items-center justify-center font-bold">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
               </span>
-            )}
-          </span>
-          <span>{t("nav.alerts")}</span>
-        </NavLink>
+              <span>{t("nav.alerts")}</span>
+            </NavLink>
+          </>
+        )}
 
         <NavLink to="/profile" className={tabClass}>
           {avatarUrl ? (
