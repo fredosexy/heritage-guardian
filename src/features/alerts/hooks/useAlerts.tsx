@@ -64,6 +64,9 @@ export function useUnreadAlerts(limit = 5) {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const reload = useCallback(() => setReloadKey((key) => key + 1), []);
 
   useEffect(() => {
     if (!user) {
@@ -89,7 +92,7 @@ export function useUnreadAlerts(limit = 5) {
     return () => {
       cancelled = true;
     };
-  }, [user, limit]);
+  }, [user, limit, reloadKey]);
 
-  return { alerts, loading, loadError };
+  return { alerts, loading, loadError, reload };
 }
