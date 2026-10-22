@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { corsHeaders } from "@supabase/supabase-js/cors";
+import { corsHeaders } from "./cors.ts";
 
 type FunctionName = "ai-chat" | "ai-context";
 
