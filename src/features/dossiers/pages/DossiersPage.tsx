@@ -36,7 +36,7 @@ export default function DossiersPage() {
       <AssistantTip className="mb-4" />
 
       {pending > 0 && (
-        <div className="mb-3 flex items-center gap-2 rounded-xl border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-warning-foreground">
+        <div className="mb-3 flex items-center gap-2 rounded-2xl border border-warning/30 bg-warning/10 px-3 py-3 text-sm text-warning-foreground">
           <CloudOff className="size-4 shrink-0" />
           <span className="flex-1">{t("dossiers.pendingSync", { count: pending })}</span>
           <button onClick={() => triggerSync()} className="text-xs font-medium inline-flex items-center gap-1 hover:underline">
@@ -49,8 +49,8 @@ export default function DossiersPage() {
       {drafts.length > 0 && (
         <div className="mb-3 space-y-2">
           {drafts.map((d) => (
-            <div key={d.localId} className="card-soft p-3 flex items-center gap-3 opacity-90">
-              <div className="size-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground shrink-0">
+            <div key={d.localId} className="rounded-2xl border border-border/60 bg-card/80 p-3 flex items-center gap-3 shadow-[var(--shadow-soft)] opacity-90">
+              <div className="size-10 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground shrink-0">
                 <CloudOff className="size-4" />
               </div>
               <div className="flex-1 min-w-0">
@@ -65,7 +65,7 @@ export default function DossiersPage() {
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input
-          className="pl-9 rounded-xl"
+          className="pl-9 rounded-2xl border-border/70 bg-card/80 focus-visible:ring-2 focus-visible:ring-ring"
           placeholder={t("dossiers.search")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -87,7 +87,7 @@ export default function DossiersPage() {
           onSecondary={() => navigate("/assistant")}
         />
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {filtered.map((d) => {
             const Icon = iconForType(d.type);
             return (
@@ -96,9 +96,9 @@ export default function DossiersPage() {
                 onClick={() =>
                   d.local ? toast.info(t("dossiers.localOnly")) : navigate(`/dossiers/${d.id}`)
                 }
-                className="w-full card-soft p-4 text-left hover:shadow-warm transition flex items-center gap-3"
+                className="group w-full rounded-3xl border border-border/60 bg-gradient-to-br from-card via-card to-accent/20 p-4 text-left shadow-[var(--shadow-soft)] hover:border-primary/20 hover:shadow-[var(--shadow-elegant)] transition flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <div className="size-11 rounded-xl bg-accent flex items-center justify-center text-primary shrink-0">
+                <div className="size-11 rounded-2xl bg-gradient-to-br from-accent to-secondary/70 flex items-center justify-center text-primary shrink-0 shadow-[var(--shadow-soft)]">
                   <Icon className="size-5" />
                 </div>
                 <div className="flex-1 min-w-0">
