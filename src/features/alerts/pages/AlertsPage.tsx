@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { AppLayout, AssistantTip, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
 import { Bell, Loader2, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { useAlerts } from "../hooks/useAlerts";
 
 type Filter = "all" | "urgent" | "info" | "suggestion";
@@ -10,10 +11,14 @@ type Filter = "all" | "urgent" | "info" | "suggestion";
 export default function AlertsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { alerts, loading, markRead } = useAlerts();
+  const { alerts, loading, loadError, reload, markRead } = useAlerts();
   const [filter, setFilter] = useState<Filter>("all");
 
-  const filtered = filter === "all" ? alerts : alerts.filter((a) => a.type === filter);
+  const filtered = alerts.filter((alert) => {
+    if (filter === "all") return true;
+    if (filter === "urgent") return alert.type === "urgent";
+    return alert.type === filter;
+  });
 
   const filters: { id: Filter; label: string }[] = [
     { id: "all", label: t("alerts.filterAll") },
@@ -35,7 +40,8 @@ export default function AlertsPage() {
           <button
             key={f.id}
             onClick={() => setFilter(f.id)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition ${
+            aria-pressed={filter === f.id}
+            className={`tap focus-ring min-h-11 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition ${
               filter === f.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
             }`}
           >
@@ -47,6 +53,13 @@ export default function AlertsPage() {
       {loading ? (
         <div className="flex justify-center py-12">
           <Loader2 className="size-5 animate-spin text-primary" />
+        </div>
+      ) : loadError ? (
+        <div role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
+          <p className="mb-3">{t("auth.error")}</p>
+          <button onClick={reload} className="tap focus-ring min-h-11 rounded-xl border border-border px-4 font-medium">
+            {t("common.retry", "Réessayer")}
+          </button>
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState
@@ -62,7 +75,7 @@ export default function AlertsPage() {
             <button
               key={a.id}
               onClick={() => {
-                void markRead(a.id);
+                void markRead(a.id).catch(() => toast.error(t("auth.error")));
                 if (a.action_route) navigate(a.action_route);
               }}
               className={`w-full text-left card-soft border-l-4 ${severityBorder(a.severity)} p-3 ${

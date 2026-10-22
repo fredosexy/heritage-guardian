@@ -26,7 +26,11 @@ export default function AssistantPage() {
   const autoSent = useRef(false);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    scrollRef.current?.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
   }, [messages]);
 
   const sendText = useCallback(
@@ -116,9 +120,9 @@ export default function AssistantPage() {
 
   return (
     <AppLayout hideNav>
-      <div className="flex flex-col h-screen -m-4 max-w-md mx-auto">
+      <div className="flex flex-col h-[100dvh] min-h-0 -m-4 max-w-md mx-auto">
         <header className="flex items-center gap-3 p-4 border-b border-border/60 bg-background/80 backdrop-blur-md">
-          <button onClick={() => navigate(-1)} className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-border/60 bg-card/80 shadow-[var(--shadow-soft)] transition hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={t("common.back")}>
+          <button onClick={() => navigate(-1)} className="flex size-11 shrink-0 items-center justify-center rounded-2xl border border-border/60 bg-card/80 shadow-[var(--shadow-soft)] transition hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={t("common.back")}>
             <ArrowLeft className="size-5" />
           </button>
           <div className="flex items-center gap-2">

@@ -14,18 +14,30 @@ export function useDossierDetail(id?: string) {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const load = useCallback(async () => {
-    if (!id || !user) return;
-    const [d, p, pa] = await Promise.all([dossiersRepo.getDossier(id), proofsRepo.listProofs(id), participantsRepo.listParticipants(id)]);
-    setDossier(d);
-    setProofs(p);
-    setParticipants(pa);
-    setLoading(false);
+    if (!id || !user) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setLoadError(false);
+    try {
+      const [d, p, pa] = await Promise.all([dossiersRepo.getDossier(id), proofsRepo.listProofs(id), participantsRepo.listParticipants(id)]);
+      setDossier(d);
+      setProofs(p);
+      setParticipants(pa);
+    } catch (error) {
+      setLoadError(true);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   }, [id, user]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { void load().catch(() => undefined); }, [load]);
 
   // Refresh an open dossier when offline queue processing changes state. In particular,
   // a proof queued while offline must appear in its Terrain section after sync succeeds.
@@ -93,5 +105,5 @@ export function useDossierDetail(id?: string) {
     await dossiersRepo.deleteDossier(dossier.id);
   }, [dossier, user]);
 
-  return { dossier, proofs, participants, suggestions, loading, uploading, addProof, remove, reload: load, canEdit: canEditDossier(dossier, user?.id) };
+  return { dossier, proofs, participants, suggestions, loading, loadError, uploading, addProof, remove, reload: load, canEdit: canEditDossier(dossier, user?.id) };
 }

@@ -19,7 +19,7 @@ export function BottomNav() {
   const central = centralAction(pathname);
   const CentralIcon = central.icon === "proof" ? Paperclip : Plus;
 
-  const { alerts } = useAlerts();
+  const { alerts, loadError: alertsLoadError } = useAlerts();
   const unreadCount = alerts.filter((a) => !a.read).length;
 
   const { profile } = useProfile();
@@ -48,7 +48,8 @@ export function BottomNav() {
 
   const runCentral = () => {
     if (central.route.startsWith("#")) {
-      document.getElementById(central.route.slice(1))?.scrollIntoView({ behavior: "smooth", block: "center" });
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      document.getElementById(central.route.slice(1))?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
       return;
     }
     navigate(central.route);
@@ -79,10 +80,16 @@ export function BottomNav() {
           <span className="sr-only">{t(central.labelKey)}</span>
         </button>
 
-        <NavLink to="/alerts" className={tabClass}>
+        <NavLink
+          to="/alerts"
+          className={tabClass}
+          aria-label={`${t("nav.alerts")}${alertsLoadError ? ` — ${t("auth.error")}` : unreadCount > 0 ? ` — ${unreadCount}` : ""}`}
+        >
           <span className="relative">
             <Bell className="size-5" />
-            {unreadCount > 0 && (
+            {alertsLoadError ? (
+              <span aria-hidden="true" className="absolute -top-1.5 -right-2 size-2 rounded-full bg-warning ring-2 ring-card" />
+            ) : unreadCount > 0 && (
               <span className="absolute -top-1.5 -right-2 min-w-4 h-4 px-1 text-[9px] rounded-full bg-destructive text-destructive-foreground flex items-center justify-center font-bold">
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { dossiersRepo, listLocalDrafts, participantsRepo, countProofsByDossier, proceduresRepo } from "@/data";
 import type { Dossier, DossierStatus, DossierStep } from "@/core/types/domain";
@@ -32,6 +32,9 @@ export function useDossiers() {
   const [proofs, setProofs] = useState<Record<string, number>>({});
   const [journeys, setJourneys] = useState<Record<string, { progress: number; current: string | null; next: string | null; blocked: string | null }>>({});
   const [loadingRemote, setLoadingRemote] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const reload = useCallback(() => setReloadKey((key) => key + 1), []);
 
   const localDrafts = useLiveQuery(
     async () => (isGuest && userId ? listLocalDrafts(userId) : []),
@@ -45,11 +48,13 @@ export function useDossiers() {
       setParticipants({});
       setProofs({});
       setJourneys({});
+      setLoadError(false);
       setLoadingRemote(false);
       return;
     }
     let cancelled = false;
     setLoadingRemote(true);
+    setLoadError(false);
     Promise.all([dossiersRepo.listDossiers(), countProofsByDossier()])
       .then(async ([data, proofCounts]) => {
         const participantCounts = await participantsRepo.countParticipantsByDossier(data.map((d) => d.id));
@@ -75,10 +80,10 @@ export function useDossiers() {
           setJourneys(Object.fromEntries(journeyEntries));
         }
       })
-      .catch(() => undefined)
+      .catch(() => { if (!cancelled) setLoadError(true); })
       .finally(() => { if (!cancelled) setLoadingRemote(false); });
     return () => { cancelled = true; };
-  }, [userId, isGuest, pendingSync]);
+  }, [userId, isGuest, pendingSync, reloadKey]);
 
   const dossiers = useMemo<DossierListItem[]>(() => {
     if (isGuest) return (localDrafts ?? []).map((draft) => ({
@@ -104,5 +109,5 @@ export function useDossiers() {
     }));
   }, [isGuest, localDrafts, remote, participants, proofs, journeys]);
 
-  return { dossiers, loading: isGuest ? localDrafts === undefined : loadingRemote };
+  return { dossiers, loading: isGuest ? localDrafts === undefined : loadingRemote, loadError: !isGuest && loadError, reload };
 }

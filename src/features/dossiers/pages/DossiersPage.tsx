@@ -15,7 +15,7 @@ export default function DossiersPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { dossiers, loading } = useDossiers();
+  const { dossiers, loading, loadError, reload } = useDossiers();
   const [query, setQuery] = useState("");
   const { isGuest } = useIdentity();
   const pendingCount = usePendingSync();
@@ -75,6 +75,13 @@ export default function DossiersPage() {
       {loading ? (
         <div className="flex justify-center py-12">
           <Loader2 className="size-5 animate-spin text-primary" />
+        </div>
+      ) : loadError ? (
+        <div role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
+          <p className="mb-3">{t("auth.error")}</p>
+          <button onClick={reload} className="tap focus-ring min-h-11 rounded-xl border border-border px-4 font-medium">
+            {t("common.retry", "Réessayer")}
+          </button>
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState
