@@ -18,10 +18,10 @@ export function AppLayout({ children, hideNav }: Props) {
   const showNav = !hideNav && isMain;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background bg-gradient-to-b from-accent/25 via-background to-secondary/20">
       <OfflineIndicator />
       <main className={showNav ? "flex-1 pb-24" : "flex-1"}>
-        <div className="container-app py-4 animate-fade-in">{children}</div>
+        <div className="container-app py-5 animate-fade-in">{children}</div>
       </main>
       {showNav && <BottomNav />}
     </div>
