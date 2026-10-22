@@ -30,7 +30,7 @@ export function EmptyState({
       </span>
       <p className="font-medium mb-1">{title}</p>
       {description && <p className="text-caption mb-4">{description}</p>}
-      <Button onClick={onAction} className="bg-gradient-warm w-full">
+      <Button onClick={onAction} className="w-full rounded-2xl bg-primary text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105">
         {actionLabel}
       </Button>
       {secondaryLabel && onSecondary && (
