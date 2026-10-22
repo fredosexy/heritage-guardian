@@ -36,7 +36,8 @@ export default function AlertsPage() {
           <button
             key={f.id}
             onClick={() => setFilter(f.id)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition ${
+            aria-pressed={filter === f.id}
+            className={`tap focus-ring min-h-11 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition ${
               filter === f.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
             }`}
           >
