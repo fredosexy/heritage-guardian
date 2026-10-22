@@ -62,7 +62,10 @@ jobs:
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: 2.81.3
+          version: 2.121.0
+      # Clear setup-cli's GHCR override to allow cross-registry fallback.
+      - name: Enable Supabase registry fallbacks
+        run: echo 'SUPABASE_INTERNAL_IMAGE_REGISTRY=' >> "$GITHUB_ENV"
       - name: Start isolated local Supabase stack
         run: supabase start
       - name: Reset database and prepare local Edge environment
