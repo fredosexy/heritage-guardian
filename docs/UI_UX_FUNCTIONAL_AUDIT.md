@@ -77,3 +77,25 @@ Les pages ont déjà des états explicites de chargement et d'absence de donnée
 - Les constats ci-dessus sont fondés sur la lecture du code et doivent être confirmés par tests ciblés.
 - Aucun test de navigateur, aucune simulation de panne et aucune suite automatisée n'ont été exécutés dans cette étape.
 - Ce rapport est documentaire ; il ne change pas le comportement de l'application. Les corrections sont à regrouper après la partie 4, sauf si une anomalie critique impose une intervention immédiate.
+
+## Vérification complémentaire du code source — 22 octobre 2026
+
+Les fichiers applicatifs de référence ont été relus directement sur `main`. Les cinq constats ci-dessus sont confirmés dans cette révision du code :
+
+- **F1 confirmé :** `useDossierDetail.tsx` attend les trois dépôts dans un `Promise.all`, sans `catch/finally` dans cette fonction, et ne remet `loading` à faux que sur le chemin de réussite. L'effet appelle `void load()` sans gestion d'erreur.
+- **F2 confirmé :** `useAlerts().markRead` met à jour l'état local puis attend `alertsRepo.markAlertRead(id)`, sans rollback. Dans `AlertsPage.tsx`, la promesse est lancée avec `void markRead(a.id)`, sans traitement local de l'échec.
+- **F3 confirmé :** `ConflictCard` calcule l'option visuellement sélectionnée avec `choice[field] ?? "mine"`, mais l'état initial reste vide et `submit` transmet cet état vide si l'utilisateur ne touche aucun choix. Le comportement exact de la fusion en aval doit être couvert par un test.
+- **F4 confirmé :** les erreurs finales de chargement des alertes et les erreurs de `listUnreadAlerts` sont absorbées par `catch(() => undefined)`. Les listes peuvent donc se présenter comme vides sans état d'erreur explicite.
+- **F5 confirmé :** le filtre de la page alertes applique `a.type === filter`, y compris pour `urgent`, alors que la bordure visuelle est calculée à partir de `a.severity`. Le contrat métier doit préciser si « urgent » est un type ou un niveau de gravité ; si c'est la gravité, le filtre actuel ne correspond pas à cette intention.
+
+### Risques complémentaires repérés pendant la relecture
+
+1. **Actions d'alerte :** la lecture est déclenchée avant la navigation, mais son échec n'est ni présenté ni restauré. Le test doit confirmer le comportement lorsque la route d'action change immédiatement de page.
+2. **Conflits de synchronisation :** le bouton d'application n'est pas bloqué tant que tous les champs n'ont pas de choix explicite. Avant de rendre le choix obligatoire, inspecter `resolve` et les règles de fusion pour éviter de changer une règle métier intentionnelle.
+3. **Chargement du détail :** le cas « dossier inexistant » doit être différencié d'une erreur réseau ; l'audit statique ne prouve pas encore le traitement de chacun de ces retours par le dépôt.
+
+### Périmètre et niveau de preuve
+
+Cette relecture confirme des chemins de code, pas un résultat d'exécution. Aucun scénario n'a été simulé avec un serveur indisponible, une session expirée ou un conflit réel. Les corrections déjà présentes sur une branche de travail distincte ne sont pas considérées comme livrées sur `main` tant qu'elles ne sont pas fusionnées ; le présent rapport reste donc rattaché à son commit de référence et ne présume pas de la fusion de PR.
+
+**Statut de la partie 3 :** audit statique approfondi et documenté ; tests d'exécution et validation de la logique de fusion encore nécessaires.
