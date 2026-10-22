@@ -63,3 +63,35 @@ Pour le commit `fa72672ce88fad98b4ba4ea15785d93571dd94e8` :
 - Le job `test` est réussi ; les tests, lint et build exécutés par ce job sont au vert. `edge-integration` est ignoré.
 
 **Conclusion de validation :** les contrôles applicatifs ordinaires passent sur ce commit, mais la validation complète reste bloquée par l'accès à l'image du registre pour les tests de migrations. Il faut relancer ce job lorsque la limite de téléchargement sera levée ou adapter la stratégie de pull/cache, puis exécuter les tests manuels responsive et accessibilité. Les scripts présents dans `package.json` ne constituent pas, à eux seuls, une preuve d'exécution ; les résultats ci-dessus proviennent des jobs CI consultés.
+
+
+## Suivi opérationnel — 22 octobre 2026 (mise à jour)
+
+### Correctif du workflow Supabase — PR #42
+La PR [#42](https://github.com/fredosexy/heritage-guardian/pull/42) conserve tous les contrôles et rend les téléchargements d'images Supabase résilients aux limites de registre. Sur son commit de tête `a4bf6bf9ce639fe8519bed0311360853dae5e868`, les résultats observés sont :
+- `Terrain CI` : succès.
+- `Quality / test` : succès (tests, lint et build).
+- `Quality / database-migrations` : succès ; le stack local a démarré, les migrations se sont appliquées et les tests DB ont été exécutés.
+- `Quality / edge-integration` : succès ; le stack local a démarré et les tests d'intégration Edge ont été exécutés.
+
+Cela valide le correctif CI sur la branche #42. La PR reste ouverte et non fusionnée ; ce résultat ne met pas automatiquement à jour la branche #41.
+
+### Revue statique de la PR #41
+La revue du diff confirme les changements ciblés sur les erreurs de chargement des dossiers, le rollback de marquage des alertes, les contrôles d'authentification, les mouvements réduits et la cible tactile du bouton retour de l'assistant. Deux vérifications restent requises avant approbation :
+- **Conflits hors ligne :** l'état initial est désormais explicitement `mine` pour chaque champ en conflit. Confirmer par test que le choix transmis à `resolve` correspond à la stratégie métier attendue et que les champs sont persistés correctement.
+- **Filtre urgent :** le filtre utilise désormais `severity === "high"`, ce qui est cohérent avec la bordure visuelle, mais le modèle de domaine et les cas de données doivent confirmer que « urgent » signifie bien gravité haute.
+
+La navigation après clic sur une alerte reste immédiate alors que `markRead` est asynchrone ; cela n'empêche pas l'affichage du toast d'erreur, mais doit être couvert par un test de persistance en échec. Aucun test navigateur ou lecteur d'écran n'a été exécuté par cette revue statique.
+
+### État de validation des PR
+- #36–#40 : ouvertes et non fusionnées.
+- #41 : ouverte, non fusionnée ; son dernier run consulté est antérieur au correctif CI et échoue au démarrage Supabase. Les tests applicatifs ordinaires passent, mais la validation complète de cette branche doit être rejouée après que le correctif du workflow y soit disponible.
+- #42 : ouverte, non fusionnée ; les trois jobs Quality et Terrain CI réussissent sur sa branche.
+
+### Ordre prudent de suite
+1. Intégrer le correctif CI #42 après décision explicite de fusion, puis relancer les contrôles sur les branches de travail concernées.
+2. Exécuter/ajouter les tests ciblés de résolution de conflit et de filtre urgent.
+3. Mettre à jour les audits et seulement ensuite décider de l'ordre de fusion des PR documentaires et de correction.
+4. Effectuer les validations manuelles responsive, clavier, lecteur d'écran et contraste mesuré avant de déclarer l'audit UI/UX terminé.
+
+Aucune fusion n'a été effectuée et aucun changement Lovable n'a été réalisé.
