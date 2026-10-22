@@ -256,11 +256,17 @@ async function runQueue(): Promise<void> {
                 created_at: Date.now(),
               });
             } else {
-              const { error } = await supabase.from("dossiers")
+              const { data: updated, error } = await supabase.from("dossiers")
                 .update(changes)
                 .eq("id", dossierId)
-                .eq("user_id", currentUser.id);
+                .eq("user_id", currentUser.id)
+                .eq("updated_at", remote.updated_at)
+                .select("id")
+                .maybeSingle();
               if (error) throw error;
+              if (!updated) {
+                throw new Error("Le dossier a changé pendant la synchronisation. Réessayez pour vérifier les conflits.");
+              }
             }
             await db.queue.delete(opId);
             emit();
@@ -272,7 +278,7 @@ async function runQueue(): Promise<void> {
             }
             const { data: currentDossier, error: readError } = await supabase
               .from("dossiers")
-              .select("metadata, user_id")
+              .select("metadata, user_id, updated_at")
               .eq("id", dossierId)
               .eq("user_id", currentUser.id)
               .single();
@@ -306,11 +312,17 @@ async function runQueue(): Promise<void> {
                   },
                 }
               : { ...currentMetadata, ...queuedMetadata };
-            const { error } = await supabase.from("dossiers")
+            const { data: updated, error } = await supabase.from("dossiers")
               .update({ metadata: JSON.parse(JSON.stringify(mergedMetadata)) as Json })
               .eq("id", dossierId)
-              .eq("user_id", currentUser.id);
+              .eq("user_id", currentUser.id)
+              .eq("updated_at", currentDossier.updated_at)
+              .select("id")
+              .maybeSingle();
             if (error) throw error;
+            if (!updated) {
+              throw new Error("Le dossier a changé pendant la synchronisation. Réessayez pour conserver les modifications distantes.");
+            }
             // A new offline edit may have replaced this payload during the request.
             const latestQueued = await db.queue.get(opId);
             if (latestQueued?.kind === "update_dossier" &&
