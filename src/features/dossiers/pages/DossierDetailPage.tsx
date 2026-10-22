@@ -187,13 +187,13 @@ export default function DossierDetailPage() {
     <AppLayout>
       <PageHeader title={dossier.title} parentLabel={t("dossiers.title")} showBack />
 
-      <div className="card-soft p-5 mb-4">
+      <div className="rounded-3xl border border-border/60 bg-card/85 p-5 mb-4 shadow-[var(--shadow-soft)]">
         <div className="flex items-start justify-between gap-2 mb-2">
           <p className="text-sm text-muted-foreground">{t(typeLabelKey(dossier.type))}</p>
           <button
             onClick={handleRemove}
             aria-label={t("dossier.delete")}
-            className="text-muted-foreground hover:text-destructive p-1"
+            className="rounded-xl border border-border/60 bg-background/70 p-2 text-muted-foreground transition-colors hover:border-destructive/30 hover:bg-destructive/5 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Trash2 className="size-4" />
           </button>
@@ -208,13 +208,13 @@ export default function DossierDetailPage() {
       </div>
 
       {dossier.type === "terrain" && (
-        <section className="card-soft p-5 mb-4">
+        <section className="rounded-3xl border border-border/60 bg-card/85 p-5 mb-4 shadow-[var(--shadow-soft)]">
           <div className="flex items-start justify-between gap-3 mb-4">
             <div>
               <p className="text-sm font-semibold">{t("create.terrainFormTitle")}</p>
               <p className="text-xs text-muted-foreground mt-1">{t("create.terrainFormHint")}</p>
             </div>
-            <Button disabled={!canEdit} variant="outline" size="sm" onClick={() => setEditingTerrain((value) => !value)} className="rounded-xl">
+            <Button disabled={!canEdit} variant="outline" size="sm" onClick={() => setEditingTerrain((value) => !value)} className="rounded-2xl">
               <Pencil className="size-3.5 mr-1.5" />{editingTerrain ? t("create.cancel") : t("create.editTerrain")}
             </Button>
           </div>
@@ -224,7 +224,7 @@ export default function DossierDetailPage() {
               const sectionProofs = terrainSectionProofs(key);
               const verifiedProof = sectionProofs.some((proof) => proof.verified);
               return (
-                <div key={key} className="rounded-2xl border border-border p-4">
+                <div key={key} className="rounded-2xl border border-border/70 bg-card/70 p-4 shadow-[var(--shadow-soft)]">
                   <div className="flex items-start gap-3">
                     <span className="size-7 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-xs font-semibold shrink-0">{index + 1}</span>
                     <div className="min-w-0 flex-1">
@@ -237,7 +237,7 @@ export default function DossierDetailPage() {
                   </div>
                   {!editingTerrain && value && <p className="text-sm mt-3 whitespace-pre-wrap">{value}</p>}
                   {editingTerrain && (
-                    <Textarea value={value} onChange={(e) => setTerrainSections((current) => ({ ...current, [key]: e.target.value }))} placeholder={t("create.terrainSections." + key + ".placeholder")} rows={3} className="rounded-xl mt-3" />
+                    <Textarea value={value} onChange={(e) => setTerrainSections((current) => ({ ...current, [key]: e.target.value }))} placeholder={t("create.terrainSections." + key + ".placeholder")} rows={3} className="rounded-2xl border-border/70 bg-background/70 focus-visible:ring-2 focus-visible:ring-ring mt-3" />
                   )}
                   <div className="mt-3 pt-3 border-t border-border/70">
                     <p className="text-xs text-muted-foreground mb-2">
@@ -257,7 +257,7 @@ export default function DossierDetailPage() {
             })}
           </div>
           {editingTerrain && (
-            <Button onClick={() => void saveTerrainSections()} disabled={savingTerrain} className="w-full rounded-xl mt-4">
+            <Button onClick={() => void saveTerrainSections()} disabled={savingTerrain} className="w-full rounded-2xl mt-4 bg-primary text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105">
               {savingTerrain ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}
               {t("create.saveTerrainChanges")}
             </Button>
@@ -280,7 +280,7 @@ export default function DossierDetailPage() {
               const done = step.status === "terminee";
               const blocked = step.status === "bloquee";
               return (
-                <div key={step.id} className="rounded-2xl border border-border p-3">
+                <div key={step.id} className="rounded-2xl border border-border/70 bg-card/70 p-3 shadow-[var(--shadow-soft)]">
                   <div className="flex items-start gap-3">
                     <span className="size-7 rounded-full bg-accent text-primary flex items-center justify-center shrink-0">
                       {done ? <CircleCheck className="size-4" /> : active ? <CircleDot className="size-4" /> : index + 1}
@@ -310,7 +310,7 @@ export default function DossierDetailPage() {
         </TabsContent>
 
         <TabsContent value="participants" className="mt-4">
-          <div className="card-soft p-4">
+          <div className="rounded-3xl border border-border/60 bg-card/85 p-4 shadow-[var(--shadow-soft)]">
             <div className="flex items-start gap-3 mb-4">
               <Users className="size-5 text-primary mt-0.5" />
               <div>
@@ -346,7 +346,7 @@ export default function DossierDetailPage() {
         </TabsContent>
 
         <TabsContent value="summary" className="mt-4">
-          <div className="card-soft p-4 space-y-2 text-sm">
+          <div className="rounded-3xl border border-border/60 bg-card/85 p-4 space-y-3 text-sm shadow-[var(--shadow-soft)]">
             <p>
               <span className="text-muted-foreground">{t("dossier.typeLabel")} </span>
               {t(typeLabelKey(dossier.type))}
@@ -361,10 +361,10 @@ export default function DossierDetailPage() {
 
       {suggestions.length > 0 && (
         <div className="fixed bottom-24 inset-x-0 px-4 z-30">
-          <div className="mx-auto max-w-md bg-gradient-hero text-primary-foreground rounded-2xl p-4 shadow-elegant">
+          <div className="mx-auto max-w-md rounded-3xl border border-primary/15 bg-card/95 text-foreground p-4 shadow-[var(--shadow-soft)] backdrop-blur">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="size-4" />
-              <p className="text-xs font-medium uppercase tracking-wide opacity-90">{t("ai.title")}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-primary">{t("ai.title")}</p>
             </div>
             <p className="text-sm">{suggestions[0]}</p>
           </div>
