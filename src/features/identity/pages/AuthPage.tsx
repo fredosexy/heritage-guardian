@@ -125,7 +125,7 @@ export default function Auth() {
                   <Label htmlFor="pwd">{t("auth.password")}</Label>
                   <Input id="pwd" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
                 </div>
-                <Button type="submit" disabled={loading} className="w-full bg-gradient-warm">
+                <Button type="submit" disabled={loading} className="w-full bg-gradient-warm text-foreground hover:opacity-90">
                   {loading && <Loader2 className="size-4 animate-spin" />}
                   {t("auth.continueWithEmail")}
                 </Button>
@@ -149,7 +149,7 @@ export default function Auth() {
                   {loading && <Loader2 className="size-4 animate-spin" />} {t("auth.sendOtp")}
                 </Button>
               ) : (
-                <Button onClick={handlePhoneVerify} disabled={loading || otp.length < 4} className="w-full bg-gradient-warm">
+                <Button onClick={handlePhoneVerify} disabled={loading || otp.length < 4} className="w-full bg-gradient-warm text-foreground hover:opacity-90">
                   {loading && <Loader2 className="size-4 animate-spin" />} {t("auth.verifyOtp")}
                 </Button>
               )}
