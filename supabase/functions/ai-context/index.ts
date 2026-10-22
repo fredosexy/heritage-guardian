@@ -1,4 +1,4 @@
-import { corsHeaders } from "@supabase/supabase-js/cors";
+import { corsHeaders } from "../_shared/cors.ts";
 import { authorizeAiRequest } from "../_shared/ai-security.ts";
 import { readBoundedJsonBody } from "../_shared/request-body.ts";
 
