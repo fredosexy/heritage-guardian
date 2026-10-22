@@ -37,3 +37,29 @@ Les quatre PR étaient ouvertes et fusionnables au moment de la vérification du
 - Ne pas renommer/remplacer globalement `gradient-earth` ou `gradient-warm` : leurs définitions actuelles sont pastel.
 - Ne pas changer les règles métier, les permissions ou la stratégie de conservation sans tests ciblés.
 - Aucun travail dans Lovable et aucune fusion sans demande explicite.
+
+
+## Vérification de suivi — 22 octobre 2026
+
+La revue source complémentaire de la partie 4 est consignée dans [PR #39](https://github.com/fredosexy/heritage-guardian/pull/39). Elle confirme notamment le scroll JS sans respect explicite de `prefers-reduced-motion` dans l'assistant, le bouton retour de 40 px, l'absence d'état accessible explicite pour le choix connexion/inscription et le badge d'alertes sans annonce dédiée du nombre non lu. La palette déclarée reste pastel (lavande, bleu ciel, rose poudré, menthe) ; aucun changement global de couleurs n'est recommandé sans mesure de contraste.
+
+### État des PR de la séquence
+
+- PR #36 — inventaire : ouverte, non fusionnée.
+- PR #37 — cohérence visuelle : ouverte, non fusionnée.
+- PR #38 — parcours fonctionnels : ouverte, non fusionnée.
+- PR #39 — responsive/accessibilité : ouverte, non fusionnée ; revue source approfondie ajoutée.
+- PR #40 — consolidation : ouverte, non fusionnée.
+- PR #41 — corrections prioritaires proposées : ouverte, non fusionnée.
+
+Toutes sont déclarées fusionnables par les métadonnées consultées, mais cela ne vaut pas validation fonctionnelle complète et aucune fusion n'a été effectuée.
+
+### État CI vérifié pour la branche de corrections PR #41
+
+Pour le commit `fa72672ce88fad98b4ba4ea15785d93571dd94e8` :
+- `Terrain CI` : succès.
+- `Quality` : échec sur le job `database-migrations`, à l'étape de démarrage du stack Supabase local.
+- Le journal indique une limite de téléchargement du registre (`toomanyrequests` lors du pull de `ghcr.io/supabase/postgres:17.6.1.095`). L'étape d'application des migrations et les tests DB sont donc ignorés ; ce résultat ne prouve pas une erreur SQL.
+- Le job `test` est réussi ; les tests, lint et build exécutés par ce job sont au vert. `edge-integration` est ignoré.
+
+**Conclusion de validation :** les contrôles applicatifs ordinaires passent sur ce commit, mais la validation complète reste bloquée par l'accès à l'image du registre pour les tests de migrations. Il faut relancer ce job lorsque la limite de téléchargement sera levée ou adapter la stratégie de pull/cache, puis exécuter les tests manuels responsive et accessibilité. Les scripts présents dans `package.json` ne constituent pas, à eux seuls, une preuve d'exécution ; les résultats ci-dessus proviennent des jobs CI consultés.
