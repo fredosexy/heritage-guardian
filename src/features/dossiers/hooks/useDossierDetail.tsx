@@ -37,7 +37,7 @@ export function useDossierDetail(id?: string) {
     }
   }, [id, user]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { void load().catch(() => undefined); }, [load]);
 
   // Refresh an open dossier when offline queue processing changes state. In particular,
   // a proof queued while offline must appear in its Terrain section after sync succeeds.
