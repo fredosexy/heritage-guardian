@@ -31,11 +31,26 @@ export async function getDossier(id: string): Promise<Dossier | null> {
   return data ?? null;
 }
 
+async function requireCurrentOwner(id: string) {
+  const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError) throw sessionError;
+  if (!user) throw new Error("Session required");
+  const dossier = await getDossier(id);
+  assertDossierOwner(dossier, user.id);
+  return user;
+}
+
 export async function createDossier(input: NewDossierInput): Promise<Dossier> {
+  const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError) throw sessionError;
+  if (!user) throw new Error("Session required");
+  if (input.user_id !== user.id) {
+    throw new Error("Cannot create a dossier for another user");
+  }
   const { data, error } = await supabase
     .from("dossiers")
     .insert({
-      user_id: input.user_id,
+      user_id: user.id,
       type: input.type as DossierType,
       title: input.title,
       description: input.description ?? null,
@@ -56,15 +71,18 @@ export async function updateDossierScore(
   score: number,
   status: DossierStatus
 ): Promise<void> {
+  const user = await requireCurrentOwner(id);
   const { error } = await supabase
     .from("dossiers")
     .update({ completion_score: score, status })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("user_id", user.id);
   if (error) throw error;
 }
 
 export async function deleteDossier(id: string): Promise<void> {
-  const { error } = await supabase.from("dossiers").delete().eq("id", id);
+  const user = await requireCurrentOwner(id);
+  const { error } = await supabase.from("dossiers").delete().eq("id", id).eq("user_id", user.id);
   if (error) throw error;
 }
 

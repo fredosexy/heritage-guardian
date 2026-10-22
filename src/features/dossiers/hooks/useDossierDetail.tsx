@@ -4,7 +4,7 @@ import type { Dossier, Participant, Proof } from "@/core/types/domain";
 import { scoreDossier } from "@/services";
 import { fetchDossierSuggestions } from "@/services";
 import { useAuth } from "@/features/identity";
-import { onSyncChange } from "@/data/offline/sync";
+import { enqueueDeleteDossier, onSyncChange } from "@/data/offline/sync";
 import { assertDossierOwner, canEditDossier } from "@/services/dossier-ownership";
 
 export function useDossierDetail(id?: string) {
@@ -84,8 +84,14 @@ export function useDossierDetail(id?: string) {
 
   const remove = useCallback(async () => {
     if (!dossier) return;
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      if (!user) throw new Error("Session required");
+      assertDossierOwner(dossier, user.id);
+      await enqueueDeleteDossier(dossier.id);
+      return;
+    }
     await dossiersRepo.deleteDossier(dossier.id);
-  }, [dossier]);
+  }, [dossier, user]);
 
   return { dossier, proofs, participants, suggestions, loading, uploading, addProof, remove, reload: load, canEdit: canEditDossier(dossier, user?.id) };
 }

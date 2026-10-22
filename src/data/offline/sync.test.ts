@@ -36,6 +36,9 @@ const mocks = vi.hoisted(() => {
     }),
     queueGet: vi.fn(async (id: number) => queued.get(id)),
     conflictAdd: vi.fn(async (conflict: unknown) => conflict),
+    conflictGet: vi.fn(),
+    conflictUpdate: vi.fn(),
+    conflictDelete: vi.fn(),
     storageUpload: vi.fn(),
     proofUpsert: vi.fn(),
     proofRows: new Map<string, { id: string; dossier_id: string; uploaded_by: string; metadata: { terrainSectionKey?: string } }>(),
@@ -54,7 +57,12 @@ vi.mock("@/data/offline/db", () => ({
       get: mocks.queueGet,
     },
     transaction: vi.fn(async (_mode, _table, callback) => callback()),
-    conflicts: { add: mocks.conflictAdd },
+    conflicts: {
+      add: mocks.conflictAdd,
+      get: mocks.conflictGet,
+      update: mocks.conflictUpdate,
+      delete: mocks.conflictDelete,
+    },
     drafts: {
       where: vi.fn(),
       update: vi.fn(),
@@ -74,7 +82,12 @@ vi.mock("@/data/procedures.repo", () => ({
   initializeDossierJourney: vi.fn(),
 }));
 
-import { enqueueUpdateDossierMetadata, processQueue } from "@/data/offline/sync";
+import {
+  enqueueDeleteDossier,
+  enqueueUpdateDossierMetadata,
+  processQueue,
+  resolveConflict,
+} from "@/data/offline/sync";
 
 describe("offline Terrain section updates", () => {
   beforeEach(() => {
@@ -478,5 +491,67 @@ describe("offline field conflict detection", () => {
     }));
     expect(update).not.toHaveBeenCalled();
     expect(mocks.queued.has(51)).toBe(false);
+  });
+});
+
+
+describe("offline dossier deletion and stale conflict protection", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
+  });
+
+  it("queues a dossier deletion while offline without making a network request", async () => {
+    await enqueueDeleteDossier("dossier-1");
+
+    expect([...mocks.queued.values()]).toEqual([
+      expect.objectContaining({
+        kind: "delete_dossier",
+        payload: { dossierId: "dossier-1" },
+        attempts: 0,
+      }),
+    ]);
+    expect(mocks.supabaseFrom).not.toHaveBeenCalled();
+  });
+
+  it("refreshes a stale conflict instead of overwriting a newer server version", async () => {
+    const conflict = {
+      id: 71,
+      dossier_id: "dossier-1",
+      title: "Titre conflictuel",
+      fields: ["title"],
+      mine: { title: "Titre local" },
+      theirs: { title: "Titre serveur ancien" },
+      remote_updated_at: "2026-01-02T00:00:00Z",
+      created_at: 100,
+    };
+    mocks.conflictGet.mockResolvedValue(conflict);
+    const remote = {
+      id: "dossier-1",
+      user_id: "user-1",
+      title: "Titre serveur plus récent",
+      description: null,
+      location_name: null,
+      updated_at: "2026-01-03T00:00:00Z",
+    };
+    const query = {
+      eq: vi.fn(),
+      single: vi.fn().mockResolvedValue({ data: remote, error: null }),
+    };
+    query.eq.mockImplementation(() => query);
+    mocks.supabaseFrom.mockImplementation(() => ({ select: vi.fn(() => query), update: vi.fn() }));
+
+    await expect(resolveConflict(71, { title: "Titre local" })).rejects.toThrow(
+      "Le dossier a changé depuis l'affichage du conflit"
+    );
+
+    expect(mocks.conflictUpdate).toHaveBeenCalledWith(71, expect.objectContaining({
+      title: "Titre serveur plus récent",
+      fields: ["title"],
+      theirs: { title: "Titre serveur plus récent" },
+      remote_updated_at: "2026-01-03T00:00:00Z",
+    }));
+    expect(mocks.conflictDelete).not.toHaveBeenCalled();
   });
 });
