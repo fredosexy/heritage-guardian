@@ -34,9 +34,19 @@ export function useAlerts() {
   }, [user, t]);
 
   const markRead = useCallback(async (id: string) => {
-    setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, read: true } : a)));
-    await alertsRepo.markAlertRead(id);
-  }, []);
+    const previous = alerts.find((alert) => alert.id === id);
+    if (!previous || previous.read) return;
+
+    setAlerts((current) => current.map((alert) => (alert.id === id ? { ...alert, read: true } : alert)));
+    try {
+      await alertsRepo.markAlertRead(id);
+    } catch (error) {
+      setAlerts((current) => current.map((alert) => (
+        alert.id === id ? { ...alert, read: previous.read } : alert
+      )));
+      throw error;
+    }
+  }, [alerts]);
 
   return { alerts, loading, markRead };
 }
