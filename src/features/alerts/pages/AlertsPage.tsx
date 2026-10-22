@@ -14,7 +14,11 @@ export default function AlertsPage() {
   const { alerts, loading, loadError, reload, markRead } = useAlerts();
   const [filter, setFilter] = useState<Filter>("all");
 
-  const filtered = filter === "all" ? alerts : alerts.filter((a) => a.type === filter);
+  const filtered = alerts.filter((alert) => {
+    if (filter === "all") return true;
+    if (filter === "urgent") return alert.severity === "high";
+    return alert.type === filter;
+  });
 
   const filters: { id: Filter; label: string }[] = [
     { id: "all", label: t("alerts.filterAll") },
