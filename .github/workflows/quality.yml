@@ -108,7 +108,11 @@ jobs:
           fi
 
           eval "$(supabase status -o env)"
-          SUPABASE_URL="$API_URL" SUPABASE_ANON_KEY="$ANON_KEY" SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY" node scripts/test-ai-edge-integration.mjs
+          if ! SUPABASE_URL="$API_URL" SUPABASE_ANON_KEY="$ANON_KEY" SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY" node scripts/test-ai-edge-integration.mjs; then
+            echo "Edge integration tests failed; dumping Supabase Edge runtime logs:"
+            cat /tmp/heritis-edge-functions.log
+            exit 1
+          fi
       - name: Stop local Supabase stack
         if: always()
         run: supabase stop --no-backup
