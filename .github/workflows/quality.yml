@@ -6,16 +6,50 @@ on:
   push:
     branches: [main, "codex/phase-1-session-security-mainline"]
 
-concurrency:
-  group: quality-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
 
 jobs:
   database-migrations:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.81.3
+      - name: Start isolated local Supabase stack
+        run: supabase start
+      - name: Apply every migration to a fresh local database
+        run: supabase db reset --local
+      - name: Run database security and regression tests
+        run: supabase test db --local
+      - name: Stop local Supabase stack
+        if: always()
+        run: supabase stop --no-backup
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        id: install-dependencies
+        run: npm ci
+      - run: npm test
+      - run: npm run lint
+      # Keep build diagnostics available even when lint or tests fail, provided
+      # dependencies were installed successfully.
+      - name: Run production build
+        if: always() && steps.install-dependencies.outcome == 'success'
+        run: npm run build
+
+  edge-integration:
+    runs-on: ubuntu-latest
+    needs: database-migrations
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,14 +61,11 @@ jobs:
           version: 2.81.3
       - name: Start isolated local Supabase stack
         run: supabase start
-      - name: Apply every migration to a fresh local database
-        run: supabase db reset --local
-      - name: Run database security and regression tests
-        run: supabase test db --local
-      - name: Prepare local Edge environment
+      - name: Reset database and prepare local Edge environment
         shell: bash
         run: |
           set -euo pipefail
+          supabase db reset --local
           eval "$(supabase status -o env)"
           export SUPABASE_URL="$API_URL"
           export SUPABASE_ANON_KEY="$ANON_KEY"
@@ -85,22 +116,3 @@ jobs:
       - name: Stop local Supabase stack
         if: always()
         run: supabase stop --no-backup
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - name: Install dependencies
-        id: install-dependencies
-        run: npm ci
-      - run: npm test
-      - run: npm run lint
-      # Keep build diagnostics available even when lint or tests fail, provided
-      # dependencies were installed successfully.
-      - name: Run production build
-        if: always() && steps.install-dependencies.outcome == 'success'
-        run: npm run build
