@@ -9,6 +9,7 @@ export { db } from "./offline/db";
 export type { DraftDossier, SyncConflict, QueuedOp } from "./offline/db";
 export {
   enqueueCreateDossier,
+  enqueueDeleteDossier,
   enqueueUpdateDossier,
   enqueueUpdateDossierMetadata,
   enqueueProofUpload,

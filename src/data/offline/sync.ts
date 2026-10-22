@@ -37,6 +37,19 @@ export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "syn
 
 /** Met en attente la sauvegarde des sections d'un dossier Terrain existant. */
 /** Queue a field-level dossier edit with its base timestamp for conflict detection. */
+/** Queue a dossier deletion while offline; replay rechecks the current owner. */
+export async function enqueueDeleteDossier(dossierId: string): Promise<void> {
+  if (!dossierId.trim()) throw new Error("Invalid dossier id");
+  await db.queue.add({
+    kind: "delete_dossier",
+    payload: { dossierId },
+    created_at: Date.now(),
+    attempts: 0,
+  });
+  emit();
+  if (typeof navigator === "undefined" || navigator.onLine) void processQueue();
+}
+
 export async function enqueueUpdateDossier(dossierId: string, changes: DossierChanges, baseUpdatedAt: string) {
   await db.queue.add({
     kind: "update_dossier",
@@ -306,7 +319,26 @@ async function runQueue(): Promise<void> {
               await db.queue.delete(opId);
             }
             emit();
-          }        } else if (op.kind === "upload_proof") {
+          }        } else if (op.kind === "delete_dossier") {
+          const dossierId = op.payload?.dossierId;
+          if (!dossierId) throw new Error("Invalid queued dossier deletion");
+          const { data: ownedDossier, error: ownershipError } = await supabase
+            .from("dossiers")
+            .select("id")
+            .eq("id", dossierId)
+            .eq("user_id", currentUser.id)
+            .maybeSingle();
+          if (ownershipError) throw ownershipError;
+          if (!ownedDossier) throw new Error("Only the dossier owner can modify this dossier");
+          const { error } = await supabase
+            .from("dossiers")
+            .delete()
+            .eq("id", dossierId)
+            .eq("user_id", currentUser.id);
+          if (error) throw error;
+          await db.queue.delete(opId);
+          emit();
+        } else if (op.kind === "upload_proof") {
           const payload = op.payload;
           const file = payload?.file as Blob | undefined;
           const { dossierId, userId, fileName, mimeType, sizeBytes, sectionKey, storagePath } = payload ?? {};
