@@ -6,9 +6,6 @@ on:
   push:
     branches: [main, "codex/phase-1-session-security-mainline"]
 
-permissions:
-  contents: read
-
 concurrency:
   group: quality-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -17,6 +14,7 @@ permissions:
   contents: read
 
 jobs:
+  database-migrations:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
