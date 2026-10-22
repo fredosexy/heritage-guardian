@@ -113,9 +113,9 @@ export default function CreateDossierPage() {
             <button
               key={id}
               onClick={() => (available ? setType(id) : toast.info(t("create.comingSoon")))}
-              className={`w-full card-soft p-4 text-left flex items-center gap-3 transition ${available ? "hover:shadow-warm" : "opacity-70"}`}
+              className={`group w-full rounded-3xl border border-border/60 bg-gradient-to-br from-card to-accent/20 p-4 text-left flex items-center gap-3 shadow-[var(--shadow-soft)] transition hover:border-primary/30 hover:shadow-[var(--shadow-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${available ? "" : "opacity-70"}`} 
             >
-              <div className={`size-11 rounded-xl flex items-center justify-center shrink-0 ${available ? "bg-gradient-warm text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+              <div className={`size-11 rounded-xl flex items-center justify-center shrink-0 ${available ? "bg-gradient-to-br from-primary/15 via-accent/70 to-secondary/60 text-primary" : "bg-muted text-muted-foreground"}`}>
                 <Icon className="size-5" />
               </div>
               <div className="flex-1">
@@ -158,7 +158,7 @@ export default function CreateDossierPage() {
         </div>
       </header>
 
-      <section className="card-soft p-4 mb-5">
+      <section className="rounded-3xl border border-border/60 bg-card/85 p-4 mb-5 shadow-[var(--shadow-soft)]">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold">{t("create.terrainProgressTitle")}</p>
@@ -168,11 +168,11 @@ export default function CreateDossierPage() {
       </section>
 
       <form onSubmit={submit} className="space-y-4">
-        <section className="card-soft p-4">
+        <section className="rounded-3xl border border-border/60 bg-card/85 p-4 shadow-[var(--shadow-soft)]">
           <Label htmlFor="title">{t("create.titleLabel")}</Label>
-          <Input id="title" required value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("create.titlePlaceholder")} className="rounded-xl mt-1.5" />
+          <Input id="title" required value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("create.titlePlaceholder")} className="rounded-2xl border-border/70 bg-background/70 focus-visible:ring-2 focus-visible:ring-ring mt-1.5" />
           <Label htmlFor="desc" className="block mt-4">{t("create.descLabel")}</Label>
-          <Textarea id="desc" value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("create.descPlaceholder")} rows={3} className="rounded-xl mt-1.5" />
+          <Textarea id="desc" value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("create.descPlaceholder")} rows={3} className="rounded-2xl border-border/70 bg-background/70 focus-visible:ring-2 focus-visible:ring-ring mt-1.5" />
         </section>
 
         <div className="space-y-2">
@@ -180,7 +180,7 @@ export default function CreateDossierPage() {
             const open = openSection === key;
             const done = sections[key].trim().length > 0;
             return (
-              <section key={key} className={`rounded-2xl border bg-card overflow-hidden ${open ? "border-primary/40" : "border-border"}`}>
+              <section key={key} className={`rounded-3xl border bg-gradient-to-br from-card to-accent/10 overflow-hidden shadow-[var(--shadow-soft)] transition-colors ${open ? "border-primary/40" : "border-border/70"}`} >
                 <button type="button" onClick={() => setOpenSection(open ? null : key)} className="w-full p-4 flex items-center gap-3 text-left">
                   <span className={`size-8 rounded-full flex items-center justify-center shrink-0 text-xs font-semibold ${done ? "bg-accent text-primary" : "bg-muted text-muted-foreground"}`}>
                     {done ? <CircleCheck className="size-4" /> : index + 1}
@@ -198,7 +198,7 @@ export default function CreateDossierPage() {
                       onChange={(e) => updateSection(key, e.target.value)}
                       placeholder={t(`create.terrainSections.${key}.placeholder`)}
                       rows={4}
-                      className="rounded-xl"
+                      className="rounded-2xl border-border/70 bg-background/70 focus-visible:ring-2 focus-visible:ring-ring"
                     />
                     {key === "documentation" && <p className="text-xs text-muted-foreground mt-2">{t("create.terrainDocumentationHint")}</p>}
                   </div>
@@ -218,7 +218,7 @@ export default function CreateDossierPage() {
 
         <div className="flex gap-2 pt-1 pb-4">
           <Button type="button" variant="outline" onClick={() => navigate(-1)} className="flex-1">{t("create.cancel")}</Button>
-          <Button type="submit" disabled={saving || !title.trim()} className="flex-1 bg-gradient-warm">
+          <Button type="submit" disabled={saving || !title.trim()} className="flex-1 rounded-2xl bg-primary text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105">
             {saving && <Loader2 className="size-4 animate-spin" />}
             {t("create.saveTerrain")}
           </Button>
