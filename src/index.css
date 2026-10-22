@@ -137,7 +137,8 @@
     --sidebar-accent-foreground: 260 70% 88%;
     --sidebar-border: 230 16% 24%;
     --sidebar-ring: 255 78% 75%;
-  }}
+  }
+}
 
 @layer base {
   * {
