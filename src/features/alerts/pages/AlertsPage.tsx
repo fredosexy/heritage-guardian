@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { AppLayout, AssistantTip, EmptyState, NextActionCard, PageHeader } from "@/features/shell";
 import { Bell, Loader2, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { useAlerts } from "../hooks/useAlerts";
 
 type Filter = "all" | "urgent" | "info" | "suggestion";
@@ -62,7 +63,7 @@ export default function AlertsPage() {
             <button
               key={a.id}
               onClick={() => {
-                void markRead(a.id);
+                void markRead(a.id).catch(() => toast.error(t("auth.error")));
                 if (a.action_route) navigate(a.action_route);
               }}
               className={`w-full text-left card-soft border-l-4 ${severityBorder(a.severity)} p-3 ${
