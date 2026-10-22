@@ -11,7 +11,9 @@ import { syncErrorHint } from "@/services/sync-error";
 
 function ConflictCard({ c, onResolve }: { c: SyncConflict; onResolve: (choice: Partial<Record<EditableField, "mine" | "theirs">>) => Promise<void> }) {
   const { t } = useTranslation();
-  const [choice, setChoice] = useState<Partial<Record<EditableField, "mine" | "theirs">>>({});
+  const [choice, setChoice] = useState<Partial<Record<EditableField, "mine" | "theirs">>>(
+    () => Object.fromEntries(c.fields.map((field) => [field, "mine"])) as Partial<Record<EditableField, "mine" | "theirs">>,
+  );
   const [busy, setBusy] = useState(false);
   const submit = async () => {
     setBusy(true);
