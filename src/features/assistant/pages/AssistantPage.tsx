@@ -117,25 +117,25 @@ export default function AssistantPage() {
   return (
     <AppLayout hideNav>
       <div className="flex flex-col h-screen -m-4 max-w-md mx-auto">
-        <header className="flex items-center gap-3 p-4 border-b">
-          <button onClick={() => navigate(-1)} className="p-1" aria-label={t("common.back")}>
+        <header className="flex items-center gap-3 p-4 border-b border-border/60 bg-background/80 backdrop-blur-md">
+          <button onClick={() => navigate(-1)} className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-border/60 bg-card/80 shadow-[var(--shadow-soft)] transition hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={t("common.back")}>
             <ArrowLeft className="size-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-gradient-warm flex items-center justify-center">
-              <Sparkles className="size-4 text-primary-foreground" />
+            <div className="size-10 rounded-2xl bg-gradient-to-br from-primary/15 via-secondary/70 to-accent flex items-center justify-center shadow-[var(--shadow-soft)]">
+              <Sparkles className="size-5 text-primary" />
             </div>
             <h1 className="text-title">{t("ai.title")}</h1>
           </div>
         </header>
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto bg-gradient-to-b from-background via-background to-secondary/10 p-4 space-y-4" role="log" aria-live="polite" aria-relevant="additions text">
           {moduleMeta && <section className="rounded-2xl border border-border bg-card p-3 space-y-2"><p className="text-xs uppercase tracking-wide text-primary font-medium">{t("modules.label")}</p><p className="font-semibold">{moduleId === "savoir" ? t(typeLabelKey(moduleId)) : t("modules." + moduleId + ".title")}</p><p className="text-sm text-muted-foreground">{moduleId === "savoir" ? t(moduleMeta.descKey ?? "create.savoirDesc") : t("modules." + moduleId + ".longDescription")}</p>{moduleSteps.length > 0 && <div className="flex flex-wrap gap-2">{moduleSteps.slice(0, 4).map((step) => <Button key={step} type="button" variant="outline" size="sm" className="rounded-xl text-left whitespace-normal h-auto" onClick={() => setInput(step)}>{step}</Button>)}</div>}</section>}
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${
-                  m.role === "user" ? "bg-gradient-warm text-primary-foreground" : "bg-muted text-foreground"
+                  m.role === "user" ? "bg-primary text-primary-foreground shadow-[var(--shadow-soft)]" : "border border-border/60 bg-card/90 text-foreground shadow-[var(--shadow-soft)]"
                 }`}
               >
                 {m.content || <Loader2 className="size-4 animate-spin" />}
@@ -144,16 +144,17 @@ export default function AssistantPage() {
           ))}
         </div>
 
-        <div className="p-4 border-t flex gap-2 bg-card">
+        <div className="p-4 border-t border-border/60 flex items-end gap-2 bg-background/90 backdrop-blur-md">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
             placeholder={t("ai.placeholder")}
             disabled={loading}
-            className="rounded-xl"
+            className="min-h-11 rounded-2xl border-border/70 bg-card shadow-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={t("ai.placeholder")}
           />
-          <Button onClick={send} disabled={loading || !input.trim()} className="bg-gradient-warm">
+          <Button type="button" onClick={send} disabled={loading || !input.trim()} aria-label={t("ai.title")} className="size-11 shrink-0 rounded-2xl shadow-[var(--shadow-soft)] transition hover:brightness-105">
             <Send className="size-4" />
           </Button>
         </div>
