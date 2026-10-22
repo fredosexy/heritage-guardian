@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,11 @@ import { Loader2, Mail, Phone } from "lucide-react";
 export default function Auth() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const requestedDestination = (location.state as { from?: { pathname?: string; search?: string; hash?: string } } | null)?.from;
+  const returnTo = requestedDestination?.pathname && requestedDestination.pathname !== "/auth"
+    ? `${requestedDestination.pathname}${requestedDestination.search ?? ""}${requestedDestination.hash ?? ""}`
+    : "/";
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
 
@@ -45,7 +50,7 @@ export default function Auth() {
         if (error) throw error;
         toast.success(t("auth.signedIn"));
       }
-      navigate("/");
+      navigate(mode === "signin" ? returnTo : "/", { replace: true });
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : t("auth.error"));
     } finally {
@@ -73,7 +78,7 @@ export default function Auth() {
       const { error } = await supabase.auth.verifyOtp({ phone, token: otp, type: "sms" });
       if (error) throw error;
       toast.success(t("auth.signedIn"));
-      navigate("/");
+      navigate(returnTo, { replace: true });
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : t("auth.error"));
     } finally {
