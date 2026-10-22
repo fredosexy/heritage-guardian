@@ -24,11 +24,11 @@ export function PageHeader({ title, subtitle, parentLabel, showBack, right }: Pr
   };
 
   return (
-    <header className="mb-5">
+    <header className="mb-6">
       {showBack && (
         <button
           onClick={goBack}
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground mb-2 tap focus-ring"
+          className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/75 px-3 text-sm text-muted-foreground mb-3 tap focus-ring shadow-[var(--shadow-soft)]"
         >
           <ArrowLeft className="size-4" /> {parentLabel ?? t("common.back")}
         </button>
@@ -36,7 +36,7 @@ export function PageHeader({ title, subtitle, parentLabel, showBack, right }: Pr
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-display">{title}</h1>
-          {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+          {subtitle && <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-w-prose">{subtitle}</p>}
         </div>
         {right}
       </div>

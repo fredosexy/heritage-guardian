@@ -24,13 +24,13 @@ export function EmptyState({
   onSecondary,
 }: Props) {
   return (
-    <div className="card-soft p-8 text-center">
-      <span className="size-12 rounded-2xl bg-accent text-primary mx-auto mb-4 flex items-center justify-center">
+    <div className="rounded-3xl border border-border/60 bg-gradient-to-b from-card via-card to-accent/25 p-7 text-center shadow-[var(--shadow-soft)]">
+      <span className="size-12 rounded-2xl bg-gradient-warm text-primary mx-auto mb-4 flex items-center justify-center shadow-[var(--shadow-soft)]">
         <Icon className="size-5" />
       </span>
       <p className="font-medium mb-1">{title}</p>
       {description && <p className="text-caption mb-4">{description}</p>}
-      <Button onClick={onAction} className="bg-gradient-warm w-full">
+      <Button onClick={onAction} className="w-full rounded-2xl bg-primary text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105">
         {actionLabel}
       </Button>
       {secondaryLabel && onSecondary && (

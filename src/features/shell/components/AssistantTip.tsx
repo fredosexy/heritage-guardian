@@ -21,12 +21,12 @@ export function AssistantTip({ className, fileCount }: Props) {
 
   return (
     <div
-      className={`flex items-start gap-2 rounded-2xl border border-border bg-card/60 px-3 py-2.5 shadow-soft ${className ?? ""}`}
+      className={`flex items-start gap-2 rounded-3xl border border-white/70 bg-gradient-to-r from-accent/70 via-card/85 to-secondary/60 px-4 py-3 shadow-[var(--shadow-soft)] backdrop-blur-sm ${className ?? ""}`}
     >
-      <Sparkles className="size-4 text-primary shrink-0 mt-0.5" />
+      <Sparkles className="size-4 text-primary shrink-0 mt-1" />
       <div className="flex-1 min-w-0">
         <p className="text-sm leading-snug">{t(tip.messageKey, tip.messageParams)}</p>
-        <button onClick={ask} className="mt-1 text-xs font-medium text-primary tap focus-ring">
+        <button onClick={ask} className="mt-2 inline-flex items-center rounded-full bg-card/80 px-3 text-xs font-medium text-primary tap focus-ring">
           {t("tip.ask")}
         </button>
       </div>

@@ -55,7 +55,7 @@ export default function MyFilesPage() {
           onAction={() => navigate("/dossiers")}
         />
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {files.map((file) => (
             <FileRow
               key={file.id}
