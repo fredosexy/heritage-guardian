@@ -17,7 +17,7 @@ export default function DossierDetailPage() {
   const { id } = useParams();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { dossier, proofs, participants, suggestions, loading, uploading, addProof, remove, canEdit } =
+  const { dossier, proofs, participants, suggestions, loading, loadError, reload, uploading, addProof, remove, canEdit } =
     useDossierDetail(id);
   const [journey, setJourney] = useState<proceduresRepo.DossierJourneyStep[]>([]);
   const [transitioning, setTransitioning] = useState(false);
@@ -163,6 +163,18 @@ export default function DossierDetailPage() {
       <AppLayout>
         <div className="flex justify-center py-12">
           <Loader2 className="size-5 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
+  if (loadError) {
+    return (
+      <AppLayout>
+        <div className="card-soft p-5 space-y-3" role="alert">
+          <p className="text-sm">{t("auth.error")}</p>
+          <Button onClick={() => void reload().catch(() => undefined)} className="w-full">
+            {t("common.retry", "Réessayer")}
+          </Button>
         </div>
       </AppLayout>
     );
