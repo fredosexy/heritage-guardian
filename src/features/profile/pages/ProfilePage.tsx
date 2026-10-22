@@ -77,9 +77,9 @@ export default function ProfilePage() {
           <button
             key={route}
             onClick={() => navigate(route)}
-            className="w-full card-soft p-4 flex items-center gap-3 text-left pressable focus-ring tap"
+            className="group w-full rounded-3xl border border-border/60 bg-gradient-to-br from-card via-card to-accent/20 p-4 flex items-center gap-3 text-left shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-[var(--shadow-elegant)] pressable focus-ring tap"
           >
-            <span className="size-10 rounded-xl bg-accent text-primary flex items-center justify-center shrink-0">
+            <span className="size-10 rounded-2xl bg-gradient-to-br from-accent to-secondary/70 text-primary flex items-center justify-center shrink-0 shadow-[var(--shadow-soft)]">
               <Icon className="size-4" />
             </span>
             <span className="flex-1 min-w-0">
@@ -91,11 +91,11 @@ export default function ProfilePage() {
         ))}
       </section>
 
-      <section className="card-soft p-5 mb-4 space-y-3">
+      <section className="rounded-3xl border border-border/60 bg-card/85 p-5 mb-4 space-y-4 shadow-[var(--shadow-soft)]">
         <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{t("profile.personal")}</h2>
         <div>
           <Label htmlFor="pname">{t("auth.fullName")}</Label>
-          <Input id="pname" value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl" />
+          <Input id="pname" value={name} onChange={(e) => setName(e.target.value)} className="rounded-2xl border-border/70 bg-background/70 focus-visible:ring-2 focus-visible:ring-ring" />
         </div>
         <div>
           <Label htmlFor="pphone">{t("auth.phone")}</Label>
@@ -105,7 +105,7 @@ export default function ProfilePage() {
           <Label htmlFor="pmail">{t("auth.email")}</Label>
           <Input id="pmail" value={user?.email ?? ""} disabled className="rounded-xl" />
         </div>
-        <Button onClick={save} disabled={saving} className="w-full bg-gradient-warm">
+        <Button onClick={save} disabled={saving} className="w-full rounded-2xl bg-primary text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105">
           {saving && <Loader2 className="size-4 animate-spin" />} {t("profile.save")}
         </Button>
       </section>
