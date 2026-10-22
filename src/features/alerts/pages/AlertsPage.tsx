@@ -16,7 +16,7 @@ export default function AlertsPage() {
 
   const filtered = alerts.filter((alert) => {
     if (filter === "all") return true;
-    if (filter === "urgent") return alert.severity === "high";
+    if (filter === "urgent") return alert.type === "urgent";
     return alert.type === filter;
   });
 
