@@ -19,7 +19,7 @@ export function ProofsTab({ proofs, uploading, onUpload, uploadLabel }: Props) {
     <div className="space-y-3">
       <input ref={fileRef} type="file" accept="image/*,application/pdf,video/*" hidden
         onChange={(e) => { const file = e.target.files?.[0]; if (file) onUpload(file); e.currentTarget.value = ""; }} />
-      <Button onClick={() => fileRef.current?.click()} disabled={uploading} className="w-full bg-gradient-warm">
+      <Button onClick={() => fileRef.current?.click()} disabled={uploading} className="w-full rounded-2xl bg-primary text-primary-foreground shadow-[var(--shadow-soft)] hover:brightness-105">
         {uploading ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
         {uploadLabel ?? t("dossier.addProof")}
       </Button>
@@ -28,8 +28,8 @@ export function ProofsTab({ proofs, uploading, onUpload, uploadLabel }: Props) {
       ) : (
         <div className="space-y-2">
           {proofs.map((p) => (
-            <div key={p.id} className="card-soft p-3 flex items-center gap-3">
-              <div className="size-9 rounded-lg bg-accent flex items-center justify-center text-primary">
+            <div key={p.id} className="rounded-2xl border border-border/60 bg-card/85 p-3 flex items-center gap-3 shadow-[var(--shadow-soft)]">
+              <div className="size-10 rounded-2xl bg-gradient-to-br from-primary/15 via-accent/70 to-secondary/60 flex items-center justify-center text-primary shrink-0">
                 {p.type === "image" ? <ImageIcon className="size-4" /> : <FileText className="size-4" />}
               </div>
               <div className="flex-1 min-w-0">
