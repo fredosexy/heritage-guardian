@@ -39,8 +39,6 @@ export default function MyFilesPage() {
           title={t("files.needAccount")}
           actionLabel={t("visitor.cta")}
           onAction={() => navigate("/auth")}
-          secondaryLabel={t("next.seeDossiers")}
-          onSecondary={() => navigate("/dossiers")}
         />
       ) : loading ? (
         <div className="flex justify-center py-12">
