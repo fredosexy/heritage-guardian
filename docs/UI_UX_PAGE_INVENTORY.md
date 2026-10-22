@@ -80,3 +80,25 @@ Ces noms de classes ne prouvent pas à eux seuls un défaut de rendu : il faut e
 ## 5. Critère de sortie de la phase 1
 
 La phase d’inventaire sera considérée comme terminée lorsque chaque route aura une liste de ses sous-vues et états conditionnels, un statut d’audit, les écarts liés à des fichiers précis et les validations attendues. Le présent document établit la cartographie initiale ; les étapes suivantes la complèteront avec les résultats détaillés des audits visuel, fonctionnel et responsive.
+
+
+## 6. Matrice de couverture et statut de vérification
+
+Cette matrice distingue la présence d'une route dans l'inventaire de sa validation réelle. « Inventorié » ne signifie pas que le parcours a été testé dans un navigateur.
+
+| Groupe | Routes / surfaces | Couverture documentaire | Validation restante |
+|---|---|---|---|
+| Identité et découverte | `/`, `/auth`, `/onboarding`, `/index`, `/index.html` | Inventorié | Parcours visiteur → compte, erreurs, navigation retour, mobile |
+| Espaces et dossiers | `/modules/:moduleId`, `/dossiers`, `/create`, `/dossiers/:id`, `/dossiers/:id/edit` | Inventorié | Droits, dossier absent, formulaires, preuves, participants, réseau indisponible |
+| Gestion quotidienne | `/alerts`, `/files`, `/profile` | Inventorié | Filtres, actions sensibles, états vides/erreur, préférences et accès visiteur |
+| Continuité et assistance | `/sync`, `/assistant`, `*` | Inventorié | Conflits, relance, clavier virtuel, mouvement réduit, page introuvable |
+| Composants transversaux | Navigation, en-têtes, cartes, états vides, primitives UI, thème | Inventorié au niveau des familles | Vérification de chaque usage, clavier, lecteur d'écran, contrastes et tailles tactiles |
+
+### Règles de clôture
+
+- **Inventorié** : la route et ses états attendus sont listés dans ce document.
+- **Audit statique** : le code a été examiné et les écarts sont reliés à des fichiers précis.
+- **Testé** : un contrôle automatisé ou manuel a effectivement été exécuté ; le résultat et son contexte doivent être consignés.
+- **À vérifier manuellement** : le contrôle nécessite un navigateur, un appareil, un lecteur d'écran ou des identifiants/données de test non disponibles dans cette inspection.
+
+À la fin de la partie 1, aucune route ne doit être considérée comme « testée » sur la seule base de son inscription dans l'inventaire. Les parties 2 à 4 enrichiront cette matrice avec les constats visuels, fonctionnels et responsive/accessibilité correspondants.
