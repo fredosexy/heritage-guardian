@@ -79,3 +79,27 @@ Des contrôles possèdent des styles de focus visibles et les boutons de résolu
 4. Lecteur d’écran : nom, rôle, état et annonces du badge d’alertes, du formulaire, du chat et de la synchronisation.
 5. Zoom à 200 % et 400 %, langues avec libellés longs et préférence de mouvement réduit.
 6. Après validation, corriger les écarts confirmés dans une branche de code dédiée et exécuter lint, tests, build et CI avant toute proposition de fusion.
+
+
+## Vérification complémentaire du code source — 22 octobre 2026
+
+Cette vérification compare les constats ci-dessus au contenu actuel de `main`. Elle reste statique : aucune interaction navigateur ou technologie d’assistance n'a été exécutée.
+
+| Point | Constat confirmé sur `main` | Statut |
+|---|---|---|
+| A11Y-01 — assistant mobile | `AssistantPage.tsx` utilise encore `h-screen` dans `AppLayout`, dont le conteneur ajoute `py-5`. Le scroll automatique appelle `scrollTo({ behavior: "smooth" })` sans consulter `prefers-reduced-motion`. | Confirmé dans le code ; impact clavier/viewport à tester. |
+| A11Y-02 — modes d’authentification | Les boutons connexion/inscription sont des boutons natifs, mais n'ont ni `aria-pressed` ni association explicite à l'état `mode`. Les classes locales ne comportent pas de style de focus explicite ni de cible minimale. | Confirmé dans le code. |
+| A11Y-03 — retour assistant | Le bouton retour utilise `size-10` (40 px) alors que le design system définit la cible `.tap` à 44 px. Il a néanmoins un focus visible personnalisé : le problème est surtout la taille tactile et la cohérence, pas une absence totale de focus. | Confirmé, nuance apportée. |
+| A11Y-04 — badge alertes | `BottomNav.tsx` affiche le nombre dans un `span` visuel, sans nom accessible qui annonce « nombre d’alertes non lues ». Le lien conserve le libellé « Alertes ». Le hook consommé ne fournit pas ici d'état d'erreur dans le composant. | Confirmé dans le code. |
+| A11Y-04 — chat et synchronisation | Le journal du chat porte `role="log"`, `aria-live="polite"` et `aria-relevant`. La résolution de conflit utilise `aria-pressed`; les retours de synchronisation utilisent aussi des toasts. Leur annonce effective reste à vérifier avec lecteur d’écran. | Bonnes bases confirmées ; annonce réelle non testée. |
+| A11Y-05 — layout partagé | `AppLayout` utilise `min-h-screen` et un conteneur `py-5`. L'assistant plein écran est imbriqué dans cette structure, ce qui renforce le risque de calcul de hauteur/espacement sur mobile. | Risque confirmé par composition des composants. |
+| A11Y-06 — authentification | Le choix connexion/inscription est géré séparément des `Tabs` email/téléphone ; les onglets de méthode utilisent les composants Radix Tabs, mais le mode d'authentification n'est pas un onglet sémantique. | Confirmé dans le code. |
+| Mouvement réduit | `src/index.css` comporte une règle globale `prefers-reduced-motion`, mais les appels de défilement JavaScript ne sont pas neutralisés par cette règle CSS. | Limite confirmée. |
+| Palette et contraste | `src/index.css` définit des tokens sémantiques et des dégradés pastel. La page Auth utilise `bg-gradient-earth` ; le nom du token ne signifie pas que la palette est terre/ocre : sa définition réelle est rose poudré, bleu ciel et menthe. | Direction pastel confirmée ; contraste calculé non vérifié. |
+
+### Validation technique complémentaire
+
+- Les scripts déclarés dans `package.json` comprennent `npm run lint`, `npm test` et `npm run build`.
+- Leur présence ne prouve pas qu'ils ont été exécutés sur la branche de cet audit ; aucun résultat d'exécution locale n'est revendiqué ici.
+- La CI ne remplace pas les tests manuels de clavier, zoom, lecteur d’écran et clavier virtuel.
+- Aucun changement applicatif n'est effectué dans cette PR documentaire. Les corrections de code doivent rester dans la branche dédiée aux corrections prioritaires, puis être vérifiées séparément.
