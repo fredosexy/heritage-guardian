@@ -93,11 +93,13 @@ export default function Auth() {
           <div className="flex gap-2 p-1 rounded-xl bg-muted">
             <button
               onClick={() => setMode("signin")}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${mode === "signin" ? "bg-card shadow-soft" : "text-muted-foreground"}`}
+              aria-pressed={mode === "signin"}
+              className={`tap focus-ring flex-1 min-h-11 py-2 rounded-lg text-sm font-medium transition ${mode === "signin" ? "bg-card shadow-soft" : "text-muted-foreground"}`
             >{t("auth.signIn")}</button>
             <button
               onClick={() => setMode("signup")}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${mode === "signup" ? "bg-card shadow-soft" : "text-muted-foreground"}`}
+              aria-pressed={mode === "signup"}
+              className={`tap focus-ring flex-1 min-h-11 py-2 rounded-lg text-sm font-medium transition ${mode === "signup" ? "bg-card shadow-soft" : "text-muted-foreground"}`
             >{t("auth.signUp")}</button>
           </div>
 
