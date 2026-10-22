@@ -52,8 +52,10 @@ describe("IndexedDB offline continuity", () => {
         return query;
       },
       update: mocks.update.mockImplementation(() => {
-        let count = 0;
-        const query = { eq: vi.fn(() => ++count === 2 ? pending : query) };
+        const query = {
+          eq: vi.fn(() => query),
+          select: vi.fn(() => ({ maybeSingle: vi.fn(() => pending) })),
+        };
         return query;
       }),
     });
