@@ -109,6 +109,6 @@ jobs:
 
           eval "$(supabase status -o env)"
           SUPABASE_URL="$API_URL" SUPABASE_ANON_KEY="$ANON_KEY" SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY" node scripts/test-ai-edge-integration.mjs
-                - name: Stop local Supabase stack
+      - name: Stop local Supabase stack
         if: always()
         run: supabase stop --no-backup
