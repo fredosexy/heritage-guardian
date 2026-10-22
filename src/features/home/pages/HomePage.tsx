@@ -71,10 +71,10 @@ export default function HomePage() {
       <AppLayout>
         <section className="mb-7">
           <p className="text-xs uppercase tracking-[0.18em] text-primary font-medium">{t("home.visitorEyebrow")}</p>
-          <h1 className="text-display mt-2">{t("home.visitorTitle")}</h1>
+          <h1 className="text-display mt-2 max-w-sm">{t("home.visitorTitle")}</h1>
           <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-xl">{t("home.visitorVision")}</p>
         </section>
-        <section className="mb-5 rounded-2xl border border-border/70 bg-card/70 p-4">
+        <section className="mb-7 rounded-3xl border border-border/60 bg-card/80 p-4 shadow-[var(--shadow-soft)] backdrop-blur-sm">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="font-medium">{guest.firstName ? t("firstStep.title") : t("firstStep.subtitle")}</p>
@@ -88,9 +88,9 @@ export default function HomePage() {
           <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.modulesTitle")}</h2><p className="text-caption mt-1">{t("home.modulesVisitorHint")}</p></div><Sparkles className="size-5 text-primary" /></div>
           <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} journeyProgress={module.journeyProgress} currentStepTitle={module.currentStepTitle} nextStepTitle={module.nextStepTitle} blockedStepTitle={module.blockedStepTitle} participantsCount={module.participantsCount} proofsCount={module.proofsCount} onFirstGesture={openModule} available={module.available} />)}</div>
         </section>
-        <section className="rounded-3xl bg-gradient-hero p-5 text-primary-foreground shadow-elegant mb-6">
-          <div className="flex items-start gap-3"><Sparkles className="size-5 mt-0.5 shrink-0" /><div><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><p className="text-sm opacity-85 mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>
-          <Button onClick={() => navigate("/assistant")} variant="secondary" className="w-full mt-4 rounded-2xl justify-between">{t("home.visitorAssistantCta")}<ChevronRight className="size-4" /></Button>
+        <section className="rounded-[2rem] border border-white/70 bg-gradient-hero p-5 text-foreground shadow-[var(--shadow-elegant)] mb-6">
+          <div className="flex items-start gap-3"><span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-card/75 text-primary shadow-[var(--shadow-soft)]"><Sparkles className="size-5" /></span><div><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><p className="text-sm text-muted-foreground mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>
+          <Button onClick={() => navigate("/assistant")} variant="secondary" className="w-full mt-4 rounded-2xl justify-between shadow-[var(--shadow-soft)]">{t("home.visitorAssistantCta")}<ChevronRight className="size-4" /></Button>
         </section>
       </AppLayout>
     );
