@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Dossier, DossierStatus, DossierType } from "@/core/types/domain";
-import { assertDossierOwner } from "@/services/dossier-ownership";
+import { assertDossierOwner, requireOwnerSession } from "@/services/dossier-ownership";
 import type { Json } from "@/integrations/supabase/types";
 
 export interface NewDossierInput {
@@ -34,10 +34,8 @@ export async function getDossier(id: string): Promise<Dossier | null> {
 async function requireCurrentOwner(id: string) {
   const { data: { user }, error: sessionError } = await supabase.auth.getUser();
   if (sessionError) throw sessionError;
-  if (!user) throw new Error("Session required");
-  const dossier = await getDossier(id);
-  assertDossierOwner(dossier, user.id);
-  return user;
+  const ownerId = requireOwnerSession(user, await getDossier(id));
+  return { user: { ...user, id: ownerId } };
 }
 
 export async function createDossier(input: NewDossierInput): Promise<Dossier> {
@@ -71,7 +69,7 @@ export async function updateDossierScore(
   score: number,
   status: DossierStatus
 ): Promise<void> {
-  const user = await requireCurrentOwner(id);
+  const { user } = await requireCurrentOwner(id);
   const { error } = await supabase
     .from("dossiers")
     .update({ completion_score: score, status })
@@ -81,11 +79,10 @@ export async function updateDossierScore(
 }
 
 export async function deleteDossier(id: string): Promise<void> {
-  const user = await requireCurrentOwner(id);
+  const { user } = await requireCurrentOwner(id);
   const { error } = await supabase.from("dossiers").delete().eq("id", id).eq("user_id", user.id);
   if (error) throw error;
 }
-
 
 export async function updateDossierMetadata(
   id: string,
@@ -93,9 +90,9 @@ export async function updateDossierMetadata(
 ): Promise<Dossier> {
   const { data: { user }, error: sessionError } = await supabase.auth.getUser();
   if (sessionError) throw sessionError;
-  const dossier = await getDossier(id);
-  assertDossierOwner(dossier, user?.id);
   if (!user) throw new Error("Session required");
+  const dossier = await getDossier(id);
+  assertDossierOwner(dossier, user.id);
   const { data, error } = await supabase
     .from("dossiers")
     .update({ metadata: JSON.parse(JSON.stringify(metadata)) as Json })
