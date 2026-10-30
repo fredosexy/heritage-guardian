@@ -75,9 +75,14 @@ export async function enqueueUpdateDossier(dossierId: string, changes: DossierCh
 }
 
 export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: Record<string, unknown>) {
-  // Coalesce pending edits without dropping sections saved by an earlier offline edit.
   const pending = await db.queue.where("kind").equals("update_dossier").toArray();
-  const existing = pending.find((op): op is Extract<QueuedOp, { kind: "update_dossier" }> => op.kind === "update_dossier" && op.payload?.dossierId === dossierId && op.payload?.metadata && typeof op.payload.metadata === "object" && !Array.isArray(op.payload.metadata));
+  const existing = pending.find((op): op is Extract<QueuedOp, { kind: "update_dossier" }> =>
+    op.kind === "update_dossier" &&
+    op.payload?.dossierId === dossierId &&
+    op.payload?.metadata &&
+    typeof op.payload.metadata === "object" &&
+    !Array.isArray(op.payload.metadata));
+
   if (existing?.id) {
     const previous = existing.payload?.metadata && typeof existing.payload.metadata === "object" && !Array.isArray(existing.payload.metadata)
       ? existing.payload.metadata as Record<string, unknown>
@@ -107,22 +112,14 @@ export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: 
           },
         }
       : { ...previous, ...metadata };
-    await db.queue.update(existing.id, {
-      payload: { dossierId, metadata: mergedMetadata },
-    });
+    await db.queue.update(existing.id, { payload: { dossierId, metadata: mergedMetadata } });
   } else {
-    await db.queue.add({
-      kind: "update_dossier",
-      payload: { dossierId, metadata },
-      created_at: Date.now(),
-      attempts: 0,
-    });
+    await db.queue.add({ kind: "update_dossier", payload: { dossierId, metadata }, created_at: Date.now(), attempts: 0 });
   }
   emit();
   if (typeof navigator === "undefined" || navigator.onLine) void processQueue();
 }
 
-/** Stocke le fichier et son chemin de destination dans une seule écriture IndexedDB. */
 export async function enqueueProofUpload(params: {
   file: File;
   dossierId: string;
@@ -162,8 +159,6 @@ export async function processQueue(): Promise<void> {
 
 async function runQueue(): Promise<void> {
   if (syncing) {
-    // A mutation may be queued while this pass is awaiting the network. Request one
-    // fresh pass after the current one finishes so the newer payload is not stranded.
     rerunRequested = true;
     return;
   }
@@ -229,16 +224,11 @@ async function runQueue(): Promise<void> {
         } else if (op.kind === "update_dossier") {
           const payload = op.payload;
           const dossierId = payload?.dossierId;
-          if (!dossierId) {
-            throw new Error("Invalid queued dossier update");
-          }
+          if (!dossierId) throw new Error("Invalid queued dossier update");
 
-          // Main's offline editor queues field-level changes with a base timestamp.
-          // Detect overlapping edits and persist them for the Sync Center instead of overwriting.
           if (payload.changes && payload.baseUpdatedAt) {
             const changes = payload.changes as DossierChanges;
             const remote = await requireCurrentOwnerForDossier(dossierId, currentUser.id);
-            assertDossierOwner(remote, currentUser.id);
             const fields = detectConflictFields(payload.baseUpdatedAt, remote, changes);
             if (fields.length > 0) {
               const theirs: Record<string, string | null> = {};
@@ -261,9 +251,7 @@ async function runQueue(): Promise<void> {
                 .select("id")
                 .maybeSingle();
               if (error) throw error;
-              if (!updated) {
-                throw new Error("Le dossier a changé pendant la synchronisation. Réessayez pour vérifier les conflits.");
-              }
+              if (!updated) throw new Error("Le dossier a changé pendant la synchronisation. Réessayez pour vérifier les conflits.");
             }
             await db.queue.delete(opId);
             emit();
@@ -295,9 +283,7 @@ async function runQueue(): Promise<void> {
                   terrain: {
                     ...currentTerrain,
                     ...queuedTerrain,
-                    ...(queuedTerrain.sections
-                      ? { sections: { ...currentSections, ...queuedSections } }
-                      : {}),
+                    ...(queuedTerrain.sections ? { sections: { ...currentSections, ...queuedSections } } : {}),
                   },
                 }
               : { ...currentMetadata, ...queuedMetadata };
@@ -309,13 +295,9 @@ async function runQueue(): Promise<void> {
               .select("id")
               .maybeSingle();
             if (error) throw error;
-            if (!updated) {
-              throw new Error("Le dossier a changé pendant la synchronisation. Réessayez pour conserver les modifications distantes.");
-            }
+            if (!updated) throw new Error("Le dossier a changé pendant la synchronisation. Réessayez pour conserver les modifications distantes.");
             const latestQueued = await db.queue.get(opId);
-            if (latestQueued?.kind === "update_dossier" &&
-                latestQueued.payload?.dossierId === dossierId &&
-                JSON.stringify(latestQueued.payload?.metadata) === JSON.stringify(metadata)) {
+            if (latestQueued?.kind === "update_dossier" && latestQueued.payload?.dossierId === dossierId && JSON.stringify(latestQueued.payload?.metadata) === JSON.stringify(metadata)) {
               await db.queue.delete(opId);
             }
             emit();
@@ -335,10 +317,8 @@ async function runQueue(): Promise<void> {
         } else if (op.kind === "upload_proof") {
           const payload = op.payload;
           const file = payload?.file as Blob | undefined;
-          const { dossierId, userId, fileName, mimeType, sizeBytes, sectionKey, storagePath } = payload ?? {};
-          if (!file || !dossierId || !userId || !storagePath) {
-            throw new Error("Invalid queued proof upload");
-          }
+          const { dossierId, userId, storagePath } = payload ?? {};
+          if (!file || !dossierId || !userId || !storagePath) throw new Error("Invalid queued proof upload");
           if (userId !== currentUser.id) throw new Error("Sign in with the account that queued this proof");
           await requireCurrentOwnerForDossier(dossierId, currentUser.id);
           await replayProof({ ...op, id: opId });
@@ -362,10 +342,8 @@ async function runQueue(): Promise<void> {
     emit();
     const shouldRerun = rerunRequested && !stoppedOnError;
     rerunRequested = false;
-    if (shouldRerun) {
-      if (typeof navigator === "undefined" || navigator.onLine) {
-        void processQueue();
-      }
+    if (shouldRerun && (typeof navigator === "undefined" || navigator.onLine)) {
+      void processQueue();
     }
   }
 }
@@ -408,25 +386,18 @@ export async function claimLocalDrafts(fromUserId: string, toUserId: string): Pr
   for (const draft of drafts) {
     if (draft.id === undefined) continue;
     await db.drafts.update(draft.id, { user_id: toUserId, updated_at: Date.now() });
-    await db.queue.add({
-      kind: "create_dossier",
-      payload: { localId: draft.localId },
-      created_at: Date.now(),
-      attempts: 0,
-    });
+    await db.queue.add({ kind: "create_dossier", payload: { localId: draft.localId }, created_at: Date.now(), attempts: 0 });
   }
   emit();
   if (drafts.length > 0) void processQueue();
   return drafts.length;
 }
 
-// Remove a queued operation only when the user explicitly discards it in Sync Center.
 export async function discardQueuedOp(id: number) {
   await db.queue.delete(id);
   emit();
 }
 
-/** Apply the user's field-by-field choice after verifying ownership of the dossier. */
 export async function resolveConflict(conflictId: number, values: DossierChanges) {
   const conflict = await db.conflicts.get(conflictId);
   if (!conflict) return;
