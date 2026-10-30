@@ -18,7 +18,11 @@ export class ProofPersistenceError extends Error {
   }
 }
 
-async function requireOwnerForProofUpload(dossierId: string, userId: string): Promise<void> {
+async function requireDossierOwnerForCurrentUser(dossierId: string): Promise<string> {
+  const { data: sessionUser, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError) throw sessionError;
+  if (!sessionUser.user) throw new Error("Session required");
+
   const { data, error } = await supabase
     .from("dossiers")
     .select("id, user_id")
@@ -27,7 +31,18 @@ async function requireOwnerForProofUpload(dossierId: string, userId: string): Pr
 
   if (error) throw error;
   if (!data) throw new Error("Dossier not found");
-  assertDossierOwner(data, userId);
+  assertDossierOwner(data, sessionUser.user.id);
+  return sessionUser.user.id;
+}
+
+async function requireCurrentUserMatches(userId: string): Promise<string> {
+  const { data: sessionUser, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError) throw sessionError;
+  if (!sessionUser.user) throw new Error("Session required");
+  if (sessionUser.user.id !== userId) {
+    throw new Error("Only the current user can access their own proof list");
+  }
+  return sessionUser.user.id;
 }
 
 export async function listProofs(dossierId: string): Promise<Proof[]> {
@@ -50,7 +65,12 @@ export async function uploadProof(params: {
   sectionKey?: string;
 }): Promise<Proof> {
   const { file, dossierId, userId, sectionKey } = params;
-  await requireOwnerForProofUpload(dossierId, userId);
+
+  const { data: sessionUser, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError) throw sessionError;
+  if (!sessionUser.user) throw new Error("Session required");
+  if (sessionUser.user.id !== userId) throw new Error("Cannot upload a proof for another user");
+  await requireDossierOwnerForCurrentUser(dossierId);
 
   const uploadId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const path = `${userId}/${dossierId}/${uploadId}-${file.name}`;
@@ -79,12 +99,19 @@ export async function getProofUrl(storagePath: string): Promise<string | null> {
 }
 
 export async function listUserProofs(userId: string): Promise<(Proof & { dossier_title?: string | null })[]> {
+  await requireCurrentUserMatches(userId);
   const { data, error } = await supabase.from("proofs").select("*, dossiers(title)").eq("uploaded_by", userId).order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []).map(({ dossiers, ...proof }) => ({ ...proof, dossier_title: (dossiers as { title: string } | null)?.title ?? null }));
 }
 
 export async function renameProof(proofId: string, title: string): Promise<void> {
+  const { data: proof, error: proofError } = await supabase.from("proofs").select("id, dossier_id").eq("id", proofId).maybeSingle();
+  if (proofError) throw proofError;
+  if (!proof) throw new Error("Proof not found");
+
+  await requireDossierOwnerForCurrentUser(proof.dossier_id);
+
   const { error } = await supabase.from("proofs").update({ title }).eq("id", proofId);
   if (error) throw error;
 }
@@ -101,19 +128,7 @@ export async function deleteProof(
   }
 
   if (!dossierId) throw new Error("Proof dossier missing");
-
-  const { data: dossier, error: dossierError } = await supabase
-    .from("dossiers")
-    .select("id, user_id")
-    .eq("id", dossierId)
-    .maybeSingle();
-
-  if (dossierError) throw dossierError;
-  if (!dossier) throw new Error("Dossier not found");
-
-  const { data: sessionUser } = await supabase.auth.getUser();
-  if (!sessionUser.user) throw new Error("Session required");
-  assertDossierOwner(dossier, sessionUser.user.id);
+  await requireDossierOwnerForCurrentUser(dossierId);
 
   const { error: storageError } = await supabase.storage.from(BUCKET).remove([proof.storage_path]);
   if (storageError) throw storageError;
