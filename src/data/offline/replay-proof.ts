@@ -3,7 +3,7 @@ import * as proceduresRepo from "@/data/procedures.repo";
 import { detectConflictFields, type DossierChanges } from "@/services/sync-conflicts";
 import { db, DraftDossier } from "./db";
 import { replayProof } from "./replay-proof";
-import { assertDossierOwner } from "@/services/dossier-ownership";
+import { assertDossierOwner, normalizeUserId } from "@/services/dossier-ownership";
 import type { QueuedOp } from "./db";
 import type { Database, Json } from "@/integrations/supabase/types";
 
@@ -40,8 +40,27 @@ async function requireCurrentOwnerForDossier(dossierId: string, userId: string) 
   return data;
 }
 
+async function ensureQueueIsAuthorizedForCurrentUser(dossierId: string, userId: string) {
+  const normalizedUserId = normalizeUserId(userId);
+  if (!dossierId.trim() || !normalizedUserId) {
+    throw new Error("Invalid dossier or user context");
+  }
+  const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError) throw sessionError;
+  if (!user) throw new Error("Session required");
+  await requireCurrentOwnerForDossier(dossierId, user.id);
+}
+
 export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "synced" | "created_at" | "updated_at"> & { localId: string }) {
   const now = Date.now();
+  if (typeof navigator === "undefined" || navigator.onLine) {
+    const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+    if (sessionError) throw sessionError;
+    if (!user) throw new Error("Session required");
+    if (normalizeUserId(draft.user_id) !== normalizeUserId(user.id)) {
+      throw new Error("Cannot queue a dossier for another user");
+    }
+  }
   await db.drafts.add({ ...draft, created_at: now, updated_at: now, synced: 0 });
   await db.queue.add({ kind: "create_dossier", payload: { localId: draft.localId }, created_at: now, attempts: 0 });
   emit();
@@ -50,6 +69,12 @@ export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "syn
 
 export async function enqueueDeleteDossier(dossierId: string): Promise<void> {
   if (!dossierId.trim()) throw new Error("Invalid dossier id");
+  if (typeof navigator === "undefined" || navigator.onLine) {
+    const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+    if (sessionError) throw sessionError;
+    if (!user) throw new Error("Session required");
+    await ensureQueueIsAuthorizedForCurrentUser(dossierId, user.id);
+  }
   await db.queue.add({
     kind: "delete_dossier",
     payload: { dossierId },
@@ -61,6 +86,12 @@ export async function enqueueDeleteDossier(dossierId: string): Promise<void> {
 }
 
 export async function enqueueUpdateDossier(dossierId: string, changes: DossierChanges, baseUpdatedAt: string) {
+  if (typeof navigator === "undefined" || navigator.onLine) {
+    const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+    if (sessionError) throw sessionError;
+    if (!user) throw new Error("Session required");
+    await ensureQueueIsAuthorizedForCurrentUser(dossierId, user.id);
+  }
   await db.queue.add({
     kind: "update_dossier",
     payload: { dossierId, changes, baseUpdatedAt },
@@ -72,6 +103,12 @@ export async function enqueueUpdateDossier(dossierId: string, changes: DossierCh
 }
 
 export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: Record<string, unknown>) {
+  if (typeof navigator === "undefined" || navigator.onLine) {
+    const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+    if (sessionError) throw sessionError;
+    if (!user) throw new Error("Session required");
+    await ensureQueueIsAuthorizedForCurrentUser(dossierId, user.id);
+  }
   const pending = await db.queue.where("kind").equals("update_dossier").toArray();
   const existing = pending.find((op): op is Extract<QueuedOp, { kind: "update_dossier" }> =>
     op.kind === "update_dossier" &&
@@ -125,6 +162,15 @@ export async function enqueueProofUpload(params: {
   storagePath?: string;
 }) {
   const { file, dossierId, userId, sectionKey } = params;
+  if (typeof navigator === "undefined" || navigator.onLine) {
+    const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+    if (sessionError) throw sessionError;
+    if (!user) throw new Error("Session required");
+    await ensureQueueIsAuthorizedForCurrentUser(dossierId, user.id);
+    if (normalizeUserId(userId) !== normalizeUserId(user.id)) {
+      throw new Error("Cannot queue a proof for another user");
+    }
+  }
   const storagePath = params.storagePath ??
     `${userId}/${dossierId}/queued-${Date.now()}-${Math.random().toString(36).slice(2)}-${encodeURIComponent(file.name)}`;
   await db.queue.add({

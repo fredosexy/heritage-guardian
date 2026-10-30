@@ -1,66 +1,107 @@
-import { supabase } from "@/integrations/supabase/client";
-import { db, type QueuedOp } from "./db";
-import { assertDossierOwner } from "@/services/dossier-ownership";
+import { useCallback, useEffect, useState } from "react";
+import { dossiersRepo, enqueueProofUpload, participantsRepo, proofsRepo } from "@/data";
+import type { Dossier, Participant, Proof } from "@/core/types/domain";
+import { scoreDossier } from "@/services";
+import { fetchDossierSuggestions } from "@/services";
+import { useAuth } from "@/features/identity";
+import { enqueueDeleteDossier, onSyncChange } from "@/data/offline/sync";
+import { assertDossierOwner, canEditDossier } from "@/services/dossier-ownership";
 
-type ProofOperation = Extract<QueuedOp, { kind: "upload_proof" }>;
+export function useDossierDetail(id?: string) {
+  const { user } = useAuth();
+  const [dossier, setDossier] = useState<Dossier | null>(null);
+  const [proofs, setProofs] = useState<Proof[]>([]);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
-/** The persisted primary-key identity is independent of a storage_path unique index. */
-export async function replayProof(op: ProofOperation & { id: number }): Promise<void> {
-  const { dossierId, userId, storagePath, sectionKey, file, mimeType, fileName, sizeBytes } = op.payload;
-
-  const { data: currentDossier, error: dossierError } = await supabase
-    .from("dossiers")
-    .select("id, user_id")
-    .eq("id", dossierId)
-    .maybeSingle();
-
-  if (dossierError) throw dossierError;
-  if (!currentDossier) throw new Error("Dossier not found");
-  assertDossierOwner(currentDossier, userId);
-
-  const proofId = await db.transaction("rw", db.queue, async () => {
-    const latest = await db.queue.get(op.id);
-    if (latest?.kind !== "upload_proof") throw new Error("Queued proof no longer available");
-    const id = latest.payload.proofId ?? crypto.randomUUID();
-    if (!latest.payload.proofId) await db.queue.update(op.id, { payload: { ...latest.payload, proofId: id } });
-    return id;
-  });
-
-  const findExisting = async () => {
-    const { data, error } = await supabase.from("proofs").select("id, dossier_id, uploaded_by, metadata")
-      .eq("storage_path", storagePath);
-    if (error) throw error;
-    const rows = data ?? [];
-    if (rows.length > 1) throw new Error("Multiple proof records use this storage path; owner review required");
-    const existing = rows[0];
-    if (existing) {
-      const metadata = existing.metadata && typeof existing.metadata === "object" && !Array.isArray(existing.metadata)
-        ? existing.metadata : {};
-      if (existing.dossier_id !== dossierId || existing.uploaded_by !== userId ||
-          (metadata.terrainSectionKey ?? undefined) !== sectionKey) {
-        throw new Error("Proof dossier or Terrain section mismatch; owner review required");
-      }
+  const load = useCallback(async () => {
+    if (!id || !user) {
+      setLoading(false);
+      return;
     }
-    return existing;
-  };
+    setLoading(true);
+    setLoadError(false);
+    try {
+      const [d, p, pa] = await Promise.all([dossiersRepo.getDossier(id), proofsRepo.listProofs(id), participantsRepo.listParticipants(id)]);
+      setDossier(d);
+      setProofs(p);
+      setParticipants(pa);
+    } catch (error) {
+      setLoadError(true);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, [id, user]);
 
-  if (await findExisting()) return;
+  useEffect(() => { void load().catch(() => undefined); }, [load]);
 
-  const { error: uploadError } = await supabase.storage.from("dossier-proofs")
-    .upload(storagePath, file, { contentType: mimeType, upsert: true });
-  if (uploadError) throw uploadError;
+  useEffect(() => {
+    if (!id || !user) return;
+    return onSyncChange(() => { void load().catch(() => undefined); });
+  }, [id, user, load]);
 
-  const { error } = await supabase.from("proofs").upsert({
-    id: proofId,
-    dossier_id: dossierId,
-    uploaded_by: userId,
-    type: mimeType.startsWith("image/") ? "image" : mimeType.startsWith("video/") ? "video" : mimeType.startsWith("audio/") ? "audio" : "document",
-    title: fileName,
-    storage_path: storagePath,
-    mime_type: mimeType,
-    size_bytes: sizeBytes,
-    metadata: sectionKey ? { terrainSectionKey: sectionKey } : {},
-  }, { onConflict: "id", ignoreDuplicates: true });
-  if (error) throw error;
-  if (!(await findExisting())) throw new Error("Proof record not confirmed; retry required");
+  useEffect(() => {
+    if (!dossier) return;
+    let cancelled = false;
+    fetchDossierSuggestions({ dossier, proofsCount: proofs.length, participantsCount: participants.length })
+      .then((s) => { if (!cancelled) setSuggestions(s); }).catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [dossier?.id, proofs.length, participants.length]);
+
+  const addProof = useCallback(async (file: File, sectionKey?: string): Promise<"uploaded" | "queued" | ""> => {
+    if (!user || !dossier) return "";
+    assertDossierOwner(dossier, user.id);
+    setUploading(true);
+    try {
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        await enqueueProofUpload({ file, dossierId: dossier.id, userId: user.id, sectionKey });
+        return "queued";
+      }
+      try {
+        await proofsRepo.uploadProof({ file, dossierId: dossier.id, userId: user.id, sectionKey });
+      } catch (error) {
+        if (error instanceof proofsRepo.ProofPersistenceError) {
+          await enqueueProofUpload({
+            file,
+            dossierId: dossier.id,
+            userId: user.id,
+            sectionKey,
+            storagePath: error.storagePath,
+          });
+          return "queued";
+        }
+        const message = error instanceof Error ? error.message.toLowerCase() : "";
+        const networkFailure = (typeof navigator !== "undefined" && !navigator.onLine) ||
+          message.includes("fetch") || message.includes("network") || message.includes("failed to") || message.includes("load failed");
+        if (!networkFailure) throw error;
+        await enqueueProofUpload({ file, dossierId: dossier.id, userId: user.id, sectionKey });
+        return "queued";
+      }
+      const { score, status } = scoreDossier(dossier, proofs.length + 1, participants.length);
+      await dossiersRepo.updateDossierScore(dossier.id, score, status);
+      await load();
+      return "uploaded";
+    } finally {
+      setUploading(false);
+    }
+  }, [user, dossier, proofs.length, participants.length, load]);
+
+  const remove = useCallback(async () => {
+    if (!dossier) return;
+    if (!user) throw new Error("Session required");
+    assertDossierOwner(dossier, user.id);
+
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      await enqueueDeleteDossier(dossier.id);
+      return;
+    }
+
+    await dossiersRepo.deleteDossier(dossier.id);
+  }, [dossier, user]);
+
+  return { dossier, proofs, participants, suggestions, loading, loadError, uploading, addProof, remove, reload: load, canEdit: canEditDossier(dossier, user?.id) };
 }
