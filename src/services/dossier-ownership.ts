@@ -1,7 +1,7 @@
 /** UI guards complement, never replace, the existing owner-only cloud policies. */
 export type DossierOwnerTarget = { user_id?: string | null } | null | undefined;
 
-function normalizeUserId(userId?: string | null): string {
+export function normalizeUserId(userId?: string | null): string {
   return String(userId ?? "").trim();
 }
 

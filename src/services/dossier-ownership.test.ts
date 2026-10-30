@@ -14,6 +14,7 @@ describe("dossier ownership guard", () => {
     expect(canEditDossier({ user_id: "user-123" }, null)).toBe(false);
     expect(canEditDossier(null, "user-123")).toBe(false);
     expect(canEditDossier({ user_id: "" }, "user-123")).toBe(false);
+    expect(canEditDossier({ user_id: "user-123" }, "   ")).toBe(false);
   });
 
   it("throws when ownership does not match", () => {
