@@ -27,6 +27,19 @@ function getErrorMessage(error: unknown): string {
   return String(error);
 }
 
+async function requireCurrentOwnerForDossier(dossierId: string, userId: string) {
+  const { data, error } = await supabase
+    .from("dossiers")
+    .select("id, user_id, updated_at, title, metadata, description, location_name")
+    .eq("id", dossierId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) throw new Error("Dossier not found");
+  assertDossierOwner(data, userId);
+  return data;
+}
+
 export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "synced" | "created_at" | "updated_at"> & { localId: string }) {
   const now = Date.now();
   await db.drafts.add({ ...draft, created_at: now, updated_at: now, synced: 0 });
@@ -96,7 +109,6 @@ export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: 
       : { ...previous, ...metadata };
     await db.queue.update(existing.id, {
       payload: { dossierId, metadata: mergedMetadata },
-      // Keep ordering and failure diagnostics until this operation succeeds.
     });
   } else {
     await db.queue.add({
@@ -165,8 +177,6 @@ async function runQueue(): Promise<void> {
       if (op.id === undefined) continue;
       const opId = op.id;
       try {
-        // An operation can outlive the session that queued it. Never replay it
-        // under a missing or different identity.
         const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
         if (sessionError) throw sessionError;
         if (!currentUser) throw new Error("Sign in to retry synchronisation");
@@ -212,14 +222,7 @@ async function runQueue(): Promise<void> {
         } else if (op.kind === "initialize_journey") {
           const dossierId = op.payload?.dossierId;
           if (!dossierId) throw new Error("Invalid queued journey");
-          const { data: ownedDossier, error: ownershipError } = await supabase
-            .from("dossiers")
-            .select("id")
-            .eq("id", dossierId)
-            .eq("user_id", currentUser.id)
-            .single();
-          if (ownershipError) throw ownershipError;
-          if (!ownedDossier) throw new Error("Only the dossier owner can modify this dossier");
+          await requireCurrentOwnerForDossier(dossierId, currentUser.id);
           await proceduresRepo.initializeDossierJourney(dossierId);
           await db.queue.delete(opId);
           emit();
@@ -234,13 +237,7 @@ async function runQueue(): Promise<void> {
           // Detect overlapping edits and persist them for the Sync Center instead of overwriting.
           if (payload.changes && payload.baseUpdatedAt) {
             const changes = payload.changes as DossierChanges;
-            const { data: remote, error: readError } = await supabase
-              .from("dossiers")
-              .select("*")
-              .eq("id", dossierId)
-              .eq("user_id", currentUser.id)
-              .single();
-            if (readError) throw readError;
+            const remote = await requireCurrentOwnerForDossier(dossierId, currentUser.id);
             assertDossierOwner(remote, currentUser.id);
             const fields = detectConflictFields(payload.baseUpdatedAt, remote, changes);
             if (fields.length > 0) {
@@ -271,19 +268,11 @@ async function runQueue(): Promise<void> {
             await db.queue.delete(opId);
             emit();
           } else {
-            // Terrain section metadata is merged with the latest server state, not a stale snapshot.
             const metadata = payload?.metadata;
             if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
               throw new Error("Invalid queued dossier update");
             }
-            const { data: currentDossier, error: readError } = await supabase
-              .from("dossiers")
-              .select("metadata, user_id, updated_at")
-              .eq("id", dossierId)
-              .eq("user_id", currentUser.id)
-              .single();
-            if (readError) throw readError;
-            assertDossierOwner(currentDossier, currentUser.id);
+            const currentDossier = await requireCurrentOwnerForDossier(dossierId, currentUser.id);
             const currentMetadata = currentDossier?.metadata && typeof currentDossier.metadata === "object" && !Array.isArray(currentDossier.metadata)
               ? currentDossier.metadata as Record<string, unknown>
               : {};
@@ -323,7 +312,6 @@ async function runQueue(): Promise<void> {
             if (!updated) {
               throw new Error("Le dossier a changé pendant la synchronisation. Réessayez pour conserver les modifications distantes.");
             }
-            // A new offline edit may have replaced this payload during the request.
             const latestQueued = await db.queue.get(opId);
             if (latestQueued?.kind === "update_dossier" &&
                 latestQueued.payload?.dossierId === dossierId &&
@@ -331,17 +319,11 @@ async function runQueue(): Promise<void> {
               await db.queue.delete(opId);
             }
             emit();
-          }        } else if (op.kind === "delete_dossier") {
+          }
+        } else if (op.kind === "delete_dossier") {
           const dossierId = op.payload?.dossierId;
           if (!dossierId) throw new Error("Invalid queued dossier deletion");
-          const { data: ownedDossier, error: ownershipError } = await supabase
-            .from("dossiers")
-            .select("id")
-            .eq("id", dossierId)
-            .eq("user_id", currentUser.id)
-            .maybeSingle();
-          if (ownershipError) throw ownershipError;
-          if (!ownedDossier) throw new Error("Only the dossier owner can modify this dossier");
+          await requireCurrentOwnerForDossier(dossierId, currentUser.id);
           const { error } = await supabase
             .from("dossiers")
             .delete()
@@ -358,19 +340,11 @@ async function runQueue(): Promise<void> {
             throw new Error("Invalid queued proof upload");
           }
           if (userId !== currentUser.id) throw new Error("Sign in with the account that queued this proof");
-          const { data: ownedDossier, error: ownershipError } = await supabase
-            .from("dossiers")
-            .select("id")
-            .eq("id", dossierId)
-            .eq("user_id", currentUser.id)
-            .single();
-          if (ownershipError) throw ownershipError;
-          if (!ownedDossier) throw new Error("Only the dossier owner can modify this dossier");
+          await requireCurrentOwnerForDossier(dossierId, currentUser.id);
           await replayProof({ ...op, id: opId });
           await db.queue.delete(opId);
           emit();
         } else {
-          // Ne jamais supprimer silencieusement une mutation encore non prise en charge.
           throw new Error("Unsupported queued operation");
         }
       } catch (e: unknown) {
@@ -445,7 +419,6 @@ export async function claimLocalDrafts(fromUserId: string, toUserId: string): Pr
   if (drafts.length > 0) void processQueue();
   return drafts.length;
 }
-
 
 // Remove a queued operation only when the user explicitly discards it in Sync Center.
 export async function discardQueuedOp(id: number) {
