@@ -1,9 +1,15 @@
 /** UI guards complement, never replace, the existing owner-only cloud policies. */
 export type DossierOwnerTarget = { user_id?: string | null } | null | undefined;
 
+function normalizeUserId(userId?: string | null): string {
+  return String(userId ?? "").trim();
+}
+
 export function canEditDossier(dossier: DossierOwnerTarget, userId?: string | null): boolean {
-  if (!dossier || !userId) return false;
-  return String(dossier.user_id ?? "") === String(userId);
+  const dossierOwner = normalizeUserId(dossier?.user_id);
+  const sessionUserId = normalizeUserId(userId);
+  if (!dossierOwner || !sessionUserId) return false;
+  return dossierOwner === sessionUserId;
 }
 
 export function assertDossierOwner(dossier: DossierOwnerTarget, userId?: string | null): void {
@@ -16,7 +22,8 @@ export function requireOwnerSession(
   user: { id?: string | null } | null | undefined,
   dossier: DossierOwnerTarget,
 ): string {
-  if (!user?.id) throw new Error("Session required");
-  assertDossierOwner(dossier, user.id);
-  return user.id;
+  const sessionUserId = normalizeUserId(user?.id);
+  if (!sessionUserId) throw new Error("Session required");
+  assertDossierOwner(dossier, sessionUserId);
+  return sessionUserId;
 }
