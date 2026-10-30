@@ -42,7 +42,7 @@ export async function createDossier(input: NewDossierInput): Promise<Dossier> {
   const { data: { user }, error: sessionError } = await supabase.auth.getUser();
   if (sessionError) throw sessionError;
   if (!user) throw new Error("Session required");
-  if (input.user_id !== user.id) {
+  if (String(input.user_id ?? "") !== String(user.id ?? "")) {
     throw new Error("Cannot create a dossier for another user");
   }
   const { data, error } = await supabase
@@ -64,11 +64,7 @@ export async function createDossier(input: NewDossierInput): Promise<Dossier> {
   return data;
 }
 
-export async function updateDossierScore(
-  id: string,
-  score: number,
-  status: DossierStatus
-): Promise<void> {
+export async function updateDossierScore(id: string, score: number, status: DossierStatus): Promise<void> {
   const { user } = await requireCurrentOwner(id);
   const { error } = await supabase
     .from("dossiers")
@@ -84,10 +80,7 @@ export async function deleteDossier(id: string): Promise<void> {
   if (error) throw error;
 }
 
-export async function updateDossierMetadata(
-  id: string,
-  metadata: Record<string, unknown>
-): Promise<Dossier> {
+export async function updateDossierMetadata(id: string, metadata: Record<string, unknown>): Promise<Dossier> {
   const { data: { user }, error: sessionError } = await supabase.auth.getUser();
   if (sessionError) throw sessionError;
   if (!user) throw new Error("Session required");
