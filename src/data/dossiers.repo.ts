@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Dossier, DossierStatus, DossierType } from "@/core/types/domain";
-import { assertDossierOwner, requireOwnerSession } from "@/services/dossier-ownership";
+import { assertDossierOwner, normalizeUserId, requireOwnerSession } from "@/services/dossier-ownership";
 import type { Json } from "@/integrations/supabase/types";
 
 export interface NewDossierInput {
@@ -42,13 +42,20 @@ export async function createDossier(input: NewDossierInput): Promise<Dossier> {
   const { data: { user }, error: sessionError } = await supabase.auth.getUser();
   if (sessionError) throw sessionError;
   if (!user) throw new Error("Session required");
-  if (String(input.user_id ?? "") !== String(user.id ?? "")) {
+
+  const normalizedInputUserId = normalizeUserId(input.user_id);
+  const normalizedSessionUserId = normalizeUserId(user.id);
+
+  if (!normalizedInputUserId) throw new Error("User id required");
+  if (!normalizedSessionUserId) throw new Error("Session required");
+  if (normalizedInputUserId !== normalizedSessionUserId) {
     throw new Error("Cannot create a dossier for another user");
   }
+
   const { data, error } = await supabase
     .from("dossiers")
     .insert({
-      user_id: user.id,
+      user_id: normalizedSessionUserId,
       type: input.type as DossierType,
       title: input.title,
       description: input.description ?? null,
