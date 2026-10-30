@@ -26,4 +26,34 @@ describe("dossier ownership guard", () => {
     expect(canEditDossier({ user_id: "  user-123  " }, "user-123")).toBe(true);
     expect(canEditDossier({ user_id: "user-123" }, "  user-123  ")).toBe(true);
   });
+
+  it("blocks queued update if ownership changed before replay", () => {
+    const dossier = { user_id: "user-123" };
+    const currentUserId = "user-456";
+
+    expect(canEditDossier(dossier, currentUserId)).toBe(false);
+    expect(() => assertDossierOwner(dossier, currentUserId)).toThrow(
+      "Only the dossier owner can modify this dossier"
+    );
+  });
+
+  it("blocks queued delete if ownership changed before replay", () => {
+    const dossier = { user_id: "user-123" };
+    const currentUserId = "user-789";
+
+    expect(canEditDossier(dossier, currentUserId)).toBe(false);
+    expect(() => assertDossierOwner(dossier, currentUserId)).toThrow(
+      "Only the dossier owner can modify this dossier"
+    );
+  });
+
+  it("blocks queued proof upload if the user no longer owns the dossier", () => {
+    const dossier = { user_id: "user-123" };
+    const queuedUserId = "user-999";
+
+    expect(canEditDossier(dossier, queuedUserId)).toBe(false);
+    expect(() => assertDossierOwner(dossier, queuedUserId)).toThrow(
+      "Only the dossier owner can modify this dossier"
+    );
+  });
 });
