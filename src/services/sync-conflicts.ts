@@ -10,7 +10,7 @@ export type DossierChanges = Partial<Record<EditableField, string | null>>;
 export function detectConflictFields(
   baseUpdatedAt: string,
   remote: { updated_at: string } & Partial<Record<EditableField, string | null>>,
-  mine: DossierChanges
+  mine: DossierChanges,
 ): EditableField[] {
   if (remote.updated_at === baseUpdatedAt) return [];
   return (Object.keys(mine) as EditableField[]).filter(
@@ -22,7 +22,7 @@ export function detectConflictFields(
 export function mergeResolution(
   mine: DossierChanges,
   theirs: DossierChanges,
-  choice: Partial<Record<EditableField, "mine" | "theirs">>
+  choice: Partial<Record<EditableField, "mine" | "theirs">>,
 ): DossierChanges {
   const out: DossierChanges = {};
   for (const f of Object.keys(mine) as EditableField[]) {
