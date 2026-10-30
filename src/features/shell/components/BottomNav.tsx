@@ -6,17 +6,22 @@ import { centralAction } from "@/services";
 import { profilesRepo } from "@/data";
 import { useAlerts } from "@/features/alerts/hooks/useAlerts";
 import { useProfile } from "@/features/profile";
+import { useAuth } from "@/features/identity";
 import { cn } from "@/lib/utils";
 
 /**
- * Barre d'onglets : Accueil, Dossiers, action centrale contextuelle,
- * Alertes (badge non lus) et Profil (avatar). Rien dans l'en-tête.
+ * Barre d'onglets : Accueil, Assistant/Profil pour le visiteur, et les écrans
+ * d'authentification uniquement pour le compte connecté.
  */
 export function BottomNav() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const central = centralAction(pathname);
+  const location = useLocation();
+  const { user } = useAuth();
+  const isGuest = !user;
+  const central = isGuest
+    ? { labelKey: "next.createAccount", hintKey: "next.createAccountHint", route: "/auth", icon: "account" as const }
+    : centralAction(location.pathname);
   const CentralIcon = central.icon === "proof" ? Paperclip : Plus;
 
   const { alerts, loadError: alertsLoadError } = useAlerts();
@@ -43,7 +48,7 @@ export function BottomNav() {
 
   const left = [
     { to: "/", icon: Home, label: t("nav.home") },
-    { to: "/dossiers", icon: FolderOpen, label: t("nav.dossiers") },
+    ...(user ? [{ to: "/dossiers", icon: FolderOpen, label: t("nav.dossiers") }] : []),
   ];
 
   const runCentral = () => {
@@ -80,23 +85,25 @@ export function BottomNav() {
           <span className="sr-only">{t(central.labelKey)}</span>
         </button>
 
-        <NavLink
-          to="/alerts"
-          className={tabClass}
-          aria-label={`${t("nav.alerts")}${alertsLoadError ? ` — ${t("auth.error")}` : unreadCount > 0 ? ` — ${unreadCount}` : ""}`}
-        >
-          <span className="relative">
-            <Bell className="size-5" />
-            {alertsLoadError ? (
-              <span aria-hidden="true" className="absolute -top-1.5 -right-2 size-2 rounded-full bg-warning ring-2 ring-card" />
-            ) : unreadCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 min-w-4 h-4 px-1 text-[9px] rounded-full bg-destructive text-destructive-foreground flex items-center justify-center font-bold">
-                {unreadCount > 9 ? "9+" : unreadCount}
-              </span>
-            )}
-          </span>
-          <span>{t("nav.alerts")}</span>
-        </NavLink>
+        {user && (
+          <NavLink
+            to="/alerts"
+            className={tabClass}
+            aria-label={`${t("nav.alerts")}${alertsLoadError ? ` — ${t("auth.error")}` : unreadCount > 0 ? ` — ${unreadCount}` : ""}`}
+          >
+            <span className="relative">
+              <Bell className="size-5" />
+              {alertsLoadError ? (
+                <span aria-hidden="true" className="absolute -top-1.5 -right-2 size-2 rounded-full bg-warning ring-2 ring-card" />
+              ) : unreadCount > 0 && (
+                <span className="absolute -top-1.5 -right-2 min-w-4 h-4 px-1 text-[9px] rounded-full bg-destructive text-destructive-foreground flex items-center justify-center font-bold">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </span>
+            <span>{t("nav.alerts")}</span>
+          </NavLink>
+        )}
 
         <NavLink to="/profile" className={tabClass}>
           {avatarUrl ? (
