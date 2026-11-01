@@ -32,7 +32,7 @@ describe("IndexedDB offline continuity", () => {
   it("retains exact failure and attempts after close/open, then permits manual hook retry", async () => {
     const id = await seedUpdate();
     mocks.from.mockReturnValue({ select: () => {
-      const query = { eq: vi.fn(() => query), single: vi.fn(async () => ({ data: null, error: { message: "Storage/network temporarily unavailable" } })) };
+      const query = { eq: vi.fn(() => query), maybeSingle: vi.fn(async () => ({ data: null, error: { message: "Storage/network temporarily unavailable" } })) };
       return query;
     } });
     await processQueue();
@@ -48,7 +48,7 @@ describe("IndexedDB offline continuity", () => {
     const pending = new Promise<{ data: { id: string }; error: null }>((resolve) => { release = resolve; });
     mocks.from.mockReturnValue({
       select: () => {
-        const query = { eq: vi.fn(() => query), single: vi.fn(async () => ({ data: { user_id: "owner", metadata: {} }, error: null })) };
+        const query = { eq: vi.fn(() => query), maybeSingle: vi.fn(async () => ({ data: { user_id: "owner", metadata: {} }, error: null })) };
         return query;
       },
       update: mocks.update.mockImplementation(() => {
@@ -105,7 +105,7 @@ describe("IndexedDB offline continuity", () => {
     const upsert = vi.fn(async () => ({ error: new Error("record unavailable") }));
     mocks.from.mockImplementation((table) => {
       if (table === "proofs") return { select: () => ({ eq: async () => ({ data: [], error: null }) }), upsert };
-      return { select: () => { const q = { eq: () => q, single: async () => ({ data: { id: "terrain-1" }, error: null }) }; return q; } };
+      return { select: () => { const q = { eq: () => q, maybeSingle: async () => ({ data: { id: "terrain-1" }, error: null }) }; return q; } };
     });
     mocks.upload.mockResolvedValue({ error: null });
     await processQueue();
@@ -130,7 +130,7 @@ describe("IndexedDB offline continuity", () => {
       dossierId: "terrain-1", ...(mode === "fields" ? { changes: { title: "Correction" }, baseUpdatedAt: "old" } : { metadata: { terrain: {} } }),
     } });
     mocks.from.mockReturnValue({ select: () => {
-      const q = { eq: () => q, single: async () => ({ data: { user_id: "owner", metadata: {} }, error: null }) }; return q;
+      const q = { eq: () => q, maybeSingle: async () => ({ data: { user_id: "owner", metadata: {} }, error: null }) }; return q;
     }, update: mocks.update });
     await processQueue();
     expect(mocks.update).not.toHaveBeenCalled();
