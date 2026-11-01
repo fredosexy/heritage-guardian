@@ -1,7 +1,7 @@
 {
-  "name": "Mémoire — Sécurisez votre patrimoine",
-  "short_name": "Mémoire",
-  "description": "Sécurisez vos terres, organisez vos héritages et volontés. Fonctionne hors connexion.",
+  "name": "Heritis — Vos dossiers Terrain",
+  "short_name": "Heritis",
+  "description": "Organisez les informations et documents de votre terrain. Enregistrez vos brouillons hors ligne.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

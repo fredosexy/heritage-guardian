@@ -158,7 +158,7 @@ describe("ai-chat handler", () => {
     const payload = JSON.parse(String(init?.body));
     expect(payload.messages[0]).toEqual({
       role: "system",
-      content: expect.stringContaining("Tu es l'assistant Mémoire"),
+      content: expect.stringContaining("Tu es l'assistant Heritis"),
     });
     expect(payload.messages[1]).toEqual({ role: "user", content: "Bonjour" });
     expect(payload.stream).toBe(true);
