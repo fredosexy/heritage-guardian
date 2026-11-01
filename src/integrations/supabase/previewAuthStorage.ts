@@ -34,18 +34,9 @@ function readBrokerReply(data: unknown, requestId: string): BrokerReply | null {
   };
 }
 
-function createRequestId(): string {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
-  }
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
-}
-
 /**
  * On a Lovable preview surface, broker the auth session to the editor over
  * postMessage so the project's preview surfaces share one login; else localStorage.
- *
- * Fail closed: missing or stale broker replies do not resurrect a session from localStorage.
  */
 export function brokeredPreviewStorage(): PreviewAuthStorage | undefined {
   if (typeof window === 'undefined') return undefined;
@@ -56,7 +47,7 @@ export function brokeredPreviewStorage(): PreviewAuthStorage | undefined {
   // preview--<name> host can't smuggle another project's id.
   const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
   const projectId = onPreviewZone
-    ? (new RegExp('^(?:id-preview(?:-[a-z0-9]+)?|project)--(' + UUID + ')(?:-dev)?(?=\.|$)', 'i').exec(host)?.[1]
+    ? (new RegExp('^(?:id-preview(?:-[a-z0-9]+)?|project)--(' + UUID + ')(?:-dev)?(?=\\.|$)', 'i').exec(host)?.[1]
         ?? new RegExp('^(' + UUID + ')(?=[.-])', 'i').exec(host)?.[1])
     : undefined;
   // lib.dom types window.parent and location.ancestorOrigins as always set, but a
@@ -77,10 +68,11 @@ export function brokeredPreviewStorage(): PreviewAuthStorage | undefined {
     ? [ancestor]
     : (dev ? ['https://lovable.dev', 'http://localhost:3000'] : ['https://lovable.dev']);
   const TIMEOUT = 2000;
+  const newId = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 
   const request = (type: BrokerRequestType, key: string, value?: string): Promise<BrokerReply | null> =>
     new Promise((resolve) => {
-      const requestId = createRequestId();
+      const requestId = newId();
       let done = false;
       const finish = (reply: BrokerReply | null) => {
         if (done) return;
@@ -99,48 +91,53 @@ export function brokeredPreviewStorage(): PreviewAuthStorage | undefined {
       const msg: BrokerRequest = { type, requestId, projectId, key };
       if (value !== undefined) msg.value = value;
       // targetOrigin per trusted editor origin, so a session token never reaches an arbitrary embedder.
-      for (const origin of editorOrigins) {
-        try {
-          window.parent.postMessage(msg, origin);
-        } catch {
-          finish(null);
-        }
-      }
+      for (const origin of editorOrigins) window.parent.postMessage(msg, origin);
     });
 
   // The editor may not be listening yet at the first getItem, so retry once.
   let firstGet = true;
   const RETRY_DELAY = 250;
+  // Blocked third-party storage throws here; seeding must not break broker reads.
+  const readLocal = (key: string): string | null | undefined => { try { return localStorage.getItem(key); } catch { return undefined; } };
 
   return {
     getItem: async (key) => {
-      const local = (() => {
-        try { return localStorage.getItem(key); } catch { return null; }
-      })();
+      // Sent with GET and REMOVE so an editor that never cached this session can check or revoke it.
+      const local = readLocal(key);
       let res = await request('lovable-preview-auth:get', key, local ?? undefined);
       if (!res && firstGet) {
         await new Promise<void>((resolve) => setTimeout(resolve, RETRY_DELAY));
         res = await request('lovable-preview-auth:get', key, local ?? undefined);
       }
       firstGet = false;
-
-      // Fail closed: if the broker does not prove a session, do not resurrect one from localStorage.
+      // '' is the logout tombstone: clear the local copy too so it can't resurrect if
+      // the broker later goes silent. A null value means never-synced -> keep local.
       if (res?.ok && res.value !== null) {
-        if (res.value === '') return null;
+        if (res.value === '') {
+          if (local !== undefined && readLocal(key) === local) localStorage.removeItem(key);
+          return null;
+        }
+        // Seed this origin so a new tab, whose editor holds no session, stays signed in.
+        if (local === null && readLocal(key) === null) {
+          try { localStorage.setItem(key, res.value); } catch { /* storage full: still return the editor's session */ }
+        }
         return res.value;
       }
-      return null;
+      return localStorage.getItem(key);
     },
-    setItem: async (key, value) => {
-      await request('lovable-preview-auth:set', key, value).then((res) => {
-        if (res?.ok && res.value === '') {
-          return;
+    setItem: (key, value) => {
+      localStorage.setItem(key, value);
+      return request('lovable-preview-auth:set', key, value).then((res) => {
+        if (res?.ok && res.value !== null && localStorage.getItem(key) === value) {
+          if (res.value === '') localStorage.removeItem(key);
+          else localStorage.setItem(key, res.value);
         }
-        return;
       });
     },
-    removeItem: async (key) => {
-      await request('lovable-preview-auth:remove', key).then(() => undefined);
+    removeItem: (key) => {
+      const local = readLocal(key);
+      localStorage.removeItem(key);
+      return request('lovable-preview-auth:remove', key, local ?? undefined).then(() => {});
     },
   };
 }
