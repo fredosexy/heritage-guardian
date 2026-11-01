@@ -73,6 +73,8 @@ export default function HomePage() {
           <p className="text-xs uppercase tracking-[0.18em] text-primary font-medium">{t("home.visitorEyebrow")}</p>
           <h1 className="text-display mt-2 max-w-sm">{t("home.visitorTitle")}</h1>
           <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-xl">{t("home.visitorVision")}</p>
+          <Button className="mt-4" onClick={() => navigate("/create?type=terrain")}>{t("modules.visitorStart")}<ChevronRight className="size-4" /></Button>
+          <p className="text-caption mt-3 max-w-xl">{t("modules.legalNotice")}</p>
         </section>
         <section className="mb-7 rounded-3xl border border-border/60 bg-card/80 p-4 shadow-[var(--shadow-soft)] backdrop-blur-sm">
           <div className="flex items-start justify-between gap-3">
@@ -99,6 +101,7 @@ export default function HomePage() {
   return (
     <AppLayout>
       <HomeHeader firstName={profile?.full_name?.split(" ")[0] || displayName} zone={guest.locationName} alertCount={alerts.length} />
+      <p className="text-caption mb-5">{t("app.name")} · {t("modules.legalNotice")}</p>
       <ProfileCompletionCard />
       <section className="mb-6">
         <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.continueTitle")}</h2><p className="text-caption mt-1">{t("home.continueHint")}</p></div><button onClick={() => navigate(continueRoute)} className="text-xs text-primary font-medium tap focus-ring">{t("home.open")}</button></div>

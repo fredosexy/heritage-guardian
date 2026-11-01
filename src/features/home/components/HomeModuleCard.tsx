@@ -3,6 +3,9 @@ import type { LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import { Button } from "@/components/ui/button";
+import { typeLabelKey } from "@/features/dossiers/components/dossierTypeMeta";
+
 export type HomeModuleState = "new" | "progress" | "risk" | "secure";
 
 interface Props {
@@ -18,12 +21,12 @@ export function HomeModuleCard({ id, icon: Icon, dossierCount, secureCount, risk
   const route = `/modules/${id}`;
   const handleOpen = () => onFirstGesture ? onFirstGesture(route) : navigate(route);
   return (
-    <button type="button" onClick={handleOpen} className={`group w-full rounded-[1.75rem] border border-border/60 bg-gradient-to-br from-card via-card to-accent/25 p-5 text-left shadow-[var(--shadow-soft)] transition duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-[var(--shadow-elegant)] focus-ring tap ${className ?? ""}`}>
+    <Button variant="ghost" type="button" onClick={handleOpen} className={`group block h-auto whitespace-normal w-full rounded-[1.75rem] border border-border/60 bg-gradient-to-br from-card via-card to-accent/25 p-5 text-left shadow-[var(--shadow-soft)] transition duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-[var(--shadow-elegant)] focus-ring tap ${className ?? ""}`}>
       <div className="flex items-start gap-4">
         <span className="size-11 rounded-2xl bg-gradient-to-br from-accent to-secondary/70 text-primary flex items-center justify-center shrink-0 shadow-[var(--shadow-soft)]"><Icon className="size-5" /></span>
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3"><div><p className="text-base font-semibold tracking-tight">{t(`modules.${id}.title`)}</p><p className="text-sm text-muted-foreground mt-1 leading-relaxed">{t(`modules.${id}.description`)}</p>{!available && <span className="inline-flex mt-2 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">{t("create.comingSoon")}</span>}</div><ChevronRight className="size-5 text-muted-foreground shrink-0" /></div>
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+          <div className="flex items-start justify-between gap-3"><div><p className="text-base font-semibold ">{id === "savoir" ? t(typeLabelKey(id)) : t(`modules.${id}.title`)}</p><p className="text-sm text-muted-foreground mt-1 leading-relaxed">{id === "savoir" ? t("create.savoirDesc") : t(`modules.${id}.description`)}</p><span className="inline-flex mt-2 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">{available ? t("modules.available") : t("create.comingSoon")}</span></div><ChevronRight className="size-5 text-muted-foreground shrink-0" /></div>
+          {available && <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
             <span className="rounded-full bg-muted px-2.5 py-1 font-medium">{t(`modules.state.${state}`)}</span>
             {dossierCount > 0 && <span className="rounded-full border border-border px-2.5 py-1 text-muted-foreground">{t("modules.dossiersCount", { count: dossierCount })}</span>}
             {bestCompletion >= 75 && bestCompletion < 100 && <span className="rounded-full border border-border px-2.5 py-1">{t("modules.completionHintAdvanced")}</span>}{bestCompletion > 0 && bestCompletion < 75 && <span className="rounded-full border border-border px-2.5 py-1">{t("modules.completionHintToComplete")}</span>}
@@ -31,11 +34,11 @@ export function HomeModuleCard({ id, icon: Icon, dossierCount, secureCount, risk
             {proofsCount > 0 && <span className="rounded-full border border-border px-2.5 py-1 text-muted-foreground">{proofsCount} {t("modules.proofs")}</span>}
             {riskCount > 0 && <span className="inline-flex items-center gap-1 font-medium text-destructive"><CircleAlert className="size-3.5" />{t("modules.riskCount", { count: riskCount })}</span>}
             {secureCount > 0 && <span className="inline-flex items-center gap-1 text-primary font-medium"><CircleCheck className="size-3.5" />{t("modules.secureCount", { count: secureCount })}</span>}
-          </div>
-          {nextDossierTitle && state !== "secure" && <div className="mt-3 rounded-2xl border border-border/50 bg-background/70 px-3 py-3"><p className="text-[11px] uppercase tracking-wide text-muted-foreground">{t("modules.nextAttention")}</p><p className="text-sm font-medium truncate">{nextDossierTitle}</p>{blockedStepTitle ? <p className="text-xs text-destructive mt-0.5">{t("modules.journeyBlocked")}: {blockedStepTitle}</p> : currentStepTitle ? <p className="text-xs text-muted-foreground mt-0.5">{t("modules.journeyCurrent")}: {currentStepTitle}{nextStepTitle ? ` · ${t("modules.journeyNext")}: ${nextStepTitle}` : ""}</p> : nextAttention && <p className="text-xs text-muted-foreground mt-0.5">{nextAttention}</p>}</div>}
-          <div className="mt-4 flex items-center justify-between gap-3"><span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">{!available ? <Sparkles className="size-4" /> : state === "new" ? <Sparkles className="size-4" /> : <LockKeyhole className="size-4" />}{!available ? t("create.comingSoon") : t(`modules.cta.${state}`)}</span><span className="text-xs text-muted-foreground">{t("modules.openPath")}</span></div>
+          </div>}
+          {available && nextDossierTitle && state !== "secure" && <div className="mt-3 rounded-2xl border border-border/50 bg-background/70 px-3 py-3"><p className="text-[11px] uppercase tracking-wide text-muted-foreground">{t("modules.nextAttention")}</p><p className="text-sm font-medium truncate">{nextDossierTitle}</p>{blockedStepTitle ? <p className="text-xs text-destructive mt-0.5">{t("modules.journeyBlocked")}: {blockedStepTitle}</p> : currentStepTitle ? <p className="text-xs text-muted-foreground mt-0.5">{t("modules.journeyCurrent")}: {currentStepTitle}{nextStepTitle ? ` · ${t("modules.journeyNext")}: ${nextStepTitle}` : ""}</p> : nextAttention && <p className="text-xs text-muted-foreground mt-0.5">{nextAttention}</p>}</div>}
+          <div className="mt-4 flex items-center justify-between gap-3"><span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">{!available ? <Sparkles className="size-4" /> : state === "new" ? <Sparkles className="size-4" /> : <LockKeyhole className="size-4" />}{!available ? t("create.comingSoon") : t(`modules.cta.${state}`)}</span><span className="text-xs text-muted-foreground">{available ? t("modules.openPath") : t("modules.preview")}</span></div>
         </div>
       </div>
-    </button>
+    </Button>
   );
 }

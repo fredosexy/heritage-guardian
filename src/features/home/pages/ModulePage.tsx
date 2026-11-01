@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ChevronRight, CircleCheck, LockKeyhole, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/features/shell";
 import { useDossiers } from "@/features/dossiers/hooks/useDossiers";
 import { useIdentity } from "@/features/identity";
@@ -16,7 +17,7 @@ export default function ModulePage() {
   const { dossiers, loading } = useDossiers();
   const { isGuest } = useIdentity();
 
-  const id = moduleIds.includes(moduleId ?? "") ? moduleId! : "terrain";
+  const id = moduleId && moduleIds.includes(moduleId) ? moduleId : "terrain";
   const moduleMeta = DOSSIER_TYPES.find((item) => item.id === id);
   const available = moduleMeta?.available ?? false;
   const translatedSteps = t(`modules.${id}.steps`, { returnObjects: true });
@@ -48,7 +49,7 @@ export default function ModulePage() {
         </div>
       </header>
 
-      <section className="rounded-3xl border border-border bg-card p-5 mb-5">
+      {available ? <section className="rounded-3xl border border-border bg-card p-5 mb-5">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
             <p className="text-sm font-semibold">{t("modules.progressTitle")}</p>
@@ -78,10 +79,11 @@ export default function ModulePage() {
             {t("modules.inProgressHint", { count: inProgress })}
           </div>
         )}
-      </section>
+      </section> : <p className="text-sm text-muted-foreground mb-5">{t("modules.preparationHint")}</p>}
+      {available && <p className="text-caption mb-5">{t("modules.legalNotice")}</p>}
 
       <section className="mb-5">
-        <h2 className="text-base font-serif mb-3">{t("modules.stepsTitle")}</h2>
+        <h2 className="text-base font-serif mb-3">{available ? t("modules.stepsTitle") : t("modules.plannedSteps")}</h2>
         <div className="space-y-2">
           {steps.map((step, index) => (
             <div key={step} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
@@ -95,20 +97,20 @@ export default function ModulePage() {
         </div>
       </section>
 
-      <button
+      <Button variant="default"
         onClick={() => navigate(startRoute)}
-        className="w-full rounded-2xl bg-gradient-warm text-primary-foreground p-4 text-left shadow-warm tap focus-ring"
+        className="block h-auto whitespace-normal w-full rounded-2xl bg-gradient-warm text-primary-foreground p-4 text-left shadow-warm tap focus-ring"
       >
         <span className="flex items-center justify-between gap-3">
           <span>
             <span className="block font-semibold">
-              {!available ? t("create.comingSoon") : isGuest ? t("modules.visitorStart") : t(`modules.cta.${secure > 0 ? "progress" : "new"}`)}
+              {!available ? t("home.visitorAssistantCta") : isGuest ? t("modules.visitorStart") : t(`modules.cta.${secure > 0 ? "progress" : "new"}`)}
             </span>
-            <span className="block text-sm opacity-85 mt-1">{nextStep ? t("modules.nextStepExisting", { title: nextStep.title }) : t("modules.guidedHint")}</span>
+            <span className="block text-sm opacity-85 mt-1">{!available ? t("modules.preparationHint") : nextStep ? nextStep.title : t("modules.guidedHint")}</span>
           </span>
           <ChevronRight className="size-5 shrink-0" />
         </span>
-      </button>
+      </Button>
     </AppLayout>
   );
 }
