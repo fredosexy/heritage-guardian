@@ -19,16 +19,13 @@ export async function requestTerrainChecklistReview(dossierId: string, language:
   return { summary: data.summary, toComplete: Array.isArray(data.toComplete) ? data.toComplete : [] };
 }
 
-/** Builds the metadata patch saved only after the owner confirms the review. */
-export function buildConfirmedReviewMetadata(
-  metadata: unknown,
-  review: TerrainChecklistReview,
-  now: Date = new Date(),
-): Record<string, unknown> {
-  const base = metadata && typeof metadata === "object" && !Array.isArray(metadata) ? metadata as Record<string, unknown> : {};
-  const terrain = base.terrain && typeof base.terrain === "object" && !Array.isArray(base.terrain) ? base.terrain as Record<string, unknown> : {};
+/**
+ * Minimal metadata patch saved only after the owner confirms the review.
+ * The sync layer merges `terrain` keys with the server copy, so sections stay untouched.
+ */
+export function buildConfirmedReviewPatch(review: TerrainChecklistReview, now: Date = new Date()): Record<string, unknown> {
   const checklistReview: ConfirmedChecklistReview = { ...review, confirmedAt: now.toISOString() };
-  return { ...base, terrain: { ...terrain, checklistReview } };
+  return { terrain: { checklistReview } };
 }
 
 export function confirmedReviewFromMetadata(metadata: unknown): ConfirmedChecklistReview | null {
