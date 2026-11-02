@@ -80,7 +80,8 @@ describe("proof persistence", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.5);
     const file = new File(["acte"], "titre.pdf", { type: "application/pdf" });
     const databaseError = new Error("database unavailable");
-    mocks.from.mockReturnValue({ insert: mocks.proofInsert });
+    mocks.from.mockReturnValueOnce({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { id: "dossier-1", user_id: "user-1" }, error: null }) }) }) });
+    mocks.from.mockReturnValueOnce({ insert: mocks.proofInsert });
     mocks.proofSingle.mockResolvedValue({ data: null, error: databaseError });
 
     let thrown: unknown;
@@ -107,7 +108,7 @@ describe("proof persistence", () => {
 describe("deleteProof", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.from.mockReturnValue({ delete: mocks.proofDelete });
+    mocks.from.mockImplementation((table: string) => table === "dossiers" ? ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { id: "dossier-1", user_id: "user-1" }, error: null }) }) }) }) : ({ delete: mocks.proofDelete }));
     mocks.proofDelete.mockReturnValue({ eq: mocks.proofDeleteEq });
     mocks.proofDeleteEq.mockResolvedValue({ error: null });
   });
