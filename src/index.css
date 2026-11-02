@@ -193,7 +193,8 @@
 
 @layer components {
   .container-app {
-    @apply mx-auto w-full max-w-md px-4;
+    @apply mx-auto w-full max-w-6xl;
+    padding-inline: var(--page-gutter);
   }
 
   .card-soft {
