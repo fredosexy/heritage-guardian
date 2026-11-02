@@ -105,7 +105,7 @@ describe("IndexedDB offline continuity", () => {
     const upsert = vi.fn(async () => ({ error: new Error("record unavailable") }));
     mocks.from.mockImplementation((table) => {
       if (table === "proofs") return { select: () => ({ eq: async () => ({ data: [], error: null }) }), upsert };
-      return { select: () => { const q = { eq: () => q, maybeSingle: async () => ({ data: { id: "terrain-1" }, error: null }) }; return q; } };
+      return { select: () => { const q = { eq: () => q, maybeSingle: async () => ({ data: { id: "terrain-1", user_id: "owner" }, error: null }) }; return q; } };
     });
     mocks.upload.mockResolvedValue({ error: null });
     await processQueue();
