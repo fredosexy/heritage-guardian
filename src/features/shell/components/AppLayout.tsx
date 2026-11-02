@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import { BottomNav } from "./BottomNav";
 import { OfflineIndicator } from "./OfflineIndicator";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -13,7 +14,7 @@ interface Props {
 const MAIN_ROUTES = ["/", "/dossiers", "/alerts", "/profile", "/files"];
 
 export function AppLayout({ children, hideNav }: Props) {
-  const pathname = window.location.pathname;
+  const { pathname } = useLocation();
   const showNav = !hideNav && MAIN_ROUTES.includes(pathname);
 
   return (
