@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 
@@ -12,7 +11,6 @@ interface ThemeToggleProps {
 /** Accessible light/dark switch; system preference remains the initial default. */
 export function ThemeToggle({ className }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme();
-  const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -23,9 +21,9 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
     <button
       type="button"
       disabled={!mounted}
-      aria-label={mounted ? (isDark ? t("theme.switchToLight") : t("theme.switchToDark")) : t("theme.change")}
+      aria-label={mounted ? (isDark ? "Passer en mode clair" : "Passer en mode sombre") : "Changer de thème"}
       aria-pressed={isDark}
-      title={mounted ? (isDark ? t("theme.light") : t("theme.dark")) : t("theme.change")}
+      title={mounted ? (isDark ? "Mode clair" : "Mode sombre") : "Changer de thème"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className={cn(
         "inline-flex size-10 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-soft transition-colors duration-fast hover:border-primary/30 hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60",
