@@ -62,12 +62,12 @@ export function BottomNav() {
 
   const tabClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "flex flex-col items-center justify-center gap-1 rounded-2xl py-2 text-xs font-medium transition-colors tap focus-ring",
-      isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+      "flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-xs font-medium transition-colors duration-fast tap focus-ring",
+      isActive ? "bg-accent/75 text-primary" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
     );
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-border/70 bg-card/90 backdrop-blur-xl shadow-[var(--shadow-elegant)]">
+    <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-border/80 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-elegant backdrop-blur-xl">
       <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-5 gap-1">
         {left.map(({ to, icon: Icon, label }) => (
           <NavLink key={to} to={to} end className={tabClass}>
@@ -79,7 +79,7 @@ export function BottomNav() {
         <button
           onClick={runCentral}
           aria-label={t(central.labelKey)}
-          className="bg-primary text-primary-foreground shadow-[var(--shadow-warm)] -mt-4 mx-1 py-3 rounded-2xl flex items-center justify-center pressable focus-ring tap hover:brightness-105"
+          className="-mt-4 mx-1 flex min-h-12 items-center justify-center rounded-xl bg-primary py-3 text-primary-foreground shadow-warm pressable focus-ring tap transition-transform duration-fast hover:brightness-110"
         >
           <CentralIcon className="size-6" />
           <span className="sr-only">{t(central.labelKey)}</span>
