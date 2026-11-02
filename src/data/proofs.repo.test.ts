@@ -9,10 +9,12 @@ const mocks = vi.hoisted(() => ({
   proofSelect: vi.fn(),
   proofSingle: vi.fn(),
   from: vi.fn(),
+  authGetUser: vi.fn(async () => ({ data: { user: { id: "user-1" } }, error: null })),
 }));
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
+    auth: { getUser: mocks.authGetUser },
     storage: {
       from: vi.fn(() => ({ remove: mocks.storageRemove, upload: mocks.storageUpload })),
     },
@@ -25,7 +27,7 @@ import { ProofPersistenceError, countProofsByDossier, deleteProof, listProofs, u
 describe("proof persistence", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.from.mockReturnValue({ delete: mocks.proofDelete });
+    mocks.from.mockImplementation((table: string) => table === "dossiers" ? ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { id: "dossier-1", user_id: "user-1" }, error: null }) }) }) }) : ({ delete: mocks.proofDelete, insert: mocks.proofInsert }));
     mocks.proofDelete.mockReturnValue({ eq: mocks.proofDeleteEq });
     mocks.proofDeleteEq.mockResolvedValue({ error: null });
     mocks.storageUpload.mockResolvedValue({ error: null });
@@ -47,7 +49,8 @@ describe("proof persistence", () => {
       storage_path: "user-1/dossier-1/123456-i-titre.pdf",
       metadata: { terrainSectionKey: "documentation" },
     };
-    mocks.from.mockReturnValue({ insert: mocks.proofInsert });
+    mocks.from.mockReturnValueOnce({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { id: "dossier-1", user_id: "user-1" }, error: null }) }) }) });
+    mocks.from.mockReturnValueOnce({ insert: mocks.proofInsert });
     mocks.proofSingle.mockResolvedValue({ data: savedProof, error: null });
 
     await expect(uploadProof({
@@ -114,16 +117,17 @@ describe("deleteProof", () => {
     mocks.storageRemove.mockResolvedValue({ error: storageError });
 
     await expect(
-      deleteProof({ id: "proof-1", storage_path: "user-1/dossier-1/file.pdf" }),
+      deleteProof({ id: "proof-1", dossier_id: "dossier-1", storage_path: "user-1/dossier-1/file.pdf" }),
     ).rejects.toBe(storageError);
 
-    expect(mocks.from).not.toHaveBeenCalled();
+    expect(mocks.from).toHaveBeenCalledWith("dossiers");
+    expect(mocks.proofDelete).not.toHaveBeenCalled();
   });
 
   it("deletes the database record only after Storage confirms deletion", async () => {
     mocks.storageRemove.mockResolvedValue({ error: null });
 
-    await deleteProof({ id: "proof-1", storage_path: "user-1/dossier-1/file.pdf" });
+    await deleteProof({ id: "proof-1", dossier_id: "dossier-1", storage_path: "user-1/dossier-1/file.pdf" });
 
     expect(mocks.from).toHaveBeenCalledWith("proofs");
     expect(mocks.proofDelete).toHaveBeenCalledOnce();
@@ -136,7 +140,7 @@ describe("deleteProof", () => {
     mocks.proofDeleteEq.mockResolvedValue({ error: databaseError });
 
     await expect(
-      deleteProof({ id: "proof-1", storage_path: "user-1/dossier-1/file.pdf" }),
+      deleteProof({ id: "proof-1", dossier_id: "dossier-1", storage_path: "user-1/dossier-1/file.pdf" }),
     ).rejects.toBe(databaseError);
   });
 });
