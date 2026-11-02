@@ -24,7 +24,7 @@ export function PageHeader({ title, subtitle, parentLabel, showBack, right }: Pr
   };
 
   return (
-    <header className="mb-6">
+    <header className="mb-7 sm:mb-9">
       {showBack && (
         <button
           onClick={goBack}
@@ -35,8 +35,8 @@ export function PageHeader({ title, subtitle, parentLabel, showBack, right }: Pr
       )}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-display">{title}</h1>
-          {subtitle && <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-w-prose">{subtitle}</p>}
+          <h1 className="text-display max-w-4xl">{title}</h1>
+          {subtitle && <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">{subtitle}</p>}
         </div>
         {right}
       </div>

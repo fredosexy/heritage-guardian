@@ -1,5 +1,8 @@
 # Audit UI/UX — responsive et accessibilité
 
+
+> **Mise à jour design — 2 novembre 2026 :** les références de palette pastel présentes dans cet audit décrivent l'ancien état du produit. La direction artistique approuvée est désormais « Héritage premium » (vert forêt, ivoire, or patiné), avec thèmes clair et sombre. Les constats d'accessibilité restent valables comme éléments de revue statique ; les contrastes doivent être remesurés sur la nouvelle palette. Référence active : docs/DESIGN_SYSTEM_UI_UX.md.
+
 **Périmètre :** revue statique du code sur `main`, sans exécution dans un navigateur ni audit automatisé. Les points ci-dessous sont des constats de code ou des risques à valider ; ils ne constituent pas une certification WCAG.
 
 ## Synthèse

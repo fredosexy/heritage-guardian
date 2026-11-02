@@ -3,6 +3,13 @@ export const fr = {
     name: "Heritis",
     tagline: "Vos terres, vos documents, au même endroit.",
   },
+  theme: {
+    change: "Changer de thème",
+    switchToLight: "Passer en mode clair",
+    switchToDark: "Passer en mode sombre",
+    light: "Mode clair",
+    dark: "Mode sombre",
+  },
   nav: {
     home: "Accueil",
     dossiers: "Dossiers",

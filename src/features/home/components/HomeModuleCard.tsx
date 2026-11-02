@@ -21,7 +21,7 @@ export function HomeModuleCard({ id, icon: Icon, dossierCount, secureCount, risk
   const route = `/modules/${id}`;
   const handleOpen = () => onFirstGesture ? onFirstGesture(route) : navigate(route);
   return (
-    <Button variant="ghost" type="button" onClick={handleOpen} className={`group block h-auto whitespace-normal w-full rounded-[1.75rem] border border-border/60 bg-gradient-to-br from-card via-card to-accent/25 p-5 text-left shadow-[var(--shadow-soft)] transition duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-[var(--shadow-elegant)] focus-ring tap ${className ?? ""}`}>
+    <Button variant="ghost" type="button" onClick={handleOpen} className={`group block h-auto whitespace-normal w-full rounded-card border border-border/80 bg-card p-5 text-left shadow-[var(--shadow-soft)] transition duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-elegant focus-ring tap ${className ?? ""}`}>
       <div className="flex items-start gap-4">
         <span className="size-11 rounded-2xl bg-gradient-to-br from-accent to-secondary/70 text-primary flex items-center justify-center shrink-0 shadow-[var(--shadow-soft)]"><Icon className="size-5" /></span>
         <div className="min-w-0 flex-1">
