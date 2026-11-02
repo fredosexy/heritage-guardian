@@ -5,6 +5,7 @@
 - [ ] Run targeted tests and local-only browser verification; report actual checks and remaining limits.
 
 # Heritis brand and offer
+- [ ] Fix the invalid dossier status blocking the preview and verify the owner tests and app load.
 - [ ] Replace the public name and installed-app metadata without changing offline storage identity.
 - [ ] Clarify available Terrain features and journeys still in preparation.
 - [ ] Prepare domain choices without purchase, connection or publication.
