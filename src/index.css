@@ -41,6 +41,10 @@
     --input: 42 16% 80%;
     --ring: 39 38% 48%;
     --radius: 1rem;
+    --radius-card: 1.25rem;
+    --radius-panel: 1.5rem;
+    --space-section: clamp(1.75rem, 4vw, 3rem);
+    --space-card: clamp(1rem, 2.5vw, 1.5rem);
 
     --gradient-warm: linear-gradient(135deg, hsl(42 38% 91%), hsl(39 32% 82%));
     --gradient-earth: linear-gradient(145deg, hsl(42 38% 96%), hsl(145 20% 89%) 58%, hsl(39 30% 87%));
@@ -68,6 +72,8 @@
     --motion-fast: 120ms;
     --motion-base: 200ms;
     --motion-slow: 320ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
 
     --sidebar-background: 42 32% 93%;
     --sidebar-foreground: 150 22% 14%;
@@ -136,6 +142,8 @@
     --status-risk-soft: 2 28% 20%;
 
     --focus-ring: 39 48% 65%;
+    --radius-card: 1.25rem;
+    --radius-panel: 1.5rem;
     --pressed: 42 25% 92%;
 
     --sidebar-background: 150 18% 9%;
