@@ -40,7 +40,7 @@ describe("dossier ownership enforcement", () => {
   });
 
   it("rejects score changes and deletion attempts from non-owners before any mutation", async () => {
-    await expect(updateDossierScore("terrain-1", 100, "complete")).rejects.toThrow("Only the dossier owner");
+    await expect(updateDossierScore("terrain-1", 100, "secure")).rejects.toThrow("Only the dossier owner");
     await expect(deleteDossier("terrain-1")).rejects.toThrow("Only the dossier owner");
     expect(mocks.update).not.toHaveBeenCalled();
     expect(mocks.del).not.toHaveBeenCalled();
