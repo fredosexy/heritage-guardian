@@ -45,7 +45,7 @@ vi.mock("@/integrations/supabase/client", () => {
 
 import { AppRoutes } from "@/app/router";
 
-const HOME_TITLE = "Protégeons ce qui compte pour vous.";
+const HOME_TITLE = "Heritis";
 const NOT_FOUND_TITLE = "Cette page n'existe pas";
 
 function renderRoutes(initialEntry: string) {
