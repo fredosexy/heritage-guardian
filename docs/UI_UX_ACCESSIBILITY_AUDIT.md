@@ -131,3 +131,45 @@ Cette section actualise les constats historiques ci-dessus après inspection de 
 ### Limites de validation inchangées
 
 Aucun navigateur, lecteur d’écran, émulateur mobile ou outil axe/Lighthouse n’a été exécuté dans cette revue GitHub. Les changements décrits sont vérifiés dans le code de la branche, pas certifiés par une interaction réelle. Les contrôles lint, tests et build doivent être relancés sur la tête de branche lorsque la PR cible à nouveau `main` ; les workflows actuels ne se déclenchent que pour les PR ciblant `main`.
+
+## Revue complémentaire — contraste des tokens et parcours visiteur — 4 novembre 2026
+
+Cette revue porte sur les valeurs HSL déclarées dans `src/index.css` et sur les routes/composants de la branche Phase 1. Les ratios ci-dessous sont des calculs statiques sur les paires de tokens indiquées ; ils ne remplacent pas une mesure sur les composants rendus, leurs états hover/disabled, les dégradés ou les images.
+
+### Contraste calculé des paires sémantiques
+
+| Thème | Paire de tokens | Ratio calculé | Lecture |
+|---|---|---:|---|
+| Clair | `foreground` / `background` | 13,67:1 | Conforme au seuil texte courant 4,5:1 |
+| Clair | `muted-foreground` / `background` | 5,16:1 | Conforme au seuil texte courant 4,5:1 |
+| Clair | `primary-foreground` / `primary` | 8,00:1 | Conforme au seuil texte courant 4,5:1 |
+| Clair | `warning-foreground` / `warning` | 4,64:1 | Conforme de justesse au seuil texte courant 4,5:1 |
+| Clair | `warning` / `background` | 3,28:1 | Au-dessus du seuil 3:1 pour un indicateur graphique |
+| Clair | `focus-ring` / `background` | 3,66:1 | Au-dessus du seuil 3:1 pour un indicateur de focus |
+| Sombre | `foreground` / `background` | 14,95:1 | Conforme au seuil texte courant 4,5:1 |
+| Sombre | `muted-foreground` / `background` | 8,24:1 | Conforme au seuil texte courant 4,5:1 |
+| Sombre | `primary-foreground` / `primary` | 8,22:1 | Conforme au seuil texte courant 4,5:1 |
+| Sombre | `warning-foreground` / `warning` | 8,92:1 | Conforme au seuil texte courant 4,5:1 |
+| Sombre | `focus-ring` / `background` | 8,69:1 | Conforme au seuil 3:1 pour un indicateur de focus |
+
+**Réserve :** le ratio du warning clair (4,64:1) dispose d'une marge limitée. Ne pas éclaircir davantage son texte ou assombrir son fond sans recalcul. Les combinaisons de badges d'état, textes placés sur dégradé, bordures, placeholders, états désactivés et survols restent à mesurer sur leurs fonds effectifs.
+
+### Points de vigilance dans les contrôles partagés
+
+- Le calendrier donne 44 × 44 px à ses flèches de navigation et 40 × 40 px aux jours ; les jours sont donc sous la cible de projet de 44 px, même si leur taille dépasse le minimum WCAG 2.2 AA de 24 px dans les cas ordinaires.
+- Les flèches de carrousel sont en 40 × 40 px ; vérifier leur placement et leur accès sur conteneur étroit.
+- Les cases à cocher, boutons radio et curseurs ont un élément graphique de 20 × 20 px. Leur zone réelle dépend du label ou de la surface de piste ; elle doit être mesurée au niveau de l'interaction complète, pas déduite de la seule taille de l'icône.
+- Le contrôle de thème est rendu dans l'en-tête global de `AppLayout`. Vérifier qu'il reste visible, non chevauchant et cohérent avec les en-têtes spécifiques sur les petits écrans et les pages plein écran.
+
+### Parcours visiteur — point à traiter en Phase 3, pas dans le socle visuel
+
+L'inspection de `src/app/router.tsx`, `HomePage.tsx`, `ModulePage.tsx` et `AssistantPage.tsx` confirme que les routes `/modules/:moduleId` et `/assistant` sont publiques. La page d'accueil visiteur affiche des aperçus de modules et un accès à l'assistant ; la page Assistant expose actuellement un champ de saisie et une action d'envoi sans verrouillage d'interface selon l'état connecté. Le service peut refuser une requête non authentifiée, mais cette revue ne certifie pas ce comportement serveur.
+
+Ce constat ne justifie pas de modifier les règles d'accès dans la PR de design system. Il doit devenir un contrôle fonctionnel explicite de la Phase 3 : visiteur = explications et aperçu seulement ; conversation complète et fonctionnalités actives = utilisateur authentifié ; le refus côté serveur doit rester la frontière de sécurité, indépendamment du masquage UI.
+
+### Limites et suite
+
+- Ces ratios sont calculés à partir des valeurs HSL des tokens et des paires listées ; aucun screenshot ni état interactif n'a été analysé.
+- Aucun navigateur, émulateur, lecteur d'écran, axe ou Lighthouse n'a été exécuté.
+- Avant de considérer la Phase 1 terminée : mesurer les combinaisons réelles des composants, vérifier les cibles tactiles complètes et effectuer les tests responsive, clavier et lecteur d'écran.
+- Le contrôle des accès visiteur/assistant sera repris dans la Phase 3, sans élargir le périmètre de cette PR visuelle.
