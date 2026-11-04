@@ -372,7 +372,8 @@ export const fr = {
   },
   common: {
     loading: "Chargement…",
-    back: "Retour",\n    close: "Fermer",
+    back: "Retour",
+    close: "Fermer",
     save: "Enregistrer",
     cancel: "Annuler",
     delete: "Supprimer",
