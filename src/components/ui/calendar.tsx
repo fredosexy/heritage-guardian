@@ -11,7 +11,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("rounded-xl border border-border/60 bg-card p-3 shadow-sm", className)}
+      className={cn("rounded-xl border border-border/60 bg-card p-1 shadow-sm sm:p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -26,10 +26,10 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         nav_button_next: "absolute right-1",
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
-        head_cell: "text-muted-foreground rounded-md w-11 text-center font-normal text-[0.8rem]",
+        head_cell: "text-muted-foreground rounded-md w-10 text-center font-normal text-[0.8rem] sm:w-11",
         row: "flex w-full mt-2",
-        cell: "h-11 w-11 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day: cn(buttonVariants({ variant: "ghost" }), "h-11 w-11 rounded-lg p-0 font-normal aria-selected:opacity-100 focus-visible:ring-2 focus-visible:ring-ring"),
+        cell: "h-10 w-10 text-center sm:h-11 sm:w-11 text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+        day: cn(buttonVariants({ variant: "ghost" }), "h-10 w-10 rounded-lg p-0 font-normal aria-selected:opacity-100 focus-visible:ring-2 focus-visible:ring-ring sm:h-11 sm:w-11"),
         day_range_end: "day-range-end",
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
