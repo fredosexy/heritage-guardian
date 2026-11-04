@@ -372,7 +372,7 @@ export const en = {
   },
   common: {
     loading: "Loading…",
-    back: "Back",
+    back: "Back",\n    close: "Close",
     save: "Save",
     cancel: "Cancel",
     delete: "Delete",
