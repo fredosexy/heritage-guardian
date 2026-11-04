@@ -124,8 +124,8 @@ Cette section actualise les constats historiques ci-dessus après inspection de 
 ### Compléments apportés au socle partagé
 
 - Les boutons icône par défaut, le contrôle de thème, les déclencheurs de navigation latérale et les flèches du calendrier disposent maintenant de zones d'au moins 44 × 44 px.
-- Les commandes des menus déroulants (éléments, sous-menus et choix radio) ont une hauteur minimale de 40 px.
-- Les commandes du carrousel utilisent une cible de 40 × 40 px ; leur positionnement doit être contrôlé sur les conteneurs étroits afin d'éviter qu'elles sortent de la zone visible.
+- Les commandes des menus déroulants (éléments, sous-menus et choix radio), ainsi que les options de sélection, visent maintenant une hauteur minimale de 44 px.
+- Les flèches du carrousel, les boutons de fermeture des dialogues et notifications et les actions de notification disposent maintenant d'une cible de 44 × 44 px ; le placement du carrousel reste à vérifier sur les conteneurs étroits.
 - Les composants calendrier, tableaux, menus, accordéons, avatars, graphiques et panneaux latéraux ont été harmonisés sur les tokens sémantiques et les deux thèmes.
 
 ### Limites de validation inchangées
@@ -156,8 +156,8 @@ Cette revue porte sur les valeurs HSL déclarées dans `src/index.css` et sur le
 
 ### Points de vigilance dans les contrôles partagés
 
-- Le calendrier donne 44 × 44 px à ses flèches de navigation et 40 × 40 px aux jours ; les jours sont donc sous la cible de projet de 44 px, même si leur taille dépasse le minimum WCAG 2.2 AA de 24 px dans les cas ordinaires.
-- Les flèches de carrousel sont en 40 × 40 px ; vérifier leur placement et leur accès sur conteneur étroit.
+- Le calendrier utilise des jours de 40 × 40 px sur les écrans étroits pour éviter le débordement horizontal, puis 44 × 44 px à partir du breakpoint `sm` ; ses flèches de navigation restent à 44 × 44 px.
+- Les flèches de carrousel sont passées à 44 × 44 px ; vérifier leur placement et leur accès sur conteneur étroit.
 - Les cases à cocher, boutons radio et curseurs ont un élément graphique de 20 × 20 px. Leur zone réelle dépend du label ou de la surface de piste ; elle doit être mesurée au niveau de l'interaction complète, pas déduite de la seule taille de l'icône.
 - Le contrôle de thème est rendu dans l'en-tête global de `AppLayout`. Vérifier qu'il reste visible, non chevauchant et cohérent avec les en-têtes spécifiques sur les petits écrans et les pages plein écran.
 
