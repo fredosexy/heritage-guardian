@@ -106,3 +106,28 @@ Cette vérification compare les constats ci-dessus au contenu actuel de `main`. 
 - Leur présence ne prouve pas qu'ils ont été exécutés sur la branche de cet audit ; aucun résultat d'exécution locale n'est revendiqué ici.
 - La CI ne remplace pas les tests manuels de clavier, zoom, lecteur d’écran et clavier virtuel.
 - Aucun changement applicatif n'est effectué dans cette PR documentaire. Les corrections de code doivent rester dans la branche dédiée aux corrections prioritaires, puis être vérifiées séparément.
+
+
+## Revue de suivi sur la branche Phase 1 — 4 novembre 2026
+
+Cette section actualise les constats historiques ci-dessus après inspection de `codex/phase-1-heritage-premium-design-system`. Elle ne remplace pas les tests manuels ni une mesure automatisée.
+
+| Point historique | État constaté sur la branche Phase 1 | Suite requise |
+|---|---|---|
+| A11Y-01 — assistant mobile et mouvement réduit | `AssistantPage.tsx` utilise désormais `h-[100dvh]` et consulte `prefers-reduced-motion` avant le défilement automatique. | Tester le clavier virtuel, le paysage et le zoom sur appareils réels. |
+| A11Y-02 — mode connexion/inscription | `AuthPage.tsx` expose maintenant `aria-pressed` sur les deux choix et applique `tap` / `focus-ring`. | Vérifier la restitution réelle avec lecteur d’écran et le contraste des états. |
+| A11Y-03 — cibles tactiles | Le bouton retour de l’assistant est en 44 px ; les contrôles principaux de la navigation basse utilisent une hauteur minimale de 48 px. Les boutons icône partagés, le sélecteur de thème, le déclencheur de sidebar et les commandes du calendrier ont été alignés sur 44 px. | Vérifier les exceptions dans les écrans métier et la densité sur petits écrans. |
+| A11Y-04 — compteur d’alertes | Le lien Alertes fournit un nom accessible qui inclut le nombre non lu ou l’état d’erreur. | Confirmer l’annonce avec NVDA, VoiceOver ou TalkBack. |
+| A11Y-05 — responsive | Le shell partagé utilise une gouttière responsive et l’assistant une hauteur dynamique. | Exécuter les tests visuels 320/360/390/768/1280 px, zoom 200–400 % et textes longs. |
+| A11Y-06 — parcours clavier | Les composants partagés ont des états de focus visibles renforcés ; les primitives Radix conservent leur gestion clavier native. | Parcourir manuellement Tab/Shift+Tab, Entrée/Espace et Échap sur les routes et dialogues. |
+
+### Compléments apportés au socle partagé
+
+- Les boutons icône par défaut, le contrôle de thème, les déclencheurs de navigation latérale et les flèches du calendrier disposent maintenant de zones d'au moins 44 × 44 px.
+- Les commandes des menus déroulants (éléments, sous-menus et choix radio) ont une hauteur minimale de 40 px.
+- Les commandes du carrousel utilisent une cible de 40 × 40 px ; leur positionnement doit être contrôlé sur les conteneurs étroits afin d'éviter qu'elles sortent de la zone visible.
+- Les composants calendrier, tableaux, menus, accordéons, avatars, graphiques et panneaux latéraux ont été harmonisés sur les tokens sémantiques et les deux thèmes.
+
+### Limites de validation inchangées
+
+Aucun navigateur, lecteur d’écran, émulateur mobile ou outil axe/Lighthouse n’a été exécuté dans cette revue GitHub. Les changements décrits sont vérifiés dans le code de la branche, pas certifiés par une interaction réelle. Les contrôles lint, tests et build doivent être relancés sur la tête de branche lorsque la PR cible à nouveau `main` ; les workflows actuels ne se déclenchent que pour les PR ciblant `main`.
