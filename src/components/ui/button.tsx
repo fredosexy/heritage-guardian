@@ -19,10 +19,10 @@ const buttonVariants = cva(
         soft: "border border-transparent bg-accent text-accent-foreground hover:border-primary/15 hover:bg-accent/75",
       },
       size: {
-        default: "min-h-10 px-4 py-2",
+        default: "min-h-11 px-4 py-2",
         sm: "min-h-9 rounded-lg px-3 text-xs",
         lg: "min-h-12 rounded-xl px-7 text-base",
-        icon: "size-10",
+        icon: "size-11",
         tap: "min-h-11 min-w-11 rounded-xl px-5 text-base",
       },
     },
