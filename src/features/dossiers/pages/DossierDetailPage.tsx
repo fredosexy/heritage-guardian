@@ -11,6 +11,7 @@ import { useDossierDetail } from "../hooks/useDossierDetail";
 import { dossiersRepo, enqueueUpdateDossierMetadata, proceduresRepo } from "@/data";
 import type { DossierStep } from "@/core/types/domain";
 import { ProofsTab } from "../components/ProofsTab";
+import { TerrainChecklistAssist } from "../components/TerrainChecklistAssist";
 import { typeLabelKey } from "../components/dossierTypeMeta";
 
 export default function DossierDetailPage() {
@@ -218,6 +219,10 @@ export default function DossierDetailPage() {
         )}
         <p className="text-sm text-muted-foreground">{t(`dossier.state.${dossier.status}`)}</p>
       </div>
+
+      {dossier.type === "terrain" && (
+        <TerrainChecklistAssist dossier={dossier} proofs={proofs} canEdit={canEdit} onSaved={() => void reload().catch(() => undefined)} />
+      )}
 
       {dossier.type === "terrain" && (
         <section className="rounded-3xl border border-border/60 bg-card/85 p-5 mb-4 shadow-[var(--shadow-soft)]">
