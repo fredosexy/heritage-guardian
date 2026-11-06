@@ -421,7 +421,7 @@ export const fr = {
     allFilled: "Toutes les parties de la fiche ont du contenu.",
     gapCount_one: "{{count}} partie à compléter",
     gapCount_other: "{{count}} parties à compléter",
-    gap_text: "texte manquant",
+    gap_info: "texte manquant",
     gap_proof: "pièce jointe manquante",
     gap_both: "texte et pièce jointe manquants",
     proposal: "Proposition de l'assistant — à confirmer",

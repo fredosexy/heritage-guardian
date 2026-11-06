@@ -421,7 +421,7 @@ export const en = {
     allFilled: "Every part of the record has content.",
     gapCount_one: "{{count}} part to complete",
     gapCount_other: "{{count}} parts to complete",
-    gap_text: "text missing",
+    gap_info: "text missing",
     gap_proof: "attachment missing",
     gap_both: "text and attachment missing",
     proposal: "Assistant suggestion — please confirm",
