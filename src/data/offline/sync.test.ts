@@ -154,7 +154,7 @@ describe("sync queue concurrency", () => {
       select: vi.fn(() => {
         const query: MockQuery = {
           eq: vi.fn(() => query),
-          single: vi.fn(() => {
+          maybeSingle: vi.fn(() => {
             readCount += 1;
             if (readCount === 1) {
               signalFirstRead();
@@ -232,7 +232,7 @@ describe("proof upload queue retry", () => {
       if (table === "dossiers") {
         const query: MockQuery = {
           eq: vi.fn(() => query),
-          single: vi.fn().mockResolvedValue({ data: { id: "dossier-1", user_id: "user-1" }, error: null }),
+          maybeSingle: vi.fn().mockResolvedValue({ data: { id: "dossier-1", user_id: "user-1" }, error: null }),
         };
         return { select: vi.fn(() => query) };
       }
@@ -400,7 +400,7 @@ describe("Terrain section persistence after offline replay", () => {
       select: vi.fn(() => {
         const query: MockQuery = {
           eq: vi.fn(() => query),
-          single: vi.fn().mockResolvedValue({
+          maybeSingle: vi.fn().mockResolvedValue({
             data: {
               user_id: "user-1",
               updated_at: "2026-01-01T00:00:00Z",
@@ -474,7 +474,7 @@ describe("offline field conflict detection", () => {
     };
     const readQuery: MockQuery = {
       eq: vi.fn(() => readQuery),
-      single: vi.fn().mockResolvedValue({
+      maybeSingle: vi.fn().mockResolvedValue({
         data: {
           id: "dossier-1",
           user_id: "user-1",
@@ -515,7 +515,7 @@ describe("offline field conflict detection", () => {
     const update = vi.fn();
     const query: MockQuery = {
       eq: vi.fn(() => query),
-      single: vi.fn().mockResolvedValue({
+      maybeSingle: vi.fn().mockResolvedValue({
         data: {
           id: "dossier-1",
           user_id: "user-1",
