@@ -44,8 +44,8 @@ describe("IndexedDB offline continuity", () => {
     first.unmount();
     db.close();
     await db.open();
-    let release: (result: { data: { id: string }; error: null }) => void = () => { throw new Error("not started"); };
-    const pending = new Promise<{ data: { id: string }; error: null }>((resolve) => { release = resolve; });
+    let release: (result: { data: { id: string; user_id?: string }; error: null }) => void = () => { throw new Error("not started"); };
+    const pending = new Promise<{ data: { id: string; user_id?: string }; error: null }>((resolve) => { release = resolve; });
     mocks.from.mockReturnValue({
       select: () => {
         const query = { eq: vi.fn(() => query), maybeSingle: vi.fn(async () => ({ data: { user_id: "owner", metadata: {} }, error: null })) };
