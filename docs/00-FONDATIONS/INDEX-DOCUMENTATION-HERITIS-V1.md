@@ -47,16 +47,17 @@ Ordre de lecture recommandé :
 - Les références croisées entre domaines doivent éviter la duplication des personnes, biens, documents et dossiers.
 - Toute évolution de périmètre doit être explicitement documentée et validée.
 
-## 6. Audits de l’interface et de l’expérience utilisateur
+## 6. Audits et modèles UI/UX
 
 | Document | Contenu |
 |---|---|
-| [Audit de l’état UI/UX actuel — 7 novembre 2026](../UI_UX_CURRENT_STATE_AUDIT_2026-11-07.md) | Première passe de vérification statique des routes, pages, accès visiteur, cartes, navigation et système visuel sur le main courant. Ce document prépare la réorganisation progressive ; il ne constitue pas une validation navigateur. |
+| [Audit de l’état UI/UX actuel — 7 novembre 2026](../UI_UX_CURRENT_STATE_AUDIT_2026-11-07.md) | Vérification statique des routes, pages, accès visiteur, cartes, navigation et système visuel sur le main de référence. |
+| [Modèles de référence des écrans UI/UX — 7 novembre 2026](../UI_UX_SCREEN_REFERENCE_MODELS_2026-11-07.md) | Hiérarchie des écrans, rôles des cartes, modèles de composition, correspondance avec les pages actuelles et ordre proposé des lots. |
 
 Les audits UI/UX antérieurs sont des instantanés historiques. Vérifier leur commit de référence et les confronter à l’audit courant avant d’utiliser leurs constats.
 
 ## 7. Périmètre de cette livraison documentaire
 
-Cette livraison regroupe la documentation stratégique et fonctionnelle de Heritis V1. Elle ne modifie pas le code applicatif, les schémas de données, les migrations, les fonctions Supabase, les configurations ou le projet Lovable.
+Cette livraison décrit les références stratégiques, fonctionnelles et UI/UX de Heritis V1. Les modèles d'écran sont des propositions de composition et ne constituent pas une autorisation de modifier le code applicatif. Aucun schéma de données, migration, fonction Supabase ou projet Lovable n'est modifié.
 
-**Statut :** index de navigation de la documentation stratégique et fonctionnelle Heritis V1.
+**Statut :** index de navigation de la documentation stratégique, fonctionnelle et UI/UX de Heritis V1.
