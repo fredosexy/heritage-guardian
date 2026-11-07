@@ -263,3 +263,32 @@ Constats :
 | P3 | `theme-color` HTML et langue dynamique | Incohérences à examiner | Harmoniser avec le thème actif et l'i18n |
 
 **Limite de sortie :** cette revue approfondit les constats statiques et définit les scénarios de test. A11Y-01, A11Y-05 et A11Y-06 ne pourront être déclarés clos qu'après exécution et consignation des tests navigateur/appareil, clavier et lecteur d'écran. Aucun correctif applicatif ni résultat de test manuel n'est revendiqué dans cette mise à jour.
+
+## Corrections ciblées — A11Y-01, A11Y-05 et A11Y-06 — 7 novembre 2026
+
+**Base de travail :** `main` après intégration de la PR #51 (commit `5e9fd79ef5fc2e98ce5802e6b4d8e6eae94e9fbf`). Cette section décrit les changements proposés dans la branche `fix/a11y-01-05-06-targeted`. Ils ne sont pas déclarés validés tant que les contrôles CI de la PR et les essais manuels requis ne sont pas terminés.
+
+### Modifications de code proposées
+
+- **A11Y-05 — zoom :** suppression de `maximum-scale=1` de la balise viewport ; `width=device-width`, `initial-scale=1` et `viewport-fit=cover` sont conservés. Le zoom utilisateur n'est plus plafonné par cette balise.
+- **A11Y-06 — onglets :** la primitive partagée `TabsTrigger` passe de `min-h-9` à `min-h-11` (44 px). Cela concerne notamment E-mail/Téléphone et les autres usages Radix Tabs ; le comportement clavier natif Radix n'est pas remplacé.
+- **A11Y-01 — shell plein écran :** ajout d'une option explicite `fullScreen` à `AppLayout`. Lorsqu'elle est activée, le shell masque son en-tête global et ses gouttières verticales, conserve l'indicateur hors ligne et fournit une zone principale contrainte à la hauteur dynamique du viewport. Les autres pages conservent le shell et les espacements précédents.
+- **A11Y-01 — assistant :** l'assistant utilise ce mode plein écran, conserve son propre en-tête et replace le contrôle de thème dans celui-ci. Sa zone de messages reste flexible et défilante, tandis que le champ et le bouton d'envoi restent dans le pied de page de l'écran.
+- **A11Y-01 — saisie IME :** la touche Entrée n'envoie plus le message pendant une composition de texte (`isComposing` ou code clavier 229) ; l'envoi normal par Entrée reste disponible hors composition.
+
+### Préservation et limites
+
+- Aucun changement de service de conversation, d'API, de streaming, de règles d'accès, de navigation ou de données n'est inclus.
+- Les autres pages qui utilisent `AppLayout` ne demandent pas `fullScreen` et gardent donc leur présentation existante.
+- La CI peut vérifier tests, lint, build et contrôles Supabase ; elle ne démontre pas le comportement réel du clavier virtuel, des zooms ni des lecteurs d'écran.
+- **A11Y-01, A11Y-05 et A11Y-06 restent ouverts** jusqu'à validation des scénarios manuels ci-dessous.
+
+### Validation manuelle encore requise
+
+1. Android Chrome/PWA : ouvrir et fermer Gboard, vérifier champ, bouton Envoyer, dernier message et absence de double défilement.
+2. Tester portrait/paysage, barres du navigateur, zones sûres et état hors ligne dans l'assistant.
+3. Tester la saisie IME : Entrée pendant la composition ne doit pas envoyer ; validation puis Entrée doit envoyer une seule fois.
+4. Vérifier le contrôle de thème dans l'en-tête de l'assistant en clair et sombre.
+5. Tester zoom 200 % et 400 %, largeur de 320 CSS px et absence de défilement horizontal.
+6. Parcourir les onglets avec Tab, flèches, Entrée et Espace ; vérifier les cibles tactiles effectives de 44 px.
+7. Vérifier TalkBack/VoiceOver, annonces du streaming, focus et retour au déclencheur pour les contrôles concernés.
