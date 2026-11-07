@@ -19,7 +19,8 @@ export function PageHeader({ title, subtitle, parentLabel, showBack, right }: Pr
   const { pathname } = useLocation();
 
   const goBack = () => {
-    if (window.history.length > 2) navigate(-1);
+    const historyIndex = window.history.state?.idx;
+    if (typeof historyIndex === "number" && historyIndex > 0) navigate(-1);
     else navigate(parentRoute(pathname), { replace: true });
   };
 
@@ -27,6 +28,7 @@ export function PageHeader({ title, subtitle, parentLabel, showBack, right }: Pr
     <header className="mb-6">
       {showBack && (
         <button
+          type="button"
           onClick={goBack}
           className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/75 px-3 text-sm text-muted-foreground mb-3 tap focus-ring shadow-[var(--shadow-soft)]"
         >
