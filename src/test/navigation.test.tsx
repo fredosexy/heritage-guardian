@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeAll, describe, expect, it, vi } from "vitest";
@@ -66,6 +66,17 @@ function renderRoutes(initialEntry: string) {
 describe("navigation", () => {
   beforeAll(async () => {
     await i18n.changeLanguage("fr");
+  });
+
+  it("affiche une navigation de découverte à trois entrées pour le visiteur", async () => {
+    renderRoutes("/");
+    const navigation = await screen.findByRole("navigation", { name: "Navigation principale" });
+    expect(within(navigation).getByRole("link", { name: "Accueil" })).toHaveAttribute("href", "/");
+    expect(within(navigation).getByRole("link", { name: "Assistant" })).toHaveAttribute("href", "/assistant");
+    expect(within(navigation).getByRole("link", { name: "Profil" })).toHaveAttribute("href", "/profile");
+    expect(within(navigation).getAllByRole("link")).toHaveLength(3);
+    expect(within(navigation).queryByRole("link", { name: "Mes espaces" })).not.toBeInTheDocument();
+    expect(within(navigation).queryByRole("link", { name: "Alertes" })).not.toBeInTheDocument();
   });
 
   it("l'accueil s'ouvre depuis /", async () => {

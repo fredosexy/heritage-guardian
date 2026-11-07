@@ -1,4 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+// The checklist helpers are pure; importing their module must not initialise
+// a real Supabase client or require deployment environment variables.
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: { functions: { invoke: vi.fn() } },
+}));
+
 import { buildTerrainChecklist } from "./terrain-checklist";
 describe("terrain checklist gaps", () => {
   it("flags all 9 sections as missing both on an empty dossier", () => {

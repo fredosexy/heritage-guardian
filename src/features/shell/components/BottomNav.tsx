@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Bell, FolderOpen, Home, Paperclip, Plus, User } from "lucide-react";
+import { Bell, FolderOpen, Home, Paperclip, Plus, Sparkles, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { centralAction } from "@/services";
 import { profilesRepo } from "@/data";
@@ -10,8 +10,9 @@ import { useAuth } from "@/features/identity";
 import { cn } from "@/lib/utils";
 
 /**
- * Barre d'onglets : Accueil, Assistant/Profil pour le visiteur, et les écrans
- * d'authentification uniquement pour le compte connecté.
+ * Navigation principale adaptée au statut :
+ * - visiteur : Accueil, Assistant, Profil ;
+ * - compte connecté : Accueil, Mes espaces, action centrale, Alertes, Profil.
  */
 export function BottomNav() {
   const { t } = useTranslation();
@@ -19,9 +20,7 @@ export function BottomNav() {
   const location = useLocation();
   const { user } = useAuth();
   const isGuest = !user;
-  const central = isGuest
-    ? { labelKey: "next.createAccount", hintKey: "next.createAccountHint", route: "/auth", icon: "account" as const }
-    : centralAction(location.pathname);
+  const central = centralAction(location.pathname);
   const CentralIcon = central.icon === "proof" ? Paperclip : Plus;
 
   const { alerts, loadError: alertsLoadError } = useAlerts();
@@ -46,10 +45,11 @@ export function BottomNav() {
     };
   }, [profile?.avatar_url]);
 
-  const left = [
-    { to: "/", icon: Home, label: t("nav.home") },
-    ...(user ? [{ to: "/dossiers", icon: FolderOpen, label: t("nav.dossiers") }] : []),
-  ];
+  const tabClass = ({ isActive }: { isActive: boolean }) =>
+    cn(
+      "flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-xs font-medium transition-colors tap focus-ring",
+      isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+    );
 
   const runCentral = () => {
     if (central.route.startsWith("#")) {
@@ -60,60 +60,76 @@ export function BottomNav() {
     navigate(central.route);
   };
 
-  const tabClass = ({ isActive }: { isActive: boolean }) =>
-    cn(
-      "flex flex-col items-center justify-center gap-1 rounded-2xl py-2 text-xs font-medium transition-colors tap focus-ring",
-      isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
-    );
-
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-border/70 bg-card/90 backdrop-blur-xl shadow-[var(--shadow-elegant)]">
-      <div className="mx-auto max-w-md px-3 py-2 grid grid-cols-5 gap-1">
-        {left.map(({ to, icon: Icon, label }) => (
-          <NavLink key={to} to={to} end className={tabClass}>
-            <Icon className="size-5" />
-            <span>{label}</span>
+    <nav
+      aria-label={t("nav.primaryNavigation")}
+      className="fixed bottom-0 inset-x-0 z-40 border-t border-border/70 bg-card/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl shadow-[var(--shadow-elegant)]"
+    >
+      {isGuest ? (
+        <div className="mx-auto grid max-w-md grid-cols-3 gap-1 px-3 py-2">
+          <NavLink to="/" end className={tabClass}>
+            <Home className="size-5" />
+            <span>{t("nav.home")}</span>
           </NavLink>
-        ))}
-
-        <button
-          onClick={runCentral}
-          aria-label={t(central.labelKey)}
-          className="bg-primary text-primary-foreground shadow-[var(--shadow-warm)] -mt-4 mx-1 py-3 rounded-2xl flex items-center justify-center pressable focus-ring tap hover:brightness-105"
-        >
-          <CentralIcon className="size-6" />
-          <span className="sr-only">{t(central.labelKey)}</span>
-        </button>
-
-        {user && (
+          <NavLink to="/assistant" className={tabClass}>
+            <Sparkles className="size-5" />
+            <span>{t("nav.assistant")}</span>
+          </NavLink>
+          <NavLink to="/profile" className={tabClass}>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" className="size-5 rounded-full object-cover" loading="lazy" />
+            ) : (
+              <User className="size-5" />
+            )}
+            <span>{t("nav.profile")}</span>
+          </NavLink>
+        </div>
+      ) : (
+        <div className="mx-auto grid max-w-md grid-cols-5 gap-1 px-3 py-2">
+          <NavLink to="/" end className={tabClass}>
+            <Home className="size-5" />
+            <span>{t("nav.home")}</span>
+          </NavLink>
+          <NavLink to="/dossiers" className={tabClass}>
+            <FolderOpen className="size-5" />
+            <span>{t("nav.spaces")}</span>
+          </NavLink>
+          <button
+            type="button"
+            onClick={runCentral}
+            aria-label={t(central.labelKey)}
+            title={t(central.hintKey)}
+            className="bg-primary text-primary-foreground shadow-[var(--shadow-warm)] -mt-4 mx-1 min-h-11 rounded-2xl flex items-center justify-center pressable focus-ring tap hover:brightness-105"
+          >
+            <CentralIcon className="size-6" aria-hidden="true" />
+          </button>
           <NavLink
             to="/alerts"
             className={tabClass}
-            aria-label={`${t("nav.alerts")}${alertsLoadError ? ` — ${t("auth.error")}` : unreadCount > 0 ? ` — ${unreadCount}` : ""}`}
+            aria-label={`${t("nav.alerts")}${alertsLoadError ? ` — ${t("auth.error")}` : unreadCount > 0 ? ` — ${t("nav.alertsUnread", { count: unreadCount })}` : ""}`}
           >
             <span className="relative">
               <Bell className="size-5" />
               {alertsLoadError ? (
                 <span aria-hidden="true" className="absolute -top-1.5 -right-2 size-2 rounded-full bg-warning ring-2 ring-card" />
               ) : unreadCount > 0 && (
-                <span className="absolute -top-1.5 -right-2 min-w-4 h-4 px-1 text-[9px] rounded-full bg-destructive text-destructive-foreground flex items-center justify-center font-bold">
+                <span aria-hidden="true" className="absolute -top-1.5 -right-2 min-w-4 h-4 px-1 text-[9px] rounded-full bg-destructive text-destructive-foreground flex items-center justify-center font-bold">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
             </span>
             <span>{t("nav.alerts")}</span>
           </NavLink>
-        )}
-
-        <NavLink to="/profile" className={tabClass}>
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="" className="size-5 rounded-full object-cover" loading="lazy" />
-          ) : (
-            <User className="size-5" />
-          )}
-          <span>{t("nav.profile")}</span>
-        </NavLink>
-      </div>
+          <NavLink to="/profile" className={tabClass}>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" className="size-5 rounded-full object-cover" loading="lazy" />
+            ) : (
+              <User className="size-5" />
+            )}
+            <span>{t("nav.profile")}</span>
+          </NavLink>
+        </div>
+      )}
     </nav>
   );
 }

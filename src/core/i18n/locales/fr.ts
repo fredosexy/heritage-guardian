@@ -10,6 +10,9 @@ export const fr = {
     alerts: "Alertes",
     profile: "Profil",
     assistant: "Assistant",
+    spaces: "Mes espaces",
+    primaryNavigation: "Navigation principale",
+    alertsUnread: "{{count}} alerte(s) non lue(s)",
   },
   auth: {
     welcome: "Bienvenue sur Heritis",
