@@ -47,8 +47,8 @@ export function BottomNav() {
 
   const tabClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-xs font-medium transition-colors tap focus-ring",
-      isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+      "flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-xs font-medium transition-colors duration-fast tap focus-ring",
+      isActive ? "bg-accent/75 text-primary" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
     );
 
   const runCentral = () => {
@@ -63,7 +63,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label={t("nav.primaryNavigation")}
-      className="fixed bottom-0 inset-x-0 z-40 border-t border-border/70 bg-card/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl shadow-[var(--shadow-elegant)]"
+      className="fixed bottom-0 inset-x-0 z-40 border-t border-border/80 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-elegant backdrop-blur-xl"
     >
       {isGuest ? (
         <div className="mx-auto grid max-w-md grid-cols-3 gap-1 px-3 py-2">
@@ -99,7 +99,7 @@ export function BottomNav() {
             onClick={runCentral}
             aria-label={t(central.labelKey)}
             title={t(central.hintKey)}
-            className="bg-primary text-primary-foreground shadow-[var(--shadow-warm)] -mt-4 mx-1 min-h-11 rounded-2xl flex items-center justify-center pressable focus-ring tap hover:brightness-105"
+            className="-mt-4 mx-1 flex min-h-12 items-center justify-center rounded-xl bg-primary py-3 text-primary-foreground shadow-warm pressable focus-ring tap transition-transform duration-fast hover:brightness-110"
           >
             <CentralIcon className="size-6" aria-hidden="true" />
           </button>
