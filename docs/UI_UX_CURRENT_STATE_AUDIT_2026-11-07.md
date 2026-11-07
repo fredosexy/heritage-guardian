@@ -325,6 +325,44 @@ Leur réutilisation doit être fondée sur une fonction commune réelle, pas sur
 
 **Décision nécessaire avant refonte :** définir comment les quatre domaines V1 seront présentés comme espaces métier, tandis que les types techniques de dossier et les catégories de biens restent des notions distinctes. Ne pas supprimer les références historiques ou données de `savoir` sans audit de dépendances, de migrations et de contenus.
 
+### 5.10 Découverte, identité et conversation
+
+**Assistant — `AssistantPage`**
+- L’écran est un espace de conversation plein écran avec en-tête propre, historique, zone de saisie et envoi.
+- Il accepte des paramètres de contexte (`module`, `q`) et peut envoyer automatiquement une question transmise depuis un conseil contextuel.
+- Le compositeur et l’envoi restent visibles sur la route publique ; l’exigence de compte n’apparaît qu’au retour d’erreur du service IA.
+- La conversation utilise un contexte de bienvenue et des réponses en flux.
+
+**Orientation :** séparer explicitement l’accueil guidé du visiteur et la conversation complète réservée au compte. Pour le visiteur, ne pas laisser croire qu’un message libre sera traité si le service le refusera. Conserver le contexte métier transmis par les pages, mais le présenter comme un repère, pas comme un nouveau domaine.
+
+**Authentification — `AuthPage`**
+- La page propose connexion et inscription, avec deux moyens : email/mot de passe et téléphone/OTP.
+- Le nom complet est demandé à l’inscription email.
+- L’écran est autonome, sans shell de navigation partagé.
+
+**Orientation :** conserver les moyens d’accès existants ; clarifier les étapes et les retours après envoi d’un OTP ou inscription. L’interface doit expliquer pourquoi la création d’un compte est nécessaire et revenir au parcours interrompu lorsque le comportement existant le permet.
+
+**Onboarding — `OnboardingPage`**
+- Trois questions binaires sont présentées une à une : présence d’un terrain, intérêt pour l’héritage, intérêt pour les volontés.
+- Les réponses sont enregistrées dans le profil ; une réponse positive sur le terrain peut créer une suggestion d’alerte.
+- L’écran ne montre pas de choix « passer » ou de résumé des réponses dans sa composition actuelle.
+
+**Orientation :** présenter ces questions comme une personnalisation facultative et compréhensible, sans suggérer que les réponses établissent des droits ou obligations. Vérifier le caractère facultatif et les possibilités de retour avant de revoir le parcours.
+
+**Première étape visiteur — `FirstStepDialog`**
+- La boîte de dialogue demande un prénom facultatif et propose une géolocalisation facultative.
+- L’utilisateur peut continuer ou passer ; les informations sont mises à jour dans l’identité visiteur locale.
+- La localisation est demandée via le navigateur et peut être refusée sans bloquer la suite.
+
+**Orientation :** garder le consentement explicite et le caractère facultatif de la localisation. Aligner les libellés et l’enchaînement sur la décision produit : la personne est reconnue dès qu’elle fournit un prénom ou un nom, puis choisit de poursuivre son inscription ou de découvrir Heritis. Le composant actuel ne demande que le prénom ; ne pas inventer un nom de famille ou une vérification d’identité.
+
+**Édition dossier — `EditDossierPage`**
+- L’écran édite titre, description et localisation.
+- Le formulaire est désactivé lorsque `canEdit` est faux, avec une explication propriétaire.
+- Après sauvegarde, l’écran revient au détail ; une modification hors ligne propose un accès au centre de synchronisation.
+
+**Orientation :** garder les champs et les règles de permission existants, mais distinguer visuellement lecture seule, modification autorisée et sauvegarde en attente. Ne pas faire passer une sauvegarde locale pour une confirmation serveur.
+
 ## 6. Principes de composition à appliquer lors des maquettes et corrections
 
 | Type d’écran | Hiérarchie recommandée | Carte / composant pertinent |
