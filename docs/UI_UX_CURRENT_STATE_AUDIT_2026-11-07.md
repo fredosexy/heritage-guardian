@@ -191,7 +191,88 @@ Cette revue décrit les surfaces et les contrôles visibles dans le code ; elle 
 
 Leur réutilisation doit être fondée sur une fonction commune réelle, pas sur une ressemblance visuelle.
 
-## 6. Ordre de travail proposé
+## 5. Audit des composants transversaux et des règles d’interaction
+
+### 5.1 Cadre partagé — `AppLayout`
+
+- Le shell standard affiche l’indicateur hors ligne, un contrôle de thème dans l’en-tête et, selon la route, la navigation inférieure.
+- Le mode `fullScreen` ajouté pour l’assistant masque l’en-tête et la navigation inférieure, mais conserve l’indicateur hors ligne.
+- Le shell standard applique un conteneur commun et un espacement vertical. Les pages qui ont leur propre en-tête ou composition peuvent donc avoir des rythmes différents.
+
+**Orientation :** conserver un shell commun, mais formaliser plusieurs gabarits selon la tâche. Ne pas imposer l’en-tête global aux conversations, formulaires ou écrans immersifs lorsque cela réduit l’espace utile.
+
+### 5.2 Navigation inférieure — `BottomNav`
+
+- Visiteur : trois entrées Accueil, Assistant, Profil.
+- Compte connecté : cinq colonnes, Accueil, Mes espaces, action centrale contextuelle, Alertes, Profil.
+- L’action centrale provient du service `centralAction(pathname)` et peut soit naviguer vers une route, soit faire défiler vers un élément de la page.
+- Le nombre d’alertes non lues et une indication d’erreur de chargement sont affichés sur l’entrée Alertes.
+- L’avatar du profil est chargé de façon asynchrone.
+
+**Points à vérifier avant refonte :**
+- La navigation visiteur expose Assistant alors que la conversation complète doit être réservée au compte ; il faut décider si l’entrée ouvre une découverte guidée ou une invitation à se connecter.
+- L’action centrale contextuelle doit rester explicite et prévisible ; son libellé accessible existe, mais le sens de l’action doit aussi être compréhensible visuellement.
+- Vérifier le comportement à 320 px, avec libellés longs, zoom et safe-area Android.
+- Éviter que le badge d’alertes soit le seul moyen de transmettre une information urgente.
+
+### 5.3 En-tête de page — `PageHeader`
+
+- Le composant affiche un titre, un sous-titre facultatif, un parent court et une action droite facultative.
+- Le retour utilise l’historique du navigateur lorsqu’un index existe, sinon une route parent calculée.
+
+**Orientation :** adopter ce composant pour les écrans de liste, détail et formulaire lorsque sa hiérarchie correspond à la tâche. Vérifier les routes de repli et les titres longs ; ne pas ajouter systématiquement un fil d’Ariane plus profond.
+
+### 5.4 Cartes d’action et conseils — `NextActionCard`, `AssistantTip`
+
+- `NextActionCard` est une surface bouton pleine largeur qui propose une seule prochaine action calculée par `useNextAction`.
+- `AssistantTip` est un bloc non cliquable dans son ensemble : il contient un bouton d’ouverture de l’assistant et un bouton de masquage.
+- Les deux composants peuvent coexister sur un même écran avec d’autres accès à l’assistant.
+
+**Orientation :** conserver la prochaine action unique si elle est réellement prioritaire sur l’écran. Le conseil assistant doit rester secondaire et ne pas répéter la même action. Une carte d’information sans action ne doit pas être transformée en bouton.
+
+### 5.5 Carte de domaine — `HomeModuleCard`
+
+- La carte entière est un bouton accessible et ouvre `/modules/:moduleId` ou déclenche `onFirstGesture`.
+- Elle regroupe icône, titre, description, disponibilité, état, compteurs, progression, participants, preuves, prochaine attention et CTA textuel.
+- La carte `savoir` est explicitement traitée dans le composant, confirmant sa présence visuelle malgré son absence du périmètre métier V1 validé.
+
+**Orientation :** pour la refonte, limiter le premier niveau à l’identité du domaine, une phrase utile, sa disponibilité et une seule information d’état pertinente. Déplacer les indicateurs secondaires vers la page du domaine. La carte doit garder un comportement uniforme et un seul point d’activation.
+
+### 5.6 Primitives UI — bouton, carte, badge, dialogue
+
+- Le bouton partagé propose plusieurs variantes et tailles ; les tailles par défaut et larges atteignent au moins 44 px, tandis que la variante `sm` est de 36 px.
+- La primitive `Card` est un conteneur visuel neutre sans comportement interactif imposé.
+- Le badge est un élément de statut/étiquette, et non un contrôle.
+- Le dialogue Radix possède un overlay, une hauteur maximale avec défilement, une largeur adaptée au mobile et une cible de fermeture de 44 px.
+
+**Orientation :** ne pas confondre la primitive `Card` avec une carte cliquable. Les actions doivent utiliser des boutons ou liens sémantiquement adaptés. Réserver les badges aux états réellement utiles et vérifier la variante `sm` au regard des cibles tactiles lorsque le contrôle doit être touché.
+
+### 5.7 Tokens visuels — `src/index.css`
+
+- La palette active est sémantique et partagée entre thème clair et sombre : fond ivoire/vert profond, accent vert forêt et or patiné.
+- Les polices déclarées sont DM Sans pour le texte et Fraunces pour les titres.
+- Des tokens existent pour les surfaces, statuts, rayons, espacements, ombres, animations et focus.
+- Les classes utilitaires `.tap`, `.focus-ring`, `.card-soft`, `.text-display`, `.text-caption` fournissent des conventions partagées.
+- La règle `prefers-reduced-motion` réduit les animations et transitions.
+
+**Orientation :** réutiliser les tokens plutôt que coder des couleurs, ombres et rayons locaux. Vérifier les contrastes réels des combinaisons clair/sombre avant de modifier les couleurs ; la présence d’un token ne prouve pas son contraste.
+
+## 6. Principes de composition à appliquer lors des maquettes et corrections
+
+| Type d’écran | Hiérarchie recommandée | Carte / composant pertinent |
+|---|---|---|
+| Découverte publique | Promesse et rôle de Heritis → quatre domaines → aperçu → première action guidée | Cartes de domaine informatives, CTA d’exploration |
+| Accueil connecté | Prochaine action prioritaire → dossiers/parcours → alertes nécessitant une action | Une carte prochaine action, liste ou résumé de parcours |
+| Liste | Titre et action de création → recherche/filtres utiles → éléments → état vide/erreur | Lignes ou cartes d’objet compactes |
+| Détail | Identité et statut → action principale → sections métier → preuves/personnes/historique | Résumé d’objet, sections repliables si justifiées |
+| Formulaire | But et conséquences → champs requis → champs complémentaires → validation | Groupes de champs, aide contextuelle ciblée |
+| Suivi / synchronisation | État réel → problème à résoudre → choix/action → historique et détails | Cartes d’état et panneaux de résolution |
+| Conversation | Contexte → échange → composer → état de connexion/permission | Fil de messages ; pas de cartes décoratives répétées |
+| Préférences | Regroupement par sujet → valeur actuelle → action de modification | Lignes de réglages, confirmations pour actions sensibles |
+
+Cette table est un principe de hiérarchie visuelle, pas l’ajout de nouvelles fonctions métier.
+
+## 7. Ordre de travail proposé
 
 1. **Clore l’inventaire courant** : vérifier chaque page et ses sous-vues, les états, les actions et les permissions.
 2. **Résoudre les écarts de périmètre et d’accès** : visiteur/compte, présence du type `savoir`, descriptions des quatre domaines.
@@ -201,7 +282,7 @@ Leur réutilisation doit être fondée sur une fonction commune réelle, pas sur
 6. **Valider chaque lot** : tests concernés, lint, build, CI, comparaison mobile/desktop et tests manuels adaptés.
 7. **Mettre à jour la documentation GitHub après validation de chaque domaine ou lot cohérent**, avant d’entamer le suivant.
 
-## 7. Limites de cet audit
+## 8. Limites de cet audit
 
 - Audit réalisé par lecture statique des fichiers du dépôt sur `main`.
 - Aucune navigation de l’application en navigateur n’a été exécutée.
