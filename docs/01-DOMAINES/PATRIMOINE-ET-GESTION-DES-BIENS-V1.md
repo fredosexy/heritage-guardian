@@ -343,4 +343,4 @@ Les choix techniques devront être étudiés séparément, après audit de l'arc
 ---
 
 **Statut :** domaine « Patrimoine et gestion des biens » validé pour le périmètre fonctionnel de Heritis V1.  
-**Documentation :** version détaillée en cours de revue avant toute fusion dans la branche principale.
+**Documentation :** version détaillée revue et intégrée à la consolidation documentaire Heritis V1.
