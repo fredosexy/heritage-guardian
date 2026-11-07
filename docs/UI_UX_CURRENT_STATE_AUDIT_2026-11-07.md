@@ -257,6 +257,74 @@ Leur réutilisation doit être fondée sur une fonction commune réelle, pas sur
 
 **Orientation :** réutiliser les tokens plutôt que coder des couleurs, ombres et rayons locaux. Vérifier les contrastes réels des combinaisons clair/sombre avant de modifier les couleurs ; la présence d’un token ne prouve pas son contraste.
 
+### 5.8 Pages de gestion — constats complémentaires
+
+**Liste des dossiers — `DossiersPage`**
+- Recherche actuelle limitée au titre.
+- Les opérations locales en attente et les brouillons hors ligne sont présentés avant la liste.
+- Chaque dossier est une surface bouton compacte avec titre, statut et type.
+- L’écran affiche à la fois `AssistantTip` et `NextActionCard`.
+- Un dossier local non synchronisé affiche une notification d’information au clic, sans ouvrir de détail.
+
+**Orientation :** donner la priorité à l’identité du dossier, à son statut réel et à la prochaine action possible. Éviter de répéter le conseil assistant et la prochaine action. Examiner les critères de recherche utiles et le traitement des dossiers locaux sans modifier leur logique hors ligne.
+
+**Création — `CreateDossierPage`**
+- La sélection initiale reprend tous les éléments de `DOSSIER_TYPES`, y compris `savoir`, avec une mention « bientôt disponible » pour les types non activés.
+- Le seul formulaire réellement disponible est celui du terrain.
+- Le formulaire terrain regroupe titre, description et neuf sections repliables ; une section est ouverte à la fois.
+- Une zone de validation et deux actions de fin de formulaire complètent l’écran.
+- La route reste protégée, même si l’accueil visiteur et le hook de création comportent des mécanismes de brouillon local.
+
+**Orientation :** présenter clairement ce qui est utilisable maintenant et ce qui relève d’une évolution future, sans faire croire que les quatre domaines V1 sont tous déjà opérationnels. Revoir la progression des neuf sections, la distinction obligatoire/facultatif et le retour après sauvegarde. Ne pas ouvrir la création au visiteur avant décision explicite sur le parcours et les permissions.
+
+**Centre de synchronisation — `SyncCenterPage`**
+- Les conflits sont présentés avant la file d’attente.
+- Pour chaque champ en conflit, deux valeurs sont proposées (« moi » / « distant ») ; l’état initial sélectionne « moi » pour chaque champ.
+- La résolution est appliquée par une action dédiée.
+- Les opérations en attente affichent type, date, nombre de tentatives et dernière erreur ; une relance globale et l’abandon confirmé sont disponibles.
+- L’écran n’affiche pas encore dans cette composition une synthèse hiérarchisée de l’état global de synchronisation.
+
+**Orientation :** rendre explicites la conséquence de chaque choix, le nombre de champs concernés et l’état de l’opération. Le choix initial « moi » ne doit pas être interprété comme un arbitrage implicite : l’interface doit vérifier que la personne comprend et confirme les valeurs à conserver. Préserver les détails techniques de l’erreur dans une zone secondaire.
+
+**Alertes — `AlertsPage`**
+- Filtres Toutes, Urgentes, Informations et Suggestions.
+- Le filtre « Urgentes » compare actuellement `alert.type === "urgent"`, tandis que la bordure visuelle utilise `alert.severity`.
+- Chaque alerte est une surface bouton ; au clic, elle est marquée comme lue puis ouvre éventuellement `action_route`.
+- L’écran juxtapose `AssistantTip` et `NextActionCard`.
+
+**Orientation :** clarifier la distinction entre type et gravité dans le modèle avant de modifier le filtre. Rendre visible la destination de l’alerte et distinguer l’action de lecture de l’action métier si nécessaire. Éviter les conseils répétés.
+
+**Fichiers — `MyFilesPage`**
+- L’écran combine en-tête, conseil assistant, liste de fichiers ou état vide, puis prochaine action.
+- La ligne de fichier est déléguée à `FileRow`, qui porte les actions de renommage, suppression et aperçu.
+- Le visiteur reçoit un état demandant un compte, mais le composant `AssistantTip` est rendu avant cette branche.
+
+**Orientation :** pour le visiteur, afficher l’explication d’accès avant toute aide contextuelle qui pourrait laisser croire à une gestion de fichiers disponible. Pour le compte, privilégier la recherche et le classement uniquement si les capacités existantes le permettent.
+
+**Profil — `ProfilePage`**
+- La page mélange bannière visiteur, conseil assistant, complétion de profil, identité, sécurité, notifications, langue, thème et accès aux fichiers.
+- Les champs nom/téléphone et l’action d’enregistrement sont présents dans le composant ; la fonction de sauvegarde quitte immédiatement si aucun compte n’est connecté.
+- Le changement de thème modifie directement la classe `dark` sur `document.documentElement`, alors que le shell utilise aussi `ThemeToggle` et `next-themes`.
+
+**Orientation :** distinguer un profil visiteur (reconnaissance et préférences locales réellement disponibles) d’un compte (données persistées, sécurité et notifications). Harmoniser le thème via une seule source d’état après vérification de la persistance existante.
+
+**Détail dossier — `DossierDetailPage`**
+- Le haut de page combine le titre et le retour, puis une carte de résumé avec type, localisation, statut et suppression.
+- Le terrain ajoute l’assistance checklist et l’édition des neuf sections.
+- Le reste de l’écran regroupe parcours/étapes, preuves, participants, récapitulatif, suggestions et actions.
+- La sauvegarde des sections terrain relit les métadonnées serveur et n’envoie que les sections modifiées ; hors ligne, elle place la modification en file d’attente.
+
+**Orientation :** conserver la logique de sauvegarde et de fusion des sections ; réorganiser d’abord la présentation. Faire apparaître en premier l’état du dossier et l’action prioritaire, puis organiser les informations par tâches (informations du bien, personnes/relations, documents, parcours, historique). Les actions destructives doivent rester séparées des actions courantes. Ne pas déduire qu’une section est vérifiée du seul fait qu’elle contient un document.
+
+### 5.9 Alignement avec le périmètre métier V1
+
+- La cartographie V1 définit quatre domaines métier : patrimoine et gestion des biens, héritage et succession, volontés secrètes et dernières volontés, gestion des conflits et litiges.
+- Le code de navigation des domaines et `DOSSIER_TYPES` expose cinq identifiants : `terrain`, `heritage`, `volonte`, `conflit`, `savoir`. Le terrain est le seul type disponible actuellement ; les quatre autres sont désactivés ou annoncés comme à venir selon les composants.
+- `terrain` représente la catégorie foncière / un parcours de bien, et non un cinquième domaine métier.
+- `savoir` n’appartient pas au périmètre V1 approuvé.
+
+**Décision nécessaire avant refonte :** définir comment les quatre domaines V1 seront présentés comme espaces métier, tandis que les types techniques de dossier et les catégories de biens restent des notions distinctes. Ne pas supprimer les références historiques ou données de `savoir` sans audit de dépendances, de migrations et de contenus.
+
 ## 6. Principes de composition à appliquer lors des maquettes et corrections
 
 | Type d’écran | Hiérarchie recommandée | Carte / composant pertinent |
