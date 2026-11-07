@@ -84,17 +84,17 @@ export default function ModulePage() {
 
       <section className="mb-5">
         <h2 className="text-base font-serif mb-3">{available ? t("modules.stepsTitle") : t("modules.plannedSteps")}</h2>
-        <div className="space-y-2">
+        <ol className="divide-y divide-border/70">
           {steps.map((step, index) => (
-            <div key={step} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3">
-              <span className="size-7 rounded-full bg-accent text-primary flex items-center justify-center text-xs font-semibold">
+            <li key={step} className="flex items-start gap-4 py-4">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent text-primary text-sm font-semibold">
                 {index + 1}
               </span>
-              <span className="text-sm">{step}</span>
-              {isAuthenticated && index === 0 && secure > 0 ? <CircleCheck className="ml-auto size-4 text-primary" /> : null}
-            </div>
+              <span className="flex-1 pt-1 text-base leading-relaxed">{step}</span>
+              {isAuthenticated && index === 0 && secure > 0 ? <CircleCheck className="mt-1 size-5 shrink-0 text-primary" /> : null}
+            </li>
           ))}
-        </div>
+        </ol>
       </section>
 
       <Button variant="default"
