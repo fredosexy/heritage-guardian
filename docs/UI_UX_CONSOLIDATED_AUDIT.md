@@ -1,5 +1,8 @@
 # Heritis — consolidation des audits UI/UX
 
+
+> **Mise à jour design — 2 novembre 2026 :** les recommandations historiques de ce rapport qui mentionnent la palette pastel décrivent l'état et les décisions antérieurs. La direction artistique actuellement approuvée est désormais « Héritage premium » (vert forêt, ivoire, or patiné), avec thèmes clair et sombre. La référence active est docs/DESIGN_SYSTEM_UI_UX.md ; les constats fonctionnels et d'accessibilité de cet audit restent à traiter selon leur priorité.
+
 **Référence :** `main` au commit `26dca74ff76a21ebd67cf73c03860bf222c8d6d5`. Dépôt GitHub uniquement ; aucun changement direct dans Lovable.
 
 ## Sources documentaires
