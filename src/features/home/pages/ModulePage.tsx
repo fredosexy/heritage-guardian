@@ -15,7 +15,7 @@ export default function ModulePage() {
   const navigate = useNavigate();
   const { moduleId } = useParams();
   const { dossiers, loading } = useDossiers();
-  const { isGuest } = useIdentity();
+  const { isGuest, isAuthenticated } = useIdentity();
 
   const id = moduleId && moduleIds.includes(moduleId) ? moduleId : "terrain";
   const moduleMeta = DOSSIER_TYPES.find((item) => item.id === id);
@@ -49,7 +49,7 @@ export default function ModulePage() {
         </div>
       </header>
 
-      {available ? <section className="rounded-3xl border border-border bg-card p-5 mb-5">
+      {available && isAuthenticated ? <section className="rounded-3xl border border-border bg-card p-5 mb-5">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
             <p className="text-sm font-semibold">{t("modules.progressTitle")}</p>
@@ -98,15 +98,15 @@ export default function ModulePage() {
       </section>
 
       <Button variant="default"
-        onClick={() => navigate(startRoute)}
+        onClick={() => navigate(isGuest ? "/auth" : startRoute)}
         className="block h-auto whitespace-normal w-full rounded-2xl bg-gradient-warm text-primary-foreground p-4 text-left shadow-warm tap focus-ring"
       >
         <span className="flex items-center justify-between gap-3">
           <span>
             <span className="block font-semibold">
-              {!available ? t("home.visitorAssistantCta") : isGuest ? t("modules.visitorStart") : t(`modules.cta.${secure > 0 ? "progress" : "new"}`)}
+              {isGuest ? t("home.createAccountToContinue") : !available ? t("home.visitorAssistantCta") : t(`modules.cta.${secure > 0 ? "progress" : "new"}`)}
             </span>
-            <span className="block text-sm opacity-85 mt-1">{!available ? t("modules.preparationHint") : nextStep ? nextStep.title : t("modules.guidedHint")}</span>
+            <span className="block text-sm opacity-85 mt-1">{isGuest ? t("home.previewOnlyHint") : !available ? t("modules.preparationHint") : nextStep ? nextStep.title : t("modules.guidedHint")}</span>
           </span>
           <ChevronRight className="size-5 shrink-0" />
         </span>

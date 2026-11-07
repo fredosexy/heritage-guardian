@@ -8,14 +8,12 @@ import { useUnreadAlerts } from "@/features/alerts/hooks/useAlerts";
 import { useDossiers } from "@/features/dossiers/hooks/useDossiers";
 import { HomeHeader } from "../components/HomeHeader";
 import { HomeModuleCard } from "../components/HomeModuleCard";
-import { DOSSIER_TYPES } from "@/features/dossiers/components/dossierTypeMeta";
+import { PUBLIC_DOMAINS_V1 } from "../data/publicDomains";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Loader2, Sparkles } from "lucide-react";
 
 const severityClass = (severity: string) =>
   severity === "high" ? "border-l-destructive bg-destructive/5" : severity === "medium" ? "border-l-warning bg-warning/5" : "border-l-primary bg-primary/5";
-
-const modules = DOSSIER_TYPES.map(({ id, icon, available }) => ({ id, icon, available }));
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -73,22 +71,46 @@ export default function HomePage() {
           <p className="text-xs uppercase tracking-[0.18em] text-primary font-medium">{t("home.visitorEyebrow")}</p>
           <h1 className="text-display mt-2 max-w-sm">{t("home.visitorTitle")}</h1>
           <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-xl">{t("home.visitorVision")}</p>
-          <Button className="mt-4" onClick={() => navigate("/create?type=terrain")}>{t("modules.visitorStart")}<ChevronRight className="size-4" /></Button>
+          <Button className="mt-4" onClick={() => navigate("/modules/terrain")}>{t("home.discoverDomains")}<ChevronRight className="size-4" /></Button>
           <p className="text-caption mt-3 max-w-xl">{t("modules.legalNotice")}</p>
         </section>
         <section className="mb-7 rounded-3xl border border-border/60 bg-card/80 p-4 shadow-[var(--shadow-soft)] backdrop-blur-sm">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="font-medium">{guest.firstName ? t("firstStep.title") : t("firstStep.subtitle")}</p>
-              <p className="text-sm text-muted-foreground mt-1">{guest.firstName ? guest.firstName : t("firstStep.namePlaceholder")}</p>
+              <p className="text-sm text-muted-foreground mt-1">{guest.firstName || guest.lastName || t("firstStep.namePlaceholder")}</p>
             </div>
             <Button variant="outline" className="shrink-0 rounded-xl" onClick={() => setPersonalizationOpen(true)}>{t("firstStep.continue")}</Button>
           </div>
         </section>
         <FirstStepDialog open={personalizationOpen} onClose={() => setPersonalizationOpen(false)} />
         <section className="mb-7">
-          <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.modulesTitle")}</h2><p className="text-caption mt-1">{t("home.modulesVisitorHint")}</p></div><Sparkles className="size-5 text-primary" /></div>
-          <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} journeyProgress={module.journeyProgress} currentStepTitle={module.currentStepTitle} nextStepTitle={module.nextStepTitle} blockedStepTitle={module.blockedStepTitle} participantsCount={module.participantsCount} proofsCount={module.proofsCount} onFirstGesture={openModule} available={module.available} />)}</div>
+          <div className="mb-3">
+            <h2 className="text-base font-serif">{t("home.modulesTitle")}</h2>
+            <p className="text-caption mt-1">{t("home.modulesVisitorHint")}</p>
+          </div>
+          <div className="grid gap-3">
+            {PUBLIC_DOMAINS_V1.map(({ id, icon: Icon, previewModuleId, titleKey, descriptionKey, availabilityKey }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => navigate(`/modules/${previewModuleId}`)}
+                className="flex w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-left shadow-[var(--shadow-soft)] transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent text-primary">
+                  <Icon className="size-5" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-start justify-between gap-3">
+                    <span className="font-semibold">{t(titleKey)}</span>
+                    <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  </span>
+                  <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">{t(descriptionKey)}</span>
+                  <span className="mt-2 inline-flex rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">{t(availabilityKey)}</span>
+                </span>
+              </button>
+            ))}
+          </div>
         </section>
         <section className="rounded-[2rem] border border-white/70 bg-gradient-hero p-5 text-foreground shadow-[var(--shadow-elegant)] mb-6">
           <div className="flex items-start gap-3"><span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-card/75 text-primary shadow-[var(--shadow-soft)]"><Sparkles className="size-5" /></span><div><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><p className="text-sm text-muted-foreground mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>

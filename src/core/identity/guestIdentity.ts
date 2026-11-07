@@ -6,6 +6,7 @@
 export interface GuestIdentity {
   id: string;
   firstName?: string;
+  lastName?: string;
   locationName?: string;
   latitude?: number;
   longitude?: number;
