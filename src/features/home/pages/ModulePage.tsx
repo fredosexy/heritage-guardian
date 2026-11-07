@@ -55,7 +55,7 @@ export default function ModulePage() {
       {isPublicAssetPreview && (
         <section className="mb-7">
           <h2 className="mb-4 text-lg font-semibold">{t("home.assetCategoriesTitle")}</h2>
-          <ul className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <ul className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
             {PUBLIC_ASSET_CATEGORIES.map((category) => (
               <li key={category.id} className="border-l-2 border-primary/30 pl-4">
                 <h3 className="text-base font-semibold leading-snug">{t(category.titleKey)}</h3>
