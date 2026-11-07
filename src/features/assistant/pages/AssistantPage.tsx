@@ -8,6 +8,7 @@ import { ArrowLeft, Loader2, Send, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { AiUnavailableError, streamChat, type ChatMessage } from "@/services";
 import { DOSSIER_TYPES, typeLabelKey } from "@/features/dossiers/components/dossierTypeMeta";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function AssistantPage() {
   const { t, i18n } = useTranslation();
@@ -119,8 +120,8 @@ export default function AssistantPage() {
   };
 
   return (
-    <AppLayout hideNav>
-      <div className="flex flex-col h-[100dvh] min-h-0 -m-4 max-w-md mx-auto">
+    <AppLayout hideNav fullScreen>
+      <div className="flex h-full min-h-0 w-full max-w-md mx-auto flex-col">
         <header className="flex items-center gap-3 p-4 border-b border-border/60 bg-background/80 backdrop-blur-md">
           <button onClick={() => navigate(-1)} className="flex size-11 shrink-0 items-center justify-center rounded-2xl border border-border/60 bg-card/80 shadow-[var(--shadow-soft)] transition hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={t("common.back")}>
             <ArrowLeft className="size-5" />
@@ -131,6 +132,7 @@ export default function AssistantPage() {
             </div>
             <h1 className="text-title">{t("ai.title")}</h1>
           </div>
+          <div className="ml-auto"><ThemeToggle /></div>
         </header>
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto bg-gradient-to-b from-background via-background to-secondary/10 p-4 space-y-4" role="log" aria-live="polite" aria-relevant="additions text">
@@ -152,7 +154,12 @@ export default function AssistantPage() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && send()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.nativeEvent.isComposing && e.nativeEvent.keyCode !== 229) {
+                e.preventDefault();
+                void send();
+              }
+            }}
             placeholder={t("ai.placeholder")}
             disabled={loading}
             className="min-h-11 rounded-2xl border-border/70 bg-card shadow-none focus-visible:ring-2 focus-visible:ring-ring"
