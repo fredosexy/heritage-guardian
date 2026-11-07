@@ -3,7 +3,7 @@
 > **Nature du document :** référence stratégique et fondatrice du projet Heritis.  
 > **Périmètre :** vision générale de la plateforme et orientation des versions successives.  
 > **Lancement V1 :** Cameroun, avec une ambition de couverture nationale.  
-> **Statut :** définition, vision, mission, périmètre V1 et orientation générale validés ; les formulations éditoriales des objectifs et principes sont consolidées ici pour assurer leur cohérence documentaire et restent à confronter aux formulations exactes précédemment approuvées avant clôture de la revue.
+> **Statut :** définition, vision, mission, objectifs stratégiques, principes fondateurs, périmètre V1 et orientation générale validés.
 
 ## 1. Définition officielle
 
@@ -34,7 +34,7 @@ La mission se traduit par une plateforme qui aide à :
 
 ## 4. Objectifs stratégiques
 
-Les objectifs stratégiques donnent une traduction opérationnelle à la mission. Les sept objectifs ci-dessous sont une formulation de travail des orientations stratégiques déjà retenues. Leurs formulations exactes approuvées n'ayant pas été retrouvées dans les échanges disponibles, cette liste reste à confirmer avant validation définitive du document.
+Les objectifs stratégiques donnent une traduction opérationnelle à la mission. Les sept objectifs ci-dessous ont été validés comme objectifs stratégiques officiels de Heritis.
 
 1. **Organiser l'information patrimoniale et familiale :** permettre aux personnes et aux familles de structurer les informations utiles sur leurs biens, leurs situations et leurs dossiers.
 2. **Documenter et préserver les éléments importants :** faciliter la conservation des déclarations, documents, justificatifs, volontés et historiques, avec une provenance identifiable.
