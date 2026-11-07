@@ -34,7 +34,7 @@ La mission se traduit par une plateforme qui aide à :
 
 ## 4. Objectifs stratégiques
 
-Les objectifs stratégiques donnent une traduction opérationnelle à la mission. Les formulations ci-dessous constituent une mise en cohérence documentaire des orientations retenues pour Heritis.
+Les objectifs stratégiques donnent une traduction opérationnelle à la mission. Les sept objectifs ci-dessous sont une formulation de travail des orientations stratégiques déjà retenues. Leurs formulations exactes approuvées n'ayant pas été retrouvées dans les échanges disponibles, cette liste reste à confirmer avant validation définitive du document.
 
 1. **Organiser l'information patrimoniale et familiale :** permettre aux personnes et aux familles de structurer les informations utiles sur leurs biens, leurs situations et leurs dossiers.
 2. **Documenter et préserver les éléments importants :** faciliter la conservation des déclarations, documents, justificatifs, volontés et historiques, avec une provenance identifiable.
@@ -50,29 +50,29 @@ Ces objectifs ne signifient pas que toutes les fonctionnalités correspondantes 
 
 Les principes suivants structurent la conception des domaines, des parcours et des services. Ils servent de règles de cohérence pour les décisions fonctionnelles et les évolutions.
 
-### 5.1 Accessibilité et compréhension
-Les informations, les termes et les parcours doivent être compréhensibles par des personnes aux niveaux d'expérience numérique différents. L'accompagnement doit aider à avancer sans rendre obligatoire la maîtrise préalable des procédures complexes.
+### 5.1 Centré sur l'humain
+Partir des besoins réels des personnes et des familles. Les parcours, les informations et les services doivent être conçus pour les situations vécues, avec une attention particulière à la compréhension et à l'accompagnement.
 
-### 5.2 Respect des personnes et de leurs situations
-Heritis doit prendre en compte la diversité des situations familiales, patrimoniales et personnelles. Les informations déclarées doivent être attribuables à leur auteur et les personnes concernées doivent être traitées avec équité.
+### 5.2 Confiance et transparence
+Rendre les informations, les responsabilités et les actions compréhensibles. L'utilisateur doit pouvoir distinguer ce qui est déclaré, documenté, examiné, vérifié ou décidé par une autorité compétente.
 
-### 5.3 Déclaration distincte de reconnaissance juridique
-Une déclaration, une association de personne, un document déposé, un statut interne ou une vérification limitée ne constitue pas automatiquement une reconnaissance juridique. Les qualités déclarées, les éléments examinés et les décisions des autorités compétentes doivent rester distincts.
+### 5.3 Respect des droits
+Distinguer une déclaration, une preuve documentaire et un droit juridiquement établi. Heritis ne doit pas attribuer automatiquement un droit ou une qualité sur la seule base d'une information saisie.
 
-### 5.4 Confidentialité et maîtrise des accès
-Chaque personne ne doit accéder qu'aux informations et fonctionnalités autorisées. Les données sensibles, notamment les volontés secrètes et dernières volontés, exigent des protections renforcées. Les permissions doivent être explicites, limitées et révocables selon les règles applicables.
+### 5.4 Confidentialité
+Protéger les informations personnelles, familiales et patrimoniales. Les accès doivent être limités aux personnes autorisées, selon la sensibilité des contenus et les règles applicables.
 
-### 5.5 Sécurité et protection des informations
-La protection des comptes, des documents, des échanges et des données doit être prise en compte dès la conception. Les opérations sensibles doivent être contrôlées et les accès importants traçables.
+### 5.5 Traçabilité
+Conserver l'historique des déclarations, modifications, vérifications et accès. Les actions importantes doivent être attribuables, datées et consultables selon les permissions.
 
-### 5.6 Traçabilité et préservation de l'historique
-Les déclarations, modifications, corrections, confirmations, contestations, vérifications, transmissions et clôtures importantes doivent conserver un historique attribuable. Une correction ne doit pas effacer silencieusement les éléments antérieurs nécessaires à la compréhension.
+### 5.6 Accessibilité
+Rendre Heritis utilisable sur smartphone, avec des connexions faibles et dans les zones rurales. Les parcours doivent tenir compte des contraintes matérielles et de connectivité.
 
-### 5.7 Neutralité et absence de décision indue
-Heritis organise et accompagne les informations et les parcours. La plateforme ne doit pas transformer une déclaration en vérité établie, arbitrer automatiquement un litige, imposer une solution ou prétendre remplacer une autorité ou un professionnel compétent.
+### 5.7 Simplicité
+Proposer des parcours compréhensibles et des fonctionnalités utiles. Éviter la complexité inutile, les doublons et les étapes qui n'apportent pas de valeur claire aux personnes.
 
-### 5.8 Progressivité et cohérence de l'écosystème
-Les fonctionnalités sont introduites progressivement, en fonction des priorités et de la capacité à les sécuriser. Les domaines doivent partager les références utiles sans dupliquer les personnes, les biens, les documents ou les dossiers.
+### 5.8 Évolutivité
+Construire une plateforme modulaire, capable de grandir sans perdre sa cohérence. Les nouveaux domaines et services doivent s'intégrer progressivement, en respectant les principes et les fondations existants.
 
 ## 6. Positionnement et limites de Heritis
 
