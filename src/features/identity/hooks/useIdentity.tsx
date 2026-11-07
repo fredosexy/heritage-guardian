@@ -46,6 +46,6 @@ export function useIdentity(): IdentityState {
     guest,
     needsFirstStep: isGuest && !guest.firstStepDone,
     updateGuest,
-    displayName: user ? null : guest.firstName ?? null,
+    displayName: user ? null : guest.firstName ?? guest.lastName ?? null,
   };
 }
