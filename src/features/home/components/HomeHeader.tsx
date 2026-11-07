@@ -51,7 +51,7 @@ export function HomeHeader({ firstName, zone, alertCount = 0, avatarUrl }: Props
 
       <button
         onClick={() => navigate("/assistant")}
-        className="mt-3 w-full flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2.5 text-left text-sm text-muted-foreground shadow-soft pressable focus-ring tap"
+        className="mt-3 w-full flex items-center gap-2 rounded-xl border border-border/80 bg-card px-3.5 py-3 text-left text-sm text-muted-foreground shadow-soft pressable focus-ring tap transition-colors duration-fast hover:border-primary/30 hover:bg-accent/30"
       >
         <Search className="size-4 shrink-0" />
         <span className="truncate">{t("greeting.searchHint")}</span>
