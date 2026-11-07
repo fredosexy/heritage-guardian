@@ -1,5 +1,11 @@
 # Audit UI/UX — responsive et accessibilité
 
+> **État de suivi — 7 novembre 2026 :** la revue de code et les changements UI/UX de la phase 1 sont désormais repris dans la PR #50, construite depuis le `main` courant. La PR #44 reste l'origine historique de ces améliorations, mais sa branche initiale n'est plus la branche de validation. Les sections datées du 4 novembre décrivent la revue statique de cette ancienne branche ; elles documentent les améliorations prévues ou observées, sans constituer une validation manuelle de la branche #50. Les mesures de contraste restent des calculs statiques des tokens de la palette Héritage premium. Aucun test navigateur, clavier, lecteur d'écran, axe ou Lighthouse n'est revendiqué. Les contrôles CI de la PR #50 doivent être validés sur son dernier commit.
+
+
+
+> **Mise à jour design — 2 novembre 2026 :** les références de palette pastel présentes dans cet audit décrivent l'ancien état du produit. La direction artistique approuvée est désormais « Héritage premium » (vert forêt, ivoire, or patiné), avec thèmes clair et sombre. Les constats d'accessibilité restent valables comme éléments de revue statique ; les contrastes doivent être remesurés sur la nouvelle palette. Référence active : docs/DESIGN_SYSTEM_UI_UX.md.
+
 **Périmètre :** revue statique du code sur `main`, sans exécution dans un navigateur ni audit automatisé. Les points ci-dessous sont des constats de code ou des risques à valider ; ils ne constituent pas une certification WCAG.
 
 ## Synthèse
@@ -103,3 +109,70 @@ Cette vérification compare les constats ci-dessus au contenu actuel de `main`. 
 - Leur présence ne prouve pas qu'ils ont été exécutés sur la branche de cet audit ; aucun résultat d'exécution locale n'est revendiqué ici.
 - La CI ne remplace pas les tests manuels de clavier, zoom, lecteur d’écran et clavier virtuel.
 - Aucun changement applicatif n'est effectué dans cette PR documentaire. Les corrections de code doivent rester dans la branche dédiée aux corrections prioritaires, puis être vérifiées séparément.
+
+
+## Revue de suivi sur la branche Phase 1 — 4 novembre 2026
+
+Cette section actualise les constats historiques ci-dessus après inspection de `codex/phase-1-heritage-premium-design-system`. Elle ne remplace pas les tests manuels ni une mesure automatisée.
+
+| Point historique | État constaté sur la branche Phase 1 | Suite requise |
+|---|---|---|
+| A11Y-01 — assistant mobile et mouvement réduit | `AssistantPage.tsx` utilise désormais `h-[100dvh]` et consulte `prefers-reduced-motion` avant le défilement automatique. | Tester le clavier virtuel, le paysage et le zoom sur appareils réels. |
+| A11Y-02 — mode connexion/inscription | `AuthPage.tsx` expose maintenant `aria-pressed` sur les deux choix et applique `tap` / `focus-ring`. | Vérifier la restitution réelle avec lecteur d’écran et le contraste des états. |
+| A11Y-03 — cibles tactiles | Le bouton retour de l’assistant est en 44 px ; les contrôles principaux de la navigation basse utilisent une hauteur minimale de 48 px. Les boutons icône partagés, le sélecteur de thème, le déclencheur de sidebar et les commandes du calendrier ont été alignés sur 44 px. | Vérifier les exceptions dans les écrans métier et la densité sur petits écrans. |
+| A11Y-04 — compteur d’alertes | Le lien Alertes fournit un nom accessible qui inclut le nombre non lu ou l’état d’erreur. | Confirmer l’annonce avec NVDA, VoiceOver ou TalkBack. |
+| A11Y-05 — responsive | Le shell partagé utilise une gouttière responsive et l’assistant une hauteur dynamique. | Exécuter les tests visuels 320/360/390/768/1280 px, zoom 200–400 % et textes longs. |
+| A11Y-06 — parcours clavier | Les composants partagés ont des états de focus visibles renforcés ; les primitives Radix conservent leur gestion clavier native. | Parcourir manuellement Tab/Shift+Tab, Entrée/Espace et Échap sur les routes et dialogues. |
+
+### Compléments apportés au socle partagé
+
+- Les boutons icône par défaut, le contrôle de thème, les déclencheurs de navigation latérale et les flèches du calendrier disposent maintenant de zones d'au moins 44 × 44 px.
+- Les commandes des menus déroulants (éléments, sous-menus et choix radio), ainsi que les options de sélection, visent maintenant une hauteur minimale de 44 px.
+- Les flèches du carrousel, les boutons de fermeture des dialogues et notifications et les actions de notification disposent maintenant d'une cible de 44 × 44 px ; le placement du carrousel reste à vérifier sur les conteneurs étroits.
+- Les composants calendrier, tableaux, menus, accordéons, avatars, graphiques et panneaux latéraux ont été harmonisés sur les tokens sémantiques et les deux thèmes.
+
+### Limites de validation inchangées
+
+Aucun navigateur, lecteur d’écran, émulateur mobile ou outil axe/Lighthouse n’a été exécuté dans cette revue GitHub. Les changements décrits sont vérifiés dans le code de la branche, pas certifiés par une interaction réelle. Les contrôles lint, tests et build doivent être relancés sur la tête de branche lorsque la PR cible à nouveau `main` ; les workflows actuels ne se déclenchent que pour les PR ciblant `main`.
+
+## Revue complémentaire — contraste des tokens et parcours visiteur — 4 novembre 2026
+
+Cette revue porte sur les valeurs HSL déclarées dans `src/index.css` et sur les routes/composants de la branche Phase 1. Les ratios ci-dessous sont des calculs statiques sur les paires de tokens indiquées ; ils ne remplacent pas une mesure sur les composants rendus, leurs états hover/disabled, les dégradés ou les images.
+
+### Contraste calculé des paires sémantiques
+
+| Thème | Paire de tokens | Ratio calculé | Lecture |
+|---|---|---:|---|
+| Clair | `foreground` / `background` | 13,67:1 | Conforme au seuil texte courant 4,5:1 |
+| Clair | `muted-foreground` / `background` | 5,16:1 | Conforme au seuil texte courant 4,5:1 |
+| Clair | `primary-foreground` / `primary` | 8,00:1 | Conforme au seuil texte courant 4,5:1 |
+| Clair | `warning-foreground` / `warning` | 4,64:1 | Conforme de justesse au seuil texte courant 4,5:1 |
+| Clair | `warning` / `background` | 3,28:1 | Au-dessus du seuil 3:1 pour un indicateur graphique |
+| Clair | `focus-ring` / `background` | 3,66:1 | Au-dessus du seuil 3:1 pour un indicateur de focus |
+| Sombre | `foreground` / `background` | 14,95:1 | Conforme au seuil texte courant 4,5:1 |
+| Sombre | `muted-foreground` / `background` | 8,24:1 | Conforme au seuil texte courant 4,5:1 |
+| Sombre | `primary-foreground` / `primary` | 8,22:1 | Conforme au seuil texte courant 4,5:1 |
+| Sombre | `warning-foreground` / `warning` | 8,92:1 | Conforme au seuil texte courant 4,5:1 |
+| Sombre | `focus-ring` / `background` | 8,69:1 | Conforme au seuil 3:1 pour un indicateur de focus |
+
+**Réserve :** le ratio du warning clair (4,64:1) dispose d'une marge limitée. Ne pas éclaircir davantage son texte ou assombrir son fond sans recalcul. Les combinaisons de badges d'état, textes placés sur dégradé, bordures, placeholders, états désactivés et survols restent à mesurer sur leurs fonds effectifs.
+
+### Points de vigilance dans les contrôles partagés
+
+- Le calendrier utilise des jours de 40 × 40 px sur les écrans étroits pour éviter le débordement horizontal, puis 44 × 44 px à partir du breakpoint `sm` ; ses flèches de navigation restent à 44 × 44 px.
+- Les flèches de carrousel sont passées à 44 × 44 px ; vérifier leur placement et leur accès sur conteneur étroit.
+- Les cases à cocher, boutons radio et curseurs ont un élément graphique de 20 × 20 px. Leur zone réelle dépend du label ou de la surface de piste ; elle doit être mesurée au niveau de l'interaction complète, pas déduite de la seule taille de l'icône.
+- Le contrôle de thème est rendu dans l'en-tête global de `AppLayout`. Vérifier qu'il reste visible, non chevauchant et cohérent avec les en-têtes spécifiques sur les petits écrans et les pages plein écran.
+
+### Parcours visiteur — point à traiter en Phase 3, pas dans le socle visuel
+
+L'inspection de `src/app/router.tsx`, `HomePage.tsx`, `ModulePage.tsx` et `AssistantPage.tsx` confirme que les routes `/modules/:moduleId` et `/assistant` sont publiques. La page d'accueil visiteur affiche des aperçus de modules et un accès à l'assistant ; la page Assistant expose actuellement un champ de saisie et une action d'envoi sans verrouillage d'interface selon l'état connecté. Le service peut refuser une requête non authentifiée, mais cette revue ne certifie pas ce comportement serveur.
+
+Ce constat ne justifie pas de modifier les règles d'accès dans la PR de design system. Il doit devenir un contrôle fonctionnel explicite de la Phase 3 : visiteur = explications et aperçu seulement ; conversation complète et fonctionnalités actives = utilisateur authentifié ; le refus côté serveur doit rester la frontière de sécurité, indépendamment du masquage UI.
+
+### Limites et suite
+
+- Ces ratios sont calculés à partir des valeurs HSL des tokens et des paires listées ; aucun screenshot ni état interactif n'a été analysé.
+- Aucun navigateur, émulateur, lecteur d'écran, axe ou Lighthouse n'a été exécuté.
+- Avant de considérer la Phase 1 terminée : mesurer les combinaisons réelles des composants, vérifier les cibles tactiles complètes et effectuer les tests responsive, clavier et lecteur d'écran.
+- Le contrôle des accès visiteur/assistant sera repris dans la Phase 3, sans élargir le périmètre de cette PR visuelle.

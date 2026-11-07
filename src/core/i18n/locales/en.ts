@@ -3,6 +3,13 @@ export const en = {
     name: "Heritis",
     tagline: "Your land and documents, together.",
   },
+  theme: {
+    change: "Change theme",
+    switchToLight: "Switch to light mode",
+    switchToDark: "Switch to dark mode",
+    light: "Light mode",
+    dark: "Dark mode",
+  },
   nav: {
     home: "Home",
     dossiers: "Dossiers",
@@ -369,6 +376,7 @@ export const en = {
   common: {
     loading: "Loading…",
     back: "Back",
+    close: "Close",
     save: "Save",
     cancel: "Cancel",
     delete: "Delete",

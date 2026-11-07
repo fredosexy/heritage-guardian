@@ -1,5 +1,11 @@
 # Heritis — consolidation des audits UI/UX
 
+> **État vérifié — 7 novembre 2026 :** les PR documentaires et d'audit #36 à #42 sont désormais toutes fermées et fusionnées dans `main`. La PR #49, qui a aligné les documents historiques, est également fusionnée. La PR #44 reste ouverte en brouillon, mais sa branche est en retard sur `main` ; la présente réconciliation est suivie dans la PR #50, créée depuis `main` au commit `732d657f0c9363775451dfb13be0b6ef97e2da17`. Les statuts listés dans les sections historiques ci-dessous décrivent les vérifications d'octobre 2026 et ne doivent pas être lus comme l'état GitHub actuel. La fusion des PR #36 à #42 ne prouve pas que tous les constats fonctionnels ont été corrigés : chaque constat doit être revalidé sur le code actuel et ses tests.
+
+
+
+> **Mise à jour design — 2 novembre 2026 :** les recommandations historiques de ce rapport qui mentionnent la palette pastel décrivent l'état et les décisions antérieurs. La direction artistique actuellement approuvée est désormais « Héritage premium » (vert forêt, ivoire, or patiné), avec thèmes clair et sombre. La référence active est docs/DESIGN_SYSTEM_UI_UX.md ; les constats fonctionnels et d'accessibilité de cet audit restent à traiter selon leur priorité.
+
 **Référence :** `main` au commit `26dca74ff76a21ebd67cf73c03860bf222c8d6d5`. Dépôt GitHub uniquement ; aucun changement direct dans Lovable.
 
 ## Sources documentaires
@@ -23,7 +29,7 @@ Les quatre PR étaient ouvertes et fusionnables au moment de la vérification du
 | P2 | Hooks dossiers/alertes | Certains échecs sont absorbés et peuvent ressembler à une liste vide. | Distinguer erreur et état vide, avec relance ; tester panne réseau vs réponse vide. |
 | P2 | Filtre urgent | Le filtre compare `type`, alors que le style repose sur `severity`. | Confirmer le modèle de domaine puis ajouter des tests sur type/gravité avant de changer le filtre. |
 | P2 | Navigation et composants partagés | Badge non lu, focus clavier, tailles tactiles, zoom, langues longues et thèmes restent à valider. | Tests responsive, clavier seul, lecteur d'écran et contrastes. |
-| P2 | Typographie et surfaces | Quelques écrans ont des styles locaux ; thème clair/sombre pas validé visuellement. | Réutiliser les tokens pertinents sans altérer la direction pastel lavande/bleu/rose/menthe. |
+| P2 | Typographie et surfaces | Quelques écrans ont des styles locaux ; thème clair/sombre pas validé visuellement. | Réutiliser les tokens pertinents conformément à la direction « Héritage premium » ; ne pas réintroduire l'ancienne palette pastel. |
 
 ## Séquence approuvée
 1. Corriger les risques fonctionnels P1.
