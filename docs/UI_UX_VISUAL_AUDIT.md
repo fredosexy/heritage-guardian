@@ -1,5 +1,8 @@
 # Heritis — audit de cohérence visuelle (partie 2)
 
+> **État documentaire — 7 novembre 2026 :** ce rapport décrit un audit statique effectué sur un ancien état de `main` (commit `26dca74ff76a21ebd67cf73c03860bf222c8d6d5`). Depuis, le dépôt a évolué de 71 commits. Les constats et références de palette pastel ci-dessous sont historiques : ils ne doivent pas être présentés comme un audit du code actuel ni comme la direction artistique approuvée. La direction approuvée est « Héritage premium » (vert forêt, ivoire, or patiné), avec thèmes clair et sombre. La documentation actualisée du système de design est portée par la PR #44 ; sa fusion et la revalidation des écrans restent à confirmer.
+
+
 - **Référence de code :** `main`, commit `26dca74ff76a21ebd67cf73c03860bf222c8d6d5`
 - **Branche de travail :** `docs/heritis-ui-ux-visual-audit`
 - **Périmètre :** dépôt GitHub uniquement ; aucune modification directe dans Lovable.
