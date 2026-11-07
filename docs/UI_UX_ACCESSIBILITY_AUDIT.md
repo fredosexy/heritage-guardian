@@ -176,3 +176,90 @@ Ce constat ne justifie pas de modifier les règles d'accès dans la PR de design
 - Aucun navigateur, émulateur, lecteur d'écran, axe ou Lighthouse n'a été exécuté.
 - Avant de considérer la Phase 1 terminée : mesurer les combinaisons réelles des composants, vérifier les cibles tactiles complètes et effectuer les tests responsive, clavier et lecteur d'écran.
 - Le contrôle des accès visiteur/assistant sera repris dans la Phase 3, sans élargir le périmètre de cette PR visuelle.
+
+
+## Audit approfondi — assistant mobile, responsive et clavier — 7 novembre 2026
+
+**Référence vérifiée :** `main` au commit `6ccc2e3c9002a29e7545b37aff6bca758e2203a7`. Revue statique des fichiers actuels ; aucun test sur appareil, navigateur ou lecteur d'écran n'est revendiqué. Aucun code applicatif n'est modifié par cette mise à jour documentaire.
+
+### A11Y-01 — Assistant mobile et clavier virtuel
+
+**Fichiers :** `src/features/assistant/pages/AssistantPage.tsx`, `src/features/shell/components/AppLayout.tsx`, `src/components/ui/theme-toggle.tsx`.
+
+Constats :
+- L'assistant utilise `h-[100dvh]`, `min-h-0` et une zone de messages en `overflow-y-auto`. Le défilement automatique consulte `prefers-reduced-motion` et passe à `behavior: "auto"` lorsque nécessaire : ces protections sont présentes dans le code actuel.
+- La page est cependant enveloppée par `AppLayout`. Même avec `hideNav`, le shell rend toujours l'en-tête global contenant le contrôle de thème ; le conteneur principal ajoute aussi un padding vertical (`py-5 sm:py-7`). La zone de l'assistant réclame en plus une hauteur de viewport complète. Cette composition peut créer une hauteur totale supérieure au viewport et un défilement extérieur, en particulier sur mobile.
+- Le `-m-4` de l'assistant compense une partie des espacements, mais pas nécessairement le padding responsive du shell ni la hauteur de l'en-tête.
+- Le champ et le bouton d'envoi ont une hauteur minimale de 44 px. Le bouton retour est en 44 × 44 px.
+- Le champ d'envoi utilise Entrée pour envoyer. Le gestionnaire ne vérifie pas explicitement `event.isComposing` ; à tester avec les méthodes de saisie qui utilisent une composition (IME) afin d'éviter un envoi prématuré.
+- Le journal de conversation utilise `role="log"`, `aria-live="polite"` et `aria-relevant="additions text"`. Le contenu de réponse est mis à jour progressivement pendant le streaming ; le volume et le rythme des annonces doivent être vérifiés avec TalkBack/VoiceOver.
+- L'icône de chargement d'une réponse vide n'est pas accompagnée d'un texte d'état explicitement annoncé dans le contenu du journal.
+
+**Évaluation statique :** risque de débordement lié à la composition shell/plein écran confirmé dans le code ; impact réel du clavier virtuel et qualité des annonces non testés.
+
+**Contrôles manuels requis :**
+1. Android Chrome et Android WebView/PWA, clavier Gboard ouvert puis fermé ; iOS Safari si pris en charge.
+2. Portrait, paysage, clavier ouvert, barre d'adresse repliée/déployée et zone sûre.
+3. Vérifier que le champ, le bouton Envoyer et le dernier message restent visibles, sans double défilement ni saut de mise en page.
+4. Tester une réponse longue et le streaming avec TalkBack/VoiceOver ; vérifier les annonces et le mouvement réduit.
+5. Tester Entrée pendant une composition IME et confirmer que le message n'est envoyé qu'après validation de la saisie.
+
+**Orientation de correction à confirmer après tests :** prévoir un mode de shell réellement plein écran pour l'assistant (en-tête global masquable, sans padding vertical externe), puis dimensionner la zone de conversation avec une stratégie de viewport adaptée. Ne pas corriger uniquement en remplaçant `100dvh` par une autre unité sans vérifier la composition complète.
+
+### A11Y-05 — Responsive, zoom et reflow
+
+**Fichiers :** `index.html`, `src/index.css`, `src/features/shell/components/AppLayout.tsx`, `src/features/assistant/pages/AssistantPage.tsx`.
+
+Constats :
+- La balise viewport contient `maximum-scale=1`. Cette restriction peut empêcher ou limiter le zoom utilisateur et doit être supprimée ; conserver `width=device-width, initial-scale=1, viewport-fit=cover` sans plafond de zoom.
+- Le shell partagé utilise `min-h-screen` et un en-tête toujours présent. Les pages plein écran doivent être vérifiées séparément pour éviter que le shell et leur propre hauteur se cumulent.
+- Le conteneur partagé utilise une gouttière CSS responsive `clamp(1rem, 4vw, 2rem)`, ce qui fournit une base adaptée aux largeurs variables.
+- La navigation basse prend en compte `env(safe-area-inset-bottom)`. Sa lisibilité et son absence de chevauchement restent à vérifier avec le zoom et les zones sûres.
+- Le thème clair/sombre repose sur des tokens sémantiques. La revue de code ne suffit pas à garantir le contraste de chaque combinaison réelle, notamment les badges, dégradés, états désactivés, placeholders, bordures et focus.
+- Le fichier HTML conserve un `theme-color` orange ancien, différent de la direction Héritage premium ; c'est une incohérence visuelle à corriger dans le chantier thème, sans la confondre avec un défaut WCAG.
+- Le document racine déclare `lang="fr"`. Si l'interface bascule effectivement en anglais, vérifier que la langue de document est synchronisée avec la langue active afin que les lecteurs d'écran utilisent la bonne prononciation.
+
+**Évaluation statique :** restriction de zoom confirmée et prioritaire ; les problèmes de reflow, de contraste rendu et de langue dynamique restent à tester.
+
+**Contrôles requis :**
+1. Largeurs CSS 320, 360, 390, 768 et 1280 px, portrait et paysage.
+2. Zoom navigateur 200 % et 400 %, sans perte de contenu ni défilement horizontal de page.
+3. Vérifier que les tableaux, cartes, dialogues, menus, onglets et messages longs restent utilisables à 320 CSS px.
+4. Vérifier les textes longs en français et en anglais, ainsi que les erreurs réseau et états vides.
+5. Vérifier les zones sûres, la navigation basse et le contrôle de thème.
+6. Mesurer les contrastes sur les composants rendus et leurs états réels, pas uniquement sur les tokens.
+
+### A11Y-06 — Navigation clavier et restitution des contrôles
+
+**Fichiers :** `src/features/identity/pages/AuthPage.tsx`, `src/components/ui/tabs.tsx`, `src/components/ui/dialog.tsx`, `src/components/ui/select.tsx`, `src/components/ui/dropdown-menu.tsx`, `src/components/ui/popover.tsx`, `src/features/assistant/pages/AssistantPage.tsx`.
+
+Constats :
+- Les choix Connexion/Inscription sont des boutons natifs avec `aria-pressed`, `tap` et `focus-ring`. Ils exposent l'état sélectionné et une indication de focus prévue par le CSS.
+- Les choix E-mail/Téléphone reposent sur Radix Tabs, qui fournit le modèle clavier des onglets (flèches et focus roving). Toutefois, `TabsTrigger` a une hauteur minimale de 36 px ; la cible effective doit être évaluée et portée à au moins 44 px sur les usages tactiles, sans casser le modèle clavier.
+- Les boutons partagés et le contrôle de thème ont des styles `focus-visible`. Les menus et éléments de sélection utilisent principalement un changement de fond à l'état focus ; le contraste de cet indicateur doit être mesuré sur les deux thèmes.
+- Les composants Dialog et AlertDialog reposent sur Radix, ce qui fournit une base de gestion du focus, d'échappement et de restitution. Le comportement réel du focus à l'ouverture/fermeture et le nom accessible des contrôles doivent néanmoins être parcourus.
+- Le composant Popover n'ajoute pas de style de focus au conteneur lui-même ; vérifier que les éléments interactifs contenus restent visibles et que l'ouverture/fermeture restitue le focus au déclencheur.
+- Dans l'assistant, l'ordre DOM place l'en-tête, le journal, le champ et le bouton d'envoi dans un ordre logique. Le journal de messages n'est pas un arrêt clavier, ce qui évite de tabuler chaque message ; vérifier toutefois l'accès au contenu et l'annonce des réponses par lecteur d'écran.
+- L'assistant ne définit pas explicitement une gestion de focus après réponse/erreur. Le focus devrait rester prévisible sur le champ lors d'un envoi et ne pas être déplacé de façon inattendue pendant le streaming.
+- La revue statique ne démontre ni piège clavier ni défaut de restitution : ces points nécessitent une exécution réelle.
+
+**Contrôles manuels requis :**
+1. Parcours clavier seul de chaque route prioritaire : Tab, Shift+Tab, Entrée, Espace et Échap lorsque pertinent.
+2. Vérifier un indicateur de focus visible, contrasté et jamais masqué par un en-tête fixe, une barre basse ou un dialogue.
+3. Tester le modèle clavier des onglets (flèches, Tab, activation) et les contrôles de menus/sélecteurs.
+4. Ouvrir/fermer Dialog, AlertDialog, Select et Popover ; vérifier focus initial, confinement lorsque requis et retour au déclencheur.
+5. Tester les états chargement, erreur, désactivé et succès ; aucun état ne doit être indiqué uniquement par la couleur.
+6. Vérifier TalkBack/VoiceOver pour les noms, rôles, états et annonces du formulaire et du journal de conversation.
+
+### Priorités issues de cette revue
+
+| Priorité | Point | Nature | Suite |
+|---|---|---|---|
+| P1 | `maximum-scale=1` | Restriction présente dans le code | Retirer le plafond de zoom et tester 200–400 % |
+| P1 | Assistant plein écran dans `AppLayout` | Risque structurel confirmé par composition | Tester clavier/viewport puis corriger le shell ou le layout dédié |
+| P2 | Cible des onglets E-mail/Téléphone | Hauteur minimale de 36 px confirmée | Aligner la cible tactile à 44 px |
+| P2 | Focus et annonces du streaming | Non vérifiés en interaction | Tests clavier et lecteurs d'écran |
+| P2 | Reflow, textes longs et thèmes | Non vérifiés en navigateur | Matrice responsive et mesures de contraste |
+| P3 | `theme-color` HTML et langue dynamique | Incohérences à examiner | Harmoniser avec le thème actif et l'i18n |
+
+**Limite de sortie :** cette revue approfondit les constats statiques et définit les scénarios de test. A11Y-01, A11Y-05 et A11Y-06 ne pourront être déclarés clos qu'après exécution et consignation des tests navigateur/appareil, clavier et lecteur d'écran. Aucun correctif applicatif ni résultat de test manuel n'est revendiqué dans cette mise à jour.
