@@ -1,7 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { corsHeaders } from "./cors.ts";
 
 type FunctionName = "ai-chat" | "ai-context";
+
+type AiAuthorizationResult =
+  | { response: Response }
+  | { user: User; userClient: SupabaseClient };
 
 function jsonResponse(status: number, error: string): Response {
   return new Response(JSON.stringify({ error }), {
@@ -18,7 +22,7 @@ export async function authorizeAiRequest(
   req: Request,
   functionName: FunctionName,
   limitPerMinute: number,
-) {
+): Promise<AiAuthorizationResult> {
   const authorization = req.headers.get("Authorization");
   const token = authorization?.match(/^Bearer\s+(.+)$/i)?.[1];
   if (!token) return { response: jsonResponse(401, "authentication_required") };
