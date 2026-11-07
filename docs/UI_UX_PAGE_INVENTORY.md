@@ -1,5 +1,8 @@
 # Heritis — inventaire UI/UX des pages et sous-pages
 
+> **État documentaire — 7 novembre 2026 :** cet inventaire est un instantané historique fondé sur `main` au commit `26dca74ff76a21ebd67cf73c03860bf222c8d6d5`. Depuis ce repère, `main` a évolué de 71 commits, dont plusieurs modifications de routes et de composants. Les statuts « inventorié » ci-dessous ne décrivent donc pas nécessairement l'état actuel. Revalider chaque route et chaque sous-vue sur le `main` courant avant de conclure qu'elle existe, fonctionne ou a été testée. La direction artistique approuvée est « Héritage premium » ; les anciennes références pastel de cet instantané ne sont pas la référence visuelle active. La mise à jour correspondante du système de design est suivie dans la PR #44, encore ouverte au moment de cette note.
+
+
 - **Branche de référence :** `main`
 - **Commit de référence :** `26dca74ff76a21ebd67cf73c03860bf222c8d6d5`
 - **Date de l’inventaire :** 22 octobre 2026
