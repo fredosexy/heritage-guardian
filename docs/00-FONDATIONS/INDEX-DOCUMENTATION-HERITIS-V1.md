@@ -47,7 +47,15 @@ Ordre de lecture recommandé :
 - Les références croisées entre domaines doivent éviter la duplication des personnes, biens, documents et dossiers.
 - Toute évolution de périmètre doit être explicitement documentée et validée.
 
-## 6. Périmètre de cette livraison documentaire
+## 6. Audits de l’interface et de l’expérience utilisateur
+
+| Document | Contenu |
+|---|---|
+| [Audit de l’état UI/UX actuel — 7 novembre 2026](../UI_UX_CURRENT_STATE_AUDIT_2026-11-07.md) | Première passe de vérification statique des routes, pages, accès visiteur, cartes, navigation et système visuel sur le main courant. Ce document prépare la réorganisation progressive ; il ne constitue pas une validation navigateur. |
+
+Les audits UI/UX antérieurs sont des instantanés historiques. Vérifier leur commit de référence et les confronter à l’audit courant avant d’utiliser leurs constats.
+
+## 7. Périmètre de cette livraison documentaire
 
 Cette livraison regroupe la documentation stratégique et fonctionnelle de Heritis V1. Elle ne modifie pas le code applicatif, les schémas de données, les migrations, les fonctions Supabase, les configurations ou le projet Lovable.
 
