@@ -83,6 +83,16 @@ export const en = {
     visitorAssistantTitle: "Guidance from the start", visitorAssistantHint: "You do not need to know everything. The assistant helps you choose the right first action.", visitorAssistantCta: "Ask for advice",
     visitorIdentityTitle: "Build your identity progressively", visitorIdentityHint: "Your first or last name is enough for Heritis to recognise you during discovery. You can then create an account or keep exploring.", visitorAccountCta: "Create my account",
     discoverDomains: "Explore the domains", createAccountToContinue: "Create an account to continue", previewOnlyHint: "This preview explains the domain. Create an account to access available features.",
+      assetCategoriesTitle: "Asset categories",
+      assetAvailableJourneyTitle: "Currently available journey: Land",
+      assetCategories: {
+        land: { title: "Land and real estate plots", description: "Urban or rural land, plots, lots and agricultural land, with their location details and declared situation." },
+        buildings: { title: "Buildings and property", description: "Houses, homes, apartment buildings, business premises, structures and outbuildings, linked to their land when relevant." },
+        rural: { title: "Agricultural and rural assets", description: "Farms, plantations, crops, livestock, equipment and other assets related to rural activities." },
+        movable: { title: "Movable assets", description: "Vehicles, furniture, equipment, machinery, tools, valuables and collections." },
+        financial: { title: "Financial assets and property rights", description: "Declared holdings, shares, receivables, investments and other financial interests or property rights." },
+        other: { title: "Other and special assets", description: "Specific assets that do not clearly fit the previous categories, described according to their nature." },
+      },
     domains: {
       patrimoine: { title: "Assets and asset management", description: "Organise information about your assets, the people concerned and related documents.", availability: "Land journey available; other categories to be confirmed" },
       succession: { title: "Inheritance and succession", description: "Prepare a clear record of the people, assets, documents and steps involved in a transfer.", availability: "Domain in preparation" },

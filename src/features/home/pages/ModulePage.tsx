@@ -7,6 +7,7 @@ import { AppLayout } from "@/features/shell";
 import { useDossiers } from "@/features/dossiers/hooks/useDossiers";
 import { useIdentity } from "@/features/identity";
 import { DOSSIER_TYPES, typeLabelKey } from "@/features/dossiers/components/dossierTypeMeta";
+import { PUBLIC_ASSET_CATEGORIES, PUBLIC_DOMAINS_V1 } from "../data/publicDomains";
 
 const moduleIds = DOSSIER_TYPES.map(({ id }) => id);
 
@@ -19,6 +20,8 @@ export default function ModulePage() {
 
   const id = moduleId && moduleIds.includes(moduleId) ? moduleId : "terrain";
   const moduleMeta = DOSSIER_TYPES.find((item) => item.id === id);
+  const publicDomain = PUBLIC_DOMAINS_V1.find((domain) => domain.previewModuleId === id);
+  const isPublicAssetPreview = isGuest && id === "terrain";
   const available = moduleMeta?.available ?? false;
   const translatedSteps = t(`modules.${id}.steps`, { returnObjects: true });
   const steps = Array.isArray(translatedSteps) ? translatedSteps as string[] : [];
@@ -42,12 +45,26 @@ export default function ModulePage() {
           </span>
           <div>
             <p className="text-xs uppercase tracking-wide text-primary font-medium">{t("modules.label")}</p>
-            <h1 className="text-display mt-1">{id === "savoir" ? t(typeLabelKey(id)) : t(`modules.${id}.title`)}</h1>
-            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{id === "savoir" ? t(moduleMeta?.descKey ?? "create.savoirDesc") : t(`modules.${id}.longDescription`)}</p>
+            <h1 className="text-display mt-1">{id === "savoir" ? t(typeLabelKey(id)) : isGuest && publicDomain ? t(publicDomain.titleKey) : t(`modules.${id}.title`)}</h1>
+            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{id === "savoir" ? t(moduleMeta?.descKey ?? "create.savoirDesc") : isGuest && publicDomain ? t(publicDomain.descriptionKey) : t(`modules.${id}.longDescription`)}</p>
             {!available && <p className="mt-3 inline-flex rounded-full bg-muted px-3 py-1.5 text-xs text-muted-foreground">{t("create.comingSoon")}</p>}
           </div>
         </div>
       </header>
+
+      {isPublicAssetPreview && (
+        <section className="mb-7">
+          <h2 className="mb-4 text-lg font-semibold">{t("home.assetCategoriesTitle")}</h2>
+          <ul className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {PUBLIC_ASSET_CATEGORIES.map((category) => (
+              <li key={category.id} className="border-l-2 border-primary/30 pl-4">
+                <h3 className="text-base font-semibold leading-snug">{t(category.titleKey)}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t(category.descriptionKey)}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {identityLoading ? null : available && isAuthenticated ? <section className="rounded-3xl border border-border bg-card p-5 mb-5">
         <div className="flex items-center justify-between gap-3 mb-4">
@@ -83,7 +100,7 @@ export default function ModulePage() {
       {available && <p className="text-caption mb-5">{t("modules.legalNotice")}</p>}
 
       <section className="mb-5">
-        <h2 className="text-base font-serif mb-3">{available ? t("modules.stepsTitle") : t("modules.plannedSteps")}</h2>
+        <h2 className="text-base font-serif mb-3">{isPublicAssetPreview ? t("home.assetAvailableJourneyTitle") : available ? t("modules.stepsTitle") : t("modules.plannedSteps")}</h2>
         <ol className="divide-y divide-border/70">
           {steps.map((step, index) => (
             <li key={step} className="flex items-start gap-4 py-4">

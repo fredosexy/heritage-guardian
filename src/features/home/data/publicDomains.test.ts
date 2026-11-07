@@ -24,4 +24,11 @@ describe("public V1 domain catalogue", () => {
   it("routes the assets domain to the available Land journey", () => {
     expect(PUBLIC_DOMAINS_V1[0].previewModuleId).toBe("terrain");
   });
+
+  it("exposes the six documented asset categories without turning them into dossier types", async () => {
+    const { PUBLIC_ASSET_CATEGORIES } = await import("./publicDomains");
+    expect(PUBLIC_ASSET_CATEGORIES.map((category) => category.id)).toEqual([
+      "land", "buildings", "rural", "movable", "financial", "other",
+    ]);
+  });
 });

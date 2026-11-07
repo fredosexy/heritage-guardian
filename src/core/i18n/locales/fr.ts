@@ -83,6 +83,16 @@ export const fr = {
     visitorAssistantTitle: "Un accompagnement dès maintenant", visitorAssistantHint: "Vous n'avez pas besoin de tout connaître. L'assistant vous aide à choisir le bon premier geste.", visitorAssistantCta: "Demander conseil",
     visitorIdentityTitle: "Construisons votre identité progressivement", visitorIdentityHint: "Votre prénom ou votre nom suffit pour être reconnu. Vous pourrez ensuite créer un compte ou continuer à découvrir Heritis.", visitorAccountCta: "Créer mon compte",
     discoverDomains: "Découvrir les domaines", createAccountToContinue: "Créer un compte pour continuer", previewOnlyHint: "Cet aperçu présente le domaine. Créez un compte pour accéder aux fonctionnalités disponibles.",
+      assetCategoriesTitle: "Les catégories du patrimoine",
+      assetAvailableJourneyTitle: "Parcours actuellement disponible : Terrain",
+      assetCategories: {
+        land: { title: "Terrains et biens fonciers", description: "Terrains urbains ou ruraux, parcelles, lots et terres agricoles, avec leurs informations de localisation et de situation déclarée." },
+        buildings: { title: "Bâtiments et biens immobiliers", description: "Maisons, logements, immeubles, locaux professionnels, constructions et dépendances, reliés si nécessaire à leur terrain." },
+        rural: { title: "Biens agricoles et ruraux", description: "Exploitations, plantations, cultures, élevages, équipements et autres actifs liés aux activités rurales." },
+        movable: { title: "Biens mobiliers", description: "Véhicules, meubles, équipements, machines, matériels, objets de valeur et collections." },
+        financial: { title: "Biens financiers et droits patrimoniaux", description: "Participations, parts, créances, placements et autres intérêts ou droits patrimoniaux déclarés." },
+        other: { title: "Autres biens et actifs particuliers", description: "Biens spécifiques qui ne relèvent pas clairement des catégories précédentes, décrits selon leur nature." },
+      },
     domains: {
       patrimoine: { title: "Patrimoine et gestion des biens", description: "Organiser les informations sur vos biens, les personnes concernées et les documents associés.", availability: "Parcours Terrain disponible ; autres catégories à confirmer" },
       succession: { title: "Héritage et succession", description: "Préparer un dossier clair autour des personnes, des biens, des documents et des étapes d’une transmission.", availability: "Domaine en préparation" },
