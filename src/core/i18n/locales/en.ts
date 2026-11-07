@@ -10,6 +10,9 @@ export const en = {
     alerts: "Alerts",
     profile: "Profile",
     assistant: "Assistant",
+    spaces: "My spaces",
+    primaryNavigation: "Primary navigation",
+    alertsUnread: "{{count}} unread alert(s)",
   },
   auth: {
     welcome: "Welcome to Heritis",
