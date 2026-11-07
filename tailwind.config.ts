@@ -13,8 +13,19 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["DM Sans", "system-ui", "sans-serif"],
         serif: ["Fraunces", "Georgia", "serif"],
+        display: ["Fraunces", "Georgia", "serif"],
+      },
+      fontSize: {
+        "display-sm": ["clamp(1.875rem, 4vw, 2.5rem)", { lineHeight: "1.12", letterSpacing: "-0.035em", fontWeight: "600" }],
+        "display-lg": ["clamp(2.25rem, 5vw, 3.5rem)", { lineHeight: "1.08", letterSpacing: "-0.04em", fontWeight: "600" }],
+        "body-lg": ["1.0625rem", { lineHeight: "1.7" }],
+      },
+      spacing: {
+        page: "var(--page-gutter)",
+        section: "var(--space-section)",
+        "card-inset": "var(--space-card)",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -107,6 +118,8 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        card: "var(--radius-card)",
+        panel: "var(--radius-panel)",
       },
       keyframes: {
         "accordion-down": {
