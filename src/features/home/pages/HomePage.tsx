@@ -91,24 +91,24 @@ export default function HomePage() {
             <h2 className="text-base font-serif">{t("home.modulesTitle")}</h2>
             <p className="text-caption mt-1">{t("home.modulesVisitorHint")}</p>
           </div>
-          <div className="grid gap-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
             {PUBLIC_DOMAINS_V1.map(({ id, icon: Icon, previewModuleId, titleKey, descriptionKey, availabilityKey }) => (
               <button
                 key={id}
                 type="button"
                 onClick={() => navigate(`/modules/${previewModuleId}`)}
-                className="flex w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-left shadow-[var(--shadow-soft)] transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex min-h-52 w-full flex-col items-start rounded-3xl border border-border bg-card p-5 text-left shadow-[var(--shadow-soft)] transition-colors hover:border-primary/40 hover:shadow-[var(--shadow-elegant)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:min-h-56 sm:p-6"
               >
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent text-primary">
-                  <Icon className="size-5" aria-hidden="true" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-start justify-between gap-3">
-                    <span className="font-semibold">{t(titleKey)}</span>
-                    <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                <span className="flex w-full items-center justify-between gap-4">
+                  <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-accent text-primary">
+                    <Icon className="size-7" aria-hidden="true" />
                   </span>
-                  <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">{t(descriptionKey)}</span>
-                  <span className="mt-2 inline-flex rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">{t(availabilityKey)}</span>
+                  <ChevronRight className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                </span>
+                <span className="mt-5 block text-xl font-semibold leading-snug sm:text-2xl">{t(titleKey)}</span>
+                <span className="mt-2 block max-w-prose text-sm leading-relaxed text-muted-foreground sm:text-base">{t(descriptionKey)}</span>
+                <span className="mt-auto pt-4">
+                  <span className="inline-flex rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">{t(availabilityKey)}</span>
                 </span>
               </button>
             ))}
