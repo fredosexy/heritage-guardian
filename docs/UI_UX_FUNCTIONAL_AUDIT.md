@@ -1,5 +1,8 @@
 # Heritis — audit fonctionnel des parcours (partie 3)
 
+> **État documentaire — 7 novembre 2026 :** cet audit statique est rattaché à `main` au commit `26dca74ff76a21ebd67cf73c03860bf222c8d6d5`. Depuis ce repère, `main` a évolué de 71 commits, notamment dans les parcours dossiers, alertes, synchronisation, authentification et assistant. Les constats F1 à F5 sont des constats historiques à revalider sur le code actuel ; ils ne doivent pas être considérés automatiquement comme des défauts encore présents ou comme des corrections déjà livrées. Aucun statut de résolution n'est attribué sans vérification du code et des tests actuels.
+
+
 - **Référence :** branche `main`, commit `26dca74ff76a21ebd67cf73c03860bf222c8d6d5`
 - **Périmètre :** dépôt GitHub uniquement ; aucune modification directe dans Lovable.
 - **Méthode :** lecture statique des routes, pages et hooks métier. Aucun parcours n'a été exécuté dans un navigateur ni avec un compte de test pendant cette étape.
