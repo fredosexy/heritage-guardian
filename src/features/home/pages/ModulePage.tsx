@@ -79,7 +79,7 @@ export default function ModulePage() {
             {t("modules.inProgressHint", { count: inProgress })}
           </div>
         )}
-      </section> : <p className="text-sm text-muted-foreground mb-5">{t("modules.preparationHint")}</p>}
+      </section> : !available ? <p className="text-sm text-muted-foreground mb-5">{t("modules.preparationHint")}</p> : null}
       {available && <p className="text-caption mb-5">{t("modules.legalNotice")}</p>}
 
       <section className="mb-5">
@@ -91,7 +91,7 @@ export default function ModulePage() {
                 {index + 1}
               </span>
               <span className="text-sm">{step}</span>
-              {index === 0 && secure > 0 ? <CircleCheck className="ml-auto size-4 text-primary" /> : null}
+              {isAuthenticated && index === 0 && secure > 0 ? <CircleCheck className="ml-auto size-4 text-primary" /> : null}
             </div>
           ))}
         </div>

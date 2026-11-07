@@ -9,11 +9,14 @@ import { useDossiers } from "@/features/dossiers/hooks/useDossiers";
 import { HomeHeader } from "../components/HomeHeader";
 import { HomeModuleCard } from "../components/HomeModuleCard";
 import { PUBLIC_DOMAINS_V1 } from "../data/publicDomains";
+import { DOSSIER_TYPES } from "@/features/dossiers/components/dossierTypeMeta";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Loader2, Sparkles } from "lucide-react";
 
 const severityClass = (severity: string) =>
   severity === "high" ? "border-l-destructive bg-destructive/5" : severity === "medium" ? "border-l-warning bg-warning/5" : "border-l-primary bg-primary/5";
+
+const modules = DOSSIER_TYPES.map(({ id, icon, available }) => ({ id, icon, available }));
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -57,7 +60,6 @@ export default function HomePage() {
     moduleStats.find((module) => module.dossierCount > 0) ??
     moduleStats[0];
 
-  const openModule = (route: string) => navigate(route);
   const continueRoute = `/modules/${firstActiveModule.id}`;
 
   if (profileLoading || alertsLoading || dossiersLoading) {
@@ -77,7 +79,7 @@ export default function HomePage() {
         <section className="mb-7 rounded-3xl border border-border/60 bg-card/80 p-4 shadow-[var(--shadow-soft)] backdrop-blur-sm">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="font-medium">{guest.firstName ? t("firstStep.title") : t("firstStep.subtitle")}</p>
+              <p className="font-medium">{guest.firstName || guest.lastName ? t("firstStep.title") : t("firstStep.subtitle")}</p>
               <p className="text-sm text-muted-foreground mt-1">{guest.firstName || guest.lastName || t("firstStep.namePlaceholder")}</p>
             </div>
             <Button variant="outline" className="shrink-0 rounded-xl" onClick={() => setPersonalizationOpen(true)}>{t("firstStep.continue")}</Button>
