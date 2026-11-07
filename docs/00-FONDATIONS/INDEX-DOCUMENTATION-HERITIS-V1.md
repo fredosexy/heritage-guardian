@@ -3,7 +3,6 @@
 **Référentiel :** Heritis  
 **Version :** V1 — Fondation  
 **Pays de lancement :** Cameroun  
-**Branche de consolidation :** `docs/heritis-documentation-v1-complete`
 
 ## 1. Comment lire cette documentation
 
