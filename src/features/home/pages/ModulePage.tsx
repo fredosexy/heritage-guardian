@@ -99,7 +99,7 @@ export default function ModulePage() {
 
       <Button variant="default"
         onClick={() => navigate(isGuest ? "/auth" : startRoute)}
-        className="block h-auto whitespace-normal w-full rounded-2xl bg-gradient-warm text-primary-foreground p-4 text-left shadow-warm tap focus-ring"
+        className="block h-auto whitespace-normal w-full rounded-2xl bg-primary text-primary-foreground p-4 text-left shadow-soft tap focus-ring"
       >
         <span className="flex items-center justify-between gap-3">
           <span>

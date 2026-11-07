@@ -114,8 +114,8 @@ export default function HomePage() {
             ))}
           </div>
         </section>
-        <section className="rounded-[2rem] border border-white/70 bg-gradient-hero p-5 text-foreground shadow-[var(--shadow-elegant)] mb-6">
-          <div className="flex items-start gap-3"><span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-card/75 text-primary shadow-[var(--shadow-soft)]"><Sparkles className="size-5" /></span><div><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><p className="text-sm text-muted-foreground mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>
+        <section className="rounded-[2rem] border border-primary/20 bg-primary p-5 text-primary-foreground shadow-[var(--shadow-elegant)] mb-6">
+          <div className="flex items-start gap-3"><span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-card/75 text-primary shadow-[var(--shadow-soft)]"><Sparkles className="size-5" /></span><div><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><p className="text-sm text-primary-foreground mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>
           <Button onClick={() => navigate("/assistant")} variant="secondary" className="w-full mt-4 rounded-2xl justify-between shadow-[var(--shadow-soft)]">{t("home.visitorAssistantCta")}<ChevronRight className="size-4" /></Button>
         </section>
       </AppLayout>
