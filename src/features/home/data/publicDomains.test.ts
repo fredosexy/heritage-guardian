@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PUBLIC_DOMAINS_V1 } from "./publicDomains";
+import { PUBLIC_ASSET_CATEGORIES, PUBLIC_DOMAINS_V1 } from "./publicDomains";
 
 describe("public V1 domain catalogue", () => {
   it("exposes exactly the four approved business domains", () => {
@@ -25,8 +25,7 @@ describe("public V1 domain catalogue", () => {
     expect(PUBLIC_DOMAINS_V1[0].previewModuleId).toBe("terrain");
   });
 
-  it("exposes the six documented asset categories without turning them into dossier types", async () => {
-    const { PUBLIC_ASSET_CATEGORIES } = await import("./publicDomains");
+  it("exposes the six documented asset categories without turning them into dossier types", () => {
     expect(PUBLIC_ASSET_CATEGORIES.map((category) => category.id)).toEqual([
       "land", "buildings", "rural", "movable", "financial", "other",
     ]);
