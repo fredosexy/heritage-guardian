@@ -1,5 +1,8 @@
 # Audit UI/UX — responsive et accessibilité
 
+> **État de suivi — 7 novembre 2026 :** la revue de code et les changements UI/UX de la phase 1 sont désormais repris dans la PR #50, construite depuis le `main` courant. La PR #44 reste l'origine historique de ces améliorations, mais sa branche initiale n'est plus la branche de validation. Les sections datées du 4 novembre décrivent la revue statique de cette ancienne branche ; elles documentent les améliorations prévues ou observées, sans constituer une validation manuelle de la branche #50. Les mesures de contraste restent des calculs statiques des tokens de la palette Héritage premium. Aucun test navigateur, clavier, lecteur d'écran, axe ou Lighthouse n'est revendiqué. Les contrôles CI de la PR #50 doivent être validés sur son dernier commit.
+
+
 
 > **Mise à jour design — 2 novembre 2026 :** les références de palette pastel présentes dans cet audit décrivent l'ancien état du produit. La direction artistique approuvée est désormais « Héritage premium » (vert forêt, ivoire, or patiné), avec thèmes clair et sombre. Les constats d'accessibilité restent valables comme éléments de revue statique ; les contrastes doivent être remesurés sur la nouvelle palette. Référence active : docs/DESIGN_SYSTEM_UI_UX.md.
 
