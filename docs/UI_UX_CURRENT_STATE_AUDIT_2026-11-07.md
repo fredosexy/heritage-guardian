@@ -157,6 +157,28 @@ Les textes visibles des modules sont dans `src/core/i18n/locales/fr.ts`. Certain
 
 Les comportements métier ne doivent pas être modifiés pendant la seule réorganisation visuelle.
 
+### 4.9 Revue page par page — surfaces et actions présentes
+
+| Page | Composition et informations observées dans le code | Point de réorganisation à étudier |
+|---|---|---|
+| Accueil visiteur `/` | Présentation orientée Terrain, première étape d’identité, cartes de parcours, bloc assistant et CTA de création. | Recentrer sur la découverte des quatre domaines et l’aperçu, clarifier la première action et retirer toute promesse d’accès non conforme au mode visiteur validé. |
+| Accueil connecté `/` | Salutation/contextualisation, profil à compléter, prochaine étape, cartes des parcours, alertes et assistant. | Réduire les répétitions et établir une hiérarchie entre prochaine action, état des dossiers et alertes. |
+| Page module `/modules/:moduleId` | Présentation, disponibilité, étapes traduites, compteurs de dossiers et CTA vers création ou assistant. | Aligner chaque description/étape sur le document métier ; séparer nettement aperçu et action réellement disponible. |
+| Authentification `/auth` | Bascule connexion/inscription, onglets e-mail/téléphone, formulaire, OTP et retours toast. | Simplifier les choix visibles, renforcer la lisibilité des erreurs et vérifier les états de chargement et les textes d’aide. |
+| Onboarding `/onboarding` | Trois questions successives oui/non, progression visuelle, sauvegarde finale. | Vérifier que chaque question reste utile au parcours et expliquer la progression sans ajouter de collecte non documentée. |
+| Assistant `/assistant` | En-tête dédié, contexte de module éventuel, conversation défilante, réponses en streaming, champ et bouton d’envoi. | Distinguer l’aperçu visiteur de la conversation complète du compte ; clarifier le rôle de l’assistant et éviter les propositions contextuelles répétées. |
+| Profil `/profile` | Bannière visiteur, aide assistant, complétion, raccourcis, identité, langue, thème, alertes e-mail, sécurité et déconnexion selon le compte. | Séparer préférences et identité ; ne pas afficher au visiteur un formulaire d’enregistrement qui ne peut rien enregistrer. |
+| Liste des dossiers `/dossiers` | En-tête, conseil assistant, file de synchronisation, brouillons, recherche, liste, état vide/erreur et prochaine action. | Prioriser la recherche et la liste ; rendre les états hors ligne visibles sans multiplier les panneaux ; préciser les actions disponibles selon les droits. |
+| Création `/create` | Choix de type, badge « en préparation », formulaire Terrain et neuf sections repliables, puis sauvegarde. | Confirmer le parcours d’accès visiteur/compte ; distinguer les informations essentielles des compléments facultatifs et expliquer la progression réelle. |
+| Détail `/dossiers/:id` | Résumé du dossier, suppression, aide Terrain, neuf sections détaillées et leurs pièces, parcours/étapes, onglets preuves/participants/récapitulatif, suggestion IA flottante. | C’est l’écran le plus dense. Regrouper les informations par tâche et priorité, réduire les répétitions de cartes, rendre les actions sensibles distinctes et vérifier que la suggestion flottante ne masque pas le contenu. |
+| Modification `/dossiers/:id/edit` | Formulaire titre, description et localisation ; champs désactivés si l’utilisateur ne peut pas modifier. | Expliquer clairement le mode lecture seule et le résultat d’une sauvegarde ou d’une mise en attente hors ligne. |
+| Alertes `/alerts` | Filtres Toutes/Urgentes/Infos/Suggestions, liste cliquable, marquage lu et navigation vers l’action associée. | Vérifier la sémantique « urgente » : le filtre actuel compare `type === "urgent"`, tandis que la présentation utilise aussi `severity`. Confirmer le modèle avant correction. |
+| Fichiers `/files` | Aperçu visiteur nécessitant un compte, liste de fichiers, aperçu, renommage et suppression. | Faire de chaque ligne un résumé de fichier lisible ; garder les trois actions secondaires discrètes et confirmer les opérations sensibles. |
+| Synchronisation `/sync` | Conflits avec choix « moi/distant », file d’attente, relance, nombre de tentatives et abandon confirmé. | Donner la priorité aux conflits et à la reprise ; présenter les erreurs en langage utilisateur et éviter que les détails techniques deviennent l’information dominante. |
+| Page introuvable `*` | État vide avec retour à l’accueil et raccourci vers les dossiers. | Garder une seule action principale cohérente avec le statut visiteur ou compte ; vérifier que le raccourci dossiers ne mène pas à une redirection inattendue. |
+
+Cette revue décrit les surfaces et les contrôles visibles dans le code ; elle ne valide pas encore l’exécution de chaque action dans un navigateur.
+
 ## 5. Composants transversaux à auditer avant leur réutilisation
 
 - `AppLayout`, `BottomNav`, `OfflineIndicator` ;
