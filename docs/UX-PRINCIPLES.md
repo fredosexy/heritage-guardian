@@ -1,5 +1,8 @@
 # Règles UX — Heritage Guardian
 
+> **Portée :** ces règles complètent les fondations et les règles UI/UX de Heritis. Elles ne remplacent pas les règles propres aux domaines, les permissions ni les exigences de sécurité. Les états présentés à l'utilisateur doivent décrire une situation compréhensible et une prochaine action utile ; les pourcentages et scores ne doivent pas devenir le langage principal de progression.
+
+
 ## Condition obligatoire pour toute amélioration future
 
 L'application ne doit pas présenter l'avancement, la qualité ou l'état d'un dossier principalement sous forme de pourcentages, de scores ou de jauges numériques visibles par l'utilisateur.

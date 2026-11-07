@@ -1,1008 +1,112 @@
-# Heritage Guardian
+# Heritis
 
-### 🎯 RÔLE
+**Heritis est une plateforme numérique d'organisation, de documentation, de préservation et d'accompagnement du patrimoine des personnes et des familles.**
 
-Tu es un architecte logiciel senior, expert en GovTech, UX mobile-first et systèmes distribués en zones à faible connectivité.
+Heritis aide les personnes et les familles à mieux organiser leurs informations patrimoniales, documenter les biens et les événements importants, préparer les transmissions, conserver leurs volontés et s'orienter lorsqu'une difficulté ou un conflit survient.
 
-Ta mission est de concevoir une application complète, optimisée pour l’Afrique, centrée sur la gestion des terres, héritages, successions et volontés.
+La plateforme facilite la compréhension, la participation maîtrisée des personnes concernées et l'accès aux accompagnements compétents. Elle ne remplace pas les autorités, les professionnels qualifiés ni les procédures officielles.
 
----
+## Mission
 
-### 🌍 CONTEXTE PRODUIT
+Rendre la gestion, la documentation, la préservation et la transmission du patrimoine des personnes et des familles plus accessibles, mieux organisées, plus sécurisées et plus transparentes, en facilitant leur accompagnement et leur accès aux services compétents.
 
-L’application est une plateforme numérique qui permet aux utilisateurs de :
+## Les quatre domaines métier de la V1
 
-* Gérer leurs biens (terrains, immobiliers, héritages)
+La première version de Heritis se concentre sur quatre domaines. L'enregistrement des biens et la documentation sont transversaux : ils soutiennent les domaines sans constituer un domaine métier supplémentaire.
 
-* Organiser leur succession
+### 1. Patrimoine et gestion des biens
 
-* Enregistrer leurs volontés (publiques ou secrètes)
+Déclarer, inventorier, décrire, documenter et suivre les biens et les intérêts qui leur sont associés. Les rôles des personnes, les droits déclarés, les pièces et les résultats de vérification restent distincts.
 
-* Transmettre des savoirs et patrimoines culturels
+### 2. Héritage et succession
 
-Elle cible principalement des utilisateurs sur mobile avec connexions lentes ou instables.
+Constituer et suivre un dossier de succession, identifier les personnes concernées, relier les biens, réunir les documents et permettre aux participants autorisés de contribuer, confirmer ou contester des informations.
 
----
+### 3. Volontés secrètes et dernières volontés
 
-### 🧠 OBJECTIF
+Enregistrer et préserver des volontés personnelles ou patrimoniales, gérer leur confidentialité, leurs destinataires et leurs conditions de transmission, avec une vérification documentée avant toute transmission.
 
-Concevoir une application :
+### 4. Gestion des conflits et litiges
 
-* Simple, fluide et rapide
+Permettre à une personne de signaler un conflit, de constituer son dossier, puis de comprendre les voies possibles et d'accéder à des professionnels ou services compétents. Heritis n'arbitre pas le litige et ne décide pas des droits des parties.
 
-* Fonctionnelle hors connexion (offline-first)
+## Publics concernés
 
-* Sécurisée et juridiquement exploitable
+- Les personnes et les familles qui souhaitent organiser et préserver leur patrimoine.
+- Les personnes concernées par une succession.
+- Les personnes confrontées à un différend familial, patrimonial, successoral ou documentaire.
+- Les professionnels qualifiés et les organisations compétentes, dans le cadre d'accès et de responsabilités distincts.
 
-* Engagée (incite l’utilisateur à agir)
+L'inscription à Heritis ne constitue pas, à elle seule, une preuve d'identité vérifiée, de qualification professionnelle, de filiation, de qualité d'héritier ou de droit de propriété.
 
----
+## Positionnement et limites
 
-### 🧩 ARCHITECTURE MODULAIRE
+Heritis organise les informations, conserve les documents, facilite la traçabilité et oriente vers les interlocuteurs appropriés. La plateforme :
 
-L’application est composée de 4 modules principaux :
+- ne constitue pas un tribunal, un service cadastral ou une autorité administrative ;
+- ne certifie pas automatiquement la propriété, l'authenticité d'un document ou la qualité d'héritier ;
+- ne transforme pas une déclaration ou une pièce déposée en droit juridiquement établi ;
+- ne tranche pas les conflits et ne garantit pas l'issue d'une procédure ;
+- ne remplace pas les avocats, notaires, experts, administrations ou juridictions compétentes.
 
-#### 1. Mémoire des Terres
+Les informations déclarées, les documents déposés, les vérifications internes et les décisions officielles doivent rester clairement différenciés.
 
-* Gestion des terrains et biens immobiliers
+## Accès et accompagnement
 
-* Historique de propriété
+- **Visiteur :** découverte de Heritis, explications et aperçus uniquement ; pas d'accès aux fonctionnalités de gestion.
+- **Utilisateur disposant d'un compte :** accès aux fonctionnalités selon son identité, ses droits et les permissions accordées.
+- **Professionnel ou organisation :** accès distinct, encadré par la spécialité, les justificatifs et le statut de vérification applicables.
 
-* Ajout de preuves (documents, images, vidéos)
+L'assistant adaptatif accompagne la découverte et les parcours autorisés. Il explique et oriente ; il ne remplace pas un professionnel et ne prend pas de décision juridique.
 
-* Géolocalisation et segmentation des biens
+## Pays de lancement
 
-#### 2. Héritage & Succession
+Le Cameroun constitue le premier pays de lancement de la V1, avec une ambition d'accès national. Les services professionnels disponibles peuvent varier selon les régions et les spécialités. Toute expansion ultérieure devra tenir compte des cadres et pratiques locaux.
 
-* Création de dossiers d’héritage
+## Évolution du produit
 
-* Identification des héritiers
+- **V1 — Fondation :** lancement maîtrisé des quatre domaines métier et des services transversaux essentiels.
+- **V2 — Stabilisation :** correction, consolidation et amélioration des fonctionnalités existantes.
+- **V3 — Extension :** enrichissement progressif des capacités des domaines existants.
+- **V4 — Évolution :** ouverture à de nouveaux services, domaines et territoires.
 
-* Répartition des biens
+La présence d'une fonctionnalité dans la documentation de référence décrit le périmètre fonctionnel validé ; elle ne signifie pas nécessairement que cette fonctionnalité est déjà implémentée ou disponible en production.
 
-* Suivi des conflits et procédures
+## Documentation de référence
 
-#### 3. Volontés & Testaments
+Commencer par l'[index de la documentation Heritis V1](docs/00-FONDATIONS/INDEX-DOCUMENTATION-HERITIS-V1.md).
 
-* Enregistrement de volontés
+- [Vision, mission, objectifs et principes](docs/00-FONDATIONS/VISION-MISSION-OBJECTIFS-PRINCIPES-HERITIS.md)
+- [Cartographie générale des domaines et fonctionnalités V1](docs/00-FONDATIONS/CARTOGRAPHIE-GENERALE-DOMAINES-FONCTIONNALITES-V1.md)
+- [Patrimoine et gestion des biens](docs/01-DOMAINES/PATRIMOINE-ET-GESTION-DES-BIENS-V1.md)
+- [Héritage et succession](docs/02-DOMAINES/HERITAGE-ET-SUCCESSION-V1.md)
+- [Volontés secrètes et dernières volontés](docs/03-DOMAINES/VOLONTES-SECRETES-ET-DERNIERES-VOLONTES-V1.md)
+- [Gestion des conflits et litiges](docs/04-DOMAINES/GESTION-DES-CONFLITS-ET-LITIGES-V1.md)
+- [Services transversaux V1](docs/SERVICES_TRANSVERSAUX_V1.md)
 
-* Programmation de testaments
+Les audits UI/UX et les documents de préparation complémentaires peuvent contenir des constats historiques. Toujours vérifier leur date, leur commit de référence et leur niveau de validation avant de les utiliser comme état actuel du produit.
 
-* Gestion des volontés secrètes (accès conditionnel)
+## Socle technique du dépôt
 
-* Activation post-événement (ex: décès)
+Le dépôt contient une application web basée sur React, TypeScript et Vite, avec Supabase pour les services backend, une prise en charge PWA et des mécanismes de continuité hors connexion. Les choix techniques détaillés et leur état réel doivent être vérifiés dans le code et les configurations du dépôt ; cette présentation produit ne constitue pas une spécification d'architecture.
 
-#### 4. Dons & Savoirs Vivants
+## Développement
 
-* Transmission de compétences et savoirs
-
-* Héritage culturel et familial
-
-* Publications éducatives ou communautaires
-
----
-
-### 👤 GESTION DU PROFIL UTILISATEUR
-
-Le profil est structuré en 4 parties :
-
-#### 1. Informations personnelles
-
-* Création / modification / suppression
-
-* Personnalisation
-
-* Publications
-
-* Suggestions
-
-* Contact / partage
-
-* Avis / alertes
-
-#### 2. Gestion des modules
-
-* Création de dossiers (avec ID unique)
-
-* Types : personnel / public / familial / groupe
-
-* Invitations et rôles
-
-* Ajout de pièces jointes (preuves)
-
-* Suivi et historique
-
-* Gestion des accès et sécurité
-
-#### 3. Fonctionnalités publiques
-
-* Fil d’actualité intelligent
-
-* Alertes et notifications ciblées
-
-* Suggestions dynamiques
-
-* Publications géolocalisées
-
-* Mise en relation avec services (experts, autorités)
-
-#### 4. Configuration
-
-* Langue
-
-* Thème
-
-* Paramètres utilisateur
-
-* Préférences de notification
-
----
-
-### ⚙️ CONTRAINTES TECHNIQUES
-
-* Mobile-first (priorité smartphone)
-
-* Progressive Web App (PWA)
-
-* Fonctionnement offline avec synchronisation
-
-* Optimisation pour réseaux faibles (2G/3G)
-
-* Chargement rapide et UX fluide
-
-* Design moderne, simple et élégant
-
----
-
-### 🔥 MÉCANIQUES D’ENGAGEMENT
-
-L’application doit pousser l’utilisateur à agir via :
-
-* Suggestions intelligentes
-
-* Alertes contextuelles
-
-* Recommandations personnalisées
-
-* Notifications utiles (pas intrusives)
-
-Exemples :
-
-* “Vous devriez sécuriser ce terrain”
-
-* “Ajoutez un bénéficiaire à votre héritage”
-
-* “Programmez votre testament”
-
-* “Un expert est disponible dans votre zone”
-
----
-
-### 💡 FONCTIONNALITÉS CLÉS (DIFFÉRENCIATION)
-
-Permettre à l’utilisateur de :
-
-* Sécuriser un héritage
-
-* Valoriser un bien immobilier
-
-* Programmer une succession
-
-* Enregistrer un testament
-
-* Gérer un conflit foncier
-
-* Contacter un expert (avocat, notaire, etc.)
-
-* Lancer une procédure
-
-* Signaler une fraude ou infraction
-
-* Enregistrer une volonté (publique ou secrète)
-
-* Partager des informations importantes
-
----
-
-### 🏛️ ÉCOSYSTÈME CONNECTÉ
-
-L’application interagit avec :
-
-* Chefferies traditionnelles
-
-* Mairies
-
-* Tribunaux
-
-* Cadastre
-
-* Notaires
-
-* Avocats
-
----
-
-### 📌 TA MISSION
-
-1. Proposer une architecture technique complète (frontend + backend)
-
-2. Définir la structure de base de données
-
-3. Détailler les fonctionnalités de chaque module
-
-4. Proposer une UX claire (parcours utilisateur)
-
-5. Suggérer des APIs et technologies adaptées
-
-6. Intégrer un assistant IA dans l’application (guidage utilisateur)
-
-Structure ta réponse de manière claire, exploitable et prête à être développée.
-
-🧠 1. ASSISTANT IA AVANCÉ (CŒUR DE TON APP)
-
-🎯 Rôle réel (pas juste chatbot)
-
-Ton IA n’est pas un gadget. Elle doit être :
-
-. Conseiller juridique simplifié
-
-. Guide utilisateur intelligent
-
-. Agent d’engagement (pousse à agir)
-
-. Assistant de création (remplit dossiers automatiquement)
-
-. Système d’alerte proactive
-
-👉 En gros : un “assistant de vie patrimoniale”
-
-🧩 STRUCTURE DE L’ASSISTANT IA
-
-1. IA d’accueil (Onboarding intelligent)
-
-Quand l’utilisateur arrive :
-
-Pose des questions simples :
-
-“Avez-vous un terrain ?”
-
-“Souhaitez-vous protéger un héritage ?”
-
-“Voulez-vous enregistrer une volonté ?”
-
-👉 Ensuite :
-
-. Crée un parcours personnalisé automatiquement
-
-. Active les modules nécessaires
-
-2. IA contextuelle (dans chaque module)
-
-Exemple :
-
-📍 Dans “Mémoire des terres”
-
-“Ajoutez une preuve pour sécuriser ce terrain”
-
-“Voulez-vous géolocaliser ce bien ?”
-
-📍 Dans “Héritage”
-
-“Vous n’avez pas encore ajouté de bénéficiaire”
-
-“Voulez-vous répartir les parts ?”
-
-📍 Dans “Volontés”
-
-“Souhaitez-vous rendre cette volonté secrète ?”
-
-“Programmer l’activation après décès ?”
-
-3. IA proactive (TRÈS IMPORTANT 🔥)
-
-Elle agit sans attendre :
-
-. Détecte les manques
-
-. Analyse les actions utilisateur
-
-. Envoie des suggestions intelligentes
-
-Exemples :
-
-“Votre dossier n’est pas sécurisé”
-
-“Un conflit pourrait survenir (aucun héritier défini)”
-
-“Ajoutez un témoin ou un expert”
-
-4. IA juridique simplifiée
-
-⚠️ Pas un avocat, mais :
-
-. Explique les démarches simplement
-
-. Guide étape par étape
-
-. Traduit le langage juridique
-
-Exemple :
-
-“Pour sécuriser ce terrain, vous devez ajouter un document ou contacter un notaire.”
-
-5. IA actionnable (ultra puissant)
-
-👉 L’utilisateur ne doit PAS réfléchir
-
-Il clique → l’IA fait :
-
-. Génère un dossier
-
-. Remplit les champs automatiquement
-
-. Propose des modèles (testament, partage…)
-
-6. IA offline (clé pour ton marché)
-
-. Fonctionne sans internet (version légère)
-
-. Stocke les actions
-
-. Synchronise dès connexion
-
-🧠 PERSONNALITÉ DE L’IA
-
-. Simple
-
-. Humaine
-
-. Locale (langage accessible)
-
-. Jamais technique
-
-. Toujours orientée action
-
-💬 EXEMPLES DE MESSAGES IA
-
-“Je peux vous aider à sécuriser ce terrain en 2 minutes.”
-
-“Attention, ce dossier est incomplet.”
-
-“Voulez-vous enregistrer une volonté secrète ?”
-
-“Un expert est disponible près de vous.”
-
-🎨 2. UX COMPLÈTE (STRUCTURE DE TON APP)
-
-📱 PRINCIPES UX
-
-. Mobile-first
-
-. 1 action = 1 écran
-
-. Navigation simple (max 3 niveaux)
-
-. Boutons visibles (CTA forts)
-
-. Offline-friendly
-
-🏠 1. PAGE D’ACCUEIL (PAGE VIVANTE 🔥)
-
-C’est le cœur de mon app.
-
-Contenu :
-
-🧠 Bloc IA (en haut)
-
-. Message dynamique :
-
-“Que voulez-vous faire aujourd’hui ?”
-
-Boutons rapides :
-
-. Sécuriser un bien
-
-. Créer un héritage
-
-. Ajouter une volonté
-
-🔔 Alertes intelligentes
-
-“Votre dossier est incomplet”
-
-“Ajoutez un document”
-
-💡 Suggestions
-
-. Basées sur comportement utilisateur
-
-🌍 Activité / publications
-
-. Infos locales
-
-. Conseils
-
-. Cas pratiques
-
-📞 Mise en relation
-
-. Experts
-
-. Services
-
-📂 2. NAVIGATION PRINCIPALE
-
-Barre du bas (mobile) :
-
-🏠 Accueil
-
-📁 Mes dossiers
-
-➕ Créer
-
-🔔 Alertes
-
-👤 Profil
-
-📁 3. PAGE “MES DOSSIERS”
-
-Liste des dossiers :
-
-. Terrain
-
-. Héritage
-
-. Volonté
-
-Chaque dossier affiche :
-
-. Statut (sécurisé / incomplet / risque)
-
-. Actions rapides
-
-➕ 4. CRÉATION RAPIDE (ULTRA IMPORTANT)
-
-Bouton central :
-
-Quand on clique :
-
-👉 choix simple :
-
-. Terrain
-
-. Héritage
-
-. Volonté
-
-. Conflit
-
-. Document
-
-👉 L’IA prend le relais
-
-📄 5. PAGE DOSSIER
-
-Structure :
-
-. Résumé
-
-. Preuves
-
-. Participants
-
-. Historique
-
-. Actions
-
-👉 IA toujours visible :
-
-. suggestions
-
-. corrections
-
-🔔 6. ALERTES
-
-. Risques
-
-. Actions à faire
-
-. Notifications importantes
-
-👤 7. PROFIL
-
-. Infos personnelles
-
-. Modules activés
-
-. Paramètres
-
-. Sécurité
-
-⚡ UX SPÉCIALE (ADAPTÉE AFRIQUE)
-
-🔌 Mode faible connexion
-
-. Images compressées
-
-. Chargement progressif
-
-. Texte prioritaire
-
-📴 Mode offline
-
-. Création de dossiers sans internet
-
-. Sauvegarde locale
-
-. Sync automatique
-
-🎯 SIMPLICITÉ EXTRÊME
-
-Exemple :
-
-❌ Mauvais :
-
-Formulaire long
-
-✅ Bon :
-
-“Ajoutez une info” (étape par étape)
-
-🔥 CE QUI VA TE DIFFÉRENCIER
-
-IA proactive (rare en Afrique)
-
-UX ultra simple
-
-Offline-first
-
-Cas réels (héritage africain)
-
-Connexion avec autorités
-
-………………….
-
-🎨 1. DESIGN UI CONCRET (ÉCRANS DÉTAILLÉS)
-
-🏠 ÉCRAN 1 : ACCUEIL (Dashboard intelligent)
-
-Structure :
-
-[HEADER]
-
-Photo profil
-
-“Bonjour [Nom]”
-
-Icône notification 🔔
-
-[BLOC IA PRINCIPAL 🔥]
-
-Message dynamique :
-
-“Que voulez-vous faire aujourd’hui ?”
-
-Boutons rapides (cards) :
-
-📍 Sécuriser un terrain
-
-👨‍👩‍👧 Créer un héritage
-
-📝 Ajouter une volonté
-
-⚖️ Gérer un conflit
-
-[ALERTES]
-
-⚠️ “Votre dossier ‘Terrain Akwa’ est incomplet”
-
-🔴 “Aucun héritier défini”
-
-[SUGGESTIONS IA]
-
-“Ajoutez une preuve pour sécuriser votre bien”
-
-“Contactez un expert proche”
-
-[ACTIVITÉ / FEED]
-
-Publications
-
-Conseils
-
-Informations locales
-
-[BOTTOM NAV]
-
-🏠 Accueil
-
-📁 Dossiers
-
-➕ Créer
-
-🔔 Alertes
-
-👤 Profil
-
-📁 ÉCRAN 2 : MES DOSSIERS
-
-Liste des dossiers :
-
-Chaque carte contient :
-
-Nom : “Terrain Bonamoussadi”
-
-Type : Terrain / Héritage / Volonté
-
-Statut :
-
-🟢 Sécurisé
-
-🟡 Incomplet
-
-🔴 Risque
-
-Actions rapides :
-
-Voir
-
-Modifier
-
-Partager
-
-👉 CTA :
-
-“+ Nouveau dossier”
-
-➕ ÉCRAN 3 : CRÉATION (ULTRA SIMPLE)
-
-Étape 1 :
-
-“Que voulez-vous créer ?”
-
-Terrain
-
-Héritage
-
-Volonté
-
-Conflit
-
-Document
-
-Étape 2 (IA guidée)
-
-Exemple Terrain :
-
-Nom du bien
-
-Localisation (optionnel offline)
-
-Type
-
-Ajouter preuve ?
-
-👉 Bouton :
-
-“Créer maintenant”
-
-📄 ÉCRAN 4 : PAGE DOSSIER (TRÈS IMPORTANT)
-
-Structure :
-
-[HEADER]
-
-Nom du dossier
-
-Statut visuel
-
-[RÉSUMÉ]
-
-Type
-
-Propriétaire
-
-Date
-
-[PREUVES]
-
-Documents
-
-Images
-
-Vidéos
-
-👉 bouton “Ajouter”
-
-[PARTICIPANTS]
-
-Héritiers / bénéficiaires
-
-Rôles
-
-[HISTORIQUE]
-
-Actions effectuées
-
-[IA ASSISTANT (FIXE EN BAS) 🔥]
-
-“Ajoutez une preuve pour sécuriser ce dossier”
-
-“Voulez-vous inviter un héritier ?”
-
-🔔 ÉCRAN 5 : ALERTES
-
-Liste des alertes :
-
-Risques
-
-Actions urgentes
-
-Suggestions IA
-
-👉 Filtres :
-
-Urgent
-
-Info
-
-IA
-
-👤 ÉCRAN 6 : PROFIL
-
-Sections :
-
-Infos personnelles
-
-Mes modules
-
-Paramètres
-
-Sécurité
-
-Langue / thème
-
-⚙️ 2. LOGIQUE BACKEND DES MODULES
-
-🧩 ARCHITECTURE GLOBALE
-
-🔧 Stack recommandé :
-
-Backend : Node.js (NestJS recommandé)
-
-DB : MongoDB (flexible pour dossiers)
-
-Auth : JWT + OTP (SMS)
-
-Stockage : Cloud (images/docs)
-
-Sync offline : IndexedDB / local storage
-
-🧠 STRUCTURE DES DONNÉES
-
-👤 User
-
-{
-
-  id,
-
-  name,
-
-  phone,
-
-  email,
-
-  role,
-
-  settings,
-
-  createdAt
-
-}
-
-📁 Dossier (CORE 🔥)
-
-{
-
-  id,
-
-  userId,
-
-  type: "terrain | heritage | volonte | conflit",
-
-  title,
-
-  status: "secure | incomplete | risk",
-
-  visibility: "private | public | family",
-
-  participants: [],
-
-  proofs: [],
-
-  metadata: {},
-
-  createdAt,
-
-  updatedAt
-
-}
-
-📎 Preuve
-
-{
-
-  id,
-
-  dossierId,
-
-  type: "image | document | video",
-
-  url,
-
-  verified: false,
-
-  createdAt
-
-}
-
-👥 Participant
-
-{
-
-  id,
-
-  dossierId,
-
-  userId,
-
-  role: "owner | heir | witness | expert",
-
-  permissions: []
-
-}
-
-🔔 Alert
-
-{
-
-  id,
-
-  userId,
-
-  type: "risk | suggestion | info",
-
-  message,
-
-  relatedDossierId,
-
-  read: false,
-
-  createdAt
-
-}
-
-🔁 LOGIQUE PAR MODULE
-
-📍 MODULE 1 : MÉMOIRE DES TERRES
-
-Backend logique :
-
-Création dossier terrain
-
-Ajout preuves (documents fonciers)
-
-Vérification (option future)
-
-Géolocalisation
-
-IA :
-
-Détecte manque de preuves
-
-Génère alertes
-
-👨‍👩‍👧 MODULE 2 : HÉRITAGE
-
-Backend logique :
-
-Création héritage
-
-Ajout héritiers
-
-Répartition (% ou biens)
-
-Gestion conflits
-
-IA :
-
-“Aucun héritier défini”
-
-“Répartition non équilibrée”
-
-📝 MODULE 3 : VOLONTÉS
-
-Backend logique :
-
-Enregistrement volonté
-
-Mode secret :
-
-{
-
-  isSecret: true,
-
-  unlockCondition: "death | date"
-
-}
-
-Chiffrement des données 🔐
-
-🎓 MODULE 4 : SAVOIRS VIVANTS
-
-Backend logique :
-
-Création contenu
-
-Publication
-
-Partage
-
-🤖 IA BACKEND (IMPORTANT)
-
-Service IA :
-
-analyzeUserData()
-
-generateSuggestions()
-
-detectRisk()
-
-triggerAlerts()
-
-Exemple logique :
-
-if dossier.proofs.length == 0:
-
-   createAlert("Ajoutez une preuve")
-
-🔄 SYNCHRONISATION OFFLINE
-
-Flow :
-
-User crée offline
-
-Data stockée localement
-
-Sync auto dès connexion
-
-🔐 SÉCURITÉ
-
-JWT auth
-
-Encryption volontés
-
-Permissions par dossier
-
-Logs d’activité
-
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/01e53010-0c8f-4666-ba67-f335364adf82).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Le dépôt utilise Bun et son lockfile pour l'installation reproductible et les contrôles CI.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+git clone <repository-url>
+cd <repository-directory>
+bun install --frozen-lockfile
+bun run dev
 ```
+
+Commandes de contrôle :
+
+```sh
+bun run test
+bun run lint
+bun run build
+```
+
+Les tests de migrations et d'intégration nécessitent l'environnement local prévu par les workflows GitHub Actions. Ne pas utiliser une base distante pour les contrôles de migrations locaux.
