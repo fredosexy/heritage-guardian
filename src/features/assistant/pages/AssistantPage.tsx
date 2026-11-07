@@ -14,7 +14,7 @@ import { useIdentity } from "@/features/identity";
 export default function AssistantPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { isGuest } = useIdentity();
+  const { isGuest, loading: identityLoading } = useIdentity();
   const [searchParams, setSearchParams] = useSearchParams();
   const moduleId = searchParams.get("module");
   const moduleMeta = DOSSIER_TYPES.find((item) => item.id === moduleId);
@@ -137,7 +137,9 @@ export default function AssistantPage() {
           <div className="ml-auto"><ThemeToggle /></div>
         </header>
 
-        {isGuest ? (
+        {identityLoading ? (
+          <div className="flex flex-1 items-center justify-center"><Loader2 className="size-6 animate-spin text-primary" /></div>
+        ) : isGuest ? (
           <div className="flex-1 overflow-y-auto p-5">
             <div className="mx-auto max-w-sm space-y-5">
               <div className="space-y-2">

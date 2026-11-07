@@ -24,7 +24,7 @@ export default function HomePage() {
   const { profile, loading: profileLoading } = useProfile();
   const { alerts, loading: alertsLoading } = useUnreadAlerts(5);
   const { dossiers, loading: dossiersLoading } = useDossiers();
-  const { isAuthenticated, displayName, guest } = useIdentity();
+  const { isAuthenticated, displayName, guest, loading: identityLoading } = useIdentity();
   const [personalizationOpen, setPersonalizationOpen] = useState(false);
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function HomePage() {
 
   const continueRoute = `/modules/${firstActiveModule.id}`;
 
-  if (profileLoading || alertsLoading || dossiersLoading) {
+  if (identityLoading || profileLoading || alertsLoading || dossiersLoading) {
     return <AppLayout><div className="flex justify-center py-20"><Loader2 className="size-6 animate-spin text-primary" /></div></AppLayout>;
   }
 

@@ -15,7 +15,7 @@ export default function ModulePage() {
   const navigate = useNavigate();
   const { moduleId } = useParams();
   const { dossiers, loading } = useDossiers();
-  const { isGuest, isAuthenticated } = useIdentity();
+  const { isGuest, isAuthenticated, loading: identityLoading } = useIdentity();
 
   const id = moduleId && moduleIds.includes(moduleId) ? moduleId : "terrain";
   const moduleMeta = DOSSIER_TYPES.find((item) => item.id === id);
@@ -49,7 +49,7 @@ export default function ModulePage() {
         </div>
       </header>
 
-      {available && isAuthenticated ? <section className="rounded-3xl border border-border bg-card p-5 mb-5">
+      {identityLoading ? null : available && isAuthenticated ? <section className="rounded-3xl border border-border bg-card p-5 mb-5">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
             <p className="text-sm font-semibold">{t("modules.progressTitle")}</p>
