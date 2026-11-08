@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ChevronRight, CircleAlert, CircleCheck, CircleDot, Loader2, MapPin, Pencil, Save, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useDossierDetail } from "../hooks/useDossierDetail";
-import { dossiersRepo, enqueueUpdateDossierMetadata, proceduresRepo } from "@/data";
+import { buildingsRepo, dossiersRepo, enqueueUpdateDossierMetadata, proceduresRepo } from "@/data";
 import type { DossierStep } from "@/core/types/domain";
 import { ProofsTab } from "../components/ProofsTab";
 import { TerrainChecklistAssist } from "../components/TerrainChecklistAssist";
@@ -26,6 +26,8 @@ export default function DossierDetailPage() {
   const [savingTerrain, setSavingTerrain] = useState(false);
   const [terrainSections, setTerrainSections] = useState<Record<string, string>>({});
   const [initialTerrainSections, setInitialTerrainSections] = useState<Record<string, string>>({});
+  const [buildingProperty, setBuildingProperty] = useState<buildingsRepo.BuildingProperty | null>(null);
+  const [loadingBuildingProperty, setLoadingBuildingProperty] = useState(false);
   const terrainSectionKeys = ["histoire","provenance","proprietaires","ayantsDroit","documentation","localisation","dimensions","etat","miseEnValeur"] as const;
   const terrainSectionProofs = (sectionKey: string) => proofs.filter((proof) => {
     const metadata = proof.metadata && typeof proof.metadata === "object" && !Array.isArray(proof.metadata)
@@ -37,6 +39,20 @@ export default function DossierDetailPage() {
   useEffect(() => {
     if (id) void proceduresRepo.getDossierSteps(id).then(setJourney).catch(() => setJourney([]));
   }, [id]);
+
+  useEffect(() => {
+    if (!dossier || dossier.type !== "batiment") {
+      setBuildingProperty(null);
+      return;
+    }
+    let cancelled = false;
+    setLoadingBuildingProperty(true);
+    buildingsRepo.getBuildingProperty(dossier.id)
+      .then((property) => { if (!cancelled) setBuildingProperty(property); })
+      .catch((error) => { if (!cancelled) toast.error(error instanceof Error ? error.message : t("auth.error")); })
+      .finally(() => { if (!cancelled) setLoadingBuildingProperty(false); });
+    return () => { cancelled = true; };
+  }, [dossier?.id, dossier?.type, t]);
 
   useEffect(() => {
     if (!dossier || dossier.type !== "terrain") return;
@@ -219,6 +235,39 @@ export default function DossierDetailPage() {
         )}
         <p className="text-sm text-muted-foreground">{t(`dossier.state.${dossier.status}`)}</p>
       </div>
+
+      {dossier.type === "batiment" && (
+        <section className="rounded-3xl border border-border/60 bg-card/85 p-5 mb-4 shadow-[var(--shadow-soft)]">
+          <div className="mb-4">
+            <h2 className="text-base font-semibold">{t("create.buildingFormTitle")}</h2>
+            <p className="text-xs text-muted-foreground mt-1">{t("create.buildingScopeNote")}</p>
+          </div>
+          {loadingBuildingProperty ? (
+            <div className="flex justify-center py-5"><Loader2 className="size-5 animate-spin text-primary" /></div>
+          ) : buildingProperty ? (
+            <dl className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <dt className="text-xs text-muted-foreground">{t("create.buildingKindLabel")}</dt>
+                <dd className="mt-1 text-sm font-medium">{t("create.buildingKinds." + buildingProperty.property_kind)}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">{t("create.buildingLocalityLabel")}</dt>
+                <dd className="mt-1 text-sm">{buildingProperty.locality || "—"}</dd>
+              </div>
+              <div className="sm:col-span-2">
+                <dt className="text-xs text-muted-foreground">{t("create.buildingAddressLabel")}</dt>
+                <dd className="mt-1 text-sm whitespace-pre-wrap">{buildingProperty.address_description || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">{t("create.buildingSurfaceLabel")}</dt>
+                <dd className="mt-1 text-sm">{buildingProperty.declared_surface === null ? "—" : buildingProperty.declared_surface + " " + (buildingProperty.surface_unit === "m2" ? "m²" : buildingProperty.surface_unit === "are" ? "are" : "ha")}</dd>
+              </div>
+            </dl>
+          ) : (
+            <p className="text-sm text-muted-foreground">{t("auth.error")}</p>
+          )}
+        </section>
+      )}
 
       {dossier.type === "terrain" && (
         <TerrainChecklistAssist dossier={dossier} proofs={proofs} canEdit={canEdit} onSaved={() => void reload().catch(() => undefined)} />
