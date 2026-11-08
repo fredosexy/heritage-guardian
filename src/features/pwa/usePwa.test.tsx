@@ -29,7 +29,7 @@ describe("usePwa", () => {
     let choice: string | undefined;
     await act(async () => { choice = await result.current.install(); });
 
-    expect(prompt).toHaveBeenCalledOnce();
+    expect(prompt).toHaveBeenCalledTimes(1);
     expect(choice).toBe("accepted");
     expect(result.current.canPromptInstall).toBe(false);
   });
@@ -53,4 +53,10 @@ describe("usePwa", () => {
     expect(result.current.ios).toBe(true);
     expect(result.current.canPromptInstall).toBe(false);
   });
+  it("detects Android for browser-menu installation guidance", () => {
+    Object.defineProperty(navigator, "userAgent", { configurable: true, value: "Mozilla/5.0 (Linux; Android 15) Chrome/130.0.0.0" });
+    const { result } = renderHook(() => usePwa());
+    expect(result.current.android).toBe(true);
+  });
+
 });
