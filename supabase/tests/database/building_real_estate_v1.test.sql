@@ -81,6 +81,7 @@ SELECT is(
 );
 UPDATE public.building_properties SET locality = 'Intrusion'
 WHERE dossier_id = '62000000-0000-0000-0000-000000000002';
+SELECT set_config('request.jwt.claim.sub', '61000000-0000-0000-0000-000000000001', true);
 SELECT is(
   (SELECT locality FROM public.building_properties WHERE dossier_id = '62000000-0000-0000-0000-000000000002'),
   'Douala',
