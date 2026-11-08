@@ -151,7 +151,7 @@
 - Ajouter ou exécuter un test d'intégration navigateur représentant ancien worker actif → nouveau worker en attente → acceptation → activation/purge → transfert de contrôle, avec vérification qu'aucune requête post-activation ne recrée le cache.
 - Effectuer la recette de mise à niveau sur une installation ayant réellement utilisé la version précédente, y compris plusieurs onglets.
 
-**Conclusion :** le point de nettoyage à l'activation est implémenté et couvert au niveau unitaire ; le scénario complet de migration reste ouvert. La PR #71 n'est pas encore déclarée prête à fusionner.
+**Conclusion :** le nettoyage à l'activation est implémenté avec `event.waitUntil()`, couvert par des tests unitaires et vérifié dans le build de production. Le scénario complet de migration navigateur (ancien worker actif, nouveau worker en attente, plusieurs onglets) reste à exécuter sur un environnement de recette.
 
 ## Icônes : contrôle transversal
 
@@ -170,7 +170,8 @@ Les tests contrôlent l'existence, le type MIME déclaré et les dimensions. Ils
 
 ## Décision de revue
 
-- Les contrôles automatisés CI de la PR #71 sont réussis sur le commit vérifié.
-- Les essais physiques sont explicitement non réalisés.
-- La PR ne doit pas être déclarée prête à fusionner tant que le risque de transition du cache privé n'est pas traité et que les contrôles de déploiement/recette sont consignés.
-- Les résultats de cette revue sont documentaires et ne doivent pas être présentés comme des preuves d'exécution Android/iOS.
+- **Condition de fusion :** tous les contrôles automatisés (tests, lint, build et vérification post-build du service worker, migrations et tests DB locaux, intégration Edge, Terrain CI) doivent être réussis sur le SHA exact de la tête de PR.
+- Le risque de conservation du cache privé historique est traité dans le code par la purge au démarrage et à l'activation du nouveau service worker ; le hook d'activation attend la suppression et le build vérifie son import effectif.
+- **Avant publication en production :** exécuter la recette de migration navigateur multi-onglets, les essais Android Chrome et iOS Safari, la vérification HTTPS/portée/réécritures et l'inspection visuelle de la zone maskable des icônes.
+- L'optimisation du bundle initial (970,81 Ko avant compression dans le build observé) reste une amélioration de performance à planifier ; elle n'est pas confondue avec un échec de build.
+- Les résultats de cette revue sont documentaires et ne doivent pas être présentés comme des preuves d'exécution Android/iOS ou de déploiement réel.
