@@ -3,7 +3,7 @@
 **Périmètre :** revue statique de la branche `feat/pwa-intelligent-complete` de la PR #71.  
 **Référence de code initiale :** commit `d99e04e4d43bfc9dfd447809d9ce174f867bfdcc`.  
 **Correction iOS intégrée ensuite :** commit `21629706864a73320a3021032ff90a3cabf3563c`.  
-**Dernière mise à jour documentaire de cette revue :** commit `7f1c7988eca8107cb515e7ef251bc2a92ed863b4`.  
+**Dernière mise à jour documentaire de cette revue :** 8 novembre 2026, après correction de l'indicateur hors ligne.  
 **Méthode :** comparaison du code, des tests et de la documentation opérationnelle avec les recommandations officielles consultées le 8 novembre 2026.  
 **Limite :** aucun appareil physique ni déploiement HTTPS n'a été utilisé. Les résultats ci-dessous ne constituent donc pas une recette d'exécution réelle.
 
@@ -14,7 +14,7 @@
 | 1 | HTTPS, portée du service worker et routes profondes | Manifest et enregistrement prévus à la racine en production ; HTTPS, portée effective, en-têtes et réécritures du serveur non démontrés | À confirmer sur déploiement |
 | 2 | Installation Android / Chrome | Membres essentiels du manifest présents ; capture précoce de `beforeinstallprompt` et invite déclenchée par action utilisateur ; éligibilité réelle et icônes non validées sur appareil | Conforme au niveau du code, terrain requis |
 | 3 | Installation iOS / Safari | Icône Apple, métadonnées et détection `navigator.standalone` présentes ; consigne de l'assistant actualisée pour « Ouvrir comme app web » lorsque l'option est proposée | Code corrigé, terrain requis |
-| 4 | Première visite et mode hors ligne | Précache et cache runtime restreint ; les documents Storage ne sont pas mis en cache ; message « ressources essentielles » nuancé ; page hors ligne dédiée et disponibilité réelle de chaque route non prouvées | Partiellement couvert |
+| 4 | Première visite et mode hors ligne | Précache et cache runtime restreint ; les documents Storage ne sont pas mis en cache ; indicateur hors ligne visible dans l'assistant ; page hors ligne dédiée et disponibilité réelle de chaque route non prouvées | Partiellement couvert |
 | 5 | Perte réseau et reprise | Écouteurs `online/offline`, file Dexie et contrôle de session/droits avant rejeu ; `navigator.onLine` ne prouve pas l'accès au serveur | Conforme au principe, terrain requis |
 | 6 | Deux comptes sur un appareil | Instantanés, opérations et conflits attribués au compte lecteur ; migration v4/v5 et tests d'isolation présents ; test réel multi-compte non effectué | Couverture automatisée présente, terrain requis |
 | 7 | Mise à jour du service worker | Mode `prompt`, notification de mise à jour, action explicite et contrôle au retour au premier plan ; conservation des saisies et parcours OAuth doivent être vérifiés sur déploiement | Conforme au niveau du code, terrain requis |
