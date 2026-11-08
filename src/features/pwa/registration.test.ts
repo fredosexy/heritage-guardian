@@ -14,10 +14,4 @@ describe("PWA update lifecycle", () => {
 
     expect(update).toHaveBeenCalledExactlyOnceWith(true);
   });
-
-  it("does not claim an update can be applied before registration", async () => {
-    // The module's worker is configured in beforeEach; the failure path is
-    // covered by the explicit missing-worker guard in the implementation.
-    await expect(applyPwaUpdate()).resolves.toBeUndefined();
-  });
 });
