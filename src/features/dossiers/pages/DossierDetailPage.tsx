@@ -297,6 +297,25 @@ export default function DossierDetailPage() {
         </section>
       )}
 
+      {dossier.type === "agricole" && (() => {
+        const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+          ? dossier.metadata as Record<string, unknown>
+          : {};
+        const raw = metadata.agriculturalRural;
+        const asset = raw && typeof raw === "object" && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
+        const family = typeof asset.family === "string" ? asset.family : "autre";
+        const details = typeof asset.declaredDetails === "string" ? asset.declaredDetails : "";
+        return (
+          <section className="card-soft mb-4 p-5">
+            <p className="text-overline text-primary">{t("agricultural.title")}</p>
+            <h2 className="mt-1 text-lg font-semibold">{t("agricultural.families." + family)}</h2>
+            <p className="mt-3 text-xs text-muted-foreground">{t("agricultural.declarationNotice")}</p>
+            {details ? <p className="mt-3 whitespace-pre-wrap text-sm">{details}</p> : null}
+            {dossier.location_name ? <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="size-4" />{dossier.location_name}</p> : null}
+          </section>
+        );
+      })()}
+
       {dossier.type === "terrain" && (
         <TerrainChecklistAssist dossier={dossier} proofs={proofs} canEdit={canEdit} onSaved={() => void reload().catch(() => undefined)} />
       )}
