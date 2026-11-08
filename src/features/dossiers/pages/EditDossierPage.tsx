@@ -25,8 +25,8 @@ export default function EditDossierPage() {
   const [family, setFamily] = useState<Family>("exploitation");
   const [specifics, setSpecifics] = useState("");
   const [familyDetails, setFamilyDetails] = useState<Record<string, string>>({});
-  const [declaredPeople, setDeclaredPeople] = useState<Array<{ id: string; name: string; role: string; note: string; source: "declarant"; status: "declare"; recordedAt: string }>>([]);
-  const [events, setEvents] = useState<Array<{ id: string; type: string; date: string; description: string; source: "declarant"; recordedAt: string }>>([]);
+  const [declaredPeople, setDeclaredPeople] = useState<Array<{ id: string; name: string; role: string; note: string; source: "declarant"; status: "declare"; recordedAt: string; active?: boolean; endedAt?: string; persisted?: boolean }>>([]);
+  const [events, setEvents] = useState<Array<{ id: string; type: string; date: string; description: string; source: "declarant"; recordedAt: string; persisted?: boolean }>>([]);
   const [relatedAssets, setRelatedAssets] = useState<Array<{ dossierId: string; relationType: string }>>([]);
   const [personDraft, setPersonDraft] = useState({ name: "", role: "owner_declared", note: "" });
   const [eventDraft, setEventDraft] = useState({ type: "inventory", date: new Date().toISOString().slice(0, 10), description: "" });
@@ -47,8 +47,8 @@ export default function EditDossierPage() {
         ? asset.familyDetails as Record<string, unknown>
         : {};
       setFamilyDetails(Object.fromEntries(Object.entries(details).map(([key, value]) => [key, String(value)])));
-      setDeclaredPeople(Array.isArray(asset.declaredPeople) ? asset.declaredPeople as typeof declaredPeople : []);
-      setEvents(Array.isArray(asset.events) ? asset.events as typeof events : []);
+      setDeclaredPeople(Array.isArray(asset.declaredPeople) ? (asset.declaredPeople as typeof declaredPeople).map((person) => ({ ...person, active: person.active !== false, persisted: true })) : []);
+      setEvents(Array.isArray(asset.events) ? (asset.events as typeof events).map((event) => ({ ...event, persisted: true })) : []);
       setRelatedAssets(Array.isArray(asset.relatedAssets) ? asset.relatedAssets as typeof relatedAssets : []);
     }
   }, [dossier]);
@@ -161,10 +161,12 @@ export default function EditDossierPage() {
                   </div>
                 </div>
                 <Button type="button" variant="outline" disabled={!personDraft.name.trim()} onClick={() => {
-                  setDeclaredPeople((current) => [...current, { id: "person-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7), ...personDraft, name: personDraft.name.trim(), source: "declarant", status: "declare", recordedAt: new Date().toISOString() }]);
+                  setDeclaredPeople((current) => [...current, { id: "person-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7), ...personDraft, name: personDraft.name.trim(), source: "declarant", status: "declare", active: true, persisted: false, recordedAt: new Date().toISOString() }]);
                   setPersonDraft({ name: "", role: "owner_declared", note: "" });
                 }}>{t("agricultural.people.add")}</Button>
-                {declaredPeople.length > 0 ? <ul className="space-y-2">{declaredPeople.map((person) => <li key={person.id} className="flex items-start justify-between gap-2 rounded-xl bg-muted/40 p-3"><div className="min-w-0"><p className="text-sm font-medium">{person.name}</p><p className="text-xs text-muted-foreground">{t("agricultural.people.roles." + person.role)} · {t("agricultural.people.declared")}</p>{person.note ? <p className="mt-1 text-xs">{person.note}</p> : null}</div><Button type="button" size="sm" variant="ghost" onClick={() => setDeclaredPeople((current) => current.filter((item) => item.id !== person.id))}>{t("common.delete")}</Button></li>)}</ul> : <p className="text-xs text-muted-foreground">{t("agricultural.people.empty")}</p>}
+                {declaredPeople.length > 0 ? <ul className="space-y-2">{declaredPeople.map((person) => <li key={person.id} className="flex items-start justify-between gap-2 rounded-xl bg-muted/40 p-3"><div className="min-w-0"><p className="text-sm font-medium">{person.name}</p><p className="text-xs text-muted-foreground">{t("agricultural.people.roles." + person.role)} · {t("agricultural.people.declared")}{person.active === false ? " · " + t("agricultural.people.ended") : ""}</p>{person.note ? <p className="mt-1 text-xs">{person.note}</p> : null}</div><Button type="button" size="sm" variant="ghost" onClick={() => setDeclaredPeople((current) => person.persisted
+                    ? current.map((item) => item.id === person.id ? { ...item, active: false, endedAt: new Date().toISOString() } : item)
+                    : current.filter((item) => item.id !== person.id))}>{person.persisted ? t("agricultural.people.end") : t("common.delete")}</Button></li>)}</ul> : <p className="text-xs text-muted-foreground">{t("agricultural.people.empty")}</p>}
               </section>
               <section className="space-y-3 rounded-2xl border border-border p-4">
                 <div>
@@ -207,10 +209,10 @@ export default function EditDossierPage() {
                   </div>
                 </div>
                 <Button type="button" variant="outline" disabled={!eventDraft.description.trim() || !eventDraft.date} onClick={() => {
-                  setEvents((current) => [...current, { id: "event-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7), ...eventDraft, description: eventDraft.description.trim(), source: "declarant", recordedAt: new Date().toISOString() }]);
+                  setEvents((current) => [...current, { id: "event-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7), ...eventDraft, description: eventDraft.description.trim(), source: "declarant", persisted: false, recordedAt: new Date().toISOString() }]);
                   setEventDraft({ type: "inventory", date: new Date().toISOString().slice(0, 10), description: "" });
                 }}>{t("agricultural.events.add")}</Button>
-                {events.length > 0 ? <ol className="space-y-2">{[...events].sort((a, b) => b.date.localeCompare(a.date)).map((event) => <li key={event.id} className="flex items-start justify-between gap-2 rounded-xl bg-muted/40 p-3"><div className="min-w-0"><p className="text-sm font-medium">{t("agricultural.events.types." + event.type)} · {event.date}</p><p className="mt-1 text-xs">{event.description}</p><p className="mt-1 text-[11px] text-muted-foreground">{t("agricultural.events.declared")}</p></div><Button type="button" size="sm" variant="ghost" onClick={() => setEvents((current) => current.filter((item) => item.id !== event.id))}>{t("common.delete")}</Button></li>)}</ol> : <p className="text-xs text-muted-foreground">{t("agricultural.events.empty")}</p>}
+                {events.length > 0 ? <ol className="space-y-2">{[...events].sort((a, b) => b.date.localeCompare(a.date)).map((event) => <li key={event.id} className="flex items-start justify-between gap-2 rounded-xl bg-muted/40 p-3"><div className="min-w-0"><p className="text-sm font-medium">{t("agricultural.events.types." + event.type)} · {event.date}</p><p className="mt-1 text-xs">{event.description}</p><p className="mt-1 text-[11px] text-muted-foreground">{t("agricultural.events.declared")}</p></div>{!event.persisted ? <Button type="button" size="sm" variant="ghost" onClick={() => setEvents((current) => current.filter((item) => item.id !== event.id))}>{t("common.delete")}</Button> : null}</li>)}</ol> : <p className="text-xs text-muted-foreground">{t("agricultural.events.empty")}</p>}
               </section>
             </section>
           )}
