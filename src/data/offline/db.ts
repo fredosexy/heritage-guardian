@@ -20,14 +20,15 @@ export interface DraftDossier {
 }
 
 export type QueuedOp =
-  | { id?: number; kind: "create_dossier"; payload: { localId: string }; created_at: number; attempts: number; last_error?: string | null }
-  | { id?: number; kind: "update_dossier"; payload: { dossierId: string; changes?: DossierChanges; baseUpdatedAt?: string; metadata?: Record<string, unknown> }; created_at: number; attempts: number; last_error?: string | null }
-  | { id?: number; kind: "initialize_journey"; payload: { dossierId: string }; created_at: number; attempts: number; last_error?: string | null }
-  | { id?: number; kind: "upload_proof"; payload: { file: Blob; fileName: string; mimeType: string; sizeBytes: number; dossierId: string; userId: string; sectionKey?: string; storagePath: string; proofId?: string }; created_at: number; attempts: number; last_error?: string | null }
-  | { id?: number; kind: "delete_dossier"; payload: { dossierId: string }; created_at: number; attempts: number; last_error?: string | null };
+  | { id?: number; viewer_user_id?: string; kind: "create_dossier"; payload: { localId: string }; created_at: number; attempts: number; last_error?: string | null }
+  | { id?: number; viewer_user_id?: string; kind: "update_dossier"; payload: { dossierId: string; changes?: DossierChanges; baseUpdatedAt?: string; metadata?: Record<string, unknown> }; created_at: number; attempts: number; last_error?: string | null }
+  | { id?: number; viewer_user_id?: string; kind: "initialize_journey"; payload: { dossierId: string }; created_at: number; attempts: number; last_error?: string | null }
+  | { id?: number; viewer_user_id?: string; kind: "upload_proof"; payload: { file: Blob; fileName: string; mimeType: string; sizeBytes: number; dossierId: string; userId: string; sectionKey?: string; storagePath: string; proofId?: string }; created_at: number; attempts: number; last_error?: string | null }
+  | { id?: number; viewer_user_id?: string; kind: "delete_dossier"; payload: { dossierId: string }; created_at: number; attempts: number; last_error?: string | null };
 
 export interface SyncConflict {
   id?: number;
+  viewer_user_id?: string;
   dossier_id: string;
   title: string;
   fields: string[];
@@ -40,6 +41,7 @@ export interface SyncConflict {
 export interface CachedDossier {
   id: string;
   user_id: string;
+  viewer_user_id: string;
   data: Json | Record<string, unknown>;
   cached_at: number;
 }
@@ -69,6 +71,36 @@ class MemoireDB extends Dexie {
       queue: "++id, kind, created_at",
       cachedDossiers: "id, user_id, cached_at",
       conflicts: "++id, dossier_id, created_at",
+    });
+    // Bind cached dossier snapshots to the account that was authorized to view them.
+    this.version(4).stores({
+      drafts: "++id, localId, user_id, synced, updated_at",
+      queue: "++id, kind, created_at",
+      cachedDossiers: "id, user_id, viewer_user_id, cached_at",
+      conflicts: "++id, dossier_id, created_at",
+    }).upgrade((transaction) => transaction.table("cachedDossiers").clear());
+    // Scope queued work and conflict snapshots to the account that created them.
+    this.version(5).stores({
+      drafts: "++id, localId, user_id, synced, updated_at",
+      queue: "++id, kind, viewer_user_id, created_at",
+      cachedDossiers: "id, user_id, viewer_user_id, cached_at",
+      conflicts: "++id, dossier_id, viewer_user_id, created_at",
+    }).upgrade(async (transaction) => {
+      const queue = transaction.table("queue");
+      const drafts = transaction.table("drafts");
+      const operations = await queue.toArray();
+      for (const operation of operations) {
+        let viewerId: string | undefined;
+        if (operation.kind === "create_dossier") {
+          const draft = await drafts.where("localId").equals(operation.payload?.localId ?? "").first();
+          viewerId = draft?.user_id;
+        } else if (operation.kind === "upload_proof") {
+          viewerId = operation.payload?.userId;
+        }
+        if (viewerId && operation.id !== undefined) {
+          await queue.update(operation.id, { viewer_user_id: viewerId });
+        }
+      }
     });
   }
 }

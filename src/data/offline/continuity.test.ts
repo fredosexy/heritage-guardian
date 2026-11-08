@@ -4,11 +4,15 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 
 const mocks = vi.hoisted(() => ({ from: vi.fn(), upload: vi.fn(), userId: "owner", update: vi.fn() }));
 vi.mock("@/integrations/supabase/client", () => ({ supabase: {
-  auth: { getUser: vi.fn(async () => ({ data: { user: { id: mocks.userId } }, error: null })) },
+  auth: {
+    getUser: vi.fn(async () => ({ data: { user: { id: mocks.userId } }, error: null })),
+    getSession: vi.fn(async () => ({ data: { session: { user: { id: mocks.userId } } }, error: null })),
+  },
   from: mocks.from,
   storage: { from: vi.fn(() => ({ upload: mocks.upload })) },
 } }));
 vi.mock("@/data/procedures.repo", () => ({ initializeDossierJourney: vi.fn() }));
+vi.mock("@/features/identity", () => ({ useAuth: () => ({ user: { id: mocks.userId } }) }));
 import { db } from "./db";
 import { enqueueUpdateDossierMetadata, processQueue } from "./sync";
 import { useSyncCenter } from "@/features/offline/hooks/useSyncCenter";
@@ -25,6 +29,7 @@ describe("IndexedDB offline continuity", () => {
   afterEach(async () => { await db.queue.clear(); await db.conflicts.clear(); db.close(); });
 
   const seedUpdate = () => db.queue.add({
+    viewer_user_id: "owner",
     kind: "update_dossier", payload: { dossierId: "terrain-1", metadata: { terrain: { sections: { histoire: "Famille" } } } },
     attempts: 2, last_error: "old error", created_at: 1,
   });
@@ -86,7 +91,7 @@ describe("IndexedDB offline continuity", () => {
     mocks.from.mockReturnValue({ select: () => { const query = { eq: vi.fn(() => query), maybeSingle }; return query; } });
     const first = processQueue();
     await vi.waitFor(() => expect(maybeSingle).toHaveBeenCalledOnce());
-    await db.queue.add({ kind: "initialize_journey", payload: { dossierId: "terrain-1" }, attempts: 0, created_at: 2 });
+    await db.queue.add({ viewer_user_id: "owner", kind: "initialize_journey", payload: { dossierId: "terrain-1" }, attempts: 0, created_at: 2 });
     await processQueue();
     release({ data: null, error: new Error("network failure") });
     await first;
@@ -98,7 +103,7 @@ describe("IndexedDB offline continuity", () => {
 
   it("keeps proof path, generated proof identity and Terrain section through reload and failed retries", async () => {
     const path = "owner/terrain-1/acte.pdf";
-    const id = await db.queue.add({ kind: "upload_proof", created_at: 1, attempts: 0, payload: {
+    const id = await db.queue.add({ viewer_user_id: "owner", kind: "upload_proof", created_at: 1, attempts: 0, payload: {
       file: new Blob(["acte"]), fileName: "acte.pdf", mimeType: "application/pdf", sizeBytes: 4,
       dossierId: "terrain-1", userId: "owner", storagePath: path, sectionKey: "documentation",
     } });
@@ -126,7 +131,7 @@ describe("IndexedDB offline continuity", () => {
 
   it.each(["fields", "metadata"])("never writes a guest's queued %s change directly", async (mode) => {
     mocks.userId = "invited-user";
-    await db.queue.add({ kind: "update_dossier", attempts: 0, created_at: 1, payload: {
+    await db.queue.add({ viewer_user_id: "invited-user", kind: "update_dossier", attempts: 0, created_at: 1, payload: {
       dossierId: "terrain-1", ...(mode === "fields" ? { changes: { title: "Correction" }, baseUpdatedAt: "old" } : { metadata: { terrain: {} } }),
     } });
     mocks.from.mockReturnValue({ select: () => {
@@ -137,4 +142,31 @@ describe("IndexedDB offline continuity", () => {
     expect(await db.queue.count()).toBe(1);
     expect((await db.queue.toArray())[0]).toMatchObject({ attempts: 1, last_error: "Only the dossier owner can modify this dossier" });
   });
+
+  it("hides another account's queued operations and conflicts from Sync Center", async () => {
+    await db.queue.add({
+      viewer_user_id: "another-account",
+      kind: "delete_dossier",
+      payload: { dossierId: "private-dossier" },
+      attempts: 0,
+      created_at: 1,
+    });
+    await db.conflicts.add({
+      viewer_user_id: "another-account",
+      dossier_id: "private-dossier",
+      title: "Private conflict",
+      fields: ["title"],
+      mine: { title: "Private value A" },
+      theirs: { title: "Private value B" },
+      remote_updated_at: "v1",
+      created_at: 1,
+    });
+
+    const hook = renderHook(() => useSyncCenter());
+    await waitFor(() => expect(hook.result.current.queue).toEqual([]));
+    expect(hook.result.current.conflicts).toEqual([]);
+    expect(hook.result.current.legacyUnassignedCount).toBe(0);
+    hook.unmount();
+  });
+
 });

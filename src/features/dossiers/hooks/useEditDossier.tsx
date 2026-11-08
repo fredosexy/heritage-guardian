@@ -9,38 +9,68 @@ import { assertDossierOwner, canEditDossier } from "@/services/dossier-ownership
 /** Charge le dossier (réseau puis cache local) et met les changements en file. */
 export function useEditDossier(id?: string) {
   const { user } = useAuth();
+  const userId = user?.id ?? null;
   const [dossier, setDossier] = useState<Dossier | null>(null);
+  const [dossierViewerId, setDossierViewerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const visibleDossier = dossierViewerId === userId ? dossier : null;
 
   useEffect(() => {
-    if (!id) return;
     let cancelled = false;
-    (async () => {
-      let d: Dossier | null = null;
-      try {
-        d = await dossiersRepo.getDossier(id);
-        if (d) await db.cachedDossiers.put({ id: d.id, user_id: d.user_id, data: d, cached_at: Date.now() });
-      } catch {
-        d = ((await db.cachedDossiers.get(id))?.data as Dossier) ?? null;
-      }
-      if (!cancelled) { setDossier(d); setLoading(false); }
-    })();
-    return () => { cancelled = true; };
-  }, [id]);
+    setDossier(null);
+    setDossierViewerId(null);
+    setLoading(Boolean(id && userId));
 
-  /** Renvoie false si rien n'a changé. */
+    if (!id || !userId) {
+      setLoading(false);
+      return () => { cancelled = true; };
+    }
+
+    (async () => {
+      let loaded: Dossier | null = null;
+      try {
+        loaded = await dossiersRepo.getDossier(id);
+        if (loaded) {
+          await db.cachedDossiers.put({
+            id: loaded.id,
+            user_id: loaded.user_id,
+            viewer_user_id: userId,
+            data: loaded,
+            cached_at: Date.now(),
+          });
+        }
+      } catch {
+        try {
+          const cached = await db.cachedDossiers.get(id);
+          if (cached?.viewer_user_id === userId) {
+            loaded = cached.data as Dossier;
+          }
+        } catch {
+          loaded = null;
+        }
+      }
+      if (!cancelled) {
+        setDossier(loaded);
+        setDossierViewerId(userId);
+        setLoading(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [id, userId]);
+
   const save = async (values: DossierChanges): Promise<boolean> => {
-    if (!dossier) return false;
-    assertDossierOwner(dossier, user?.id);
+    if (!visibleDossier) return false;
+    assertDossierOwner(visibleDossier, userId);
     const changes: DossierChanges = {};
     for (const f of EDITABLE_FIELDS) {
       const v = (values[f] ?? "").trim() || null;
-      if (v !== (dossier[f] ?? null)) changes[f] = v;
+      if (v !== (visibleDossier[f] ?? null)) changes[f] = v;
     }
     if (Object.keys(changes).length === 0) return false;
-    await enqueueUpdateDossier(dossier.id, changes, dossier.updated_at);
+    await enqueueUpdateDossier(visibleDossier.id, changes, visibleDossier.updated_at);
     return true;
   };
 
-  return { dossier, loading, save, canEdit: canEditDossier(dossier, user?.id) };
+  return { dossier: visibleDossier, loading, save, canEdit: canEditDossier(visibleDossier, userId) };
 }

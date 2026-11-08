@@ -52,6 +52,13 @@ async function ensureQueueIsAuthorizedForCurrentUser(dossierId: string, userId: 
   await requireCurrentOwnerForDossier(dossierId, user.id);
 }
 
+async function getStoredSessionUserId(): Promise<string> {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error) throw error;
+  if (!session?.user?.id) throw new Error("Session required");
+  return session.user.id;
+}
+
 export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "synced" | "created_at" | "updated_at"> & { localId: string }) {
   const now = Date.now();
   if (typeof navigator === "undefined" || navigator.onLine) {
@@ -63,21 +70,26 @@ export async function enqueueCreateDossier(draft: Omit<DraftDossier, "id" | "syn
     }
   }
   await db.drafts.add({ ...draft, created_at: now, updated_at: now, synced: 0 });
-  await db.queue.add({ kind: "create_dossier", payload: { localId: draft.localId }, created_at: now, attempts: 0 });
+  await db.queue.add({ kind: "create_dossier", viewer_user_id: draft.user_id, payload: { localId: draft.localId }, created_at: now, attempts: 0 });
   emit();
   void processQueue();
 }
 
 export async function enqueueDeleteDossier(dossierId: string): Promise<void> {
   if (!dossierId.trim()) throw new Error("Invalid dossier id");
+  let viewerUserId: string;
   if (typeof navigator === "undefined" || navigator.onLine) {
     const { data: { user }, error: sessionError } = await supabase.auth.getUser();
     if (sessionError) throw sessionError;
     if (!user) throw new Error("Session required");
+    viewerUserId = user.id;
     await ensureQueueIsAuthorizedForCurrentUser(dossierId, user.id);
+  } else {
+    viewerUserId = await getStoredSessionUserId();
   }
   await db.queue.add({
     kind: "delete_dossier",
+    viewer_user_id: viewerUserId,
     payload: { dossierId },
     created_at: Date.now(),
     attempts: 0,
@@ -87,14 +99,19 @@ export async function enqueueDeleteDossier(dossierId: string): Promise<void> {
 }
 
 export async function enqueueUpdateDossier(dossierId: string, changes: DossierChanges, baseUpdatedAt: string) {
+  let viewerUserId: string;
   if (typeof navigator === "undefined" || navigator.onLine) {
     const { data: { user }, error: sessionError } = await supabase.auth.getUser();
     if (sessionError) throw sessionError;
     if (!user) throw new Error("Session required");
+    viewerUserId = user.id;
     await ensureQueueIsAuthorizedForCurrentUser(dossierId, user.id);
+  } else {
+    viewerUserId = await getStoredSessionUserId();
   }
   await db.queue.add({
     kind: "update_dossier",
+    viewer_user_id: viewerUserId,
     payload: { dossierId, changes, baseUpdatedAt },
     created_at: Date.now(),
     attempts: 0,
@@ -104,15 +121,20 @@ export async function enqueueUpdateDossier(dossierId: string, changes: DossierCh
 }
 
 export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: Record<string, unknown>) {
+  let viewerUserId: string;
   if (typeof navigator === "undefined" || navigator.onLine) {
     const { data: { user }, error: sessionError } = await supabase.auth.getUser();
     if (sessionError) throw sessionError;
     if (!user) throw new Error("Session required");
+    viewerUserId = user.id;
     await ensureQueueIsAuthorizedForCurrentUser(dossierId, user.id);
+  } else {
+    viewerUserId = await getStoredSessionUserId();
   }
   const pending = await db.queue.where("kind").equals("update_dossier").toArray();
   const existing = pending.find((op): op is Extract<QueuedOp, { kind: "update_dossier" }> =>
     op.kind === "update_dossier" &&
+    op.viewer_user_id === viewerUserId &&
     op.payload?.dossierId === dossierId &&
     op.payload?.metadata &&
     typeof op.payload.metadata === "object" &&
@@ -149,7 +171,7 @@ export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: 
       : { ...previous, ...metadata };
     await db.queue.update(existing.id, { payload: { dossierId, metadata: mergedMetadata } });
   } else {
-    await db.queue.add({ kind: "update_dossier", payload: { dossierId, metadata }, created_at: Date.now(), attempts: 0 });
+    await db.queue.add({ kind: "update_dossier", viewer_user_id: viewerUserId, payload: { dossierId, metadata }, created_at: Date.now(), attempts: 0 });
   }
   emit();
   if (typeof navigator === "undefined" || navigator.onLine) void processQueue();
@@ -163,6 +185,7 @@ export async function enqueueProofUpload(params: {
   storagePath?: string;
 }) {
   const { file, dossierId, userId, sectionKey } = params;
+  if (!userId.trim()) throw new Error("Invalid proof owner");
   if (typeof navigator === "undefined" || navigator.onLine) {
     const { data: { user }, error: sessionError } = await supabase.auth.getUser();
     if (sessionError) throw sessionError;
@@ -176,6 +199,7 @@ export async function enqueueProofUpload(params: {
     `${userId}/${dossierId}/queued-${Date.now()}-${Math.random().toString(36).slice(2)}-${encodeURIComponent(file.name)}`;
   await db.queue.add({
     kind: "upload_proof",
+    viewer_user_id: userId,
     payload: {
       file,
       fileName: file.name,
@@ -213,12 +237,14 @@ async function runQueue(): Promise<void> {
   try {
     const ops = await db.queue.orderBy("created_at").toArray();
     for (const op of ops) {
-      if (op.id === undefined) continue;
+      if (op.id === undefined || !op.viewer_user_id) continue;
       const opId = op.id;
       try {
         const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
         if (sessionError) throw sessionError;
         if (!currentUser) throw new Error("Sign in to retry synchronisation");
+        // Never replay an operation created under another or unknown identity.
+        if (op.viewer_user_id !== currentUser.id) continue;
 
         if (op.kind === "create_dossier") {
           const draft = await db.drafts.where("localId").equals(op.payload.localId).first();
@@ -267,6 +293,7 @@ async function runQueue(): Promise<void> {
             if (code !== "P0002" && !message.includes("published_procedure_not_found")) {
               await db.queue.add({
                 kind: "initialize_journey",
+                viewer_user_id: currentUser.id,
                 payload: { dossierId: remoteDossierId },
                 created_at: Date.now(),
                 attempts: 0,
@@ -294,6 +321,7 @@ async function runQueue(): Promise<void> {
               const theirs: Record<string, string | null> = {};
               for (const field of Object.keys(changes) as (keyof DossierChanges)[]) theirs[field] = remote[field] ?? null;
               await db.conflicts.add({
+                viewer_user_id: currentUser.id,
                 dossier_id: dossierId,
                 title: remote.title,
                 fields,
@@ -446,7 +474,10 @@ export async function claimLocalDrafts(fromUserId: string, toUserId: string): Pr
   for (const draft of drafts) {
     if (draft.id === undefined) continue;
     await db.drafts.update(draft.id, { user_id: toUserId, updated_at: Date.now() });
-    await db.queue.add({ kind: "create_dossier", payload: { localId: draft.localId }, created_at: Date.now(), attempts: 0 });
+    await db.queue.where("kind").equals("create_dossier").filter((op) =>
+      op.kind === "create_dossier" && op.payload.localId === draft.localId
+    ).delete();
+    await db.queue.add({ kind: "create_dossier", viewer_user_id: toUserId, payload: { localId: draft.localId }, created_at: Date.now(), attempts: 0 });
   }
   emit();
   if (drafts.length > 0) void processQueue();
@@ -454,6 +485,13 @@ export async function claimLocalDrafts(fromUserId: string, toUserId: string): Pr
 }
 
 export async function discardQueuedOp(id: number) {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error) throw error;
+  if (!session?.user?.id) throw new Error("Session required");
+  const operation = await db.queue.get(id);
+  if (!operation || operation.viewer_user_id !== session.user.id) {
+    throw new Error("This queued operation does not belong to the active account");
+  }
   await db.queue.delete(id);
   emit();
 }
@@ -464,6 +502,9 @@ export async function resolveConflict(conflictId: number, values: DossierChanges
 
   const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
   if (sessionError || !currentUser) throw new Error("Session requise pour résoudre ce conflit");
+  if (conflict.viewer_user_id !== currentUser.id) {
+    throw new Error("Ce conflit n'appartient pas au compte actif");
+  }
 
   const { data: remote, error: lookupError } = await supabase
     .from("dossiers")

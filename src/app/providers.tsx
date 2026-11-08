@@ -6,6 +6,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/features/identity";
+import { PwaAssistant } from "@/features/pwa";
 import "@/core/i18n";
 
 const queryClient = new QueryClient({
@@ -20,7 +21,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              {children}
+              <PwaAssistant />
+            </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>

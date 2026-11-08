@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 interface TestOp {
   id?: number;
+  viewer_user_id?: string;
   kind: string;
   created_at: number;
   attempts: number;
@@ -72,7 +73,10 @@ vi.mock("@/data/offline/db", () => ({
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
-    auth: { getUser: vi.fn(async () => ({ data: { user: { id: "user-1" } }, error: null })) },
+    auth: {
+      getUser: vi.fn(async () => ({ data: { user: { id: "user-1" } }, error: null })),
+      getSession: vi.fn(async () => ({ data: { session: { user: { id: "user-1" } } }, error: null })),
+    },
     storage: { from: vi.fn(() => ({ upload: mocks.storageUpload })) },
     from: mocks.supabaseFrom,
   },
@@ -83,6 +87,7 @@ vi.mock("@/data/procedures.repo", () => ({
 }));
 
 import {
+  discardQueuedOp,
   enqueueDeleteDossier,
   enqueueUpdateDossierMetadata,
   processQueue,
@@ -114,6 +119,7 @@ describe("offline Terrain section updates", () => {
 
   it("preserves a queued field-level edit when Terrain metadata is also edited offline", async () => {
     await mocks.queueAdd({
+      viewer_user_id: "user-1",
       kind: "update_dossier",
       payload: {
         dossierId: "dossier-1",
@@ -246,6 +252,7 @@ describe("proof upload queue retry", () => {
   it("keeps a failed proof operation and retries with the same storage path", async () => {
     const operation: TestOp = {
       id: 41,
+      viewer_user_id: "user-1",
       kind: "upload_proof",
       created_at: 100,
       attempts: 0,
@@ -301,6 +308,7 @@ describe("proof upload queue retry", () => {
   it("retains a proof upload after a Storage error and retries the same path", async () => {
     const operation: TestOp = {
       id: 43,
+      viewer_user_id: "user-1",
       kind: "upload_proof",
       created_at: 102,
       attempts: 0,
@@ -352,6 +360,7 @@ describe("proof upload queue retry", () => {
     Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
     mocks.queued.set(42, {
       id: 42,
+      viewer_user_id: "user-1",
       kind: "upload_proof",
       created_at: 101,
       attempts: 0,
@@ -457,6 +466,7 @@ describe("offline field conflict detection", () => {
   it("keeps a field edit queued when the server changes after the conflict check", async () => {
     mocks.queued.set(52, {
       id: 52,
+      viewer_user_id: "user-1",
       kind: "update_dossier",
       created_at: 101,
       attempts: 0,
@@ -503,6 +513,7 @@ describe("offline field conflict detection", () => {
   it("persists an overlapping edit for Sync Center instead of overwriting the server", async () => {
     mocks.queued.set(51, {
       id: 51,
+      viewer_user_id: "user-1",
       kind: "update_dossier",
       created_at: 100,
       attempts: 0,
@@ -535,6 +546,7 @@ describe("offline field conflict detection", () => {
     await processQueue();
 
     expect(mocks.conflictAdd).toHaveBeenCalledWith(expect.objectContaining({
+      viewer_user_id: "user-1",
       dossier_id: "dossier-1",
       fields: ["title"],
       mine: { title: "Titre local" },
@@ -569,6 +581,7 @@ describe("offline dossier deletion and stale conflict protection", () => {
   it("refreshes a stale conflict instead of overwriting a newer server version", async () => {
     const conflict = {
       id: 71,
+      viewer_user_id: "user-1",
       dossier_id: "dossier-1",
       title: "Titre conflictuel",
       fields: ["title"],
@@ -605,4 +618,45 @@ describe("offline dossier deletion and stale conflict protection", () => {
     }));
     expect(mocks.conflictDelete).not.toHaveBeenCalled();
   });
+
+describe("account-scoped offline queue access", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+  });
+
+  it("does not replay operations assigned to another account", async () => {
+    mocks.queued.set(91, {
+      id: 91,
+      viewer_user_id: "user-2",
+      kind: "delete_dossier",
+      created_at: 1,
+      attempts: 0,
+      payload: { dossierId: "private-dossier-2" },
+    });
+
+    await processQueue();
+
+    expect(mocks.supabaseFrom).not.toHaveBeenCalled();
+    expect(mocks.queued.has(91)).toBe(true);
+  });
+
+  it("refuses to discard another account's queued operation", async () => {
+    mocks.queued.set(92, {
+      id: 92,
+      viewer_user_id: "user-2",
+      kind: "delete_dossier",
+      created_at: 1,
+      attempts: 0,
+      payload: { dossierId: "private-dossier-2" },
+    });
+
+    await expect(discardQueuedOp(92)).rejects.toThrow("does not belong to the active account");
+
+    expect(mocks.queueDelete).not.toHaveBeenCalled();
+    expect(mocks.queued.has(92)).toBe(true);
+  });
+});
+
 });
