@@ -11,7 +11,7 @@
 |---|---|---|---|
 | 1 | HTTPS, portée du service worker et routes profondes | Manifest et enregistrement prévus à la racine en production ; HTTPS, portée effective, en-têtes et réécritures du serveur non démontrés | À confirmer sur déploiement |
 | 2 | Installation Android / Chrome | Membres essentiels du manifest présents ; capture précoce de `beforeinstallprompt` et invite déclenchée par action utilisateur ; éligibilité réelle et icônes non validées sur appareil | Conforme au niveau du code, terrain requis |
-| 3 | Installation iOS / Safari | Icône Apple, métadonnées et détection `navigator.standalone` présentes ; instruction d'installation à actualiser pour l'option « Ouvrir comme app web » des versions récentes | Correction documentaire/UI recommandée |
+| 3 | Installation iOS / Safari | Icône Apple, métadonnées et détection `navigator.standalone` présentes ; consigne de l'assistant actualisée pour « Ouvrir comme app web » lorsque l'option est proposée | Code corrigé, terrain requis |
 | 4 | Première visite et mode hors ligne | Précache et cache runtime restreint ; les documents Storage ne sont pas mis en cache ; message « ressources essentielles » nuancé ; page hors ligne dédiée et disponibilité réelle de chaque route non prouvées | Partiellement couvert |
 | 5 | Perte réseau et reprise | Écouteurs `online/offline`, file Dexie et contrôle de session/droits avant rejeu ; `navigator.onLine` ne prouve pas l'accès au serveur | Conforme au principe, terrain requis |
 | 6 | Deux comptes sur un appareil | Instantanés, opérations et conflits attribués au compte lecteur ; migration v4/v5 et tests d'isolation présents ; test réel multi-compte non effectué | Couverture automatisée présente, terrain requis |
@@ -58,8 +58,8 @@
 - La détection inclut `navigator.standalone`, les modes d'affichage et le cas iPadOS signalé comme Mac tactile.
 - L'assistant explique le parcours Safari de partage puis ajout à l'écran d'accueil.
 
-**Écart identifié**
-- La documentation Apple actuelle décrit également l'option **« Ouvrir comme app web »** lors de l'ajout à l'écran d'accueil. L'assistant ne la mentionne pas. L'instruction devrait dire de l'activer si elle est proposée, sans supposer que toutes les versions d'iOS affichent exactement la même interface.
+**Correction appliquée dans la PR #71**
+- La documentation Apple actuelle décrit également l'option **« Ouvrir comme app web »** lors de l'ajout à l'écran d'accueil. Le texte de l'assistant a été actualisé pour recommander de l'activer lorsqu'elle est proposée, sans supposer que toutes les versions d'iOS affichent exactement la même interface.
 
 **À prouver sur appareil**
 - Ajout à l'écran d'accueil, lancement depuis l'icône, comportement autonome et valeur effective de `navigator.standalone` sur les versions ciblées.
