@@ -3,9 +3,9 @@ import App from "./app/App";
 import "./index.css";
 import { initSyncListeners } from "./data/offline/sync";
 import { clearLegacyPrivatePwaCaches } from "./features/pwa/cachePolicy";
-import { setPwaUpdateWorker } from "./features/pwa/registration";
+import { publishPwaStatus, setPwaUpdateWorker } from "./features/pwa/registration";
 
-const dispatchPwaEvent = (name: string) => window.dispatchEvent(new Event(name));
+const reportPwaError = () => publishPwaStatus("error");
 
 // PWA is intentionally disabled in embedded Lovable previews.
 const isInIframe = (() => {
@@ -28,13 +28,13 @@ if (isPreviewHost || isInIframe) {
     }).catch(() => undefined);
   }
 } else if ("serviceWorker" in navigator && import.meta.env.PROD) {
-  void clearLegacyPrivatePwaCaches().catch(() => dispatchPwaEvent("heritis:pwa-error"));
+  void clearLegacyPrivatePwaCaches().catch(() => reportPwaError());
 
   import("virtual:pwa-register").then(({ registerSW }) => {
     const updateSW = registerSW({
       immediate: true,
-      onNeedRefresh() { dispatchPwaEvent("heritis:pwa-update"); },
-      onOfflineReady() { dispatchPwaEvent("heritis:pwa-offline-ready"); },
+      onNeedRefresh() { publishPwaStatus("update"); },
+      onOfflineReady() { publishPwaStatus("offline-ready"); },
       onRegisterError() { dispatchPwaEvent("heritis:pwa-error"); },
       onRegisteredSW(_swUrl, registration) {
         if (!registration) return;
