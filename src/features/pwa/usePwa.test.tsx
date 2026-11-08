@@ -59,4 +59,19 @@ describe("usePwa", () => {
     expect(result.current.android).toBe(true);
   });
 
+
+  it("retains an install prompt that fires before the assistant mounts", async () => {
+    const prompt = vi.fn().mockResolvedValue(undefined);
+    const event = Object.assign(new Event("beforeinstallprompt"), {
+      prompt,
+      userChoice: Promise.resolve({ outcome: "dismissed" as const, platform: "web" }),
+    });
+    act(() => window.dispatchEvent(event));
+
+    const { result } = renderHook(() => usePwa());
+    expect(result.current.canPromptInstall).toBe(true);
+    await act(async () => { await result.current.install(); });
+    expect(prompt).toHaveBeenCalledTimes(1);
+  });
+
 });
