@@ -87,6 +87,7 @@ vi.mock("@/data/procedures.repo", () => ({
 }));
 
 import {
+  discardQueuedOp,
   enqueueDeleteDossier,
   enqueueUpdateDossierMetadata,
   processQueue,
@@ -616,4 +617,45 @@ describe("offline dossier deletion and stale conflict protection", () => {
     }));
     expect(mocks.conflictDelete).not.toHaveBeenCalled();
   });
+
+describe("account-scoped offline queue access", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.queued.clear();
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: true });
+  });
+
+  it("does not replay operations assigned to another account", async () => {
+    mocks.queued.set(91, {
+      id: 91,
+      viewer_user_id: "user-2",
+      kind: "delete_dossier",
+      created_at: 1,
+      attempts: 0,
+      payload: { dossierId: "private-dossier-2" },
+    });
+
+    await processQueue();
+
+    expect(mocks.supabaseFrom).not.toHaveBeenCalled();
+    expect(mocks.queued.has(91)).toBe(true);
+  });
+
+  it("refuses to discard another account's queued operation", async () => {
+    mocks.queued.set(92, {
+      id: 92,
+      viewer_user_id: "user-2",
+      kind: "delete_dossier",
+      created_at: 1,
+      attempts: 0,
+      payload: { dossierId: "private-dossier-2" },
+    });
+
+    await expect(discardQueuedOp(92)).rejects.toThrow("does not belong to the active account");
+
+    expect(mocks.queueDelete).not.toHaveBeenCalled();
+    expect(mocks.queued.has(92)).toBe(true);
+  });
+});
+
 });
