@@ -106,9 +106,14 @@ export default function ModulePage() {
             <div className="min-w-0 flex-1">
               <h2 className="text-base font-semibold">{t(typeLabelKey("batiment"))}</h2>
               <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{t("create.buildingDesc")}</p>
-              <Button onClick={() => navigate(isGuest ? "/auth" : "/create?type=batiment")} className="mt-4 min-h-11 w-full rounded-2xl">
-                {t(isGuest ? "home.visitorAccountCta" : "create.buildingFormTitle")} <ChevronRight className="size-4 ml-2" />
-              </Button>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                <Button variant="outline" onClick={() => navigate(isGuest ? "/auth" : "/buildings")} className="min-h-11 rounded-2xl">
+                  {t(isGuest ? "home.visitorAccountCta" : "buildings.viewAll")} <ChevronRight className="size-4 ml-2" />
+                </Button>
+                <Button onClick={() => navigate(isGuest ? "/auth" : "/create?type=batiment")} className="min-h-11 rounded-2xl">
+                  {t(isGuest ? "home.visitorAccountCta" : "create.buildingFormTitle")} <ChevronRight className="size-4 ml-2" />
+                </Button>
+              </div>
             </div>
           </div>
         </section>
