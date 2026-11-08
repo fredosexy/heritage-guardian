@@ -500,3 +500,9 @@ Avant validation d'une évolution de données, confirmer :
 ## Référentiel permanent complémentaire
 
 Les exigences de validation, de qualité du code, de tests, de sécurité, de performance, de maintenabilité et de modernisation sont définies dans [TESTING-REQUIREMENTS.md](TESTING-REQUIREMENTS.md). Elles s'appliquent à tout changement relevant de ce document.
+
+---
+
+## Exigences permanentes de tests et de qualité
+
+Les règles de validation du comportement réel, de qualité du code de production, de sécurité, de maintenabilité, de scalabilité, de résilience, d'accessibilité et de modernisation progressive sont définies dans [TESTING-REQUIREMENTS.md](TESTING-REQUIREMENTS.md). Les techniques éprouvées et déjà maîtrisées doivent être privilégiées ; toute nouvelle technologie doit démontrer son bénéfice, sa maturité, sa sécurité et son coût total avant adoption.
