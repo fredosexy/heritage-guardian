@@ -326,6 +326,49 @@ export default function DossierDetailPage() {
         );
       })()}
 
+      {dossier.type === "agricole" && (() => {
+        const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+          ? dossier.metadata as Record<string, unknown>
+          : {};
+        const raw = metadata.agriculturalRural;
+        const asset = raw && typeof raw === "object" && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
+        const family = typeof asset.family === "string" ? asset.family : "autre";
+        const required: Record<string, string[]> = {
+          exploitation: ["activities", "activeSince"],
+          plantation: ["cropType", "declaredArea", "areaUnit"],
+          elevage: ["animalType", "declaredQuantity", "inventoryDate"],
+          equipement: ["equipmentType", "condition"],
+          infrastructure: ["infrastructureType", "use"],
+          autre: ["nature", "characteristics"],
+        };
+        const familyDetails = asset.familyDetails && typeof asset.familyDetails === "object" && !Array.isArray(asset.familyDetails)
+          ? asset.familyDetails as Record<string, unknown>
+          : {};
+        const missing = (required[family] ?? required.autre).filter((key) => familyDetails[key] === undefined || familyDetails[key] === null || String(familyDetails[key]).trim() === "");
+        const actions = [
+          ...(missing.length > 0 ? [{ key: "details", label: t("agricultural.actions.completeDetails", { count: missing.length }), run: () => navigate(`/dossiers/${dossier.id}/edit`) }] : []),
+          ...(!dossier.location_name && !asset.geospatial ? [{ key: "location", label: t("agricultural.actions.addLocation"), run: () => navigate(`/dossiers/${dossier.id}/edit`) }] : []),
+          ...(proofs.length === 0 ? [{ key: "proof", label: t("agricultural.actions.addProof"), run: () => document.getElementById("proofs")?.scrollIntoView({ behavior: "smooth", block: "start" }) }] : []),
+        ];
+        if (actions.length === 0) return null;
+        return (
+          <section className="mb-4 rounded-3xl border border-primary/15 bg-accent/20 p-4" aria-live="polite">
+            <div className="flex items-center gap-2">
+              <Sparkles className="size-4 text-primary" />
+              <h2 className="text-sm font-semibold">{t("agricultural.actions.title")}</h2>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.actions.hint")}</p>
+            <div className="mt-3 flex flex-col gap-2">
+              {actions.map((action) => (
+                <Button key={action.key} type="button" variant="outline" disabled={!canEdit && action.key !== "proof"} onClick={action.run} className="min-h-11 justify-start rounded-xl bg-background text-left">
+                  {action.label}
+                </Button>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
+
       {dossier.type === "terrain" && (
         <TerrainChecklistAssist dossier={dossier} proofs={proofs} canEdit={canEdit} onSaved={() => void reload().catch(() => undefined)} />
       )}
