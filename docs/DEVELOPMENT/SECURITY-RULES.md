@@ -651,7 +651,8 @@ Lire ce document avec :
 - `GOVERNANCE.md` — responsabilités, autorisations, arbitrages et exceptions ;
 - `ARCHITECTURE-RULES.md` — couches, frontières, contrats, IA et résilience ;
 - `DATA-AND-DATABASE-RULES.md` — classification, schémas, RLS, rétention et migrations ;
-- `AI-AND-AUTOMATION-RULES.md` — gouvernance détaillée des modèles, agents, outils et automatisations ;\n- `UI-UX-STANDARDS.md` — exigences d'interface pour les profils, permissions, données privées, états d'accès et interactions sensibles ;
+- `AI-AND-AUTOMATION-RULES.md` — gouvernance détaillée des modèles, agents, outils et automatisations ;
+- `UI-UX-STANDARDS.md` — exigences d'interface pour les profils, permissions, données privées, états d'accès et interactions sensibles ;
 - `TESTING-REQUIREMENTS.md` — tests et preuves ;
 - procédures d'incident, de sauvegarde, de déploiement et de gestion des secrets.
 
