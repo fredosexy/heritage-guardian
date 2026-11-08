@@ -67,7 +67,8 @@ La suite PWA doit couvrir au minimum :
 - test d'intégration navigateur à ajouter/valider pour reproduire un ancien worker actif, un nouveau worker en attente, l'acceptation de la mise à jour, la purge à l'activation et l'absence de recréation après transfert de contrôle ;
 - isolation des instantanés IndexedDB par compte lecteur ;
 - migration Dexie et préservation des brouillons/opérations en attente ;
-- build de production et génération effective du service worker/manifest.
+- build de production et génération effective du service worker/manifest ;
+- vérification post-build que `dist/sw.js` importe le hook de migration et que le fichier importé existe dans `dist/`.
 
 Les tests unitaires ne remplacent pas les essais sur appareils réels.
 
