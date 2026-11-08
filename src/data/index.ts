@@ -1,4 +1,5 @@
 export * as dossiersRepo from "./dossiers.repo";
+export * as buildingsRepo from "./buildings.repo";
 export * as proofsRepo from "./proofs.repo";
 export { countProofsByDossier } from "./proofs.repo";
 export * as participantsRepo from "./participants.repo";
