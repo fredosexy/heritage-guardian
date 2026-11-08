@@ -267,7 +267,7 @@ async function runQueue(): Promise<void> {
             if (code !== "P0002" && !message.includes("published_procedure_not_found")) {
               await db.queue.add({
                 kind: "initialize_journey",
-                payload: { dossierId: data.id },
+                payload: { dossierId: remoteDossierId },
                 created_at: Date.now(),
                 attempts: 0,
                 last_error: message,
