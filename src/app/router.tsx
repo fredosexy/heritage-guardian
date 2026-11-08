@@ -23,7 +23,7 @@ export function AppRoutes() {
       <Route path="/index.html" element={<Navigate to="/" replace />} />
       <Route path="/modules/:moduleId" element={<ModulePage />} />
       <Route path="/assistant" element={<AssistantPage />} />
-      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProfilePage />} />
 
       <Route path="/dossiers" element={<ProtectedRoute><DossiersPage /></ProtectedRoute>} />
       <Route path="/buildings" element={<ProtectedRoute><BuildingsPage /></ProtectedRoute>} />
