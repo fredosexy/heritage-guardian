@@ -78,7 +78,7 @@ export default function DossierDetailPage() {
   useEffect(() => {
     if (!dossier || dossier.type !== "terrain") return;
     const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
-      ? dossier.metadata as { terrain?: { sections?: Record<string, string> } }
+      ? dossier.metadata as { terrain?: { sections?: Record<string, string>; geospatial?: TerrainGeospatialData } }
       : {};
     const sections = metadata.terrain?.sections ?? {};
     setTerrainSections(sections);
