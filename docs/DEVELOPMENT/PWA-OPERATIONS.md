@@ -29,7 +29,9 @@
 - Le précache Workbox est réservé aux ressources statiques de l'application.
 - Le cache runtime est limité aux bibliothèques cartographiques publiques et aux icônes.
 - Les réponses Supabase Storage ne sont plus mises en cache par une règle générique dans la nouvelle configuration.
-- Le cache historique `supabase-storage` est supprimé au démarrage ; **cette purge au démarrage ne suffit pas, à elle seule, à prouver que l'ancien service worker ne peut pas recréer ce cache pendant la transition**. Voir le point bloquant décrit dans la revue des 8 parcours.
+- Le cache historique `supabase-storage` est supprimé au démarrage en défense complémentaire.
+- Le script `public/pwa-legacy-cache-cleanup.js` est importé dans le service worker Workbox généré. Son gestionnaire `activate` passe la suppression du cache historique à `event.waitUntil()` : l'activation du nouveau worker attend donc la fin de cette purge.
+- Cette purge d'activation traite la remise de contrôle ; elle ne prétend pas empêcher l'ancien worker de remplir son cache tant que la mise à jour est encore en attente et que l'utilisateur n'a pas accepté son activation. La migration réelle et les onglets multiples doivent encore être vérifiés.
 - Les dossiers mis en cache dans IndexedDB sont associés à l'identité du compte qui avait obtenu le droit de les consulter (`viewer_user_id`). Le propriétaire métier reste conservé séparément dans `user_id`.
 - Le schéma Dexie version 4 supprime les anciens instantanés qui ne portent pas l'identité du lecteur. Ils ne sont donc jamais réutilisés comme cache hors ligne pour un autre compte.
 - Les opérations en attente et les conflits sont associés au compte lecteur (`viewer_user_id`) ; le centre de synchronisation ne montre que les éléments du compte actif.
@@ -60,7 +62,9 @@ La suite PWA doit couvrir au minimum :
 - détection du parcours manuel iOS ;
 - transitions réseau `online/offline` ;
 - activation contrôlée d'une mise à jour en attente ;
-- suppression du cache historique Supabase Storage, y compris transition depuis un ancien worker ;
+- suppression du cache historique Supabase Storage au démarrage et pendant l'activation du nouveau worker ;
+- test du gestionnaire `activate` : vérification de `event.waitUntil()` et de l'attente effective de la suppression ;
+- test d'intégration navigateur à ajouter/valider pour reproduire un ancien worker actif, un nouveau worker en attente, l'acceptation de la mise à jour, la purge à l'activation et l'absence de recréation après transfert de contrôle ;
 - isolation des instantanés IndexedDB par compte lecteur ;
 - migration Dexie et préservation des brouillons/opérations en attente ;
 - build de production et génération effective du service worker/manifest.
