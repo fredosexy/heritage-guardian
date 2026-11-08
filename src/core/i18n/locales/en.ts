@@ -175,6 +175,7 @@ export const en = {
       infrastructure: "Installation type, use, resources and description…",
       autre: "Describe the nature of this rural asset and what distinguishes it…"
     },
+    invalidNumber: "Invalid numeric value. Enter a positive number or zero.",
     structuredTitle: "Structured asset information",
     structuredHint: "Fields adapt to the asset family. All entered values remain declarations.",
     fields: {
