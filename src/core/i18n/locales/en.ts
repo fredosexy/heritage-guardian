@@ -195,6 +195,7 @@ export const en = {
     notFound: "Dossier not found.",
     createdOn: "Created on",
     typeLabel: "Type",
+    typeBatiment: "Buildings and real estate",
     kb: "KB",
     proofAdded: "Proof added",
     proofVerified: "Marked as verified — review not independently confirmed",
