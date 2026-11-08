@@ -4,11 +4,15 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 
 const mocks = vi.hoisted(() => ({ from: vi.fn(), upload: vi.fn(), userId: "owner", update: vi.fn() }));
 vi.mock("@/integrations/supabase/client", () => ({ supabase: {
-  auth: { getUser: vi.fn(async () => ({ data: { user: { id: mocks.userId } }, error: null })) },
+  auth: {
+    getUser: vi.fn(async () => ({ data: { user: { id: mocks.userId } }, error: null })),
+    getSession: vi.fn(async () => ({ data: { session: { user: { id: mocks.userId } } }, error: null })),
+  },
   from: mocks.from,
   storage: { from: vi.fn(() => ({ upload: mocks.upload })) },
 } }));
 vi.mock("@/data/procedures.repo", () => ({ initializeDossierJourney: vi.fn() }));
+vi.mock("@/features/identity", () => ({ useAuth: () => ({ user: { id: mocks.userId } }) }));
 import { db } from "./db";
 import { enqueueUpdateDossierMetadata, processQueue } from "./sync";
 import { useSyncCenter } from "@/features/offline/hooks/useSyncCenter";
@@ -86,7 +90,7 @@ describe("IndexedDB offline continuity", () => {
     mocks.from.mockReturnValue({ select: () => { const query = { eq: vi.fn(() => query), maybeSingle }; return query; } });
     const first = processQueue();
     await vi.waitFor(() => expect(maybeSingle).toHaveBeenCalledOnce());
-    await db.queue.add({ kind: "initialize_journey", payload: { dossierId: "terrain-1" }, attempts: 0, created_at: 2 });
+    await db.queue.add({ viewer_user_id: "owner", kind: "initialize_journey", payload: { dossierId: "terrain-1" }, attempts: 0, created_at: 2 });
     await processQueue();
     release({ data: null, error: new Error("network failure") });
     await first;
@@ -98,7 +102,7 @@ describe("IndexedDB offline continuity", () => {
 
   it("keeps proof path, generated proof identity and Terrain section through reload and failed retries", async () => {
     const path = "owner/terrain-1/acte.pdf";
-    const id = await db.queue.add({ kind: "upload_proof", created_at: 1, attempts: 0, payload: {
+    const id = await db.queue.add({ viewer_user_id: "owner", kind: "upload_proof", created_at: 1, attempts: 0, payload: {
       file: new Blob(["acte"]), fileName: "acte.pdf", mimeType: "application/pdf", sizeBytes: 4,
       dossierId: "terrain-1", userId: "owner", storagePath: path, sectionKey: "documentation",
     } });
@@ -126,7 +130,7 @@ describe("IndexedDB offline continuity", () => {
 
   it.each(["fields", "metadata"])("never writes a guest's queued %s change directly", async (mode) => {
     mocks.userId = "invited-user";
-    await db.queue.add({ kind: "update_dossier", attempts: 0, created_at: 1, payload: {
+    await db.queue.add({ viewer_user_id: "invited-user", kind: "update_dossier", attempts: 0, created_at: 1, payload: {
       dossierId: "terrain-1", ...(mode === "fields" ? { changes: { title: "Correction" }, baseUpdatedAt: "old" } : { metadata: { terrain: {} } }),
     } });
     mocks.from.mockReturnValue({ select: () => {
