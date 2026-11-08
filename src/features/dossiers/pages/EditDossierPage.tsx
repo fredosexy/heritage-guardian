@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useEditDossier } from "../hooks/useEditDossier";
 import { AgriculturalFamilyFields } from "./AgriculturalFamilyFields";
+import { useDossiers } from "../hooks/useDossiers";
 
 type Family = "exploitation" | "plantation" | "elevage" | "equipement" | "infrastructure" | "autre";
 const FAMILIES: Family[] = ["exploitation", "plantation", "elevage", "equipement", "infrastructure", "autre"];
@@ -19,12 +20,14 @@ export default function EditDossierPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { dossier, loading, save, saveAgricultural, canEdit } = useEditDossier(id);
+  const { dossiers: availableDossiers } = useDossiers();
   const [form, setForm] = useState({ title: "", description: "", location_name: "" });
   const [family, setFamily] = useState<Family>("exploitation");
   const [specifics, setSpecifics] = useState("");
   const [familyDetails, setFamilyDetails] = useState<Record<string, string>>({});
   const [declaredPeople, setDeclaredPeople] = useState<Array<{ id: string; name: string; role: string; note: string; source: "declarant"; status: "declare"; recordedAt: string }>>([]);
   const [events, setEvents] = useState<Array<{ id: string; type: string; date: string; description: string; source: "declarant"; recordedAt: string }>>([]);
+  const [relatedAssets, setRelatedAssets] = useState<Array<{ dossierId: string; relationType: string }>>([]);
   const [personDraft, setPersonDraft] = useState({ name: "", role: "owner_declared", note: "" });
   const [eventDraft, setEventDraft] = useState({ type: "inventory", date: new Date().toISOString().slice(0, 10), description: "" });
   const [busy, setBusy] = useState(false);
@@ -46,6 +49,7 @@ export default function EditDossierPage() {
       setFamilyDetails(Object.fromEntries(Object.entries(details).map(([key, value]) => [key, String(value)])));
       setDeclaredPeople(Array.isArray(asset.declaredPeople) ? asset.declaredPeople as typeof declaredPeople : []);
       setEvents(Array.isArray(asset.events) ? asset.events as typeof events : []);
+      setRelatedAssets(Array.isArray(asset.relatedAssets) ? asset.relatedAssets as typeof relatedAssets : []);
     }
   }, [dossier]);
 
@@ -76,6 +80,7 @@ export default function EditDossierPage() {
           familyDetails: familyDetailsNormalized,
           declaredPeople,
           events,
+          relatedAssets,
         });
       }
       if (!mainChanged && !agriculturalChanged) {
@@ -160,6 +165,25 @@ export default function EditDossierPage() {
                   setPersonDraft({ name: "", role: "owner_declared", note: "" });
                 }}>{t("agricultural.people.add")}</Button>
                 {declaredPeople.length > 0 ? <ul className="space-y-2">{declaredPeople.map((person) => <li key={person.id} className="flex items-start justify-between gap-2 rounded-xl bg-muted/40 p-3"><div className="min-w-0"><p className="text-sm font-medium">{person.name}</p><p className="text-xs text-muted-foreground">{t("agricultural.people.roles." + person.role)} · {t("agricultural.people.declared")}</p>{person.note ? <p className="mt-1 text-xs">{person.note}</p> : null}</div><Button type="button" size="sm" variant="ghost" onClick={() => setDeclaredPeople((current) => current.filter((item) => item.id !== person.id))}>{t("common.delete")}</Button></li>)}</ul> : <p className="text-xs text-muted-foreground">{t("agricultural.people.empty")}</p>}
+              </section>
+              <section className="space-y-3 rounded-2xl border border-border p-4">
+                <div>
+                  <h3 className="text-sm font-semibold">{t("agricultural.links.title")}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.links.disclaimer")}</p>
+                </div>
+                {availableDossiers.filter((item) => item.id !== dossier.id && ["terrain", "batiment", "agricole"].includes(item.type) && !item.local).length > 0 ? (
+                  <div className="space-y-2">
+                    {availableDossiers.filter((item) => item.id !== dossier.id && ["terrain", "batiment", "agricole"].includes(item.type) && !item.local).map((item) => {
+                      const current = relatedAssets.find((link) => link.dossierId === item.id);
+                      return <div key={item.id} className="grid gap-2 rounded-xl bg-muted/40 p-3 sm:grid-cols-[1fr_auto] sm:items-center">
+                        <label className="flex min-w-0 items-center gap-2 text-sm"><input type="checkbox" checked={Boolean(current)} onChange={(event) => setRelatedAssets((links) => event.target.checked ? [...links, { dossierId: item.id, relationType: "associated_asset" }] : links.filter((link) => link.dossierId !== item.id))} /><span className="min-w-0"><span className="block truncate font-medium">{item.title}</span><span className="text-xs text-muted-foreground">{t("dossier.typeLabel")}: {item.type}</span></span></label>
+                        {current ? <select aria-label={t("agricultural.links.relationTo", { title: item.title })} value={current.relationType} onChange={(event) => setRelatedAssets((links) => links.map((link) => link.dossierId === item.id ? { ...link, relationType: event.target.value } : link))} className="min-h-10 rounded-xl border border-input bg-background px-2 text-xs">
+                          {["grouped_under","located_on","installed_on","associated_asset"].map((relation) => <option key={relation} value={relation}>{t("agricultural.links.types." + relation)}</option>)}
+                        </select> : null}
+                      </div>;
+                    })}
+                  </div>
+                ) : <p className="text-xs text-muted-foreground">{t("agricultural.links.empty")}</p>}
               </section>
               <section className="space-y-3 rounded-2xl border border-border p-4">
                 <div>
