@@ -65,7 +65,11 @@ export default function DossierDetailPage() {
             metadata: {},
             created_at: dossier.created_at,
             updated_at: dossier.updated_at,
-            ...fallback,
+            property_kind: fallback.property_kind,
+            locality: fallback.locality ?? null,
+            address_description: fallback.address_description ?? null,
+            declared_surface: fallback.declared_surface ?? null,
+            surface_unit: fallback.surface_unit ?? "m2",
           });
         } else {
           toast.error(error instanceof Error ? error.message : t("auth.error"));
@@ -78,7 +82,7 @@ export default function DossierDetailPage() {
   useEffect(() => {
     if (!dossier || dossier.type !== "terrain") return;
     const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
-      ? dossier.metadata as { terrain?: { sections?: Record<string, string> } }
+      ? dossier.metadata as { terrain?: { sections?: Record<string, string>; geospatial?: TerrainGeospatialData } }
       : {};
     const sections = metadata.terrain?.sections ?? {};
     setTerrainSections(sections);

@@ -1,0 +1,1 @@
+ALTER TYPE public.dossier_type ADD VALUE IF NOT EXISTS 'batiment';

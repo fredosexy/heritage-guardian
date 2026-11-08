@@ -173,8 +173,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          { foreignKeyName: "building_events_building_dossier_id_fkey"; columns: ["building_dossier_id"]; isOneToOne: false; referencedRelation: "building_properties"; referencedColumns: ["dossier_id"] },
-          { foreignKeyName: "building_events_unit_id_fkey"; columns: ["unit_id"]; isOneToOne: false; referencedRelation: "building_units"; referencedColumns: ["id"] }
+          {
+            foreignKeyName: "building_events_building_dossier_id_fkey"
+            columns: ["building_dossier_id"]
+            isOneToOne: false
+            referencedRelation: "building_properties"
+            referencedColumns: ["dossier_id"]
+          },
+          {
+            foreignKeyName: "building_events_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "building_units"
+            referencedColumns: ["id"]
+          },
         ]
       }
       building_person_relations: {
@@ -221,8 +233,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          { foreignKeyName: "building_person_relations_building_dossier_id_fkey"; columns: ["building_dossier_id"]; isOneToOne: false; referencedRelation: "building_properties"; referencedColumns: ["dossier_id"] },
-          { foreignKeyName: "building_person_relations_unit_id_fkey"; columns: ["unit_id"]; isOneToOne: false; referencedRelation: "building_units"; referencedColumns: ["id"] }
+          {
+            foreignKeyName: "building_person_relations_building_dossier_id_fkey"
+            columns: ["building_dossier_id"]
+            isOneToOne: false
+            referencedRelation: "building_properties"
+            referencedColumns: ["dossier_id"]
+          },
+          {
+            foreignKeyName: "building_person_relations_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "building_units"
+            referencedColumns: ["id"]
+          },
         ]
       }
       building_properties: {
@@ -266,52 +290,70 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          { foreignKeyName: "building_properties_dossier_id_fkey"; columns: ["dossier_id"]; isOneToOne: true; referencedRelation: "dossiers"; referencedColumns: ["id"] },
-          { foreignKeyName: "building_properties_parent_terrain_dossier_id_fkey"; columns: ["parent_terrain_dossier_id"]; isOneToOne: false; referencedRelation: "dossiers"; referencedColumns: ["id"] }
+          {
+            foreignKeyName: "building_properties_dossier_id_fkey"
+            columns: ["dossier_id"]
+            isOneToOne: true
+            referencedRelation: "dossiers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "building_properties_parent_terrain_dossier_id_fkey"
+            columns: ["parent_terrain_dossier_id"]
+            isOneToOne: false
+            referencedRelation: "dossiers"
+            referencedColumns: ["id"]
+          },
         ]
       }
       building_units: {
         Row: {
           building_dossier_id: string
           created_at: string
+          declared_surface: number | null
           description: string | null
           designation: string
           id: string
           metadata: Json
           occupancy_status: string
           surface_unit: string
-          declared_surface: number | null
           unit_kind: string
           updated_at: string
         }
         Insert: {
           building_dossier_id: string
           created_at?: string
+          declared_surface?: number | null
           description?: string | null
           designation: string
           id?: string
           metadata?: Json
           occupancy_status?: string
           surface_unit?: string
-          declared_surface?: number | null
           unit_kind: string
           updated_at?: string
         }
         Update: {
           building_dossier_id?: string
           created_at?: string
+          declared_surface?: number | null
           description?: string | null
           designation?: string
           id?: string
           metadata?: Json
           occupancy_status?: string
           surface_unit?: string
-          declared_surface?: number | null
           unit_kind?: string
           updated_at?: string
         }
         Relationships: [
-          { foreignKeyName: "building_units_building_dossier_id_fkey"; columns: ["building_dossier_id"]; isOneToOne: false; referencedRelation: "building_properties"; referencedColumns: ["dossier_id"] }
+          {
+            foreignKeyName: "building_units_building_dossier_id_fkey"
+            columns: ["building_dossier_id"]
+            isOneToOne: false
+            referencedRelation: "building_properties"
+            referencedColumns: ["dossier_id"]
+          },
         ]
       }
       dossier_steps: {
@@ -741,7 +783,13 @@ export type Database = {
       alert_type: "urgent" | "info" | "suggestion"
       app_role: "admin" | "moderator" | "user"
       dossier_status: "secure" | "incomplete" | "risk"
-      dossier_type: "terrain" | "batiment" | "heritage" | "volonte" | "conflit" | "savoir"
+      dossier_type:
+        | "terrain"
+        | "heritage"
+        | "volonte"
+        | "conflit"
+        | "savoir"
+        | "batiment"
       dossier_visibility: "private" | "family" | "public"
       participant_role: "owner" | "heir" | "witness" | "expert" | "viewer"
       proof_type: "image" | "document" | "video" | "audio"
@@ -876,7 +924,14 @@ export const Constants = {
       alert_type: ["urgent", "info", "suggestion"],
       app_role: ["admin", "moderator", "user"],
       dossier_status: ["secure", "incomplete", "risk"],
-      dossier_type: ["terrain", "batiment", "heritage", "volonte", "conflit", "savoir"],
+      dossier_type: [
+        "terrain",
+        "heritage",
+        "volonte",
+        "conflit",
+        "savoir",
+        "batiment",
+      ],
       dossier_visibility: ["private", "family", "public"],
       participant_role: ["owner", "heir", "witness", "expert", "viewer"],
       proof_type: ["image", "document", "video", "audio"],
