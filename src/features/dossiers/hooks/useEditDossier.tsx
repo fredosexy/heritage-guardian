@@ -9,29 +9,48 @@ import { assertDossierOwner, canEditDossier } from "@/services/dossier-ownership
 /** Charge le dossier (réseau puis cache local) et met les changements en file. */
 export function useEditDossier(id?: string) {
   const { user } = useAuth();
+  const userId = user?.id ?? null;
   const [dossier, setDossier] = useState<Dossier | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
     let cancelled = false;
-    (async () => {
-      let d: Dossier | null = null;
-      try {
-        d = await dossiersRepo.getDossier(id);
-        if (d) await db.cachedDossiers.put({ id: d.id, user_id: d.user_id, data: d, cached_at: Date.now() });
-      } catch {
-        d = ((await db.cachedDossiers.get(id))?.data as Dossier) ?? null;
-      }
-      if (!cancelled) { setDossier(d); setLoading(false); }
-    })();
-    return () => { cancelled = true; };
-  }, [id]);
+    setDossier(null);
+    setLoading(Boolean(id && userId));
 
-  /** Renvoie false si rien n'a changé. */
+    if (!id || !userId) {
+      setLoading(false);
+      return () => { cancelled = true; };
+    }
+
+    (async () => {
+      let loaded: Dossier | null = null;
+      try {
+        loaded = await dossiersRepo.getDossier(id);
+        if (loaded && loaded.user_id === userId) {
+          await db.cachedDossiers.put({ id: loaded.id, user_id: loaded.user_id, data: loaded, cached_at: Date.now() });
+        } else if (loaded) {
+          loaded = null;
+        }
+      } catch {
+        const cached = await db.cachedDossiers.get(id);
+        if (cached?.user_id === userId) {
+          const cachedDossier = cached.data as Dossier;
+          loaded = cachedDossier.user_id === userId ? cachedDossier : null;
+        }
+      }
+      if (!cancelled) {
+        setDossier(loaded);
+        setLoading(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [id, userId]);
+
   const save = async (values: DossierChanges): Promise<boolean> => {
     if (!dossier) return false;
-    assertDossierOwner(dossier, user?.id);
+    assertDossierOwner(dossier, userId);
     const changes: DossierChanges = {};
     for (const f of EDITABLE_FIELDS) {
       const v = (values[f] ?? "").trim() || null;
@@ -42,5 +61,5 @@ export function useEditDossier(id?: string) {
     return true;
   };
 
-  return { dossier, loading, save, canEdit: canEditDossier(dossier, user?.id) };
+  return { dossier, loading, save, canEdit: canEditDossier(dossier, userId) };
 }
