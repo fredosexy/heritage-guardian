@@ -56,7 +56,7 @@ export function PwaAssistant() {
         <div className="mt-3 space-y-2">
           <p className="text-sm font-medium">Emportez Heritis avec vous</p>
           {ios ? (
-            <p className="text-sm text-muted-foreground">Sur iPhone ou iPad : ouvrez le menu Partager de Safari, puis choisissez « Sur l’écran d’accueil ».</p>
+            <p className="text-sm text-muted-foreground">Sur iPhone ou iPad : dans Safari, ouvrez Partager puis « Ajouter à l’écran d’accueil ». Si l’option « Ouvrir comme app web » apparaît, activez-la avant d’ajouter Heritis.</p>
           ) : (
             <>
               <p className="text-sm text-muted-foreground">Installez Heritis sur votre appareil pour retrouver un accès direct depuis votre écran d’accueil.</p>
