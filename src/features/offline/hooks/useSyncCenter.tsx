@@ -19,6 +19,8 @@ export function useSyncCenter() {
     [userId],
     [],
   );
+  const unassignedQueueCount = useLiveQuery(() => db.queue.filter((operation) => !operation.viewer_user_id).count(), [], 0);
+  const unassignedConflictCount = useLiveQuery(() => db.conflicts.filter((conflict) => !conflict.viewer_user_id).count(), [], 0);
 
   const resolve = (id: number, mine: DossierChanges, theirs: DossierChanges, choice: Partial<Record<EditableField, "mine" | "theirs">>) =>
     resolveConflict(id, mergeResolution(mine, theirs, choice));
@@ -30,5 +32,5 @@ export function useSyncCenter() {
     finally { setRetrying(false); }
   };
 
-  return { queue: queue ?? [], conflicts: conflicts ?? [], retry, retrying, discard: discardQueuedOp, resolve };
+  return { queue: queue ?? [], conflicts: conflicts ?? [], legacyUnassignedCount: (unassignedQueueCount ?? 0) + (unassignedConflictCount ?? 0), retry, retrying, discard: discardQueuedOp, resolve };
 }
