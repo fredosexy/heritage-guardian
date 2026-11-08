@@ -71,7 +71,7 @@ Exemples de messages : fix(sync): preserve queued proof uploads ; docs(governanc
 - Ajouter des tests de non-régression pour les corrections et les comportements métier modifiés.
 - Ne pas réduire la sécurité ou désactiver un test pour obtenir une CI verte.
 
-Les règles spécialisées de sécurité, données, architecture, UI/UX et IA sont définies dans les documents référencés par AGENTS.md. Lire notamment [GOVERNANCE.md](docs/DEVELOPMENT/GOVERNANCE.md) et [ARCHITECTURE-RULES.md](docs/DEVELOPMENT/ARCHITECTURE-RULES.md) avant toute évolution structurante.
+Les règles spécialisées de sécurité, données, architecture, UI/UX et IA sont définies dans les documents référencés par AGENTS.md. Lire notamment [GOVERNANCE.md](docs/DEVELOPMENT/GOVERNANCE.md) et [ARCHITECTURE-RULES.md](docs/DEVELOPMENT/ARCHITECTURE-RULES.md) avant toute évolution structurante. Toute contribution touchant l'identité, les permissions, les données privées, les fichiers, les fonctions serveur, l'IA ou les automatisations doit également respecter [SECURITY-RULES.md](docs/DEVELOPMENT/SECURITY-RULES.md).
 
 ## 6. Données, sécurité et environnements
 
