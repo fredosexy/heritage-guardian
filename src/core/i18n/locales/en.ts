@@ -275,7 +275,11 @@ export const en = {
     noResultsHint: "Change your search or choose another family.",
     results: "Agricultural and rural assets",
     resultCount: "{{count}} asset(s) shown",
-    locationNotSpecified: "Location not specified"
+    summary: { title: "Overview", total: "Declared assets", toComplete: "To enrich", assistantTitle: "Heritis guidance", assistantHint: "One record could use your attention: add more details to make it easier to find and manage.", allUpToDate: "Recommended information is filled in for the records reviewed.", continue: "Continue this record" },
+    cardDescriptionFallback: "Add a description to make this asset easier to recognize.",
+    cardInfoProgress: "Recommended information",
+    cardOpen: "Open record",
+    locationNotSpecified: "Location not specified",
   },
   create: {
     title: "What do you want to create?",
