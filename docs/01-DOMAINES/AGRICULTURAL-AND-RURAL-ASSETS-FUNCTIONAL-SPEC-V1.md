@@ -269,6 +269,93 @@ Chaque étape devra être auditée et documentée avant d'étendre le périmètr
 
 Cette spécification décrit un périmètre fonctionnel V1. Elle n'est ni un avis juridique ou agronomique, ni un schéma de données, ni une API, ni une autorisation d'implémentation. Les informations déclarées par les utilisateurs doivent rester distinguées des faits établis par une autorité compétente.
 
+## 17. Compléments détaillés par famille d'actifs
+
+### 17.1 Exploitation ou unité agricole de regroupement
+
+Une exploitation sert à organiser plusieurs actifs et ne remplace pas leurs fiches individuelles. Elle peut comporter une désignation usuelle, une description, une localisation générale, une période d'activité déclarée, un exploitant ou gestionnaire déclaré, ainsi que des liens vers les terrains, plantations, cheptels, équipements et installations concernés.
+
+La fiche de regroupement doit distinguer les actifs présents, les actifs temporairement associés et les actifs dont le lien a pris fin. Elle ne doit pas agréger automatiquement les surfaces, valeurs, quantités ou droits des fiches liées. Une relation à l'exploitation ne vaut pas relation de propriété à chacun de ses composants.
+
+### 17.2 Plantations et cultures pérennes
+
+Selon les informations disponibles, une plantation peut être décrite par : type de culture ou d'essence, variété déclarée, date ou période de mise en place, localisation ou terrain associé, emprise indicative, nombre de plants ou densité déclarée, âge approximatif, état général observé, source et date de l'observation. Les superficies et quantités doivent toujours préciser leur méthode et leur date de référence.
+
+La V1 peut documenter les événements patrimoniaux de création, extension, remplacement, dégradation importante, perte, abandon ou cessation d'une plantation. Elle ne calcule pas les rendements, ne planifie pas les travaux agricoles et ne fournit pas de conseil agronomique.
+
+### 17.3 Élevages et cheptels
+
+Un élevage ou cheptel peut être décrit par l'espèce ou le type d'animaux, le groupe ou lot concerné, une quantité déclarée, une date d'inventaire, une localisation ou un lieu d'élevage déclaré, le détenteur ou exploitant déclaré et les documents d'inventaire disponibles. La V1 privilégie le suivi patrimonial d'un groupe ou lot ; elle ne doit pas se présenter comme un registre vétérinaire individuel ou une traçabilité sanitaire.
+
+Les entrées, sorties, naissances, ventes, dons, pertes, décès ou changements de détenteur peuvent être consignés comme événements déclarés, avec quantité concernée, date, auteur et pièce éventuelle. Le nombre courant affiché, s'il est calculé, doit être explicitement présenté comme le résultat arithmétique des mouvements saisis, et non comme un inventaire physique confirmé.
+
+### 17.4 Équipements agricoles et matériels
+
+Les équipements peuvent être décrits par leur nature, marque, modèle, référence ou numéro de série visible, année ou période, état matériel déclaré, lieu de conservation, accessoires et documents disponibles. Lorsqu'un équipement est déjà enregistré dans le sous-domaine des biens mobiliers, la fiche existante doit être réutilisée ; la fiche d'exploitation peut uniquement créer un lien de regroupement.
+
+Les événements possibles incluent acquisition déclarée, affectation à une exploitation, déplacement, prêt, mise à disposition, changement de détenteur, panne ou dommage signalé, cession et retrait d'usage. La maintenance technique détaillée reste hors V1.
+
+### 17.5 Infrastructures et ressources rurales
+
+Les infrastructures peuvent inclure bâtiments d'exploitation, hangars, clôtures, installations d'irrigation, bassins, puits, forages, réservoirs, voies ou autres aménagements ruraux. Leur description peut préciser la nature, la fonction déclarée, le lieu, le terrain ou bâtiment associé, l'état observé, la période de réalisation si connue et les documents disponibles.
+
+Pour les ressources ou installations partagées, consigner séparément les personnes qui déclarent les utiliser, les gérer ou bénéficier d'un droit, la portée et la période de cette relation. La fiche ne conclut pas à l'existence d'une servitude, d'un droit d'eau ou d'un droit foncier juridiquement établi.
+
+## 18. Cycle de vie, relations et traçabilité approfondis
+
+### 18.1 États distincts
+
+Ne pas confondre : état matériel observé, situation d'utilisation, statut documentaire, statut de synchronisation et éventuelle contestation. Un actif peut être en bon état mais insuffisamment documenté, ou être documenté tout en faisant l'objet d'un désaccord. Chaque état doit avoir son propre libellé et sa source.
+
+### 18.2 Relations et portée
+
+Une personne peut être propriétaire déclarée, copropriétaire déclarée, détenteur/possesseur déclaré, exploitant, gestionnaire, représentant, occupant ou bénéficiaire d'un droit déclaré. La relation doit préciser si elle porte sur une exploitation, une plantation, un lot de cheptel, un équipement ou une infrastructure. Les rôles ne sont pas hérités automatiquement entre une exploitation et ses actifs liés.
+
+Les liens entre fiches doivent être typés : composant de, regroupé dans, situé sur, installé dans, utilisé par, conservé dans, remplace ou est issu de. Chaque lien conserve sa source, sa période et son auteur lorsque ces informations sont disponibles. Une relation de regroupement ne fusionne pas les identités.
+
+### 18.3 Documents, contrôles et corrections
+
+Une pièce doit être rattachée à l'actif ou à l'événement qu'elle concerne. Conserver son type déclaré, son intitulé, son émetteur ou auteur indiqué, son déposant, ses dates, sa provenance, les personnes autorisées, les contrôles internes et l'historique de remplacement. Les références administratives ou professionnelles sont retranscrites fidèlement ; aucun format ni statut juridique ne doit être inventé.
+
+Une correction conserve la valeur antérieure, la nouvelle valeur, l'auteur, la date, le motif et la source. Une contestation peut porter sur l'existence d'un actif, sa localisation, sa quantité, son détenteur ou son rattachement. Les versions contradictoires restent attribuées à leurs auteurs et ne sont pas arbitrées par Heritis.
+
+## 19. Parcours détaillés et actions V1
+
+### 19.1 Recherche, classement et prévention des doublons
+
+Avant création, rechercher une fiche existante par désignation, famille, identifiant Heritis, localisation ou référence non sensible. Présenter les correspondances possibles sans fusion automatique. Si l'actif relève déjà de Terrain, Bâtiments ou Biens mobiliers, proposer de le relier plutôt que de créer une copie. Une exploitation peut regrouper plusieurs fiches, mais ne devient pas leur identité commune.
+
+### 19.2 Création et complétion progressive
+
+Le parcours commence par la famille, la désignation et les informations minimales d'identification. Les champs spécifiques apparaissent ensuite selon la famille. L'utilisateur peut enregistrer un brouillon lorsque certaines informations sont inconnues, puis compléter les personnes, la localisation, les documents et les événements. Les valeurs inconnues ne sont pas remplacées par des valeurs par défaut trompeuses.
+
+### 19.3 Mise à jour, mouvements et archivage
+
+Une mise à jour descriptive ne crée pas nécessairement un nouvel actif. En revanche, un actif réellement distinct reçoit sa propre fiche et un lien de filiation ou de regroupement. Les mouvements d'animaux, changements de détenteur, déplacements d'équipement, transformations de plantation et changements d'usage d'une infrastructure sont consignés comme événements datés. L'archivage conserve l'historique et les liens.
+
+### 19.4 Partage et révocation
+
+Le partage porte sur une fiche, une section ou des documents sélectionnés. Il exige un destinataire et une permission explicites, un récapitulatif avant confirmation et une trace de l'opération. Les coordonnées précises, documents privés et informations sur les personnes ne sont pas inclus dans les aperçus publics ou les notifications non protégées. L'accès peut être révoqué selon les règles transversales.
+
+### 19.5 Hors connexion et conflits
+
+Un brouillon local doit indiquer son état de synchronisation. Les modifications concurrentes sur la localisation, la quantité d'un cheptel, les personnes, les pièces ou les liens entre actifs ne sont pas écrasées silencieusement. La résolution conserve les valeurs antérieures et identifie la personne ayant effectué chaque changement.
+
+## 20. Scénarios d'acceptation complémentaires
+
+1. créer une exploitation et y relier des fiches Terrain, Bâtiment, Plantation et Équipement existantes sans dupliquer ces actifs ;
+2. distinguer une plantation d'une parcelle et conserver les sources différentes de leur localisation et superficie ;
+3. enregistrer un inventaire de cheptel daté puis plusieurs mouvements, sans présenter le calcul comme un comptage confirmé ;
+4. relier un équipement agricole déjà enregistré comme bien mobilier sans créer de deuxième fiche ;
+5. documenter un puits ou une installation partagée sans déduire un droit d'eau ou une servitude ;
+6. associer plusieurs personnes à des actifs différents d'une même exploitation, sans propagation automatique des rôles ;
+7. remplacer un document tout en conservant sa version antérieure et sa provenance ;
+8. enregistrer une contestation de quantité ou de localisation sans modifier automatiquement la fiche de référence ;
+9. partager une seule fiche ou pièce avec un participant autorisé, puis révoquer cet accès ;
+10. synchroniser un mouvement saisi hors connexion sans perdre les événements concurrents.
+
+Ces scénarios sont des critères à tester ultérieurement ; ils ne constituent pas des résultats de tests déjà exécutés.
+
 ---
 
 **Statut :** périmètre V1 approuvé par l'utilisateur ; spécification détaillée mise à jour après revue de cohérence, à valider avant clôture du sous-domaine.  
