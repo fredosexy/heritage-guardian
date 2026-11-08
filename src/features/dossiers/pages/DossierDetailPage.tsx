@@ -49,7 +49,26 @@ export default function DossierDetailPage() {
     setLoadingBuildingProperty(true);
     buildingsRepo.getBuildingProperty(dossier.id)
       .then((property) => { if (!cancelled) setBuildingProperty(property); })
-      .catch((error) => { if (!cancelled) toast.error(error instanceof Error ? error.message : t("auth.error")); })
+      .catch((error) => {
+        if (cancelled) return;
+        const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+          ? dossier.metadata as Record<string, unknown>
+          : {};
+        const fallback = buildingsRepo.readBuildingPropertyInput(metadata);
+        if (fallback) {
+          setBuildingProperty({
+            dossier_id: dossier.id,
+            parent_terrain_dossier_id: null,
+            administrative_references: [],
+            metadata: {},
+            created_at: dossier.created_at,
+            updated_at: dossier.updated_at,
+            ...fallback,
+          });
+        } else {
+          toast.error(error instanceof Error ? error.message : t("auth.error"));
+        }
+      })
       .finally(() => { if (!cancelled) setLoadingBuildingProperty(false); });
     return () => { cancelled = true; };
   }, [dossier?.id, dossier?.type, t]);
