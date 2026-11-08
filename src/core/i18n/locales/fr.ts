@@ -196,6 +196,7 @@ export const fr = {
     locationCaptured: "Position GPS capturée.",
     locationDenied: "Position non obtenue. Vérifiez l'autorisation et réessayez.",
     detail: { summaryFields: "Champs renseignés", summaryPeople: "Personnes actives", summaryEvents: "Événements déclarés", progressLabel: "Complétude des informations recommandées" },
+    createSteps: { title: "Déclaration guidée", counter: "Étape {{current}} sur {{total}}", progress: "Progression de la déclaration", steps: { 0: "Identifier", 1: "Décrire", 2: "Localiser" }, hint: { 0: "Choisissez la famille du bien et donnez-lui une désignation claire.", 1: "Renseignez les caractéristiques utiles à cette famille. Les champs recommandés restent indicatifs.", 2: "Précisez le lieu et, si vous le souhaitez, autorisez une capture GPS ponctuelle." }, back: "Retour", next: "Continuer" },
     actions: {
       title: "Les prochaines étapes utiles",
       hint: "Suggestions automatiques fondées uniquement sur les informations présentes dans cette fiche.",
