@@ -1,7 +1,9 @@
 # Revue documentaire PWA Heritis — 8 parcours
 
 **Périmètre :** revue statique de la branche `feat/pwa-intelligent-complete` de la PR #71.  
-**Référence de code vérifiée :** commit `d99e04e4d43bfc9dfd447809d9ce174f867bfdcc`.  
+**Référence de code initiale :** commit `d99e04e4d43bfc9dfd447809d9ce174f867bfdcc`.  
+**Correction iOS intégrée ensuite :** commit `21629706864a73320a3021032ff90a3cabf3563c`.  
+**Dernière mise à jour documentaire de cette revue :** commit `7f1c7988eca8107cb515e7ef251bc2a92ed863b4`.  
 **Méthode :** comparaison du code, des tests et de la documentation opérationnelle avec les recommandations officielles consultées le 8 novembre 2026.  
 **Limite :** aucun appareil physique ni déploiement HTTPS n'a été utilisé. Les résultats ci-dessous ne constituent donc pas une recette d'exécution réelle.
 
