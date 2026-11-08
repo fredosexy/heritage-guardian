@@ -68,6 +68,45 @@ Ne pas créer une nouvelle catégorie technique de dossier uniquement pour repr�
 - Une unité peut être reliée à son bâtiment parent sans devenir automatiquement un bien juridiquement indépendant ni recevoir automatiquement un statut de propriété distinct.
 - Les liens sont explicites, datés si nécessaire, modifiables avec historique et accompagnés de leur source.
 - Une référence interne Heritis n'est jamais présentée comme une référence cadastrale ou un titre officiel.
+
+### 3.3 Références administratives et foncières — contexte camerounais
+
+La fiche doit pouvoir conserver des références administratives utiles sans imposer un format unique ni conclure à la validité juridique du bien. Les références sont facultatives, peuvent être absentes ou inconnues et doivent toujours être rattachées à l'objet concerné (terrain support, bâtiment, unité, personne ou procédure).
+
+Types de références à prévoir en V1, sous forme d'une liste extensible :
+- **Titre foncier** : numéro ou référence telle qu'elle apparaît sur la pièce ; conservation foncière / service émetteur indiqué ; ressort territorial ; date portée par le document ; personne ou entité mentionnée sur la pièce, si nécessaire et autorisé.
+- **Certificat de propriété** : référence portée sur le certificat, date d'émission, conservation foncière ou service émetteur indiqué et titre foncier auquel il se rapporte lorsqu'il est mentionné.
+- **CPDFC-AR** : intitulé complet « Certificat de Possession des Droits Fonciers Coutumiers Administrativement Reconnus » ; référence portée sur la pièce ; commission ou autorité/service indiqué ; date ; procédure d'immatriculation directe concernée lorsqu'elle est connue. Ce document doit rester distingué du titre foncier et être décrit selon sa portée propre.
+- **Dossier ou procédure d'immatriculation** : numéro de réquisition ou de suivi lorsqu'il figure sur une pièce, référence de demande, récépissé de dépôt, service destinataire, dates de dépôt et de suivi, et état de procédure tel que déclaré ou documenté.
+- **Autre référence cadastrale, domaniale ou administrative** : libellé exact figurant sur la pièce, sans imposer une nomenclature ou une structure de numéro non vérifiée.
+- **Référence d'urbanisme ou de construction** : permis, autorisation, certificat d'urbanisme, visa ou autre acte présenté, avec son intitulé exact, son organisme émetteur et sa date. Ne pas supposer qu'un tel document établit la propriété foncière.
+
+Pour chaque référence, conserver au minimum, lorsque disponible :
+- type de référence et libellé original ;
+- numéro / identifiant exactement retranscrit, sans normalisation destructive ;
+- organisme et service émetteurs tels qu'indiqués sur la pièce ;
+- ressort territorial ou lieu concerné ;
+- date d'émission, de dépôt ou de validité, en distinguant ces notions ;
+- objet auquel la référence se rapporte et lien éventuel avec une autre référence ;
+- document justificatif, provenance, déposant et date de dépôt ;
+- statut de traitement Heritis : déclaré, pièce déposée, contrôle de cohérence interne effectué, vérification externe documentée ou information contestée ;
+- observations, historique de correction et date de dernière mise à jour.
+
+Les statuts Heritis décrivent uniquement le traitement de l'information dans l'application. Une vérification externe ne peut être indiquée que si sa source, son auteur, sa date et sa portée sont consignés ; elle ne doit pas être simulée par une simple lecture automatique du document.
+
+**Règles de prudence :**
+- Une référence foncière qui concerne le terrain support doit être rattachée à la fiche Terrain correspondante ; elle ne devient pas automatiquement une référence propre au bâtiment ou à chaque unité.
+- Un document présenté, une copie, un récépissé ou un numéro saisi ne prouve pas à lui seul l'authenticité, l'actualité, l'absence d'opposition ou la titularité d'un droit.
+- Ne pas inventer de format de numéro, de préfixe, de registre, de volume ou de folio obligatoire. Conserver la transcription fidèle et permettre les champs inconnus.
+- Ne pas rendre obligatoire un titre foncier ou un certificat pour créer une fiche immobilière ; permettre de documenter les situations sans référence disponible.
+- Toute vérification de situation juridique ou de concordance officielle relève du service public compétent ou d'un professionnel habilité, hors certification Heritis.
+
+Sources institutionnelles consultées pour cadrer les libellés (à recontrôler avant toute évolution réglementaire) :
+- [MINDCAF — Foire aux questions](https://mindcaf.gov.cm/fr/faq/) : procédure d'immatriculation, récépissé, livre foncier et duplicatum du titre foncier.
+- [MINDCAF — Documents publics](https://mindcaf.gov.cm/fr/docs/) : ressources et documents administratifs publiés par le ministère.
+- [MINDCAF — Pièces constitutives des dossiers de visas](https://www.mindcaf.gov.cm/media/filer_public/ee/69/ee690694-4776-4a2a-8a0a-4c695c6dcd93/fiche_des_pieces_constitutives_des_dossiers_de_visas.pdf) : mention du certificat de propriété, du certificat d'urbanisme et du plan de masse dans le dossier concerné.
+- [Lettre-circulaire n° 002/MINDAF/CAB/LC du 09 février 2024 — CPDFC-AR](https://www.labase-lextenso.fr/sites/lextenso/files/lextenso_upload/l_cameroun_lettre_circulaire_0002mindcafcablc_9_fevr._2024.pdf) : texte instituant ce certificat dans le cadre indiqué par la circulaire.
+
 - La suppression ou la fusion d'une fiche ne doit pas effacer les preuves, événements ou relations historiques ; toute opération doit être traçable et soumise aux permissions.
 
 ## 4. Parcours utilisateur
@@ -114,7 +153,7 @@ Permettre :
 - coordonnées GPS obtenues par action explicite ou saisies manuellement ;
 - affichage sur carte avec fournisseur configurable, sous réserve de connexion ;
 - rattachement facultatif à une fiche Terrain existante ;
-- ajout ultérieur d'une référence cadastrale ou administrative comme donnée déclarée, avec type, organisme émetteur, date et pièce justificative.
+- ajout facultatif de références foncières, cadastrales, domaniales, administratives ou d'urbanisme selon les règles de la section 3.3 ; les références relatives au terrain restent rattachées à la fiche Terrain.
 
 Les coordonnées du bâtiment représentent un point de localisation ou un repère choisi. Elles ne sont pas un bornage foncier. Un contour de bâtiment, s'il est ajouté dans une évolution, doit être explicitement nommé « emprise indicative du bâtiment » et ne pas être confondu avec le contour cadastral du terrain.
 
@@ -171,7 +210,9 @@ L'accès à la fiche, la capacité de modifier les données et la relation décl
 
 Catégories proposées :
 - acte ou titre présenté ;
-- document administratif ou référence officielle ;
+- titre foncier, certificat de propriété ou autre référence foncière présentée ;
+- CPDFC-AR ou pièce relative à une procédure d'immatriculation, si applicable ;
+- document administratif, cadastral, domanial ou d'urbanisme ;
 - plan, croquis ou relevé ;
 - permis, autorisation ou dossier de travaux ;
 - contrat de vente, location, occupation ou gestion ;
@@ -342,7 +383,6 @@ Chaque lot doit être audité, testé et documenté sur GitHub avant le suivant.
 ## 12. Questions à trancher avant le développement
 
 Les points suivants doivent être confirmés à la revue métier et technique :
-- quelles références administratives camerounaises doivent être prévues comme champs facultatifs, après vérification des sources et pratiques applicables ?
 - quel niveau de détail est réellement utile pour les matériaux, équipements et états sans transformer Heritis en outil de diagnostic technique ?
 - quelles catégories de documents et de relations doivent être obligatoires ou facultatives selon le type de bâtiment ?
 
