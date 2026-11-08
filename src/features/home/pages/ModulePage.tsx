@@ -8,7 +8,7 @@ import { useDossiers } from "@/features/dossiers/hooks/useDossiers";
 import { useIdentity } from "@/features/identity";
 import { DOSSIER_TYPES, typeLabelKey } from "@/features/dossiers/components/dossierTypeMeta";
 
-const moduleIds = DOSSIER_TYPES.map(({ id }) => id);
+const moduleIds = DOSSIER_TYPES.filter(({ id }) => id !== "batiment").map(({ id }) => id);
 
 export default function ModulePage() {
   const { t } = useTranslation();
