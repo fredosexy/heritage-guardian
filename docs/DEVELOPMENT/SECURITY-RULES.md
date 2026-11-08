@@ -238,7 +238,7 @@ Le navigateur, IndexedDB, caches et service worker peuvent être accessibles à 
 
 La déconnexion, le changement de compte, la révocation d'accès et la fermeture de session doivent déclencher une stratégie d'invalidation des données locales adaptée au risque.
 
-## 14. Protection des quatre domaines métier
+## 14. Protection des quatre domaines métier de la V1
 
 Les protections doivent être appliquées de façon cohérente dans chaque domaine.
 
