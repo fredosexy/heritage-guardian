@@ -52,7 +52,7 @@ export function PwaAssistant() {
           {notice === "update" ? <RefreshCw className="size-5 text-primary" /> : showInstall ? <Download className="size-5 text-primary" /> : online ? <Wifi className="size-5 text-primary" /> : <WifiOff className="size-5 text-warning" />}
           <p className="font-semibold">Heritis · PWA</p>
         </div>
-        <Button size="icon" variant="ghost" className="size-7 shrink-0" aria-label="Fermer l'assistant PWA" onClick={() => { setNotice(null); setInstallMessage(null); setDismissed(true); setOfflineDismissed(true); }}>
+        <Button size="icon" variant="ghost" className="size-7 shrink-0" aria-label="Fermer l'assistant PWA" onClick={() => { setNotice(null); setInstallMessage(null); if (showInstall) setDismissed(true); setOfflineDismissed(true); }}>
           <X className="size-4" />
         </Button>
       </div>
@@ -75,7 +75,7 @@ export function PwaAssistant() {
       )}
 
       {showOffline && (
-        <p role="status" className="mt-3 text-sm text-muted-foreground">Vous êtes hors ligne. Les actions nécessitant le serveur attendront le retour de la connexion ; vos opérations locales restent dans leur espace de compte.</p>
+        <p role="status" className="mt-3 text-sm text-muted-foreground">Vous êtes hors ligne. Les actions nécessitant le serveur attendront le retour de la connexion ; toutes les pages ne sont pas nécessairement disponibles.</p>
       )}
 
       {notice === "update" && (
