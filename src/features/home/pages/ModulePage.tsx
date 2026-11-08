@@ -97,6 +97,23 @@ export default function ModulePage() {
         </div>
       </section>
 
+      {id === "terrain" && (
+        <section className="mb-5 rounded-3xl border border-border/60 bg-card/85 p-5 shadow-[var(--shadow-soft)]">
+          <div className="flex items-start gap-3">
+            <span className="size-11 rounded-2xl bg-accent text-primary flex items-center justify-center shrink-0">
+              <LockKeyhole className="size-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-semibold">{t(typeLabelKey("batiment"))}</h2>
+              <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{t("create.buildingDesc")}</p>
+              <Button onClick={() => navigate("/create?type=batiment")} className="mt-4 min-h-11 w-full rounded-2xl">
+                {t("create.buildingFormTitle")} <ChevronRight className="size-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
+
       <Button variant="default"
         onClick={() => navigate(startRoute)}
         className="block h-auto whitespace-normal w-full rounded-2xl bg-gradient-warm text-primary-foreground p-4 text-left shadow-warm tap focus-ring"
