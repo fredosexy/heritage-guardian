@@ -195,6 +195,7 @@ export const fr = {
     notFound: "Dossier introuvable.",
     createdOn: "Créé le",
     typeLabel: "Type",
+    typeBatiment: "Bâtiment et immobilier",
     kb: "Ko",
     proofAdded: "Preuve ajoutée",
     proofVerified: "Statut indiqué comme vérifié",
