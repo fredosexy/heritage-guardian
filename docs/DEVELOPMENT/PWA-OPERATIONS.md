@@ -4,6 +4,8 @@
 **Périmètre :** installation, détection du mode installé, service worker, cache, continuité hors ligne et mises à jour  
 **Principe :** le mode hors ligne améliore la continuité ; il ne contourne jamais l'authentification, les autorisations serveur ou les limites des fonctions non disponibles sans réseau.
 
+> Document directeur : [PWA — trajectoire produit et parcours professionnel](./PWA-PRODUCT-ROADMAP.md). Il rassemble les capacités intégrées, le parcours utilisateur cible, les priorités futures et les critères de maturité.
+>
 > Revue documentaire complémentaire : [PWA — revue des 8 parcours](./PWA-REVIEW-8-PARCOURS.md). Cette revue sépare les constats statiques des essais physiques non effectués et documente les points restant à traiter.
 
 ## 1. Comportement attendu
