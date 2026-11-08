@@ -64,6 +64,19 @@ export default function AgriculturalAssetsPage() {
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!title.trim()) return;
+    const numericKeys = ["declaredArea", "declaredQuantity"];
+    for (const key of numericKeys) {
+      const raw = familyDetails[key]?.trim();
+      if (raw && (!Number.isFinite(Number(raw)) || Number(raw) < 0)) {
+        toast.error(t("agricultural.invalidNumber"));
+        return;
+      }
+    }
+    const normalizedFamilyDetails = Object.fromEntries(
+      Object.entries(familyDetails)
+        .filter(([, value]) => value.trim() !== "")
+        .map(([key, value]) => [key, numericKeys.includes(key) ? Number(value) : value])
+    );
     try {
       const result = await create({
         type: "agricole",
@@ -75,7 +88,7 @@ export default function AgriculturalAssetsPage() {
             version: 1,
             family,
             declaredDetails: specifics.trim() || null,
-            familyDetails: Object.fromEntries(Object.entries(familyDetails).filter(([, value]) => value.trim() !== "")),
+            familyDetails: normalizedFamilyDetails,
             declarationStatus: "declare",
             source: "declarant",
           },
