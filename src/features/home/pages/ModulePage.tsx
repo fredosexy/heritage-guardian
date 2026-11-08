@@ -150,8 +150,8 @@ export default function ModulePage() {
             <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-accent text-primary"><Sprout className="size-6" /></span>
             <div className="min-w-0 flex-1">
               <h2 className="text-base font-semibold">{t("agricultural.title")}</h2>
-              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t("assetCategories.rural.description", { defaultValue: "Exploitations, plantations, élevages, équipements et installations rurales." })}</p>
-              <Button onClick={() => navigate(isGuest ? "/auth" : "/agricultural")} className="mt-4 min-h-11 w-full rounded-2xl sm:w-auto">
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t("agricultural.subtitle")}</p>
+              <Button onClick={() => navigate("/agricultural")} className="mt-4 min-h-11 w-full rounded-2xl sm:w-auto">
                 {t(isGuest ? "home.visitorAccountCta" : "agricultural.create")} <ChevronRight className="ml-2 size-4" />
               </Button>
             </div>
