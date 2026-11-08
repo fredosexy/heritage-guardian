@@ -234,7 +234,7 @@ export function TerrainBoundaryMap({
           <Button type="button" size="sm" variant="outline" disabled={disabled || !boundaryPoints.length} onClick={() => onBoundaryChange(boundaryPoints.slice(0, -1))}>
             {t("create.terrainGeo.undoVertex")}
           </Button>
-          <Button type="button" size="sm" variant="ghost" disabled={!boundaryPoints.length} onClick={() => onBoundaryChange([])}>
+          <Button type="button" size="sm" variant="ghost" disabled={disabled || !boundaryPoints.length} onClick={() => onBoundaryChange([])}>
             {t("create.terrainGeo.clearContour")}
           </Button>
         </div>
