@@ -27,6 +27,7 @@ Ordre de lecture recommandé :
 | Domaine | Document | Finalité |
 |---|---|---|
 | 1. Patrimoine et gestion des biens | [Document détaillé](../01-DOMAINES/PATRIMOINE-ET-GESTION-DES-BIENS-V1.md) | Identifier, déclarer, inventorier, documenter et suivre les biens et les relations déclarées. |
+| ↳ Fiche Terrain — spécification fonctionnelle et géospatiale | [Spécification V1](../01-DOMAINES/TERRAIN-REGISTRATION-FONCTIONAL-SPEC-V1.md) | Décrire le parcours d’enregistrement foncier, la localisation, le contour, les distances et les superficies indicatives. |
 | 2. Héritage et succession | [Document détaillé](../02-DOMAINES/HERITAGE-ET-SUCCESSION-V1.md) | Organiser les personnes, biens, documents, participations et étapes d'une succession. |
 | 3. Volontés secrètes et dernières volontés | [Document détaillé](../03-DOMAINES/VOLONTES-SECRETES-ET-DERNIERES-VOLONTES-V1.md) | Préserver des volontés confidentielles et organiser leur transmission après vérifications. |
 | 4. Gestion des conflits et litiges | [Document détaillé](../04-DOMAINES/GESTION-DES-CONFLITS-ET-LITIGES-V1.md) | Constituer un dossier de conflit et orienter vers les méthodes et services compétents. |
