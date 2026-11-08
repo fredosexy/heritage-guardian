@@ -140,6 +140,8 @@ export const en = {
     journeyNeedsAttention: "The dossier is created, but its guided journey could not be initialized. You can still view the dossier; a technical check is needed.",
     savedLocal: "Saved on this device",
     savedOffline: "Saved offline — will sync automatically.",
+    buildingStepOne: "Step 1 of 2",
+    buildingStepTwo: "Step 2 of 2",
     buildingFormTitle: "Declare a building or property",
     buildingFormHint: "Start with the essential details. You can add units, people, documents and events afterwards.",
     buildingKindLabel: "Property type",
