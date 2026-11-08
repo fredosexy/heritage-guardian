@@ -29,6 +29,7 @@ describe("IndexedDB offline continuity", () => {
   afterEach(async () => { await db.queue.clear(); await db.conflicts.clear(); db.close(); });
 
   const seedUpdate = () => db.queue.add({
+    viewer_user_id: "owner",
     kind: "update_dossier", payload: { dossierId: "terrain-1", metadata: { terrain: { sections: { histoire: "Famille" } } } },
     attempts: 2, last_error: "old error", created_at: 1,
   });
