@@ -25,13 +25,14 @@ export interface TerrainGeospatialData {
 interface TerrainGeoFieldsProps {
   value: TerrainGeospatialData;
   onChange: (value: TerrainGeospatialData) => void;
+  disabled?: boolean;
 }
 
 function formatPoint(point: GeoPoint): string {
   return `${point.latitude}, ${point.longitude}`;
 }
 
-export function TerrainGeoFields({ value, onChange }: TerrainGeoFieldsProps) {
+export function TerrainGeoFields({ value, onChange, disabled = false }: TerrainGeoFieldsProps) {
   const { t } = useTranslation();
   const [latitude, setLatitude] = useState(value.point ? String(value.point.latitude) : "");
   const [longitude, setLongitude] = useState(value.point ? String(value.point.longitude) : "");
@@ -130,16 +131,16 @@ export function TerrainGeoFields({ value, onChange }: TerrainGeoFieldsProps) {
       <div className="space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Label>{t("create.terrainGeo.referencePoint")}</Label>
-          <Button type="button" variant="outline" size="sm" onClick={captureLocation} disabled={capturing} className="rounded-xl">
+          <Button type="button" variant="outline" size="sm" onClick={captureLocation} disabled={capturing || disabled} className="rounded-xl">
             {capturing ? <Loader2 className="size-4 mr-2 animate-spin" /> : <LocateFixed className="size-4 mr-2" />}
             {t("create.terrainGeo.useGps")}
           </Button>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <div><Label htmlFor="terrain-latitude" className="text-xs">{t("create.terrainGeo.latitude")}</Label><Input id="terrain-latitude" inputMode="decimal" value={latitude} onChange={(event) => setLatitude(event.target.value)} placeholder="4.0511" /></div>
-          <div><Label htmlFor="terrain-longitude" className="text-xs">{t("create.terrainGeo.longitude")}</Label><Input id="terrain-longitude" inputMode="decimal" value={longitude} onChange={(event) => setLongitude(event.target.value)} placeholder="9.7679" /></div>
+          <div><Label htmlFor="terrain-latitude" className="text-xs">{t("create.terrainGeo.latitude")}</Label><Input id="terrain-latitude" inputMode="decimal" value={latitude} readOnly={disabled} onChange={(event) => setLatitude(event.target.value)} placeholder="4.0511" /></div>
+          <div><Label htmlFor="terrain-longitude" className="text-xs">{t("create.terrainGeo.longitude")}</Label><Input id="terrain-longitude" inputMode="decimal" value={longitude} readOnly={disabled} onChange={(event) => setLongitude(event.target.value)} placeholder="9.7679" /></div>
         </div>
-        <Button type="button" variant="secondary" size="sm" onClick={saveManualPoint} className="w-full">{t("create.terrainGeo.saveCoordinates")}</Button>
+        <Button type="button" variant="secondary" size="sm" onClick={saveManualPoint} disabled={disabled} className="w-full">{t("create.terrainGeo.saveCoordinates")}</Button>
         {value.point && <p className="text-xs text-muted-foreground">{t("create.terrainGeo.pointSource")}: {value.point.source === "device_gps" ? t("create.terrainGeo.gpsSource") : t("create.terrainGeo.manualSource")}{value.point.accuracyMeters != null ? ` · ±${Math.round(value.point.accuracyMeters)} m` : ""}</p>}
         {error && <p className="text-xs text-destructive" role="alert">{error}</p>}
       </div>
@@ -147,8 +148,8 @@ export function TerrainGeoFields({ value, onChange }: TerrainGeoFieldsProps) {
       <div className="border-t border-border/70 pt-4 space-y-2">
         <Label htmlFor="terrain-contour">{t("create.terrainGeo.boundaryTitle")}</Label>
         <p className="text-xs text-muted-foreground">{t("create.terrainGeo.boundaryHint")}</p>
-        <Textarea id="terrain-contour" value={contourText} onChange={(event) => setContourText(event.target.value)} rows={4} placeholder={"4.0511, 9.7679\n4.0512, 9.7680\n4.0510, 9.7682"} />
-        <Button type="button" variant="outline" onClick={calculate} className="w-full rounded-xl">
+        <Textarea id="terrain-contour" value={contourText} readOnly={disabled} onChange={(event) => setContourText(event.target.value)} rows={4} placeholder={"4.0511, 9.7679\n4.0512, 9.7680\n4.0510, 9.7682"} />
+        <Button type="button" variant="outline" onClick={calculate} disabled={disabled} className="w-full rounded-xl">
           <Calculator className="size-4 mr-2" />{t("create.terrainGeo.calculate")}
         </Button>
         {measurementError && <p className="text-xs text-destructive" role="alert">{measurementError}</p>}
