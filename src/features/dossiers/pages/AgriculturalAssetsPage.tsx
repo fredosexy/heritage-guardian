@@ -17,6 +17,15 @@ import { AgriculturalFamilyFields } from "./AgriculturalFamilyFields";
 const FAMILIES = ["exploitation", "plantation", "elevage", "equipement", "infrastructure", "autre"] as const;
 type Family = typeof FAMILIES[number];
 
+const RECOMMENDED_FIELDS: Record<Family, string[]> = {
+  exploitation: ["activities", "activeSince"],
+  plantation: ["cropType", "declaredArea", "areaUnit"],
+  elevage: ["animalType", "declaredQuantity", "inventoryDate"],
+  equipement: ["equipmentType", "condition"],
+  infrastructure: ["infrastructureType", "use"],
+  autre: ["nature", "characteristics"],
+};
+
 function getAssetData(metadata: unknown): Record<string, unknown> {
   if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return {};
   const value = (metadata as Record<string, unknown>).agriculturalRural;
@@ -225,26 +234,70 @@ export default function AgriculturalAssetsPage() {
           </button>
         ))}
       </div>
+      {!loading && !loadError && assets.length > 0 ? (() => {
+        const needsAttention = assets.filter((asset) => {
+          const data = getAssetData(asset.metadata);
+          const family = typeof data.family === "string" && FAMILIES.includes(data.family as Family) ? data.family as Family : "autre";
+          const details = data.familyDetails && typeof data.familyDetails === "object" && !Array.isArray(data.familyDetails)
+            ? data.familyDetails as Record<string, unknown> : {};
+          return RECOMMENDED_FIELDS[family].some((key) => !String(details[key] ?? "").trim()) || !asset.locationName;
+        });
+        const nextAsset = needsAttention[0];
+        return (
+          <section className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3" aria-label={t("agricultural.summary.title")}>
+            <div className="rounded-3xl border border-border/70 bg-card p-4 shadow-[var(--shadow-soft)]">
+              <p className="text-3xl font-semibold tabular-nums sm:text-4xl">{assets.length}</p>
+              <p className="mt-1 text-sm leading-snug text-muted-foreground">{t("agricultural.summary.total")}</p>
+            </div>
+            <div className="rounded-3xl border border-border/70 bg-card p-4 shadow-[var(--shadow-soft)]">
+              <p className="text-3xl font-semibold tabular-nums sm:text-4xl">{needsAttention.length}</p>
+              <p className="mt-1 text-sm leading-snug text-muted-foreground">{t("agricultural.summary.toComplete")}</p>
+            </div>
+            <div className="col-span-2 rounded-3xl border border-primary/20 bg-gradient-to-br from-accent/55 to-card p-4 sm:col-span-1">
+              <p className="text-sm font-semibold">{t("agricultural.summary.assistantTitle")}</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{nextAsset ? t("agricultural.summary.assistantHint") : t("agricultural.summary.allUpToDate")}</p>
+              {nextAsset ? <Button variant="outline" size="sm" className="mt-3 min-h-10 rounded-xl" onClick={() => nextAsset.local ? toast.info(t("dossiers.localOnly")) : navigate("/dossiers/" + nextAsset.id + "/edit")}>{t("agricultural.summary.continue")}</Button> : null}
+            </div>
+          </section>
+        );
+      })() : null}
       {loading ? <div className="flex justify-center py-12" role="status"><Loader2 className="size-5 animate-spin text-primary" /></div>
         : loadError ? <div role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm"><p className="mb-3">{t("auth.error")}</p><Button variant="outline" onClick={reload}>{t("common.retry", "Réessayer")}</Button></div>
         : assets.length === 0 ? <EmptyState icon={Sprout} title={t("agricultural.empty")} description={t("agricultural.emptyHint")} actionLabel={t("agricultural.create")} onAction={() => setCreating(true)} secondaryLabel={t("next.seeDossiers")} onSecondary={() => navigate("/dossiers")} />
         : filtered.length === 0 ? <div className="rounded-3xl border border-border bg-card p-6 text-center"><p className="font-semibold">{t("agricultural.noResults")}</p><p className="mt-1 text-sm text-muted-foreground">{t("agricultural.noResultsHint")}</p><Button variant="outline" className="mt-4" onClick={() => { setQuery(""); setFamilyFilter("all"); }}>{t("buildings.clearFilters")}</Button></div>
-        : <section aria-label={t("agricultural.results")} className="space-y-3">
-          <p className="text-xs text-muted-foreground">{t("agricultural.resultCount", { count: filtered.length })}</p>
-          {filtered.map((asset) => {
-            const data = getAssetData(asset.metadata);
-            const itemFamily = typeof data.family === "string" && FAMILIES.includes(data.family as Family) ? data.family as Family : "autre";
-            return <button key={asset.id} type="button" onClick={() => asset.local ? toast.info(t("dossiers.localOnly")) : navigate("/dossiers/" + asset.id)}
-              className="group flex min-h-24 w-full items-center gap-3 rounded-3xl border border-border/70 bg-card p-4 text-left shadow-[var(--shadow-soft)] transition hover:border-primary/30 hover:shadow-[var(--shadow-elegant)] focus-ring">
-              <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-accent text-primary"><Sprout className="size-5" /></span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-base font-semibold">{asset.title}</span>
-                <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="size-3.5 shrink-0" /><span className="truncate">{asset.locationName || t("agricultural.locationNotSpecified")}</span></span>
-                <span className="mt-2 flex flex-wrap items-center gap-2"><span className="text-xs text-primary">{t("agricultural.families." + itemFamily)}</span><DossierStatusBadge status={asset.status} />{asset.local ? <span className="text-xs text-muted-foreground"><CloudOff className="mr-1 inline size-3" />{t("dossiers.draftPending")}</span> : null}</span>
-              </span>
-              <span aria-hidden="true" className="text-lg text-muted-foreground">›</span>
-            </button>;
-          })}
+        : <section aria-label={t("agricultural.results")} className="space-y-4">
+          <div className="flex items-end justify-between gap-3">
+            <div><h2 className="text-xl font-semibold sm:text-2xl">{t("agricultural.results")}</h2><p className="mt-1 text-sm text-muted-foreground">{t("agricultural.resultCount", { count: filtered.length })}</p></div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {filtered.map((asset) => {
+              const data = getAssetData(asset.metadata);
+              const itemFamily = typeof data.family === "string" && FAMILIES.includes(data.family as Family) ? data.family as Family : "autre";
+              const details = data.familyDetails && typeof data.familyDetails === "object" && !Array.isArray(data.familyDetails)
+                ? data.familyDetails as Record<string, unknown> : {};
+              const recommended = RECOMMENDED_FIELDS[itemFamily];
+              const completed = recommended.filter((key) => String(details[key] ?? "").trim()).length;
+              const description = typeof asset.description === "string" ? asset.description.trim() : "";
+              return <button key={asset.id} type="button" onClick={() => asset.local ? toast.info(t("dossiers.localOnly")) : navigate("/dossiers/" + asset.id)}
+                className="group flex min-h-56 w-full flex-col items-stretch rounded-[1.75rem] border border-border/70 bg-card p-5 text-left shadow-[var(--shadow-soft)] transition duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-[var(--shadow-elegant)] focus-ring sm:min-h-60 sm:p-6">
+                <span className="flex items-start justify-between gap-3">
+                  <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-accent text-primary sm:size-16"><Sprout className="size-7 sm:size-8" /></span>
+                  <span className="flex flex-wrap justify-end gap-2"><DossierStatusBadge status={asset.status} />{asset.local ? <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground"><CloudOff className="mr-1 inline size-3" />{t("dossiers.draftPending")}</span> : null}</span>
+                </span>
+                <span className="mt-5 block text-xl font-semibold leading-snug sm:text-2xl">{asset.title}</span>
+                <span className="mt-2 block text-sm leading-relaxed text-muted-foreground">{description || t("agricultural.cardDescriptionFallback")}</span>
+                <span className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+                  <span className="rounded-full bg-accent/70 px-3 py-1.5 font-medium text-accent-foreground">{t("agricultural.families." + itemFamily)}</span>
+                  <span className="inline-flex items-center gap-1.5 text-muted-foreground"><MapPin className="size-4" />{asset.locationName || t("agricultural.locationNotSpecified")}</span>
+                </span>
+                <span className="mt-auto block pt-5">
+                  <span className="flex items-center justify-between gap-3 text-xs text-muted-foreground"><span>{t("agricultural.cardInfoProgress")}</span><span className="font-semibold tabular-nums">{completed}/{recommended.length}</span></span>
+                  <span className="mt-2 block h-2 overflow-hidden rounded-full bg-muted"><span className="block h-full rounded-full bg-primary transition-all" style={{ width: ((completed / recommended.length) * 100) + "%" }} /></span>
+                  <span className="mt-4 flex items-center justify-between text-sm font-semibold text-primary"><span>{t("agricultural.cardOpen")}</span><span aria-hidden="true" className="text-xl transition-transform group-hover:translate-x-1">→</span></span>
+                </span>
+              </button>;
+            })}
+          </div>
         </section>}
     </AppLayout>
   );
