@@ -223,6 +223,7 @@ Les documents suivants constituent le référentiel spécialisé du dépôt. Ils
 - `docs/DEVELOPMENT/DATA-AND-DATABASE-RULES.md` — modèles, intégrité, migrations et synchronisation.
 - `docs/DEVELOPMENT/TESTING-REQUIREMENTS.md` — stratégie, couverture et critères de validation.
 - `docs/DEVELOPMENT/AI-AND-AUTOMATION-RULES.md` — IA, suggestions, automatisations et garde-fous.
+- `.lovable/plan/README.md` — point d'entrée obligatoire et consignes opérationnelles propres à Lovable ; à lire pour toute intervention menée avec Lovable, sans déplacer ces documents dans `docs/`.
 
 Les consignes propres à un outil (par exemple les instructions GitHub Copilot ou celles d'un agent donné) devront pointer vers ce fichier et reprendre ses règles essentielles sans créer une seconde source de vérité contradictoire.
 

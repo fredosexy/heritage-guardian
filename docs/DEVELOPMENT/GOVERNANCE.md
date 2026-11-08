@@ -451,6 +451,7 @@ Les documents spécialisés du référentiel de développement précisent les ex
 - [DATA-AND-DATABASE-RULES.md](DATA-AND-DATABASE-RULES.md) — données, schémas, migrations et intégrité ;
 - [TESTING-REQUIREMENTS.md](TESTING-REQUIREMENTS.md) — stratégie et exigences de test ;
 - [AI-AND-AUTOMATION-RULES.md](AI-AND-AUTOMATION-RULES.md) — intelligence artificielle et automatisation.
+- [Référentiel Lovable](../../.lovable/plan/README.md) — consignes opérationnelles, portes d'acceptation et plan de travail destinés à Lovable ; ces documents restent exclusivement dans `.lovable/plan/`.
 
 Une référence qui n'a pas encore été créée doit être considérée comme planifiée, et non comme une politique déjà disponible. Les règles communes de ce document restent applicables jusqu'à la publication et la validation du document spécialisé correspondant.
 
