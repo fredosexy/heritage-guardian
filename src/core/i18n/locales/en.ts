@@ -175,6 +175,12 @@ export const en = {
       infrastructure: "Installation type, use, resources and description…",
       autre: "Describe the nature of this rural asset and what distinguishes it…"
     },
+    assistant: {
+      title: "Declaration assistant",
+      progress: "Recommended information progress",
+      nextStep: "To make this declaration more useful, complete these items first:",
+      complete: "The recommended information for this family is filled in. You can still add more details.",
+    },
     invalidNumber: "Invalid numeric value. Enter a positive number or zero.",
     structuredTitle: "Structured asset information",
     structuredHint: "Fields adapt to the asset family. All entered values remain declarations.",
