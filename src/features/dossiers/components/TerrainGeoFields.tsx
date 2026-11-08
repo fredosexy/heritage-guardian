@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, LocateFixed, Calculator, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { TerrainBoundaryMap } from "./TerrainBoundaryMap";
 import {
   calculateTerrainMeasurements,
   isValidGeoPoint,
@@ -173,6 +174,8 @@ export function TerrainGeoFields({ value, onChange, disabled = false }: TerrainG
         <Label htmlFor="terrain-contour">{t("create.terrainGeo.boundaryTitle")}</Label>
         <p className="text-xs text-muted-foreground">{t("create.terrainGeo.boundaryHint")}</p>
         <Textarea id="terrain-contour" value={contourText} readOnly={disabled} onChange={(event) => setContourText(event.target.value)} rows={4} placeholder={"4.0511, 9.7679\n4.0512, 9.7680\n4.0510, 9.7682"} />
+        <p className="text-xs font-medium">{t("create.terrainGeo.mapSectionTitle")}</p>
+        <TerrainBoundaryMap boundaryPoints={value.boundaryPoints} referencePoint={value.point} disabled={disabled} onBoundaryChange={(boundaryPoints) => onChange({ ...value, boundaryPoints, measurements: undefined })} />
         <Button type="button" variant="outline" onClick={calculate} disabled={disabled} className="w-full rounded-xl">
           <Calculator className="size-4 mr-2" />{t("create.terrainGeo.calculate")}
         </Button>
