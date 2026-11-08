@@ -22,6 +22,7 @@ function isAppleMobileDevice(): boolean {
 export function usePwa() {
   const [installed, setInstalled] = useState(isStandaloneDisplay);
   const [ios, setIos] = useState(isAppleMobileDevice);
+  const [android, setAndroid] = useState(typeof navigator !== "undefined" && /android/i.test(navigator.userAgent));
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const [online, setOnline] = useState(typeof navigator === "undefined" ? true : navigator.onLine);
 
@@ -46,6 +47,7 @@ export function usePwa() {
     window.addEventListener("offline", handleOffline);
 
     setIos(isAppleMobileDevice());
+    setAndroid(/android/i.test(navigator.userAgent));
     updateDisplayMode();
 
     return () => {
@@ -69,6 +71,7 @@ export function usePwa() {
   return {
     installed,
     ios,
+    android,
     online,
     canPromptInstall: installPrompt !== null,
     install,
