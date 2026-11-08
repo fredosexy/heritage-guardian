@@ -321,6 +321,7 @@ async function runQueue(): Promise<void> {
               const theirs: Record<string, string | null> = {};
               for (const field of Object.keys(changes) as (keyof DossierChanges)[]) theirs[field] = remote[field] ?? null;
               await db.conflicts.add({
+                viewer_user_id: currentUser.id,
                 dossier_id: dossierId,
                 title: remote.title,
                 fields,
