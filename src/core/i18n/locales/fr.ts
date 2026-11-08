@@ -268,7 +268,11 @@ export const fr = {
     noResultsHint: "Modifiez votre recherche ou choisissez une autre famille.",
     results: "Actifs agricoles et ruraux",
     resultCount: "{{count}} actif(s) affiché(s)",
-    locationNotSpecified: "Localisation non renseignée"
+    summary: { title: "Vue d’ensemble", total: "Biens déclarés", toComplete: "À enrichir", assistantTitle: "Conseil Heritis", assistantHint: "Une fiche mérite votre attention : poursuivez sa description pour mieux la retrouver et la gérer.", allUpToDate: "Les informations recommandées sont renseignées dans les fiches consultées.", continue: "Reprendre cette fiche" },
+    cardDescriptionFallback: "Ajoutez une description pour mieux reconnaître cet actif.",
+    cardInfoProgress: "Informations recommandées",
+    cardOpen: "Ouvrir la fiche",
+    locationNotSpecified: "Localisation non renseignée",
   },
   create: {
     title: "Que voulez-vous créer ?",
