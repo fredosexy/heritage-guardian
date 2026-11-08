@@ -211,6 +211,8 @@ export const fr = {
       add: "Ajouter cette personne",
       empty: "Aucune personne associée n'est encore déclarée.",
       declared: "Déclaration non vérifiée",
+      end: "Terminer ce lien",
+      ended: "Lien terminé — conservé dans l'historique",
       roles: {
         owner_declared: "Propriétaire déclaré",
         coowner_declared: "Copropriétaire déclaré",
