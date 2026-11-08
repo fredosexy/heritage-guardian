@@ -32,6 +32,16 @@ Ordre de lecture recommandé :
 | 3. Volontés secrètes et dernières volontés | [Document détaillé](../03-DOMAINES/VOLONTES-SECRETES-ET-DERNIERES-VOLONTES-V1.md) | Préserver des volontés confidentielles et organiser leur transmission après vérifications. |
 | 4. Gestion des conflits et litiges | [Document détaillé](../04-DOMAINES/GESTION-DES-CONFLITS-ET-LITIGES-V1.md) | Constituer un dossier de conflit et orienter vers les méthodes et services compétents. |
 
+## 3.1 Spécifications des sous-domaines du patrimoine
+
+| Sous-domaine | Document | Contenu |
+|---|---|---|
+| 1. Terrains et biens fonciers | À référencer après consolidation de la spécification dédiée | Déclaration, identification, limites, localisation et documentation des terrains. |
+| 2. Bâtiments et biens immobiliers | PR #57 — spécification en revue sur sa branche dédiée | Déclaration, documentation, gestion patrimoniale, relations, transmission et différends relatifs aux bâtiments et biens immobiliers. |
+| 3. Biens agricoles et ruraux | [Spécification fonctionnelle V1](../01-DOMAINES/AGRICULTURAL-AND-RURAL-ASSETS-FUNCTIONAL-SPEC-V1.md) | Exploitations, plantations, élevages, équipements et installations rurales ; documentation, gestion patrimoniale et transmission. |
+
+Les documents de sous-domaines détaillent les parcours du domaine Patrimoine sans créer de nouveaux domaines métier. Leur périmètre reste subordonné aux principes et limites du document général Patrimoine V1.
+
 ## 4. Services transversaux
 
 | Document | Contenu |
