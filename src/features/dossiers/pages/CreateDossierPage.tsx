@@ -11,6 +11,7 @@ import { ChevronRight, CircleCheck, Loader2, MapPin, Sparkles } from "lucide-rea
 import { toast } from "sonner";
 import { useCreateDossier } from "../hooks/useCreateDossier";
 import { DOSSIER_TYPES, typeLabelKey } from "../components/dossierTypeMeta";
+import { BuildingCreateForm } from "./BuildingCreateForm";
 
 type TerrainSections = {
   histoire: string;
@@ -132,6 +133,8 @@ export default function CreateDossierPage() {
       </AppLayout>
     );
   }
+
+  if (type === "batiment") return <BuildingCreateForm onBack={() => setType(null)} />;
 
   if (type !== "terrain") {
     return (
