@@ -20,6 +20,7 @@ export interface TerrainGeospatialData {
   };
   boundaryPoints: GeoPoint[];
   measurements?: TerrainMeasurements;
+  declaredArea?: { value: number; unit: "m2" | "are" | "ha" };
 }
 
 interface TerrainGeoFieldsProps {
@@ -37,6 +38,8 @@ export function TerrainGeoFields({ value, onChange, disabled = false }: TerrainG
   const [latitude, setLatitude] = useState(value.point ? String(value.point.latitude) : "");
   const [longitude, setLongitude] = useState(value.point ? String(value.point.longitude) : "");
   const [contourText, setContourText] = useState(value.boundaryPoints.map(formatPoint).join("\n"));
+  const [declaredAreaValue, setDeclaredAreaValue] = useState(value.declaredArea ? String(value.declaredArea.value) : "");
+  const [declaredAreaUnit, setDeclaredAreaUnit] = useState<"m2" | "are" | "ha">(value.declaredArea?.unit ?? "m2");
   const [capturing, setCapturing] = useState(false);
   const [error, setError] = useState("");
   const [measurementError, setMeasurementError] = useState("");
@@ -45,6 +48,8 @@ export function TerrainGeoFields({ value, onChange, disabled = false }: TerrainG
     setLatitude(value.point ? String(value.point.latitude) : "");
     setLongitude(value.point ? String(value.point.longitude) : "");
     setContourText(value.boundaryPoints.map(formatPoint).join("\n"));
+    setDeclaredAreaValue(value.declaredArea ? String(value.declaredArea.value) : "");
+    setDeclaredAreaUnit(value.declaredArea?.unit ?? "m2");
   }, [value.point?.latitude, value.point?.longitude, value.boundaryPoints]);
 
   const parsedPoints = useMemo(() => {
@@ -144,6 +149,24 @@ export function TerrainGeoFields({ value, onChange, disabled = false }: TerrainG
         <Button type="button" variant="secondary" size="sm" onClick={saveManualPoint} disabled={disabled} className="w-full">{t("create.terrainGeo.saveCoordinates")}</Button>
         {value.point && <p className="text-xs text-muted-foreground">{t("create.terrainGeo.pointSource")}: {value.point.source === "device_gps" ? t("create.terrainGeo.gpsSource") : t("create.terrainGeo.manualSource")}{value.point.accuracyMeters != null ? ` · ±${Math.round(value.point.accuracyMeters)} m` : ""}</p>}
         {error && <p className="text-xs text-destructive" role="alert">{error}</p>}
+      </div>
+
+      <div className="border-t border-border/70 pt-4 space-y-2">
+        <Label htmlFor="terrain-declared-area">{t("create.terrainGeo.declaredArea")}</Label>
+        <div className="grid grid-cols-[1fr_auto] gap-2">
+          <Input id="terrain-declared-area" inputMode="decimal" value={declaredAreaValue} readOnly={disabled} onChange={(event) => setDeclaredAreaValue(event.target.value)} placeholder="Ex. 500" />
+          <select aria-label={t("create.terrainGeo.areaUnit")} value={declaredAreaUnit} disabled={disabled} onChange={(event) => setDeclaredAreaUnit(event.target.value as "m2" | "are" | "ha")} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
+            <option value="m2">m²</option><option value="are">are</option><option value="ha">ha</option>
+          </select>
+        </div>
+        <Button type="button" variant="secondary" size="sm" disabled={disabled || !declaredAreaValue.trim() || !Number.isFinite(Number(declaredAreaValue)) || Number(declaredAreaValue) < 0} onClick={() => onChange({ ...value, declaredArea: { value: Number(declaredAreaValue), unit: declaredAreaUnit } })} className="w-full">{t("create.terrainGeo.saveDeclaredArea")}</Button>
+        {value.declaredArea && <p className="text-xs text-muted-foreground">{t("create.terrainGeo.declaredAreaSaved")}: {value.declaredArea.value.toLocaleString()} {value.declaredArea.unit === "m2" ? "m²" : value.declaredArea.unit}</p>}
+        {value.declaredArea && value.measurements && (() => {
+          const declaredSquareMeters = value.declaredArea.value * (value.declaredArea.unit === "ha" ? 10000 : value.declaredArea.unit === "are" ? 100 : 1);
+          const difference = Math.abs(declaredSquareMeters - value.measurements.areaSquareMeters);
+          const relativeDifference = declaredSquareMeters > 0 ? (difference / declaredSquareMeters) * 100 : null;
+          return <p className="text-xs text-muted-foreground">{t("create.terrainGeo.areaDifference")}: {difference.toLocaleString(undefined, { maximumFractionDigits: 1 })} m²{relativeDifference !== null ? ` ( ${relativeDifference.toLocaleString(undefined, { maximumFractionDigits: 1 })}% )` : ""}. {t("create.terrainGeo.areaDifferenceNote")}</p>;
+        })()}
       </div>
 
       <div className="border-t border-border/70 pt-4 space-y-2">
