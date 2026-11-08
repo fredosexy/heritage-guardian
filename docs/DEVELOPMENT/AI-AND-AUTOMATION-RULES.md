@@ -41,7 +41,7 @@ Elle peut notamment :
 - proposer des rappels, étapes suivantes et automatisations utiles ;
 - faciliter la compréhension sans se substituer à la personne, à un professionnel ou à une autorité compétente.
 
-L'intelligence est une capacité transversale des quatre domaines métier V1 :
+L'intelligence est une capacité transversale des quatre domaines métier validés pour la V1. La vision générale Heritis cible six domaines ; les deux domaines complémentaires restent à définir et ne doivent pas recevoir de capacités IA inventées ou anticipées :
 1. Patrimoine et gestion des biens.
 2. Héritage et succession.
 3. Volontés secrètes et dernières volontés.

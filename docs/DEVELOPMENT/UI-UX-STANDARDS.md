@@ -155,7 +155,7 @@ Sans compte authentifié, la conversation reste un aperçu guidé et limité. Av
 
 ## 5. Architecture de l'expérience par domaines
 
-Heritis V1 comporte quatre domaines métier. Ils doivent rester compréhensibles comme quatre espaces complémentaires, et non être fusionnés dans un catalogue indistinct.
+Heritis vise une vision générale de six domaines métier ; la V1 validée en présente quatre. Les deux domaines complémentaires ne sont pas encore définis et ne doivent pas être affichés ou simulés comme des espaces fonctionnels sans décision produit. Les quatre domaines V1 doivent rester compréhensibles comme quatre espaces complémentaires, et non être fusionnés dans un catalogue indistinct.
 
 ### 5.1 Domaine 1 — Patrimoine et gestion des biens
 
