@@ -50,7 +50,7 @@ export function TerrainGeoFields({ value, onChange, disabled = false }: TerrainG
     setContourText(value.boundaryPoints.map(formatPoint).join("\n"));
     setDeclaredAreaValue(value.declaredArea ? String(value.declaredArea.value) : "");
     setDeclaredAreaUnit(value.declaredArea?.unit ?? "m2");
-  }, [value.point?.latitude, value.point?.longitude, value.boundaryPoints]);
+  }, [value.point?.latitude, value.point?.longitude, value.boundaryPoints, value.declaredArea?.value, value.declaredArea?.unit]);
 
   const parsedPoints = useMemo(() => {
     const lines = contourText.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
