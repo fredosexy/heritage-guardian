@@ -18,7 +18,7 @@
 | 5 | Perte réseau et reprise | Écouteurs `online/offline`, file Dexie et contrôle de session/droits avant rejeu ; `navigator.onLine` ne prouve pas l'accès au serveur | Conforme au principe, terrain requis |
 | 6 | Deux comptes sur un appareil | Instantanés, opérations et conflits attribués au compte lecteur ; migration v4/v5 et tests d'isolation présents ; test réel multi-compte non effectué | Couverture automatisée présente, terrain requis |
 | 7 | Mise à jour du service worker | Mode `prompt`, notification de mise à jour, action explicite et contrôle au retour au premier plan ; conservation des saisies et parcours OAuth doivent être vérifiés sur déploiement | Conforme au niveau du code, terrain requis |
-| 8 | Upgrade et purge de l'ancien cache | Suppression du cache `supabase-storage` au démarrage et suppression de la règle générique ; risque de recréation par l'ancien worker encore actif à traiter | Point bloquant à analyser/corriger |
+| 8 | Upgrade et purge de l'ancien cache | Purge au démarrage conservée ; nouveau hook Workbox importé qui attend la suppression de `supabase-storage` pendant `activate` ; tests unitaires du hook ajoutés | Correction de code engagée, intégration navigateur et recette migration restantes |
 
 ## 1. HTTPS, portée et navigation profonde
 
@@ -133,17 +133,19 @@
 - La branche `main` précédente contenait une règle Workbox `StaleWhileRevalidate` sur les URL Supabase Storage, avec le cache `supabase-storage`.
 - La PR #71 retire cette règle et supprime ce cache au démarrage de l'application.
 
-**Risque identifié**
-- La suppression au démarrage ne prouve pas que l'ancien service worker a cessé de contrôler l'onglet. Selon le cycle de vie standard, un worker nouvellement installé peut rester en attente tant que l'ancien contrôle encore des clients ; la PR utilise par ailleurs un mode de mise à jour contrôlé (`prompt`).
-- Si l'ancien worker intercepte encore une requête Storage après la purge et avant son remplacement effectif, il pourrait recréer le cache historique.
-- Les tests actuels vérifient l'appel à `caches.delete("supabase-storage")` et l'absence de règle Storage dans la nouvelle allowlist ; ils ne simulent pas l'ancien worker actif ni une recréation concurrente.
+**Correction de code ajoutée dans la PR #71**
+- La purge au démarrage est conservée comme défense complémentaire.
+- Le script `public/pwa-legacy-cache-cleanup.js` est ajouté via l'option Workbox `importScripts`. Il enregistre un gestionnaire `activate` qui passe `caches.delete("supabase-storage")` à `event.waitUntil()`.
+- Le cycle de vie documenté par MDN prévoit l'activation du nouveau worker après la fin du précédent (ou après acceptation de `skipWaiting`). L'événement `activate` est le point prévu pour nettoyer les ressources des versions antérieures ; `waitUntil` fait attendre la fin du nettoyage avant que l'activation soit achevée.
+- Le mode `registerType: "prompt"` est conservé : aucun basculement silencieux ou automatique n'est introduit. Tant que l'utilisateur n'a pas accepté la mise à jour, l'ancien worker peut continuer à fonctionner et le cache legacy peut encore exister ou être recréé. La correction vise la purge au moment de la migration effective, pas une suppression rétroactive avant consentement à la mise à jour.
+- Deux tests unitaires couvrent l'enregistrement du gestionnaire d'activation, l'appel à la suppression et l'attente de sa promesse. Ils ne simulent pas encore un navigateur complet ni plusieurs onglets.
 
-**Action requise avant de déclarer la migration sûre**
-- Concevoir une purge garantie au moment où le nouveau worker prend effectivement le contrôle, ou une autre stratégie qui empêche l'ancien worker de remettre en cache des réponses privées pendant la transition.
-- Ajouter un test de régression qui représente explicitement la transition ancien worker → nouveau worker et vérifie que le cache privé ne réapparaît pas.
-- Effectuer ensuite la recette de mise à niveau sur une installation ayant réellement utilisé la version précédente.
+**Vérifications restantes avant de déclarer la migration sûre**
+- Confirmer dans le build que le service worker généré importe bien le script de migration.
+- Ajouter ou exécuter un test d'intégration navigateur représentant ancien worker actif → nouveau worker en attente → acceptation → activation/purge → transfert de contrôle, avec vérification qu'aucune requête post-activation ne recrée le cache.
+- Effectuer la recette de mise à niveau sur une installation ayant réellement utilisé la version précédente, y compris plusieurs onglets.
 
-**Conclusion :** point de sécurité à traiter avant la clôture de la PR ; la purge au démarrage seule n'est pas une preuve suffisante.
+**Conclusion :** le point de nettoyage à l'activation est implémenté et couvert au niveau unitaire ; le scénario complet de migration reste ouvert. La PR #71 n'est pas encore déclarée prête à fusionner.
 
 ## Icônes : contrôle transversal
 
