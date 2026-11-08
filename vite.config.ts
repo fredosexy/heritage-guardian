@@ -23,7 +23,10 @@ export default defineConfig(({ mode }) => ({
       devOptions: { enabled: false },
       manifest: false,
       workbox: {
-        navigateFallbackDenylist: [/^\/~oauth/, /^\/api/, /^\/auth/],
+        // The activation hook removes the legacy private cache at the actual
+        // service-worker handover, not only during page bootstrap.
+        importScripts: ["/pwa-legacy-cache-cleanup.js"],
+        navigateFallbackDenylist: [/^\\/~oauth/, /^\\/api/, /^\\/auth/],
         globPatterns: ["**/*.{js,css,html,svg,png,jpg,jpeg,webp,woff2,webmanifest}"],
         runtimeCaching: pwaRuntimeCaching,
       },
