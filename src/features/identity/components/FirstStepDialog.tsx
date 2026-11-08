@@ -53,7 +53,21 @@ export function FirstStepDialog({ open, onClose }: { open: boolean; onClose: () 
   };
 
   return (
-    <Dialog open={open} onOpenChange={(next) => (next ? undefined : skip())}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (next) return;
+        if (showNextStep) {
+          onClose();
+          return;
+        }
+        if (firstName.trim() || lastName.trim()) {
+          finish();
+          return;
+        }
+        skip();
+      }}
+    >
       <DialogContent className="max-w-sm rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-title">{showNextStep ? t("firstStep.nextTitle") : t("firstStep.title")}</DialogTitle>
