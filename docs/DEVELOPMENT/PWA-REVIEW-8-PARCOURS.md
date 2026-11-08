@@ -73,12 +73,13 @@
 - Aucune règle générique de cache Supabase Storage n'est présente dans la nouvelle configuration.
 - L'assistant précise que seules les ressources essentielles sont préparées et que les actions serveur attendent le réseau.
 - Le texte ne revendique pas une disponibilité hors ligne complète des fonctionnalités métier.
+- L'assistant affiche désormais un état hors ligne même lorsqu'aucune notification d'installation ou de mise à jour n'est active ; l'utilisateur peut le fermer jusqu'au prochain retour du réseau. Un test dédié couvre l'affichage, la fermeture et la réapparition après une nouvelle perte de connexion.
 
 **Points à vérifier**
 - Confirmer dans le build de production que le shell nécessaire est bien précaché et que le fallback de navigation fonctionne pour les routes prévues.
 - Déterminer si une page hors ligne dédiée est nécessaire : la recommandation MDN est de présenter une expérience hors ligne explicite plutôt qu'une erreur générique du navigateur.
 - Vérifier qu'une première visite hors ligne n'est pas présentée comme possible si les ressources n'ont jamais été téléchargées.
-- Vérifier l'affichage d'un état hors ligne lorsque l'assistant est fermé ou non affiché. Le composant PWA actuel peut ne rien rendre si aucune notification n'est active.
+- Le contrôle statique de l'état hors ligne est couvert par un test de composant ; vérifier encore sur appareils réels la lisibilité, le positionnement et l'absence de gêne pendant la saisie.
 
 **Observation de performance issue du build CI**
 - Le build produit 10 ressources de précache pour environ 1,10 Mio. Le bundle principal atteint 970,81 Ko avant compression (287,15 Ko gzip) et déclenche l'avertissement Rollup au-delà de 500 Ko.
