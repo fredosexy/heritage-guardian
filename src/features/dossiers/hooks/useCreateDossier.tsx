@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
-import { dossiersRepo, enqueueCreateDossier, proceduresRepo, saveLocalDraft } from "@/data";
+import { buildingsRepo, dossiersRepo, enqueueCreateDossier, proceduresRepo, saveLocalDraft } from "@/data";
 import { useIdentity } from "@/features/identity";
-import { buildingsRepo } from "@/data";
 
 export interface CreateDossierForm {
   type: string;
