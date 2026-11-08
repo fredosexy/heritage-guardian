@@ -102,7 +102,7 @@ Un dossier métier possède un type et une finalité explicites. Les relations i
 
 ### 6.1 Identité des personnes
 
-Distinguer une personne, son compte utilisateur, ses profils, ses coordonnées et ses relations à un dossier. Un compte ne constitue pas à lui seul la preuve de l'identité civile ou d'un droit sur un bien.
+Distinguer une personne, son compte utilisateur, ses profils, ses coordonnées et ses relations à un dossier. Dans le parcours d'accueil, la communication d'un prénom ou d'un nom (l'un ou l'autre suffit) peut faire passer la personne à l'état « reconnue » ; cet état est un repère de parcours, pas une authentification, une preuve d'identité ni une permission. Sans compte authentifié, l'accès reste limité à l'aperçu guidé. Un compte ne constitue pas à lui seul la preuve de l'identité civile ou d'un droit sur un bien.
 
 Éviter les doublons de personnes ; toute fusion doit être contrôlée, traçable, réversible dans la mesure du possible et ne pas mélanger les comptes, identifiants ou preuves.
 
