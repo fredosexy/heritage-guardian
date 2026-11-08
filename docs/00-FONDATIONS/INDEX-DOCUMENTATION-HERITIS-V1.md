@@ -2,7 +2,7 @@
 
 **Référentiel :** Heritis  
 **Version :** V1 — Fondation  
-**Pays de lancement :** Cameroun  
+**Pays de lancement :** Cameroun
 
 ## 1. Comment lire cette documentation
 
@@ -31,9 +31,10 @@ Ordre de lecture recommandé :
 | 3. Volontés secrètes et dernières volontés | [Document détaillé](../03-DOMAINES/VOLONTES-SECRETES-ET-DERNIERES-VOLONTES-V1.md) | Préserver des volontés confidentielles et organiser leur transmission après vérifications. |
 | 4. Gestion des conflits et litiges | [Document détaillé](../04-DOMAINES/GESTION-DES-CONFLITS-ET-LITIGES-V1.md) | Constituer un dossier de conflit et orienter vers les méthodes et services compétents. |
 
-### Spécification détaillée d'un sous-domaine du domaine Patrimoine
+### Spécifications détaillées des sous-domaines du domaine Patrimoine
 
 - [Biens financiers et droits patrimoniaux — spécification fonctionnelle V1](../01-DOMAINES/FINANCIAL-ASSETS-AND-PATRIMONIAL-RIGHTS-FUNCTIONAL-SPEC-V1.md) — déclaration, identification, documentation, confidentialité renforcée, suivi et préparation de la transmission des actifs financiers et droits patrimoniaux.
+- [Autres biens et actifs particuliers — spécification fonctionnelle V1](../01-DOMAINES/OTHER-AND-SPECIAL-PATRIMONIAL-ASSETS-FUNCTIONAL-SPEC-V1.md) — propriété intellectuelle, actifs numériques non financiers, licences et autorisations, droits particuliers et autres actifs spécifiques documentés.
 
 ## 4. Services transversaux
 
