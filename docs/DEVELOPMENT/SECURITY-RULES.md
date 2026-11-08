@@ -658,3 +658,9 @@ Les documents annoncés mais non encore publiés restent à produire. Leur absen
 ---
 
 **Règle finale :** Heritis ne doit jamais exposer une information, accorder un droit, altérer une preuve ou exécuter une action parce qu'un écran, un utilisateur, une automatisation ou une intelligence le demande. Chaque accès et chaque action doivent être légitimes, limités, vérifiables et traçables.
+
+---
+
+## Référentiel permanent complémentaire
+
+Les règles de modélisation, de qualité, de protection, de synchronisation, de conservation et de sobriété des données sont définies dans [DATA-AND-DATABASE-RULES.md](DATA-AND-DATABASE-RULES.md). Ce référentiel doit être consulté pour toute évolution touchant aux données ou à leur stockage.
