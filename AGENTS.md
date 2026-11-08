@@ -65,6 +65,7 @@ Heritis est une application patrimoniale évolutive. Elle ne doit pas être réd
 Chaque évolution doit considérer, selon le périmètre concerné :
 
 - les domaines métier, leurs sous-domaines et leurs relations ;
+- distinguer systématiquement la vision générale Heritis (six domaines métier) du périmètre V1 (quatre domaines validés) ; les deux domaines hors V1 ne doivent recevoir aucun nom, périmètre ou comportement inventé tant qu'une décision produit ne les a pas formellement définis ;
 - les parcours, pages, sous-pages, étapes et états ;
 - les services, fonctionnalités, activités, actions et interactions réellement disponibles ;
 - les personnes, profils associés, relations, rôles et permissions ;
