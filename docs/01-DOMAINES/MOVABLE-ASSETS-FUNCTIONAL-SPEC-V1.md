@@ -297,6 +297,88 @@ Ce document formalise le périmètre fonctionnel V1. Il ne constitue ni un avis 
 
 Toute implémentation devra être précédée d'une vérification de l'état réel du dépôt et de l'architecture. Aucun changement Lovable ou Supabase distant n'est autorisé par cette spécification.
 
+## 19. Compléments de précision sur l'identité et les familles
+
+### 19.1 Bien individuel, lot et collection
+
+La fiche doit distinguer un objet individuel, un lot homogène et une collection. Un lot peut être suivi comme un ensemble lorsque ses éléments ne nécessitent pas de suivi individuel ; sa composition et sa quantité déclarée doivent être datées. Si certains éléments doivent ensuite être suivis séparément, créer des fiches propres et conserver le lien « élément de » avec le lot d'origine. Ne pas créer automatiquement une fiche par unité pour les biens de faible valeur ou non individualisés.
+
+Une collection peut être représentée par une fiche d'ensemble et, lorsque cela est utile, des fiches individuelles liées. Le nombre d'éléments, la composition et l'état général restent des informations déclarées et datées. La création ou le retrait d'une fiche enfant ne doit pas effacer l'historique de l'ensemble.
+
+### 19.2 Distinction avec les autres sous-domaines
+
+Les animaux d'élevage et les cheptels relèvent des biens agricoles et ruraux ; ils ne doivent pas être dupliqués dans les biens mobiliers. Les équipements agricoles ou ruraux déjà gérés dans leur sous-domaine sont réutilisés par lien. Les comptes, placements, créances et droits financiers relèvent des biens financiers. Les droits intellectuels, licences et actifs numériques non financiers relèvent des autres actifs particuliers. En cas de classement incertain, conserver une proposition de classement ou une déclaration à examiner plutôt que créer plusieurs fiches.
+
+### 19.3 Caractéristiques et références spécifiques
+
+Les références visibles (immatriculation, numéro de série, fabricant, modèle, signature, référence d'inventaire) doivent être retranscrites sans normalisation destructive, avec leur source et leur date de constat. Une référence peut être absente, inconnue, illisible ou contestée. Elle ne doit pas être inventée pour satisfaire un formulaire.
+
+Pour les véhicules, distinguer immatriculation, numéro de châssis, numéro de série et référence de carte grise. Pour les objets de valeur, distinguer description, marque/signature observée, document de provenance et expertise tierce. Pour les matériels, distinguer accessoires inclus, pièces séparées et consommables. Ces informations ne constituent pas une authentification.
+
+## 20. Cycle de vie, garde et mouvements
+
+### 20.1 Acquisition et modes d'entrée
+
+La fiche peut conserver le mode d'entrée déclaré : achat, don, héritage, fabrication, création, échange, prêt, dépôt, mise à disposition ou origine inconnue. La date peut être exacte, approximative ou inconnue. Une pièce peut être associée, mais son absence n'empêche pas nécessairement la création d'un brouillon. L'enregistrement ne confirme ni la transaction ni la propriété.
+
+### 20.2 Détention, garde et utilisation
+
+Distinguer le propriétaire déclaré, le détenteur ou possesseur déclaré, le gardien, l'emprunteur, le dépositaire, le locataire, l'utilisateur et le lieu de conservation. Ces qualités peuvent concerner des personnes différentes et changer dans le temps. La personne qui conserve physiquement un bien n'est pas automatiquement son propriétaire. La permission d'accès à la fiche reste indépendante de toutes ces relations.
+
+Pour chaque période de garde ou d'utilisation, conserver la personne ou l'organisation, la nature de la relation, les dates connues, le lieu utile, la source et les documents associés. Une remise ou restitution peut être consignée comme événement.
+
+### 20.3 Changements, incidents et fin de cycle
+
+Événements possibles : déplacement, prêt, dépôt, restitution, réparation signalée, dommage, perte déclarée, suspicion de vol déclarée, récupération déclarée, vente ou cession déclarée, don, transmission, destruction ou retrait d'usage. Les situations sensibles restent attribuées à leur auteur : Heritis n'affirme pas qu'un vol a eu lieu et ne désigne pas de responsable.
+
+Un événement conserve sa date d'effet déclarée, sa date de saisie, son auteur, sa source, les personnes concernées et les pièces disponibles. La situation courante est une synthèse des événements déclarés et doit rester corrigible.
+
+### 20.4 Valeur et évolution
+
+Distinguer valeur d'acquisition déclarée, valeur actuelle déclarée, estimation externe et montant figurant dans un document. Chaque valeur conserve devise, date, source, méthode et auteur lorsqu'ils sont disponibles. Une valeur ancienne ne doit pas être présentée comme actuelle. Heritis ne calcule pas une valeur de marché et ne fournit pas d'expertise.
+
+## 21. Relations, documents et accès détaillés
+
+### 21.1 Personnes et portée des relations
+
+Un même bien peut avoir plusieurs personnes associées simultanément ou successivement : propriétaire déclaré, copropriétaire déclaré, détenteur/possesseur, bénéficiaire d'un droit déclaré, représentant, gardien, dépositaire, emprunteur, locataire, utilisateur ou personne concernée par une contestation. Pour chaque relation, préciser si elle concerne un objet individuel, un lot ou une collection. Ne pas propager automatiquement une relation de l'ensemble à chaque élément, ni inversement.
+
+### 21.2 Documents et provenance
+
+Les pièces peuvent inclure factures, reçus, contrats, certificats, cartes grises, inventaires, attestations, photographies, rapports d'expertise externes et correspondances. Conserver déposant, auteur/émetteur déclaré, date de dépôt, date du document, objet concerné, provenance, visibilité et historique de remplacement. Un rapport externe doit afficher son auteur et sa date ; Heritis ne reprend pas son expertise à son compte.
+
+### 21.3 Partage, révocation et confidentialité
+
+Le partage doit être limité à un destinataire et à un contenu explicitement sélectionné. La localisation précise, les numéros de série, les documents d'acquisition et les informations susceptibles d'accroître le risque de vol ou de fraude ne doivent pas être exposés dans les listes publiques, aperçus visiteurs ou notifications non protégées. Prévoir une confirmation avant partage et une révocation traçable. Un rôle déclaré sur le bien ne donne pas automatiquement accès à la fiche.
+
+## 22. Parcours détaillés et cas limites
+
+1. rechercher un bien existant avant toute création, y compris dans les autres sous-domaines ;
+2. choisir entre objet individuel, lot ou collection et expliquer les conséquences de ce choix ;
+3. enregistrer un brouillon avec des références inconnues ou illisibles ;
+4. associer plusieurs personnes avec des rôles et périodes distincts ;
+5. documenter un prêt ou une garde par un tiers sans modifier le propriétaire déclaré ;
+6. enregistrer une suspicion de vol comme déclaration attribuée, sans la transformer en fait confirmé ;
+7. corriger une référence ou une caractéristique en conservant l'ancienne valeur ;
+8. scinder un lot en fiches enfants sans perdre la fiche d'ensemble ni sa composition historique ;
+9. relier une fiche à une succession ou à un différend sans duplication ni élargissement d'accès ;
+10. partager une pièce précise, puis révoquer l'accès ;
+11. reprendre une modification hors connexion et résoudre un conflit de situation ou de personne sans écrasement silencieux.
+
+## 23. Scénarios d'acceptation complémentaires
+
+- Un véhicule peut être identifié par plusieurs références distinctes, chacune avec sa source.
+- Un objet peut être conservé par une personne qui n'est pas le propriétaire déclaré.
+- Un lot peut évoluer en plusieurs fiches liées, avec conservation de l'historique.
+- Un élément agricole ou financier est orienté vers son sous-domaine de référence sans doublon.
+- Une suspicion de vol demeure une déclaration attribuée et contestable.
+- Une valeur d'expertise tierce n'est pas affichée comme une estimation Heritis.
+- Les données sensibles ne sont visibles que par les personnes autorisées.
+- Les changements de garde, de lieu, de situation et les corrections sont historisés.
+- Les états de synchronisation et les conflits sont visibles et réconciliables.
+
+Ces scénarios doivent être couverts par des tests lors de l'implémentation ; ils ne signifient pas que des tests techniques ont déjà été exécutés.
+
 ---
 
 **Statut :** périmètre V1 validé par l'utilisateur ; spécification fonctionnelle revue et précisée sur GitHub.  
