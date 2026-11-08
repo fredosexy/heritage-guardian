@@ -311,6 +311,16 @@ export default function DossierDetailPage() {
             <h2 className="mt-1 text-lg font-semibold">{t("agricultural.families." + family)}</h2>
             <p className="mt-3 text-xs text-muted-foreground">{t("agricultural.declarationNotice")}</p>
             {details ? <p className="mt-3 whitespace-pre-wrap text-sm">{details}</p> : null}
+            {asset.familyDetails && typeof asset.familyDetails === "object" && !Array.isArray(asset.familyDetails) ? (
+              <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                {Object.entries(asset.familyDetails as Record<string, unknown>).filter(([, value]) => typeof value === "string" && value.trim() !== "").map(([key, value]) => (
+                  <div key={key} className="rounded-xl bg-background/60 p-3">
+                    <dt className="text-xs text-muted-foreground">{t("agricultural.fields." + family + "." + key)}</dt>
+                    <dd className="mt-1 whitespace-pre-wrap text-sm font-medium">{value as string}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
             {dossier.location_name ? <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="size-4" />{dossier.location_name}</p> : null}
           </section>
         );
