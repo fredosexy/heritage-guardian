@@ -53,6 +53,21 @@ Ces migrations sont seulement versionnées sur cette branche. Elles n'ont pas é
 - Fiche de détail affichant les informations principales et utilisant les métadonnées du dossier comme repli hors ligne.
 - L'écran de liste dédié, l'édition, les unités, les personnes, les documents, les événements et le suivi des différends restent à réaliser.
 
+## Interface de liste des biens — première tranche
+
+La branche ajoute une page dédiée `/buildings`, accessible depuis le sous-domaine Bâtiments du domaine Patrimoine.
+
+- La page réutilise la liste des dossiers déjà filtrée par les permissions RLS ; elle ne crée pas une seconde source de données.
+- Seuls les dossiers de type `batiment` sont affichés.
+- Recherche sur le nom du bien et la localité.
+- Filtres par état existant du dossier : tous, incomplets, sécurisés/avancés et à surveiller. Ces filtres décrivent l'état du dossier Heritis, pas la validité juridique du bien.
+- Chaque ligne présente le nom, la localité lorsqu'elle est renseignée, l'état du dossier et l'état local le cas échéant.
+- L'ouverture d'un dossier distant conduit à sa fiche ; un brouillon local non synchronisé n'est pas présenté comme une fiche distante.
+- Les états de chargement, d'erreur avec relance, de liste vide et de recherche sans résultat sont distingués.
+- Le parcours Patrimoine donne deux actions distinctes : consulter les biens déclarés ou en déclarer un nouveau. Les visiteurs sont orientés vers l'accès au compte.
+
+La page n'ajoute ni filtre juridique, ni classement de propriété, ni indicateur de certification.
+
 ## Vérifications requises avant fusion et déploiement
 
 - Exécuter `supabase db reset` sur une base locale jetable, puis `supabase test db`.
