@@ -259,5 +259,5 @@ Ce document décrit le périmètre fonctionnel V1. Il ne constitue ni un schéma
 
 ---
 
-**Statut :** périmètre fonctionnel V1 rédigé après validation utilisateur ; revue documentaire effectuée et lien vérifié dans l'index. Validation finale utilisateur en attente.  
+**Statut :** périmètre fonctionnel V1 validé par l'utilisateur le 8 novembre 2026 ; revue documentaire effectuée et lien vérifié dans l'index.  
 **Portée de cette livraison :** documentation uniquement ; aucun code applicatif, aucune migration, aucun changement Supabase distant et aucun changement Lovable.
