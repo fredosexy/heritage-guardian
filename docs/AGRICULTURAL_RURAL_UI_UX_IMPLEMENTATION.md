@@ -1,6 +1,6 @@
 # Biens agricoles et ruraux — suivi de l'implémentation UI/UX
 
-> **Branche :** `feat/patrimoine-agricultural-rural-ui-ux`
+> **Branche :** `feat/agricultural-premium-interface`
 > **Référence fonctionnelle :** `docs/01-DOMAINES/AGRICULTURAL-AND-RURAL-ASSETS-FUNCTIONAL-SPEC-V1.md`
 > **Statut :** parcours de déclaration, enrichissement et gestion progressive implémentés sur la branche — validation V1 complète encore conditionnée aux essais et aux contrôles listés ci-dessous.
 
@@ -85,3 +85,20 @@ Aucune migration distante ni modification Lovable n'est prévue dans cette tranc
 - Essais manuels d'ajout/retrait de personnes, d'événements et de liens, en ligne et hors ligne.
 - Vérifier les droits du propriétaire, d'un participant accepté et d'un tiers non autorisé.
 - Confirmer les migrations locales et tests SQL de sécurité ; aucune migration distante n'est autorisée par cette tranche.
+
+
+## Troisième tranche — présentation premium et conseils contextuels
+
+### Améliorations d'interface
+- Remplacement de la liste compacte par une grille de cartes de grande taille : une colonne sur mobile, deux colonnes sur grand écran.
+- Chaque carte hiérarchise clairement le nom du bien, sa description, sa famille, sa localisation et son statut.
+- Ajout d'une jauge des informations recommandées, calculée selon la famille de l'actif ; cette jauge mesure uniquement la complétude de la déclaration.
+- Ajout d'une vue d'ensemble avec le nombre de biens déclarés et le nombre de fiches qui méritent un enrichissement.
+- Ajout d'un conseil contextuel qui ouvre directement la première fiche à enrichir.
+- Ajout des traductions françaises et anglaises et d'un test ciblé de l'action contextuelle.
+
+### Limites et garde-fous
+- La progression ne mesure ni la qualité juridique, ni l'authenticité des pièces, ni la réalité matérielle du bien.
+- Le conseil ne choisit qu'une fiche selon les champs recommandés manquants ou l'absence de localisation ; il ne constitue pas une IA autonome.
+- Les cartes réutilisent les données déjà disponibles et n'ajoutent aucun accès ni permission.
+- Le contrôle responsive doit encore être confirmé par essais visuels sur téléphone, tablette et écran large, en modes clair et sombre.
