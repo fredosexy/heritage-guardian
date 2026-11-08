@@ -87,26 +87,33 @@ jobs:
           edge_pid=$!
           trap 'kill "$edge_pid" 2>/dev/null || true' EXIT
 
-          ready=false
+          edge_ready=false
+          auth_ready=false
           for attempt in $(seq 1 90); do
             if ! kill -0 "$edge_pid" 2>/dev/null; then
               echo "Supabase Edge server exited before becoming ready."
               cat /tmp/heritis-edge-functions.log
               exit 1
             fi
-            code="$(curl --silent --output /dev/null --write-out '%{http_code}' --request OPTIONS \
+
+            edge_code="$(curl --silent --output /dev/null --write-out '%{http_code}' --request OPTIONS \
               --header 'Origin: http://localhost:3000' \
               --header 'Access-Control-Request-Method: POST' \
               http://127.0.0.1:54321/functions/v1/ai-chat || true)"
-            if [ "$code" = "200" ]; then
-              ready=true
+            auth_code="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+              http://127.0.0.1:54321/auth/v1/health || true)"
+
+            if [ "$edge_code" = "200" ]; then edge_ready=true; fi
+            if [ "$auth_code" = "200" ]; then auth_ready=true; fi
+            if [ "$edge_ready" = "true" ] && [ "$auth_ready" = "true" ]; then
               break
             fi
             sleep 2
           done
 
-          if [ "$ready" != "true" ]; then
-            echo "Supabase Edge runtime did not become ready within 180 seconds (last HTTP status: ${code:-none})."
+          if [ "$edge_ready" != "true" ] || [ "$auth_ready" != "true" ]; then
+            echo "Local Supabase APIs did not become ready within 180 seconds (Edge HTTP: ${edge_code:-none}; Auth HTTP: ${auth_code:-none})."
+            echo "Supabase Edge runtime logs:"
             cat /tmp/heritis-edge-functions.log
             exit 1
           fi
