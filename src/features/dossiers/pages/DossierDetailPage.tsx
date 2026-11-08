@@ -242,7 +242,7 @@ export default function DossierDetailPage() {
 
   return (
     <AppLayout>
-      <PageHeader title={dossier.title} parentLabel={t("dossiers.title")} showBack />
+      <PageHeader title={dossier.title} parentLabel={t("dossiers.title")} showBack right={<Button variant="outline" size="sm" onClick={() => navigate(`/dossiers/${dossier.id}/edit`)} disabled={!canEdit} className="rounded-xl"><Pencil className="mr-1.5 size-4" />{t("common.edit")}</Button>} />
 
       <div className="rounded-3xl border border-border/60 bg-card/85 p-5 mb-4 shadow-[var(--shadow-soft)]">
         <div className="flex items-start justify-between gap-2 mb-2">
