@@ -8,6 +8,7 @@ import { useUnreadAlerts } from "@/features/alerts/hooks/useAlerts";
 import { useDossiers } from "@/features/dossiers/hooks/useDossiers";
 import { HomeHeader } from "../components/HomeHeader";
 import { HomeModuleCard } from "../components/HomeModuleCard";
+import { PUBLIC_DOMAINS_V1 } from "../data/publicDomains";
 import { DOSSIER_TYPES } from "@/features/dossiers/components/dossierTypeMeta";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Loader2, Sparkles } from "lucide-react";
@@ -23,7 +24,7 @@ export default function HomePage() {
   const { profile, loading: profileLoading } = useProfile();
   const { alerts, loading: alertsLoading } = useUnreadAlerts(5);
   const { dossiers, loading: dossiersLoading } = useDossiers();
-  const { isAuthenticated, displayName, guest } = useIdentity();
+  const { isAuthenticated, displayName, guest, loading: identityLoading } = useIdentity();
   const [personalizationOpen, setPersonalizationOpen] = useState(false);
 
   useEffect(() => {
@@ -59,10 +60,9 @@ export default function HomePage() {
     moduleStats.find((module) => module.dossierCount > 0) ??
     moduleStats[0];
 
-  const openModule = (route: string) => navigate(route);
   const continueRoute = `/modules/${firstActiveModule.id}`;
 
-  if (profileLoading || alertsLoading || dossiersLoading) {
+  if (identityLoading || profileLoading || alertsLoading || dossiersLoading) {
     return <AppLayout><div className="flex justify-center py-20"><Loader2 className="size-6 animate-spin text-primary" /></div></AppLayout>;
   }
 
@@ -73,25 +73,49 @@ export default function HomePage() {
           <p className="text-xs uppercase tracking-[0.18em] text-primary font-medium">{t("home.visitorEyebrow")}</p>
           <h1 className="text-display mt-2 max-w-sm">{t("home.visitorTitle")}</h1>
           <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-xl">{t("home.visitorVision")}</p>
-          <Button className="mt-4" onClick={() => navigate("/create?type=terrain")}>{t("modules.visitorStart")}<ChevronRight className="size-4" /></Button>
+          <Button className="mt-4" onClick={() => navigate("/modules/terrain")}>{t("home.discoverDomains")}<ChevronRight className="size-4" /></Button>
           <p className="text-caption mt-3 max-w-xl">{t("modules.legalNotice")}</p>
         </section>
         <section className="mb-7 rounded-3xl border border-border/60 bg-card/80 p-4 shadow-[var(--shadow-soft)] backdrop-blur-sm">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="font-medium">{guest.firstName ? t("firstStep.title") : t("firstStep.subtitle")}</p>
-              <p className="text-sm text-muted-foreground mt-1">{guest.firstName ? guest.firstName : t("firstStep.namePlaceholder")}</p>
+              <p className="font-medium">{guest.firstName || guest.lastName ? t("firstStep.title") : t("firstStep.subtitle")}</p>
+              <p className="text-sm text-muted-foreground mt-1">{guest.firstName || guest.lastName || t("firstStep.namePlaceholder")}</p>
             </div>
             <Button variant="outline" className="shrink-0 rounded-xl" onClick={() => setPersonalizationOpen(true)}>{t("firstStep.continue")}</Button>
           </div>
         </section>
         <FirstStepDialog open={personalizationOpen} onClose={() => setPersonalizationOpen(false)} />
         <section className="mb-7">
-          <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.modulesTitle")}</h2><p className="text-caption mt-1">{t("home.modulesVisitorHint")}</p></div><Sparkles className="size-5 text-primary" /></div>
-          <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} journeyProgress={module.journeyProgress} currentStepTitle={module.currentStepTitle} nextStepTitle={module.nextStepTitle} blockedStepTitle={module.blockedStepTitle} participantsCount={module.participantsCount} proofsCount={module.proofsCount} onFirstGesture={openModule} available={module.available} />)}</div>
+          <div className="mb-3">
+            <h2 className="text-base font-serif">{t("home.modulesTitle")}</h2>
+            <p className="text-caption mt-1">{t("home.modulesVisitorHint")}</p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
+            {PUBLIC_DOMAINS_V1.map(({ id, icon: Icon, previewModuleId, titleKey, descriptionKey, availabilityKey }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => navigate(`/modules/${previewModuleId}`)}
+                className="flex min-h-52 w-full flex-col items-start rounded-3xl border border-border bg-card p-5 text-left shadow-[var(--shadow-soft)] transition-colors hover:border-primary/40 hover:shadow-[var(--shadow-elegant)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:min-h-56 sm:p-6"
+              >
+                <span className="flex w-full items-center justify-between gap-4">
+                  <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-accent text-primary">
+                    <Icon className="size-7" aria-hidden="true" />
+                  </span>
+                  <ChevronRight className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+                </span>
+                <span className="mt-5 block text-xl font-semibold leading-snug sm:text-2xl">{t(titleKey)}</span>
+                <span className="mt-2 block max-w-prose text-sm leading-relaxed text-muted-foreground sm:text-base">{t(descriptionKey)}</span>
+                <span className="mt-auto pt-4">
+                  <span className="inline-flex rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">{t(availabilityKey)}</span>
+                </span>
+              </button>
+            ))}
+          </div>
         </section>
-        <section className="rounded-[2rem] border border-white/70 bg-gradient-hero p-5 text-foreground shadow-[var(--shadow-elegant)] mb-6">
-          <div className="flex items-start gap-3"><span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-card/75 text-primary shadow-[var(--shadow-soft)]"><Sparkles className="size-5" /></span><div><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><p className="text-sm text-muted-foreground mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>
+        <section className="rounded-[2rem] border border-primary/20 bg-primary p-5 text-primary-foreground shadow-[var(--shadow-elegant)] mb-6">
+          <div className="flex items-start gap-3"><span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-card/75 text-primary shadow-[var(--shadow-soft)]"><Sparkles className="size-5" /></span><div><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><p className="text-sm text-primary-foreground mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>
           <Button onClick={() => navigate("/assistant")} variant="secondary" className="w-full mt-4 rounded-2xl justify-between shadow-[var(--shadow-soft)]">{t("home.visitorAssistantCta")}<ChevronRight className="size-4" /></Button>
         </section>
       </AppLayout>
@@ -132,7 +156,7 @@ export default function HomePage() {
         </button>
       </section>
       <section className="mb-6">
-        <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.modulesTitle")}</h2><p className="text-caption mt-1">{t("home.modulesConnectedHint")}</p></div></div>
+        <div className="flex items-end justify-between gap-3 mb-3"><div><h2 className="text-base font-serif">{t("home.modulesConnectedTitle")}</h2><p className="text-caption mt-1">{t("home.modulesConnectedHint")}</p></div></div>
         <div className="space-y-3">{moduleStats.map((module) => <HomeModuleCard key={module.id} id={module.id} icon={module.icon} dossierCount={module.dossierCount} secureCount={module.secureCount} riskCount={module.riskCount} bestCompletion={module.bestCompletion} nextDossierTitle={module.nextDossierTitle} nextAttention={module.nextAttention} journeyProgress={module.journeyProgress} currentStepTitle={module.currentStepTitle} nextStepTitle={module.nextStepTitle} blockedStepTitle={module.blockedStepTitle} participantsCount={module.participantsCount} proofsCount={module.proofsCount} available={module.available} />)}</div>
       </section>
       <section className="mb-6">

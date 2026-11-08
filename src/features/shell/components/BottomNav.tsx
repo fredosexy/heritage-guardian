@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Navigation principale adaptée au statut :
- * - visiteur : Accueil, Assistant, Profil ;
+ * - visiteur : Accueil et accueil guidé ;
  * - compte connecté : Accueil, Mes espaces, action centrale, Alertes, Profil.
  */
 export function BottomNav() {
@@ -66,7 +66,7 @@ export function BottomNav() {
       className="fixed bottom-0 inset-x-0 z-40 border-t border-border/80 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-elegant backdrop-blur-xl"
     >
       {isGuest ? (
-        <div className="mx-auto grid max-w-md grid-cols-3 gap-1 px-3 py-2">
+        <div className="mx-auto grid max-w-md grid-cols-2 gap-1 px-3 py-2">
           <NavLink to="/" end className={tabClass}>
             <Home className="size-5" />
             <span>{t("nav.home")}</span>
@@ -74,14 +74,6 @@ export function BottomNav() {
           <NavLink to="/assistant" className={tabClass}>
             <Sparkles className="size-5" />
             <span>{t("nav.assistant")}</span>
-          </NavLink>
-          <NavLink to="/profile" className={tabClass}>
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="" className="size-5 rounded-full object-cover" loading="lazy" />
-            ) : (
-              <User className="size-5" />
-            )}
-            <span>{t("nav.profile")}</span>
           </NavLink>
         </div>
       ) : (
