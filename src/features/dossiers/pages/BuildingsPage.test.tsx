@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -23,7 +24,7 @@ vi.mock("../hooks/useDossiers", () => ({
   useDossiers: () => ({ dossiers: mocks.dossiers, loading: false, loadError: false, reload: mocks.reload }),
 }));
 vi.mock("@/features/shell", () => ({
-  AppLayout: ({ children }: { children: React.ReactNode }) => <main>{children}</main>,
+  AppLayout: ({ children }: { children: ReactNode }) => <main>{children}</main>,
   PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
   EmptyState: ({ title, description }: { title: string; description: string }) => <div><h2>{title}</h2><p>{description}</p></div>,
 }));
