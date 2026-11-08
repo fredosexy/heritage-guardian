@@ -61,7 +61,10 @@ Ne pas créer une nouvelle catégorie technique de dossier uniquement pour repr�
 - Un terrain peut être lié à zéro, un ou plusieurs bâtiments.
 - Un bâtiment peut être rattaché à un terrain connu, à plusieurs références de terrain si le cas est documenté, ou rester sans rattachement lorsque l'information est inconnue.
 - Un bâtiment peut contenir plusieurs unités ou locaux.
-- Une unité peut être reliée à son bâtiment parent sans devenir automatiquement un bien juridiquement indépendant.
+- **Dès la V1, chaque unité pertinente peut être suivie séparément** (appartement, boutique, bureau ou autre local), tout en restant explicitement rattachée à son bâtiment parent.
+- Le suivi séparé d'une unité permet de lui associer ses propres informations utiles : désignation, usage, caractéristiques, surfaces de même nature, occupation, personnes et relations déclarées, documents, événements et historique.
+- Les informations communes au bâtiment ne doivent pas être dupliquées inutilement dans chaque unité ; le lien parent/enfant doit permettre de distinguer ce qui relève du bâtiment entier de ce qui relève d'une unité.
+- Une unité peut être reliée à son bâtiment parent sans devenir automatiquement un bien juridiquement indépendant ni recevoir automatiquement un statut de propriété distinct.
 - Les liens sont explicites, datés si nécessaire, modifiables avec historique et accompagnés de leur source.
 - Une référence interne Heritis n'est jamais présentée comme une référence cadastrale ou un titre officiel.
 - La suppression ou la fusion d'une fiche ne doit pas effacer les preuves, événements ou relations historiques ; toute opération doit être traçable et soumise aux permissions.
@@ -338,7 +341,6 @@ Chaque lot doit être audité, testé et documenté sur GitHub avant le suivant.
 ## 12. Questions à trancher avant le développement
 
 Les points suivants doivent être confirmés à la revue métier et technique :
-- le suivi séparé des appartements, boutiques et locaux doit-il être activé dès la V1 ou réservé aux immeubles qui en ont besoin ?
 - faut-il permettre qu'un bâtiment soit rattaché à plusieurs terrains dès la V1, ou conserver un lien principal et des liens secondaires documentés ?
 - quelles références administratives camerounaises doivent être prévues comme champs facultatifs, après vérification des sources et pratiques applicables ?
 - quel niveau de détail est réellement utile pour les matériaux, équipements et états sans transformer Heritis en outil de diagnostic technique ?
