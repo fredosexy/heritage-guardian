@@ -130,7 +130,7 @@ export default function EditDossierPage() {
               </div>
               <div>
                 <Label htmlFor="agricultural-edit-family">{t("agricultural.family")}</Label>
-                <select id="agricultural-edit-family" value={family} onChange={(event) => { setFamily(event.target.value as Family); setFamilyDetails({}); }} className="mt-1.5 min-h-12 w-full rounded-2xl border border-input bg-background px-3 text-sm">
+                <select id="agricultural-edit-family" value={family} onChange={(event) => setFamily(event.target.value as Family)} className="mt-1.5 min-h-12 w-full rounded-2xl border border-input bg-background px-3 text-sm">
                   {FAMILIES.map((value) => <option key={value} value={value}>{t("agricultural.families." + value)}</option>)}
                 </select>
               </div>
