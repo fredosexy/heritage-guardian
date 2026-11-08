@@ -5,6 +5,7 @@ export interface GeoPoint {
 
 export interface TerrainMeasurements {
   perimeterMeters: number;
+  segmentDistancesMeters: number[];
   areaSquareMeters: number;
   areaHectares: number;
   areaAres: number;
@@ -65,11 +66,14 @@ export function calculateTerrainMeasurements(points: readonly GeoPoint[]): Terra
   }
 
   let perimeterMeters = 0;
+  const segmentDistancesMeters: number[] = [];
   let signedAreaAccumulator = 0;
   for (let index = 0; index < points.length; index += 1) {
     const current = points[index];
     const next = points[(index + 1) % points.length];
-    perimeterMeters += distanceBetweenPointsMeters(current, next);
+    const segmentDistance = distanceBetweenPointsMeters(current, next);
+    segmentDistancesMeters.push(segmentDistance);
+    perimeterMeters += segmentDistance;
 
     const deltaLongitude = toRadians(next.longitude - current.longitude);
     signedAreaAccumulator += deltaLongitude
@@ -83,6 +87,7 @@ export function calculateTerrainMeasurements(points: readonly GeoPoint[]): Terra
 
   return {
     perimeterMeters,
+    segmentDistancesMeters,
     areaSquareMeters,
     areaHectares: areaSquareMeters / 10_000,
     areaAres: areaSquareMeters / 100,
