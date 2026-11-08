@@ -624,3 +624,9 @@ Les références spécialisées annoncées mais non encore publiées sont des do
 ---
 
 **Règle finale :** l'architecture Heritis doit rester compréhensible, modulaire, sécurisée, traçable, résiliente et évolutive. L'intelligence doit s'y intégrer comme une capacité assistive contrôlée, jamais comme une autorité parallèle. Toute évolution doit préserver la cohérence entre les quatre domaines métier, les personnes, les biens, les droits déclarés, les documents, les décisions et les actions réellement autorisées.
+
+---
+
+## Référentiel permanent complémentaire
+
+Les règles de modélisation, de qualité, de protection, de synchronisation, de conservation et de sobriété des données sont définies dans [DATA-AND-DATABASE-RULES.md](DATA-AND-DATABASE-RULES.md). Ce référentiel doit être consulté pour toute évolution touchant aux données ou à leur stockage.
