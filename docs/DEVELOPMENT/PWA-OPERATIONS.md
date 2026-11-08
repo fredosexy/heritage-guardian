@@ -23,6 +23,7 @@
 - L'utilisateur peut demander l'activation de la version en attente ; la page est rechargée par le mécanisme du plugin après activation.
 - Un contrôle de mise à jour est relancé lorsque l'application revient au premier plan et que le navigateur indique une connexion.
 - Les états « ressources hors ligne prêtes » et « erreur d'enregistrement/mise à jour » sont communiqués sans prétendre que toutes les fonctionnalités métier sont hors ligne.
+- En cas de perte de réseau, l'assistant affiche aussi un état hors ligne même sans notification d'installation ou de mise à jour ; sa fermeture est temporaire et l'indicateur réapparaît après une nouvelle perte de connexion.
 
 ## 2. Politique de cache et confidentialité
 
@@ -60,7 +61,7 @@ La suite PWA doit couvrir au minimum :
 - capture et utilisation de `beforeinstallprompt` ;
 - confirmation via `appinstalled` ;
 - détection du parcours manuel iOS ;
-- transitions réseau `online/offline` ;
+- transitions réseau `online/offline` et affichage/fermeture/réapparition de l'indicateur hors ligne dans l'assistant ;
 - activation contrôlée d'une mise à jour en attente ;
 - suppression du cache historique Supabase Storage au démarrage et pendant l'activation du nouveau worker ;
 - test du gestionnaire `activate` : vérification de `event.waitUntil()` et de l'attente effective de la suppression ;
