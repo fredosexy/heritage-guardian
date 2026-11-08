@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Download, RefreshCw, Wifi, WifiOff, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { applyPwaUpdate } from "./registration";
+import { applyPwaUpdate, subscribePwaStatus } from "./registration";
 import { usePwa } from "./usePwa";
 
 type PwaNotice = "update" | "offline-ready" | "error" | null;
@@ -13,28 +13,20 @@ export function PwaAssistant() {
   const [updating, setUpdating] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
-  useEffect(() => {
-    const update = () => setNotice("update");
-    const offlineReady = () => setNotice((current) => current === "update" ? current : "offline-ready");
-    const error = () => setNotice("error");
-    window.addEventListener("heritis:pwa-update", update);
-    window.addEventListener("heritis:pwa-offline-ready", offlineReady);
-    window.addEventListener("heritis:pwa-error", error);
-    return () => {
-      window.removeEventListener("heritis:pwa-update", update);
-      window.removeEventListener("heritis:pwa-offline-ready", offlineReady);
-      window.removeEventListener("heritis:pwa-error", error);
-    };
-  }, []);
+  useEffect(() => subscribePwaStatus(setNotice), []);
 
   const showInstall = !dismissed && !installed && (canPromptInstall || ios || installMessage !== null);
   if (!showInstall && !notice) return null;
 
   const installApp = async () => {
-    const result = await install();
-    if (result === "accepted") setInstallMessage("Demande acceptée. L'installation sera confirmée par le navigateur.");
-    if (result === "dismissed") setInstallMessage("Installation reportée. Vous pourrez la reprendre depuis ce navigateur.");
-    if (result === "unavailable") setInstallMessage("La proposition d'installation n'est plus disponible. Ouvrez le menu du navigateur pour continuer.");
+    try {
+      const result = await install();
+      if (result === "accepted") setInstallMessage("Demande acceptée. L'installation sera confirmée par le navigateur.");
+      if (result === "dismissed") setInstallMessage("Installation reportée. Vous pourrez la reprendre depuis ce navigateur.");
+      if (result === "unavailable") setInstallMessage("La proposition d'installation n'est plus disponible. Ouvrez le menu du navigateur pour continuer.");
+    } catch {
+      setInstallMessage("Le navigateur n'a pas pu lancer l'installation. Réessayez depuis son menu.");
+    }
   };
 
   const updateApp = async () => {
@@ -49,10 +41,7 @@ export function PwaAssistant() {
   };
 
   return (
-    <aside
-      aria-label="Assistant PWA Heritis"
-      className="fixed right-3 top-16 z-[60] w-[min(24rem,calc(100vw-1.5rem))] rounded-xl border border-border bg-card p-4 text-card-foreground shadow-xl"
-    >
+    <aside aria-label="Assistant PWA Heritis" className="fixed right-3 top-16 z-[60] w-[min(24rem,calc(100vw-1.5rem))] rounded-xl border border-border bg-card p-4 text-card-foreground shadow-xl">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           {notice === "update" ? <RefreshCw className="size-5 text-primary" /> : showInstall ? <Download className="size-5 text-primary" /> : online ? <Wifi className="size-5 text-primary" /> : <WifiOff className="size-5 text-warning" />}
