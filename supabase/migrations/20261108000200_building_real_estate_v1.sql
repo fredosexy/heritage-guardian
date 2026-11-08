@@ -116,6 +116,37 @@ CREATE TRIGGER validate_building_property_links
   ON public.building_properties
   FOR EACH ROW EXECUTE FUNCTION public.validate_building_property_links();
 
+-- Prevent a dossier already used as a building or linked Terrain from being
+-- silently reclassified after the relationship has been established.
+CREATE OR REPLACE FUNCTION public.guard_building_dossier_type_change()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = pg_catalog, public
+AS $function$
+BEGIN
+  IF NEW.type IS DISTINCT FROM OLD.type THEN
+    IF EXISTS (SELECT 1 FROM public.building_properties bp WHERE bp.dossier_id = OLD.id)
+      AND NEW.type <> 'batiment' THEN
+      RAISE EXCEPTION 'building_dossier_type_is_locked'
+        USING ERRCODE = '23514';
+    END IF;
+    IF EXISTS (SELECT 1 FROM public.building_properties bp WHERE bp.parent_terrain_dossier_id = OLD.id)
+      AND NEW.type <> 'terrain' THEN
+      RAISE EXCEPTION 'linked_terrain_dossier_type_is_locked'
+        USING ERRCODE = '23514';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+
+CREATE TRIGGER guard_building_dossier_type_change
+  BEFORE UPDATE OF type ON public.dossiers
+  FOR EACH ROW EXECUTE FUNCTION public.guard_building_dossier_type_change();
+
+REVOKE ALL ON FUNCTION public.guard_building_dossier_type_change() FROM PUBLIC, anon, authenticated;
+
 CREATE OR REPLACE FUNCTION public.validate_building_unit_relation()
 RETURNS trigger
 LANGUAGE plpgsql
