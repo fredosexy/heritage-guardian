@@ -307,7 +307,7 @@ export default function DossierDetailPage() {
         const asset = raw && typeof raw === "object" && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
         const family = typeof asset.family === "string" ? asset.family : "autre";
         const details = typeof asset.declaredDetails === "string" ? asset.declaredDetails : "";
-        const people = Array.isArray(asset.declaredPeople) ? asset.declaredPeople as Array<{ id: string; name: string; role: string; note?: string }> : [];
+        const people = Array.isArray(asset.declaredPeople) ? asset.declaredPeople as Array<{ id: string; name: string; role: string; note?: string; active?: boolean }> : [];
         const events = Array.isArray(asset.events) ? asset.events as Array<{ id: string; type: string; date: string; description: string }> : [];
         const relatedAssets = Array.isArray(asset.relatedAssets) ? asset.relatedAssets as Array<{ dossierId: string; relationType: string }> : [];
         const geo = asset.geospatial && typeof asset.geospatial === "object" && !Array.isArray(asset.geospatial)
@@ -350,7 +350,7 @@ export default function DossierDetailPage() {
             <div className="mt-4 border-t border-border/60 pt-4">
               <h3 className="text-sm font-semibold">{t("agricultural.people.title")}</h3>
               <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.people.disclaimer")}</p>
-              {people.length ? <ul className="mt-2 space-y-2">{people.map((person) => <li key={person.id} className="rounded-xl bg-background/60 p-3"><p className="text-sm font-medium">{person.name}</p><p className="mt-1 text-xs text-muted-foreground">{t("agricultural.people.roles." + person.role)} · {t("agricultural.people.declared")}</p>{person.note ? <p className="mt-1 text-xs">{person.note}</p> : null}</li>)}</ul> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.people.empty")}</p>}
+              {people.length ? <ul className="mt-2 space-y-2">{people.map((person) => <li key={person.id} className="rounded-xl bg-background/60 p-3"><p className="text-sm font-medium">{person.name}</p><p className="mt-1 text-xs text-muted-foreground">{t("agricultural.people.roles." + person.role)} · {t("agricultural.people.declared")}{person.active === false ? " · " + t("agricultural.people.ended") : ""}</p>{person.note ? <p className="mt-1 text-xs">{person.note}</p> : null}</li>)}</ul> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.people.empty")}</p>}
             </div>
             <div className="mt-4 border-t border-border/60 pt-4">
               <h3 className="text-sm font-semibold">{t("agricultural.events.title")}</h3>
