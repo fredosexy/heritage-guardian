@@ -80,7 +80,11 @@
 - Vérifier qu'une première visite hors ligne n'est pas présentée comme possible si les ressources n'ont jamais été téléchargées.
 - Vérifier l'affichage d'un état hors ligne lorsque l'assistant est fermé ou non affiché. Le composant PWA actuel peut ne rien rendre si aucune notification n'est active.
 
-**Conclusion :** la politique de cache est prudente ; la qualité de l'expérience hors ligne complète n'est pas prouvée par la seule configuration.
+**Observation de performance issue du build CI**
+- Le build produit 10 ressources de précache pour environ 1,10 Mio. Le bundle principal atteint 970,81 Ko avant compression (287,15 Ko gzip) et déclenche l'avertissement Rollup au-delà de 500 Ko.
+- Le build reste réussi ; ce n'est pas un défaut fonctionnel bloquant, mais cela augmente le coût de première visite et de téléchargement des ressources. Une découpe par routes/fonctionnalités et un contrôle des dépendances lourdes sont à planifier avant d'annoncer une expérience PWA légère sur réseau mobile.
+
+**Conclusion :** la politique de cache est prudente ; la qualité de l'expérience hors ligne complète n'est pas prouvée par la seule configuration. Le poids du bundle initial est un axe d'optimisation identifié.
 
 ## 5. Perte réseau et reprise de synchronisation
 
