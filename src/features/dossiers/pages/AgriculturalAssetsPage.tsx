@@ -39,6 +39,7 @@ export default function AgriculturalAssetsPage() {
   const { dossiers, loading, loadError, reload } = useDossiers();
   const { create, saving } = useCreateDossier();
   const [creating, setCreating] = useState(false);
+  const [createStep, setCreateStep] = useState<0 | 1 | 2>(0);
   const [query, setQuery] = useState("");
   const [familyFilter, setFamilyFilter] = useState<Family | "all">("all");
   const [family, setFamily] = useState<Family>("exploitation");
@@ -64,6 +65,7 @@ export default function AgriculturalAssetsPage() {
   }, [assets, familyFilter, query]);
 
   const resetForm = () => {
+    setCreateStep(0);
     setFamily("exploitation");
     setTitle("");
     setDescription("");
@@ -163,8 +165,22 @@ export default function AgriculturalAssetsPage() {
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("agricultural.createHint")}</p>
           </div>
         </header>
+        <section className="mb-5 rounded-3xl border border-border/70 bg-card p-4 shadow-[var(--shadow-soft)] sm:p-5" aria-label={t("agricultural.createSteps.title")}>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold">{t("agricultural.createSteps.title")}</p>
+            <p className="text-xs tabular-nums text-muted-foreground">{t("agricultural.createSteps.counter", { current: createStep + 1, total: 3 })}</p>
+          </div>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted" role="progressbar" aria-valuemin={1} aria-valuemax={3} aria-valuenow={createStep + 1} aria-label={t("agricultural.createSteps.progress")}>
+            <div className="h-full rounded-full bg-primary transition-all duration-300" style={{ width: (((createStep + 1) / 3) * 100) + "%" }} />
+          </div>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {[0, 1, 2].map((step) => <div key={step} className={"rounded-xl px-2 py-2 text-center text-xs " + (createStep === step ? "bg-accent font-semibold text-accent-foreground" : createStep > step ? "bg-muted text-foreground" : "text-muted-foreground")}>{t("agricultural.createSteps.steps." + step)}</div>)}
+          </div>
+          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{t("agricultural.createSteps.hint." + createStep)}</p>
+        </section>
         <form onSubmit={(event) => void submit(event)} className="space-y-4">
           <section className="card-soft space-y-4 p-4 sm:p-5">
+            {createStep === 0 && <>
             <div>
               <Label htmlFor="agricultural-family">{t("agricultural.family")}</Label>
               <select id="agricultural-family" value={family} onChange={(event) => { setFamily(event.target.value as Family); setSpecifics(""); setFamilyDetails({}); }} className="mt-1.5 min-h-12 w-full rounded-2xl border border-input bg-background px-3 text-sm">
@@ -179,12 +195,16 @@ export default function AgriculturalAssetsPage() {
               <Label htmlFor="agricultural-description">{t("agricultural.description")}</Label>
               <Textarea id="agricultural-description" rows={3} value={description} onChange={(event) => setDescription(event.target.value)} placeholder={t("agricultural.descriptionPlaceholder")} className="mt-1.5 rounded-2xl" />
             </div>
+            </>}
+            {createStep === 1 && <>
             <AgriculturalFamilyFields family={family} value={familyDetails} onChange={setFamilyDetails} />
             <div>
               <Label htmlFor="agricultural-specifics">{t("agricultural.specificsLabel")}</Label>
               <Textarea id="agricultural-specifics" rows={3} value={specifics} onChange={(event) => setSpecifics(event.target.value)} placeholder={t("agricultural.specifics." + family)} className="mt-1.5 rounded-2xl" />
               <p className="mt-1.5 text-xs text-muted-foreground">{t("agricultural.specificsHint")}</p>
             </div>
+            </>}
+            {createStep === 2 && <>
             <div>
               <Label htmlFor="agricultural-locality">{t("agricultural.location")}</Label>
               <Input id="agricultural-locality" value={locality} onChange={(event) => setLocality(event.target.value)} placeholder={t("agricultural.locationPlaceholder")} className="mt-1.5 min-h-12 rounded-2xl" />
@@ -203,13 +223,12 @@ export default function AgriculturalAssetsPage() {
               {geoPoint ? <p className="mt-2 break-all text-xs tabular-nums text-muted-foreground">{geoPoint.latitude.toFixed(6)}, {geoPoint.longitude.toFixed(6)}</p> : null}
               <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.gpsDisclaimer")}</p>
             </div>
+            </>}
           </section>
           <p className="rounded-2xl border border-accent/60 bg-accent/30 p-4 text-xs leading-relaxed text-muted-foreground">{t("agricultural.declarationNotice")}</p>
           <div className="flex gap-2 pb-4">
-            <Button type="button" variant="outline" onClick={() => setCreating(false)} className="min-h-12 flex-1 rounded-2xl">{t("common.cancel", "Annuler")}</Button>
-            <Button type="submit" disabled={saving || !title.trim()} className="min-h-12 flex-1 rounded-2xl">
-              {saving ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}{t("agricultural.save")}
-            </Button>
+            {createStep > 0 ? <Button type="button" variant="outline" onClick={() => setCreateStep((step) => (step - 1) as 0 | 1 | 2)} className="min-h-12 flex-1 rounded-2xl">{t("agricultural.createSteps.back")}</Button> : <Button type="button" variant="outline" onClick={() => setCreating(false)} className="min-h-12 flex-1 rounded-2xl">{t("common.cancel", "Annuler")}</Button>}
+            {createStep < 2 ? <Button type="button" disabled={createStep === 0 && !title.trim()} onClick={() => setCreateStep((step) => (step + 1) as 0 | 1 | 2)} className="min-h-12 flex-1 rounded-2xl">{t("agricultural.createSteps.next")}</Button> : <Button type="submit" disabled={saving || !title.trim()} className="min-h-12 flex-1 rounded-2xl">{saving ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}{t("agricultural.save")}</Button>}
           </div>
         </form>
       </AppLayout>
