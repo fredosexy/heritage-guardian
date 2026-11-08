@@ -195,6 +195,7 @@ export const fr = {
     locationUnavailable: "La géolocalisation n'est pas disponible sur cet appareil ou navigateur.",
     locationCaptured: "Position GPS capturée.",
     locationDenied: "Position non obtenue. Vérifiez l'autorisation et réessayez.",
+    detail: { summaryFields: "Champs renseignés", summaryPeople: "Personnes actives", summaryEvents: "Événements déclarés", progressLabel: "Complétude des informations recommandées" },
     actions: {
       title: "Les prochaines étapes utiles",
       hint: "Suggestions automatiques fondées uniquement sur les informations présentes dans cette fiche.",
