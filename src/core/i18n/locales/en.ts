@@ -217,7 +217,7 @@ export const en = {
       clearContour: "Clear boundary",
       mapLoading: "Loading map…",
       mapPrivacyHint: "The provider receives requests for the displayed area. Boundary vertices and dossier data remain in Heritis.",
-      mapTapHint: "Tap the map to add boundary vertices in order. The boundary and measurements are indicative only."
+      mapTapHint: "Tap the map to add boundary vertices in order. The boundary and measurements are indicative only.",
       segmentDistances: "Distances between vertices",
       side: "Side",
       area: "Estimated area",
