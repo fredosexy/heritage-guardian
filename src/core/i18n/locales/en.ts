@@ -229,6 +229,19 @@ export const en = {
         occupant_declared: "Declared occupant",
       },
     },
+    links: {
+      title: "Links to other assets",
+      disclaimer: "These links reuse existing records. They do not copy their data or prove any right over linked assets.",
+      empty: "No other asset is linked.",
+      linkedDossier: "Linked asset record",
+      relationTo: "Relationship type with {{title}}",
+      types: {
+        grouped_under: "Asset grouped under this farm",
+        located_on: "Located on this land",
+        installed_on: "Installed on this property",
+        associated_asset: "Associated asset",
+      },
+    },
     events: {
       title: "Declared asset events",
       disclaimer: "Events are recorded as dated declarations. They do not replace supporting documents or erase earlier history.",
