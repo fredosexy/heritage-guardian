@@ -77,7 +77,7 @@ class MemoireDB extends Dexie {
       queue: "++id, kind, created_at",
       cachedDossiers: "id, user_id, viewer_user_id, cached_at",
       conflicts: "++id, dossier_id, created_at",
-    });
+    }).upgrade((transaction) => transaction.table("cachedDossiers").clear());
   }
 }
 
