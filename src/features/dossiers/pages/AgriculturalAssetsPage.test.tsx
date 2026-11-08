@@ -31,7 +31,7 @@ vi.mock("../components/DossierStatusBadge", () => ({ DossierStatusBadge: ({ stat
 
 import AgriculturalAssetsPage from "./AgriculturalAssetsPage";
 
-beforeEach(() => mocks.navigate.mockClear());
+beforeEach(() => { mocks.navigate.mockClear(); mocks.create.mockClear(); });
 
 it("shows only agricultural assets and filters by family", () => {
   render(<AgriculturalAssetsPage />);
@@ -61,4 +61,12 @@ it("creates an agricultural declaration with its selected family and declared de
     metadata: { agriculturalRural: { version: 1, family: "plantation", declaredDetails: "Plantation familiale", familyDetails: { cropType: "Cacao", declaredArea: 2 }, declarationStatus: "declare", source: "declarant" } },
   })));
   expect(mocks.navigate).toHaveBeenCalledWith("/dossiers/new-farm");
+});
+
+it("offers contextual next actions while the declaration is incomplete", () => {
+  render(<AgriculturalAssetsPage />);
+  fireEvent.click(screen.getByRole("button", { name: /agricultural.create/ }));
+  expect(screen.getByText("agricultural.assistant.title")).toBeTruthy();
+  expect(screen.getByText("agricultural.assistant.nextStep")).toBeTruthy();
+  expect(screen.getByRole("button", { name: "agricultural.fields.exploitation.activities" })).toBeTruthy();
 });
