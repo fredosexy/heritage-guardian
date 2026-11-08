@@ -12,6 +12,7 @@ import { buildingsRepo, dossiersRepo, enqueueUpdateDossierMetadata, proceduresRe
 import type { DossierStep } from "@/core/types/domain";
 import { ProofsTab } from "../components/ProofsTab";
 import { TerrainChecklistAssist } from "../components/TerrainChecklistAssist";
+import { TerrainGeoFields, type TerrainGeospatialData } from "../components/TerrainGeoFields";
 import { typeLabelKey } from "../components/dossierTypeMeta";
 
 export default function DossierDetailPage() {
@@ -28,6 +29,7 @@ export default function DossierDetailPage() {
   const [initialTerrainSections, setInitialTerrainSections] = useState<Record<string, string>>({});
   const [buildingProperty, setBuildingProperty] = useState<buildingsRepo.BuildingProperty | null>(null);
   const [loadingBuildingProperty, setLoadingBuildingProperty] = useState(false);
+  const [terrainGeospatial, setTerrainGeospatial] = useState<TerrainGeospatialData>({ boundaryPoints: [] });
   const terrainSectionKeys = ["histoire","provenance","proprietaires","ayantsDroit","documentation","localisation","dimensions","etat","miseEnValeur"] as const;
   const terrainSectionProofs = (sectionKey: string) => proofs.filter((proof) => {
     const metadata = proof.metadata && typeof proof.metadata === "object" && !Array.isArray(proof.metadata)
@@ -81,6 +83,12 @@ export default function DossierDetailPage() {
     const sections = metadata.terrain?.sections ?? {};
     setTerrainSections(sections);
     setInitialTerrainSections(sections);
+    setTerrainGeospatial(metadata.terrain?.geospatial ?? {
+      boundaryPoints: [],
+      ...(dossier.latitude != null && dossier.longitude != null ? {
+        point: { latitude: dossier.latitude, longitude: dossier.longitude, source: "manual" as const, accuracyMeters: null, capturedAt: dossier.created_at },
+      } : {}),
+    });
   }, [dossier?.id, dossier?.metadata, dossier?.type]);
 
   const saveTerrainSections = async () => {
@@ -102,7 +110,7 @@ export default function DossierDetailPage() {
       ) as Record<string, string>;
       const updatedMetadata = {
         ...metadata,
-        terrain: { ...existingTerrain, version: 1, sections: changedSections },
+        terrain: { ...existingTerrain, version: 2, sections: changedSections, geospatial: terrainGeospatial },
       };
       if (typeof navigator !== "undefined" && !navigator.onLine) {
         await enqueueUpdateDossierMetadata(dossier.id, updatedMetadata);
@@ -127,8 +135,9 @@ export default function DossierDetailPage() {
             ...latestMetadata,
             terrain: {
               ...latestTerrain,
-              version: 1,
+              version: 2,
               sections: { ...latestSections, ...changedSections },
+              geospatial: terrainGeospatial,
             },
           };
           await dossiersRepo.updateDossierMetadata(dossier.id, metadataToSave);
@@ -303,6 +312,11 @@ export default function DossierDetailPage() {
               <Pencil className="size-3.5 mr-1.5" />{editingTerrain ? t("create.cancel") : t("create.editTerrain")}
             </Button>
           </div>
+          <TerrainGeoFields
+            value={terrainGeospatial}
+            onChange={setTerrainGeospatial}
+            disabled={!editingTerrain || !canEdit}
+          />
           <div className="grid gap-3">
             {terrainSectionKeys.map((key, index) => {
               const value = terrainSections[key] ?? "";

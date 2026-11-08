@@ -26,6 +26,11 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ["**/*.{js,css,html,svg,png,webp,woff2}"],
         runtimeCaching: [
           {
+            urlPattern: /^https:\/\/unpkg\.com\/maplibre-gl@6\.16\.0\/dist\/.*/i,
+            handler: "CacheFirst",
+            options: { cacheName: "maplibre-library", expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 30 } },
+          },
+          {
             urlPattern: /\/icons\/.*/,
             handler: "CacheFirst",
             options: { cacheName: "icons", expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 } },

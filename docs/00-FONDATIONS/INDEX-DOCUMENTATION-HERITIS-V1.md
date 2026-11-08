@@ -29,6 +29,7 @@ Ordre de lecture recommandé :
 | 1. Patrimoine et gestion des biens | [Document détaillé](../01-DOMAINES/PATRIMOINE-ET-GESTION-DES-BIENS-V1.md) | Identifier, déclarer, inventorier, documenter et suivre les biens et les relations déclarées. |
 | ↳ Bâtiments et biens immobiliers | [Spécification fonctionnelle et UI/UX](../01-DOMAINES/BUILDINGS-AND-REAL-ESTATE-FUNCTIONAL-SPEC-V1.md) | Déclaration, sécurisation, documentation, gestion, ayants droit, transmission, différends et modèles d'écrans V1. |
 | ↳ Modèle de données immobilier V1 | [Modèle de données et sécurité](../01-DOMAINES/BUILDING-REAL-ESTATE-DATA-MODEL-V1.md) | Tables bâtiment, unités, relations déclarées, événements, RLS et synchronisation hors ligne ; première tranche technique et UI. |
+| ↳ Fiche Terrain — spécification fonctionnelle et géospatiale | [Spécification V1](../01-DOMAINES/TERRAIN-REGISTRATION-FONCTIONAL-SPEC-V1.md) | Décrire le parcours d’enregistrement foncier, la localisation, le contour, les distances et les superficies indicatives. |
 | 2. Héritage et succession | [Document détaillé](../02-DOMAINES/HERITAGE-ET-SUCCESSION-V1.md) | Organiser les personnes, biens, documents, participations et étapes d'une succession. |
 | 3. Volontés secrètes et dernières volontés | [Document détaillé](../03-DOMAINES/VOLONTES-SECRETES-ET-DERNIERES-VOLONTES-V1.md) | Préserver des volontés confidentielles et organiser leur transmission après vérifications. |
 | 4. Gestion des conflits et litiges | [Document détaillé](../04-DOMAINES/GESTION-DES-CONFLITS-ET-LITIGES-V1.md) | Constituer un dossier de conflit et orienter vers les méthodes et services compétents. |
@@ -37,7 +38,7 @@ Ordre de lecture recommandé :
 
 | Sous-domaine | Document | Contenu |
 |---|---|---|
-| 1. Terrains et biens fonciers | À référencer après consolidation de la spécification dédiée | Déclaration, identification, limites, localisation et documentation des terrains. |
+| 1. Terrains et biens fonciers | [Spécification fonctionnelle V1](../01-DOMAINES/TERRAIN-REGISTRATION-FONCTIONAL-SPEC-V1.md) | Déclaration, identification, localisation, limites, distances et superficies indicatives des terrains. |
 | 2. Bâtiments et biens immobiliers | [Spécification fonctionnelle V1](../01-DOMAINES/BUILDINGS-AND-REAL-ESTATE-FUNCTIONAL-SPEC-V1.md) | Déclaration, documentation, gestion patrimoniale, relations, transmission et différends relatifs aux bâtiments et biens immobiliers. |
 | 3. Biens agricoles et ruraux | [Spécification fonctionnelle V1](../01-DOMAINES/AGRICULTURAL-AND-RURAL-ASSETS-FUNCTIONAL-SPEC-V1.md) | Exploitations, plantations, élevages, équipements et installations rurales ; documentation, gestion patrimoniale et transmission. |
 | 4. Biens mobiliers | [Spécification fonctionnelle V1](../01-DOMAINES/MOVABLE-ASSETS-FUNCTIONAL-SPEC-V1.md) | Déclarer, identifier, documenter, sécuriser et suivre les biens mobiliers, leurs relations déclarées, leurs pièces et leur historique. |
