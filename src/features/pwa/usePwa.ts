@@ -6,6 +6,7 @@ interface InstallPromptEvent extends Event {
 }
 
 let pendingInstallPrompt: InstallPromptEvent | null = null;
+let installationConfirmed = false;
 const installPromptListeners = new Set<(event: InstallPromptEvent) => void>();
 
 function captureInstallPrompt(event: Event) {
@@ -17,7 +18,7 @@ function captureInstallPrompt(event: Event) {
 // Capture before React mounts: startup cache cleanup and SW registration may delay the UI.
 if (typeof window !== "undefined") {
   window.addEventListener("beforeinstallprompt", captureInstallPrompt);
-  window.addEventListener("appinstalled", () => { pendingInstallPrompt = null; });
+  window.addEventListener("appinstalled", () => { pendingInstallPrompt = null; installationConfirmed = true; });
 }
 
 function subscribeToInstallPrompt(listener: (event: InstallPromptEvent) => void) {
@@ -29,7 +30,7 @@ function subscribeToInstallPrompt(listener: (event: InstallPromptEvent) => void)
 function isStandaloneDisplay(): boolean {
   if (typeof window === "undefined") return false;
   const navigatorWithStandalone = navigator as Navigator & { standalone?: boolean };
-  return window.matchMedia("(display-mode: standalone)").matches ||
+  return installationConfirmed || window.matchMedia("(display-mode: standalone)").matches ||
     window.matchMedia("(display-mode: minimal-ui)").matches ||
     navigatorWithStandalone.standalone === true;
 }
@@ -52,6 +53,7 @@ export function usePwa() {
     const updateDisplayMode = () => setInstalled(isStandaloneDisplay());
     const handleInstalled = () => {
       pendingInstallPrompt = null;
+      installationConfirmed = true;
       setInstalled(true);
       setInstallPrompt(null);
     };
