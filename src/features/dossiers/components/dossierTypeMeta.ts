@@ -9,7 +9,7 @@ export interface DossierTypeMeta {
 
 export const DOSSIER_TYPES: DossierTypeMeta[] = [
   { id: "terrain", icon: MapPin, descKey: "create.terrainDesc", available: true },
-  { id: "batiment", icon: Building2, descKey: "create.buildingDesc", available: true },
+  { id: "batiment", icon: Building2, descKey: "create.buildingDesc", available: false },
   { id: "heritage", icon: Users, descKey: "create.heritageDesc", available: false },
   { id: "volonte", icon: ScrollText, descKey: "create.volonteDesc", available: false },
   { id: "conflit", icon: Scale, descKey: "create.conflitDesc", available: false },
