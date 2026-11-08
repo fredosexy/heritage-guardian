@@ -237,7 +237,7 @@ async function runQueue(): Promise<void> {
   try {
     const ops = await db.queue.orderBy("created_at").toArray();
     for (const op of ops) {
-      if (op.id === undefined) continue;
+      if (op.id === undefined || !op.viewer_user_id) continue;
       const opId = op.id;
       try {
         const { data: { user: currentUser }, error: sessionError } = await supabase.auth.getUser();
