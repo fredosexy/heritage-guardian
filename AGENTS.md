@@ -212,7 +212,7 @@ Ne jamais écrire « tout est OK » si un contrôle requis reste en échec ou no
 
 ## 14. Documents de référence spécialisés
 
-Les documents suivants constituent la structure documentaire cible. Ils seront ajoutés et complétés progressivement ; leur absence ne vaut pas autorisation d'ignorer les règles générales de ce fichier.
+Les documents suivants constituent le référentiel spécialisé du dépôt. Ils sont maintenus et complétés progressivement ; un document annoncé mais non encore publié doit être signalé comme manquant, sans prétendre l'avoir consulté.
 
 - `docs/DEVELOPMENT/GOVERNANCE.md` — responsabilités, décisions, autorisations et dérogations.
 - `docs/DEVELOPMENT/ARCHITECTURE-RULES.md` — architecture et conventions techniques.
