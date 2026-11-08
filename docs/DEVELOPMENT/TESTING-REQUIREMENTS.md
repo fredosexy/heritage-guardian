@@ -227,6 +227,9 @@ Les scénarios doivent inclure les utilisateurs autorisés, non autorisés, anon
 
 ## 13. Tests de fonctionnalités et parcours métier complets
 
+Les parcours d'entrée doivent tester séparément : visiteur sans compte (présentation et aperçu guidé uniquement), personne reconnue après saisie d'un prénom ou d'un nom (sans privilège supplémentaire), utilisateur authentifié (conversation complète sous réserve des permissions), et identité vérifiée lorsque le domaine l'exige. Vérifier qu'aucun de ces états ne donne implicitement accès aux données ou actions d'un autre état.
+
+
 Chaque fonctionnalité doit être testée selon son parcours réel, pas uniquement par un test technique isolé.
 
 Pour chaque parcours :
