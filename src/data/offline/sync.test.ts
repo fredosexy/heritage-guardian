@@ -546,6 +546,7 @@ describe("offline field conflict detection", () => {
     await processQueue();
 
     expect(mocks.conflictAdd).toHaveBeenCalledWith(expect.objectContaining({
+      viewer_user_id: "user-1",
       dossier_id: "dossier-1",
       fields: ["title"],
       mine: { title: "Titre local" },
