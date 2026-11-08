@@ -76,6 +76,20 @@ Validation : latitude entre -90 et 90, longitude entre -180 et 180. Une coordonn
 - **Recherche d'un lieu** : si un service de géocodage est intégré ultérieurement, afficher le fournisseur et demander confirmation. Ne pas envoyer une adresse ou des coordonnées à un tiers sans information et base de traitement appropriées.
 - **Import de données géographiques** : GeoJSON/KML/GPX pourra être ajouté après validation d'un format, d'une limite de taille et d'une stratégie de contrôle. Ne pas annoncer l'import comme disponible tant qu'il n'est pas implémenté et testé.
 
+## 4.4 Moteur cartographique et fournisseur initial
+
+MapLibre GL JS est le moteur d’affichage et d’interaction ; il ne fournit pas lui-même les données cartographiques. Le fournisseur de tuiles et son style restent configurables via `VITE_TERRAIN_MAP_STYLE_URL`.
+
+Le fond initial est OpenFreeMap Liberty (`https://tiles.openfreemap.org/styles/liberty`) :
+- usage commercial autorisé selon les conditions publiées par OpenFreeMap ;
+- aucune clé API ni compte requis pour l’instance publique ;
+- attribution affichée par le contrôle MapLibre et le style ;
+- données cartographiques issues d’OpenStreetMap/OpenMapTiles ;
+- service fourni sans garantie SLA : Heritis doit pouvoir remplacer le style ou utiliser une instance auto-hébergée.
+
+Les requêtes de tuiles nécessitent une connexion. Le code de MapLibre peut être mis en cache par l’application après un premier chargement, mais cela ne signifie pas que les cartes sont disponibles hors ligne. OpenFreeMap autorise des téléchargements hors ligne limités à 3 000 tuiles ou 50 Mo par téléchargement, avec au plus quatre requêtes parallèles et un User-Agent identifiant l’application. Heritis ne met pas encore en œuvre cette fonction de téléchargement ; ne pas précharger ni mettre en cache les tuiles du fournisseur par un mécanisme générique.
+
+La carte peut transmettre au fournisseur les requêtes de tuiles correspondant à la zone affichée. La position GPS exacte, les sommets et les informations du dossier ne sont pas envoyés intentionnellement comme données de dossier par le composant cartographique ; ils sont dessinés localement dans le navigateur. La politique de confidentialité doit expliquer les requêtes de carte et le fournisseur utilisé.
 ## 5. Délimitation du terrain
 
 Le contour est une liste ordonnée de sommets géographiques. Chaque sommet peut contenir :
