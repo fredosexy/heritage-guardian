@@ -23,6 +23,10 @@ export default function EditDossierPage() {
   const [family, setFamily] = useState<Family>("exploitation");
   const [specifics, setSpecifics] = useState("");
   const [familyDetails, setFamilyDetails] = useState<Record<string, string>>({});
+  const [declaredPeople, setDeclaredPeople] = useState<Array<{ id: string; name: string; role: string; note: string; source: "declarant"; status: "declare"; recordedAt: string }>>([]);
+  const [events, setEvents] = useState<Array<{ id: string; type: string; date: string; description: string; source: "declarant"; recordedAt: string }>>([]);
+  const [personDraft, setPersonDraft] = useState({ name: "", role: "owner_declared", note: "" });
+  const [eventDraft, setEventDraft] = useState({ type: "inventory", date: new Date().toISOString().slice(0, 10), description: "" });
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -40,6 +44,8 @@ export default function EditDossierPage() {
         ? asset.familyDetails as Record<string, unknown>
         : {};
       setFamilyDetails(Object.fromEntries(Object.entries(details).map(([key, value]) => [key, String(value)])));
+      setDeclaredPeople(Array.isArray(asset.declaredPeople) ? asset.declaredPeople as typeof declaredPeople : []);
+      setEvents(Array.isArray(asset.events) ? asset.events as typeof events : []);
     }
   }, [dossier]);
 
@@ -68,6 +74,8 @@ export default function EditDossierPage() {
           family,
           declaredDetails: specifics.trim() || null,
           familyDetails: familyDetailsNormalized,
+          declaredPeople,
+          events,
         });
       }
       if (!mainChanged && !agriculturalChanged) {
@@ -126,6 +134,60 @@ export default function EditDossierPage() {
                 <Label htmlFor="agricultural-edit-specifics">{t("agricultural.specificsLabel")}</Label>
                 <Textarea id="agricultural-edit-specifics" rows={3} value={specifics} onChange={(event) => setSpecifics(event.target.value)} />
               </div>
+              <section className="space-y-3 rounded-2xl border border-border p-4">
+                <div>
+                  <h3 className="text-sm font-semibold">{t("agricultural.people.title")}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.people.disclaimer")}</p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="agricultural-person-name">{t("agricultural.people.name")}</Label>
+                    <Input id="agricultural-person-name" value={personDraft.name} onChange={(event) => setPersonDraft({ ...personDraft, name: event.target.value })} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="agricultural-person-role">{t("agricultural.people.role")}</Label>
+                    <select id="agricultural-person-role" value={personDraft.role} onChange={(event) => setPersonDraft({ ...personDraft, role: event.target.value })} className="min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm">
+                      {["owner_declared","coowner_declared","holder_declared","beneficiary_declared","representative_declared","operator_declared","manager_declared","occupant_declared"].map((role) => <option key={role} value={role}>{t("agricultural.people.roles." + role)}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-1 sm:col-span-2">
+                    <Label htmlFor="agricultural-person-note">{t("agricultural.people.note")}</Label>
+                    <Input id="agricultural-person-note" value={personDraft.note} onChange={(event) => setPersonDraft({ ...personDraft, note: event.target.value })} />
+                  </div>
+                </div>
+                <Button type="button" variant="outline" disabled={!personDraft.name.trim()} onClick={() => {
+                  setDeclaredPeople((current) => [...current, { id: "person-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7), ...personDraft, name: personDraft.name.trim(), source: "declarant", status: "declare", recordedAt: new Date().toISOString() }]);
+                  setPersonDraft({ name: "", role: "owner_declared", note: "" });
+                }}>{t("agricultural.people.add")}</Button>
+                {declaredPeople.length > 0 ? <ul className="space-y-2">{declaredPeople.map((person) => <li key={person.id} className="flex items-start justify-between gap-2 rounded-xl bg-muted/40 p-3"><div className="min-w-0"><p className="text-sm font-medium">{person.name}</p><p className="text-xs text-muted-foreground">{t("agricultural.people.roles." + person.role)} · {t("agricultural.people.declared")}</p>{person.note ? <p className="mt-1 text-xs">{person.note}</p> : null}</div><Button type="button" size="sm" variant="ghost" onClick={() => setDeclaredPeople((current) => current.filter((item) => item.id !== person.id))}>{t("common.delete")}</Button></li>)}</ul> : <p className="text-xs text-muted-foreground">{t("agricultural.people.empty")}</p>}
+              </section>
+              <section className="space-y-3 rounded-2xl border border-border p-4">
+                <div>
+                  <h3 className="text-sm font-semibold">{t("agricultural.events.title")}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.events.disclaimer")}</p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="agricultural-event-type">{t("agricultural.events.type")}</Label>
+                    <select id="agricultural-event-type" value={eventDraft.type} onChange={(event) => setEventDraft({ ...eventDraft, type: event.target.value })} className="min-h-11 w-full rounded-xl border border-input bg-background px-3 text-sm">
+                      {["acquisition","sale","creation","change","inventory","damage","transmission","correction"].map((type) => <option key={type} value={type}>{t("agricultural.events.types." + type)}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="agricultural-event-date">{t("agricultural.events.date")}</Label>
+                    <Input id="agricultural-event-date" type="date" value={eventDraft.date} onChange={(event) => setEventDraft({ ...eventDraft, date: event.target.value })} />
+                  </div>
+                  <div className="space-y-1 sm:col-span-2">
+                    <Label htmlFor="agricultural-event-description">{t("agricultural.events.description")}</Label>
+                    <Textarea id="agricultural-event-description" rows={2} value={eventDraft.description} onChange={(event) => setEventDraft({ ...eventDraft, description: event.target.value })} />
+                  </div>
+                </div>
+                <Button type="button" variant="outline" disabled={!eventDraft.description.trim() || !eventDraft.date} onClick={() => {
+                  setEvents((current) => [...current, { id: "event-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7), ...eventDraft, description: eventDraft.description.trim(), source: "declarant", recordedAt: new Date().toISOString() }]);
+                  setEventDraft({ type: "inventory", date: new Date().toISOString().slice(0, 10), description: "" });
+                }}>{t("agricultural.events.add")}</Button>
+                {events.length > 0 ? <ol className="space-y-2">{[...events].sort((a, b) => b.date.localeCompare(a.date)).map((event) => <li key={event.id} className="flex items-start justify-between gap-2 rounded-xl bg-muted/40 p-3"><div className="min-w-0"><p className="text-sm font-medium">{t("agricultural.events.types." + event.type)} · {event.date}</p><p className="mt-1 text-xs">{event.description}</p><p className="mt-1 text-[11px] text-muted-foreground">{t("agricultural.events.declared")}</p></div><Button type="button" size="sm" variant="ghost" onClick={() => setEvents((current) => current.filter((item) => item.id !== event.id))}>{t("common.delete")}</Button></li>)}</ol> : <p className="text-xs text-muted-foreground">{t("agricultural.events.empty")}</p>}
+              </section>
             </section>
           )}
           <Button type="submit" className="w-full" disabled={busy || !form.title.trim()}>
