@@ -40,6 +40,7 @@ export interface SyncConflict {
 export interface CachedDossier {
   id: string;
   user_id: string;
+  viewer_user_id?: string;
   data: Json | Record<string, unknown>;
   cached_at: number;
 }
@@ -68,6 +69,13 @@ class MemoireDB extends Dexie {
       drafts: "++id, localId, user_id, synced, updated_at",
       queue: "++id, kind, created_at",
       cachedDossiers: "id, user_id, cached_at",
+      conflicts: "++id, dossier_id, created_at",
+    });
+    // Bind cached dossier snapshots to the account that was authorized to view them.
+    this.version(4).stores({
+      drafts: "++id, localId, user_id, synced, updated_at",
+      queue: "++id, kind, created_at",
+      cachedDossiers: "id, user_id, viewer_user_id, cached_at",
       conflicts: "++id, dossier_id, created_at",
     });
   }
