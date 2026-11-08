@@ -222,6 +222,19 @@ export const fr = {
         occupant_declared: "Occupant déclaré",
       },
     },
+    links: {
+      title: "Liens avec d'autres biens",
+      disclaimer: "Ces liens réutilisent les fiches existantes. Ils ne copient pas leurs données et ne prouvent aucun droit sur les biens liés.",
+      empty: "Aucun autre bien n'est associé.",
+      linkedDossier: "Fiche patrimoniale liée",
+      relationTo: "Type de lien avec {{title}}",
+      types: {
+        grouped_under: "Actif regroupé dans cette exploitation",
+        located_on: "Situé sur ce terrain",
+        installed_on: "Installé sur ce bien",
+        associated_asset: "Actif associé",
+      },
+    },
     events: {
       title: "Événements patrimoniaux déclarés",
       disclaimer: "Les événements sont consignés comme des déclarations datées. Ils ne remplacent pas les pièces et n'effacent pas l'historique antérieur.",
