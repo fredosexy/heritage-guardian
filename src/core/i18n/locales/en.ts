@@ -215,6 +215,8 @@ export const en = {
       mapPointCount: "{{count}} vertex/vertices placed",
       undoVertex: "Undo last vertex",
       clearContour: "Clear boundary",
+      mapLoading: "Loading map…",
+      mapPrivacyHint: "The provider receives requests for the displayed area. Boundary vertices and dossier data remain in Heritis.",
       mapTapHint: "Tap the map to add boundary vertices in order. The boundary and measurements are indicative only."
       segmentDistances: "Distances between vertices",
       side: "Side",
