@@ -1,4 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// This suite tests the pure metadata normalizer; no Supabase client is needed.
+vi.mock("@/integrations/supabase/client", () => ({ supabase: {} }));
+
 import { readBuildingPropertyInput } from "./buildings.repo";
 
 describe("readBuildingPropertyInput", () => {
