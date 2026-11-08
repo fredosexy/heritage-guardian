@@ -245,7 +245,8 @@ Heritis doit distinguer les faits déclarés, les éléments fournis, les vérif
 
 En particulier :
 
-- une personne devient « reconnue » dans le parcours dès qu'elle communique un prénom ou un nom ; cette reconnaissance déclarative n'est pas une identité officiellement vérifiée et ne confère aucun droit d'accès ;
+- une personne devient « reconnue » dans le parcours dès qu'elle communique un prénom ou un nom (l'un ou l'autre suffit) ; cette reconnaissance déclarative n'est pas une identité officiellement vérifiée et ne confère aucun droit d'accès ;
+- sans compte authentifié, elle ne bénéficie que de l'aperçu guidé ; la conversation complète nécessite un compte et une session valide, avec les permissions effectives ;
 - l'inscription ne prouve pas la filiation, la qualité d'héritier, la qualification professionnelle, le mandat ou la propriété ;
 - les relations entre personnes et biens doivent conserver leur nature et leur niveau de preuve ;
 - propriétaire déclaré, copropriétaire déclaré, détenteur ou possesseur, bénéficiaire d'un droit et représentant sont des rôles distincts ;
