@@ -119,7 +119,7 @@ La création de compte est proposée lorsqu'elle apporte une capacité nécessai
 
 L'interface distingue clairement :
 - **Visiteur :** personne qui découvre Heritis sans identité persistante ou compte. Accès à la présentation et aux aperçus publics uniquement.
-- **Personne reconnue :** personne ayant communiqué un premier élément d'identification, par exemple un prénom ou un nom, selon le parcours défini. Cette reconnaissance ne prouve pas une identité vérifiée et ne vaut pas création de compte.
+- **Personne reconnue :** personne qui vient de communiquer un prénom ou un nom (un seul des deux suffit). Cette reconnaissance ne prouve pas une identité vérifiée, ne vaut pas création de compte et ne donne aucun droit d'accès supplémentaire.
 - **Utilisateur disposant d'un compte :** personne authentifiée, dont les accès restent limités par ses permissions réelles.
 - **Identité vérifiée, si le domaine le prévoit :** statut distinct, fondé sur un processus explicite ; ne pas le déduire d'un simple compte ou d'une déclaration.
 
@@ -131,9 +131,11 @@ Le parcours d'entrée doit expliquer avant de demander :
 1. accueil et explication claire de Heritis ;
 2. découverte libre des quatre domaines ;
 3. conversation de bienvenue guidée avec choix prédéfinis, si disponible ;
-4. possibilité de communiquer un premier élément d'identification sans imposer immédiatement la création d'un compte ;
-5. explication du bénéfice et des conditions d'un compte lorsque la personne souhaite poursuivre une action nécessitant une identité persistante, une sauvegarde distante ou une permission ;
-6. possibilité de continuer à découvrir Heritis sans compte.
+4. dès la communication d'un prénom ou d'un nom, passage à l'état « personne reconnue », sans authentification ni accès privé ;
+5. sans compte, maintien d'un aperçu guidé uniquement ;
+6. explication du bénéfice et des conditions du compte ;
+7. avec compte et session valide, accès à la conversation complète selon les permissions effectives ;
+8. possibilité de continuer à découvrir les contenus publics sans compte.
 
 La personne doit comprendre pourquoi une connexion, une identification complémentaire ou une permission est demandée à cet instant.
 
@@ -147,7 +149,9 @@ Si une action n'est pas accessible au visiteur, l'interface explique la raison e
 
 ### 4.5 Assistant de bienvenue
 
-L'accueil peut présenter un indicateur discret signalant que Heritis est disponible pour échanger, sans prétendre qu'un agent humain est présent ou qu'une IA est en ligne si ce n'est pas vérifié. Le visiteur dispose d'un accueil guidé et de choix prédéfinis ; la conversation complète est soumise à l'état d'identité, aux règles de sécurité et à la disponibilité réelle du service.
+L'accueil doit présenter une conversation de bienvenue guidée avec des choix prédéfinis et un indicateur d'état visible, discret et actualisé. L'indicateur annonce que Heritis est prêt à échanger uniquement lorsque le service conversationnel est réellement disponible ; sinon, il affiche clairement l'indisponibilité. Il ne doit jamais laisser croire qu'un agent humain est présent.
+
+Sans compte authentifié, la conversation reste un aperçu guidé et limité. Avec un compte et une session valide, la conversation complète est accessible selon les permissions effectives et la disponibilité du service. Le prénom ou le nom suffit à reconnaître la personne dans le parcours, mais ne déverrouille pas la conversation complète.
 
 ## 5. Architecture de l'expérience par domaines
 
