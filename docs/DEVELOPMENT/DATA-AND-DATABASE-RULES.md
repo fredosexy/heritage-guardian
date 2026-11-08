@@ -494,3 +494,9 @@ Avant validation d'une évolution de données, confirmer :
 ---
 
 **Règle finale :** les données de Heritis sont des informations confiées par des personnes et portant potentiellement sur leurs droits, leurs biens, leurs relations et leurs volontés. Leur simplicité de gestion, leur faible coût et leur disponibilité ne justifient jamais une perte de confidentialité, d'intégrité, de provenance ou de contrôle par les personnes autorisées.
+
+---
+
+## Référentiel permanent complémentaire
+
+Les exigences de validation, de qualité du code, de tests, de sécurité, de performance, de maintenabilité et de modernisation sont définies dans [TESTING-REQUIREMENTS.md](TESTING-REQUIREMENTS.md). Elles s'appliquent à tout changement relevant de ce document.
