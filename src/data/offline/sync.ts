@@ -249,6 +249,7 @@ async function runQueue(): Promise<void> {
             // creates a duplicate dossier if a later building write fails.
             await db.drafts.update(draft.id, { remote_id: remoteDossierId });
           }
+          if (!remoteDossierId) throw new Error("Building dossier could not be created");
           if (draft.type === "batiment") {
             const building = buildingsRepo.readBuildingPropertyInput(draft.metadata);
             if (!building) throw new Error("Building draft is missing its property details");
