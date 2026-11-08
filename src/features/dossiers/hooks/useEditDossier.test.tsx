@@ -60,6 +60,6 @@ it("does not load an offline dossier cached for another account", async () => {
 
   expect(hook.result.current.dossier).toBeNull();
   expect(hook.result.current.canEdit).toBe(false);
-  expect(hook.result.current.save({ title: "Leak" })).resolves.toBe(false);
+  await expect(hook.result.current.save({ title: "Leak" })).resolves.toBe(false);
   hook.unmount();
 });
