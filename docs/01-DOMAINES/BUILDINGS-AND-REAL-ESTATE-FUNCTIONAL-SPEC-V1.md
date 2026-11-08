@@ -59,7 +59,8 @@ Ne pas créer une nouvelle catégorie technique de dossier uniquement pour repr�
 ### 3.2 Relations entre terrains, bâtiments et unités
 
 - Un terrain peut être lié à zéro, un ou plusieurs bâtiments.
-- Un bâtiment peut être rattaché à un terrain connu, à plusieurs références de terrain si le cas est documenté, ou rester sans rattachement lorsque l'information est inconnue.
+- **En V1, un bâtiment peut être rattaché à un seul terrain** connu, ou rester sans rattachement lorsque l'information est inconnue.
+- Le rattachement d'un même bâtiment à plusieurs terrains, y compris la gestion d'un lien principal et de liens secondaires, est reporté à une version future. Ne pas simuler cette capacité par des doublons ou des liens non maîtrisés.
 - Un bâtiment peut contenir plusieurs unités ou locaux.
 - **Dès la V1, chaque unité pertinente peut être suivie séparément** (appartement, boutique, bureau ou autre local), tout en restant explicitement rattachée à son bâtiment parent.
 - Le suivi séparé d'une unité permet de lui associer ses propres informations utiles : désignation, usage, caractéristiques, surfaces de même nature, occupation, personnes et relations déclarées, documents, événements et historique.
@@ -341,7 +342,6 @@ Chaque lot doit être audité, testé et documenté sur GitHub avant le suivant.
 ## 12. Questions à trancher avant le développement
 
 Les points suivants doivent être confirmés à la revue métier et technique :
-- faut-il permettre qu'un bâtiment soit rattaché à plusieurs terrains dès la V1, ou conserver un lien principal et des liens secondaires documentés ?
 - quelles références administratives camerounaises doivent être prévues comme champs facultatifs, après vérification des sources et pratiques applicables ?
 - quel niveau de détail est réellement utile pour les matériaux, équipements et états sans transformer Heritis en outil de diagnostic technique ?
 - quelles catégories de documents et de relations doivent être obligatoires ou facultatives selon le type de bâtiment ?
