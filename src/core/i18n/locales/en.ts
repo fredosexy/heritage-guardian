@@ -175,6 +175,16 @@ export const en = {
       infrastructure: "Installation type, use, resources and description…",
       autre: "Describe the nature of this rural asset and what distinguishes it…"
     },
+    structuredTitle: "Structured asset information",
+    structuredHint: "Fields adapt to the asset family. All entered values remain declarations.",
+    fields: {
+      exploitation: { activities: "Declared activities", activeSince: "Declared activity start date" },
+      plantation: { cropType: "Crop type", variety: "Variety or species", declaredArea: "Declared area", areaUnit: "Area unit (m², are, hectare)", plantedPeriod: "Planting date or period" },
+      elevage: { animalType: "Species or livestock type", declaredQuantity: "Declared quantity", inventoryDate: "Inventory reference date" },
+      equipement: { equipmentType: "Equipment type", brand: "Brand", model: "Model", serialNumber: "Visible number or identifier", condition: "Declared physical condition" },
+      infrastructure: { infrastructureType: "Installation type", use: "Declared use or function", condition: "Declared observed condition" },
+      autre: { nature: "Asset nature", characteristics: "Distinctive characteristics" }
+    },
     location: "Location or place of storage",
     locationPlaceholder: "e.g. region, department, village or place of storage",
     declarationNotice: "The information saved is declarative. It does not certify ownership, a right or regulatory compliance. Structured people, documents and relationships will be addressed in subsequent steps.",
