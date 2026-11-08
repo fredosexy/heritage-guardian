@@ -264,16 +264,170 @@ L'utilisateur peut enregistrer un brouillon incomplet. Les champs obligatoires s
 
 Après sauvegarde, proposer des actions cohérentes : consulter la fiche, compléter les informations, ajouter une pièce, relier un terrain, associer une personne ou enregistrer un événement.
 
-## 5. Présentation de la fiche et actions
+## 5. UI/UX — écrans, navigation et actions
 
-La fiche détaillée doit hiérarchiser l'information et éviter une page surchargée. Composition recommandée :
-1. En-tête : nom du bien, type, localité et état de complétude.
-2. Résumé : usage, statut physique, rattachement au terrain, point de localisation.
-3. Sections consultables : description, localisation et surfaces, personnes et relations, occupation, documents, historique.
-4. Actions visibles selon permissions : modifier, ajouter une preuve, associer une personne, relier un terrain, enregistrer un événement.
-5. Historique et provenance accessibles sans masquer les informations importantes.
+### 5.1 Principes de composition propres au sous-domaine
 
-Les actions doivent être réelles, avec états de chargement, succès, erreur, annulation et confirmation lorsque nécessaire. Ne pas afficher de bouton décoratif ou d'action non implémentée.
+Appliquer le système global « Héritage premium » et les modèles d'écran UI/UX Heritis : moins d'éléments, mieux hiérarchisés. L'interface doit donner une impression de sérieux, de protection et de simplicité, sans transformer la fiche en tableau de bord dense.
+
+- Une action principale clairement identifiable par écran ou section.
+- Une hiérarchie simple : identité du bien, état utile, action principale, informations nécessaires, détails secondaires.
+- Utiliser des sections et séparateurs avant de multiplier les cartes.
+- Réserver les grandes cartes aux choix de premier niveau ou aux grandes fonctions du domaine ; ne pas transformer chaque champ, document ou personne en carte.
+- Sur téléphone, privilégier une colonne ; sur tablette et grand écran, utiliser deux colonnes uniquement lorsque les contenus sont réellement complémentaires.
+- Les titres de cartes de domaine sont visibles et suffisamment grands ; les descriptions restent courtes et explicatives.
+- Les libellés décrivent les actions : « Ajouter un document », « Associer une personne », « Déclarer un différend ».
+- Ne jamais afficher un bouton décoratif, une action indisponible ou une capacité reportée comme si elle était active.
+- Respecter les tokens, couleurs, typographies, thèmes clair/sombre et états des composants partagés ; ne pas introduire une palette propre à ce sous-domaine.
+
+### 5.2 Écran d'entrée du sous-domaine
+
+**But :** aider à comprendre ce que l'utilisateur peut faire avec ses biens immobiliers avant de lui demander des informations.
+
+Présenter un titre clair, une description courte et les actions de premier niveau :
+1. Déclarer un bien immobilier.
+2. Retrouver et gérer les biens déclarés.
+3. Documenter les personnes et les relations avec un bien.
+4. Préparer ou suivre une transmission.
+5. Signaler ou suivre un différend.
+
+Sur mobile, présenter les fonctions principales sous forme de grandes cartes lisibles, une par ligne ou deux au maximum selon la largeur. Sur grand écran, deux cartes de premier niveau par ligne au maximum. Chaque carte comporte un titre fort, une description moyenne et une action explicite. Les fonctions non encore disponibles doivent être signalées comme telles et ne doivent pas conduire à un écran fictif.
+
+### 5.3 Liste des biens immobiliers
+
+**But :** retrouver rapidement un bien et comprendre sa situation.
+
+Composition :
+- titre « Mes biens immobiliers » ou libellé adapté au contexte réel ;
+- action principale « Déclarer un bien » si la permission le permet ;
+- recherche et filtres uniquement s'ils sont réellement pris en charge ;
+- liste de biens sous forme de lignes ou cartes sobres, non surchargées.
+
+Chaque élément affiche en priorité :
+- désignation du bien ;
+- catégorie générale ;
+- localité ou repère connu ;
+- relation de l'utilisateur au bien, si elle est connue et pertinente ;
+- état de la fiche (brouillon, documentée, information à compléter, etc.) avec une formulation qui ne suggère pas une certification ;
+- état de synchronisation uniquement lorsqu'il est utile.
+
+Un élément ouvre le détail seulement si l'utilisateur a accès au bien. Ne pas afficher publiquement les références sensibles, les documents ou les coordonnées précises.
+
+### 5.4 Déclaration d'un bien — parcours progressif
+
+Le formulaire est organisé en étapes courtes, avec une progression compréhensible et sans surcharge :
+
+1. **Identifier** : désignation, catégorie générale, usage déclaré si connu.
+2. **Localiser** : localité/adresse ou description ; coordonnées seulement si l'utilisateur choisit de les renseigner ; rattachement facultatif à un seul terrain existant.
+3. **Personnes liées** : déclarant et relations connues ; possibilité de compléter plus tard.
+4. **Documents** : ajouter une pièce ou une référence facultative, ou passer cette étape.
+5. **Vérifier et enregistrer** : récapitulatif, éléments manquants facultatifs et sauvegarde du brouillon.
+
+Règles ergonomiques :
+- afficher clairement l'étape actuelle et les étapes restantes sans imposer une progression artificielle ;
+- une action principale par étape (« Continuer », puis « Enregistrer le bien ») ;
+- permettre le retour à l'étape précédente sans perdre les saisies ;
+- indiquer « Facultatif » lorsque l'information n'est pas obligatoire ;
+- proposer « Je ne sais pas » ou « À compléter plus tard » lorsque pertinent ;
+- permettre l'enregistrement d'un brouillon incomplet ;
+- ne pas demander les détails techniques reportés aux versions futures ;
+- ne pas rendre obligatoires un titre foncier, une surface ou des coordonnées pour déclarer un bien.
+
+### 5.5 Fiche détaillée du bien
+
+**But :** donner une vue d'ensemble immédiatement compréhensible et des accès directs aux tâches utiles.
+
+En-tête :
+- nom du bien et catégorie ;
+- localisation synthétique ;
+- relation déclarée de la personne connectée, si disponible ;
+- statut de la fiche et état de synchronisation, présentés séparément ;
+- action principale « Modifier » ou « Compléter » selon les droits.
+
+Sections de la fiche, dans un ordre stable :
+1. **Résumé** : identification et localisation essentielle.
+2. **Personnes et relations** : personnes liées, rôles déclarés et périodes.
+3. **Documents et preuves** : pièces et références, avec leur provenance et leur statut de traitement.
+4. **Gestion et occupation** : occupants, locataires, gestionnaires, contrats et événements de gestion documentés.
+5. **Transmission** : ayants droit déclarés, bénéficiaires et liens vers les parcours de succession/volontés, selon les permissions.
+6. **Différends** : signalements et suivis liés au bien.
+7. **Historique** : événements, corrections et changements.
+
+Ne pas afficher toutes les sections sous forme de cartes volumineuses. Utiliser des sections repliables ou une navigation secondaire uniquement si cela améliore réellement la consultation sur petit écran. Garder le résumé et l'action principale visibles en premier.
+
+### 5.6 Personnes, ayants droit et transmission
+
+La section « Personnes et relations » doit distinguer visuellement les rôles déclarés : propriétaire déclaré, copropriétaire déclaré, détenteur, bénéficiaire, représentant, gestionnaire, occupant, locataire, acquéreur, voisin ou ayant droit déclaré.
+
+- Ne pas utiliser un badge « propriétaire » sans préciser « déclaré » lorsque le statut n'est pas officiellement établi.
+- Présenter la relation, sa période et sa source dans le détail de la personne liée.
+- La commande « Préparer une transmission » conduit vers le parcours transversal concerné ; elle ne doit pas simuler la rédaction ou la validation d'un testament.
+- Les ayants droit sont présentés comme déclarés ou potentiels tant que leur qualité n'a pas été établie par les voies compétentes.
+- Les données successorales sensibles sont accessibles uniquement selon les permissions spécifiques.
+
+### 5.7 Documents et références
+
+Présenter les documents dans une liste lisible, regroupée par catégorie, avec :
+- intitulé du document ou de la référence ;
+- objet concerné (terrain, bâtiment, unité, personne ou procédure) ;
+- date portée sur la pièce, si connue ;
+- déposant et provenance ;
+- état du traitement Heritis.
+
+Action principale : « Ajouter un document ». Prévoir les états vide, chargement, erreur et accès refusé. Ne pas afficher un badge de validation juridique ; les libellés doivent rester « déclaré », « pièce déposée », « contrôle interne effectué » ou « vérification externe documentée ».
+
+### 5.8 Gestion, vente, achat et location
+
+Regrouper les éléments de gestion dans une chronologie simple et une liste de relations actives/terminées. Les contrats et événements doivent être identifiables sans transformer l'écran en logiciel de comptabilité ou de gestion locative complète.
+
+Actions possibles selon les capacités réellement implémentées :
+- enregistrer une vente ou un achat déclaré ;
+- ajouter ou consulter un contrat de location ;
+- déclarer une entrée ou une sortie d'occupation ;
+- ajouter un événement de gestion ;
+- joindre une preuve ou un échange.
+
+Ne pas inventer de calcul de loyer, de solde, de rendement ou de dette. Si le suivi financier détaillé n'est pas validé et implémenté, ne pas afficher de montant ni de tableau de paiement.
+
+### 5.9 Différends et échanges
+
+**But :** aider à consigner les faits et les éléments communiqués par chaque partie, sans prendre parti.
+
+L'écran de suivi comprend :
+- objet du différend (voisinage, limite, accès, occupation, vente, achat, location ou autre) ;
+- bien concerné et personnes/parties impliquées, selon les permissions ;
+- chronologie des faits allégués, chaque entrée attribuée à son auteur ;
+- documents, photos, contrats, échanges et autres éléments fournis ;
+- état de suivi descriptif (signalé, informations à compléter, démarche en cours, clôturé selon déclaration), sans statut de jugement ;
+- prochaines actions documentaires possibles.
+
+Les versions contradictoires doivent rester séparées et clairement attribuées. Ne jamais désigner automatiquement une partie comme fautive ou titulaire du droit. Les informations d'une partie ne doivent pas être révélées à une autre sans base d'accès explicite. L'action principale est « Ajouter un élément au suivi » ou « Déclarer un différend », selon le contexte.
+
+### 5.10 États d'interface obligatoires
+
+Prévoir et concevoir explicitement :
+- première utilisation / liste vide avec explication et action de déclaration ;
+- brouillon incomplet ;
+- chargement et actualisation ;
+- erreur de sauvegarde avec conservation des saisies ;
+- mode hors connexion et synchronisation en attente ;
+- conflit de synchronisation nécessitant un choix explicite ;
+- accès restreint ;
+- absence de document ou de personne liée ;
+- information déclarée, pièce déposée, contrôle interne ou vérification externe documentée.
+
+Les statuts doivent comporter un texte compréhensible et, si nécessaire, une icône ; jamais une couleur seule. Les états de synchronisation ne doivent pas être confondus avec le statut documentaire ou juridique du bien.
+
+### 5.11 Actions sensibles
+
+Toute suppression, révocation de partage, retrait d'un document ou clôture d'un suivi doit :
+- expliquer la conséquence ;
+- demander confirmation lorsque l'opération est sensible ;
+- respecter les permissions ;
+- préserver les traces et l'historique requis ;
+- proposer une annulation lorsque le mécanisme le permet.
+
+Les actions impossibles ou non autorisées sont masquées ou expliquées, pas simplement désactivées sans contexte.
 
 ## 6. Données, intégrité et compatibilité
 
@@ -324,17 +478,46 @@ La carte et les services de géocodage peuvent nécessiter une connexion. L'indi
 
 ## 9. Accessibilité et règles UI/UX
 
-- Mobile-first, responsive téléphone, tablette et ordinateur.
-- Cartes de domaine généreuses et peu nombreuses ; dans le formulaire, préférer des sections claires et progressives plutôt que des cartes répétées.
-- Une action principale clairement identifiable par étape.
-- Titres explicites, descriptions concises, vocabulaire non technique.
-- Champs groupés par sens métier, unités visibles, exemples et aide contextuelle.
-- États vides, erreurs, progression et sauvegarde compréhensibles.
-- Cibles tactiles d'au moins 48 dp lorsque possible.
-- Navigation clavier, focus visible, libellés accessibles, annonces des erreurs et compatibilité lecteurs d'écran.
-- Contraste WCAG AA minimum ; thème clair et sombre.
-- Ne pas coder l'état uniquement par la couleur.
-- Préserver les saisies lors des erreurs et des changements d'étape.
+Les interfaces de ce sous-domaine appliquent le système de design global Heritis « Héritage premium » et les modèles de référence UI/UX existants. Elles ne créent pas de style autonome.
+
+### Identité visuelle et cohérence
+- Vert forêt, ivoire et or patiné selon les tokens sémantiques partagés.
+- Thèmes clair et sombre conçus dès la V1 ; ne pas coder des couleurs arbitraires dans les pages.
+- DM Sans pour les textes d'interface et Fraunces pour les titres selon la charte.
+- Cartes sobres, espaces généreux, bordures discrètes et ombres limitées.
+- L'or patiné reste un accent et n'est pas utilisé pour du texte courant à contraste insuffisant.
+- Les couleurs d'état restent distinctes des couleurs de marque et sont accompagnées d'un libellé.
+
+### Simplicité et hiérarchie
+- Une action principale clairement identifiable par écran ou section.
+- Une ou deux grandes cartes maximum par rangée pour les fonctions de premier niveau ; les écrans de gestion utilisent plutôt des listes, sections et lignes compactes.
+- Les cartes ont un titre nettement visible et une description moyenne, mais ne doivent pas contenir plusieurs actions concurrentes.
+- Ne pas transformer chaque champ, personne, document ou information en carte.
+- Révéler les informations secondaires au moment où elles deviennent utiles.
+- Employer un vocabulaire compréhensible et des aides courtes ; expliquer les termes administratifs sans jargon inutile.
+- Toute information affichée doit aider à comprendre, décider, effectuer une action autorisée ou suivre un état réel.
+
+### Mobile, tablette et ordinateur
+- Mobile-first, une colonne de lecture sur téléphone.
+- Sur tablette et grand écran, deux colonnes seulement lorsque les contenus sont complémentaires et restent faciles à comparer.
+- Pas de défilement horizontal pour lire les formulaires ou les informations principales.
+- Cibles tactiles d'au moins 48 dp lorsque possible, conformément aux règles globales.
+- Les actions importantes restent accessibles sans longues zones de défilement ; les actions secondaires ne concurrencent pas l'action principale.
+- Préserver les saisies lors des changements d'étape et des erreurs.
+
+### Accessibilité et états
+- Contraste WCAG AA minimum : 4,5:1 pour le texte courant et 3:1 pour les grands textes et composants concernés.
+- Navigation clavier, focus visible, libellés accessibles, ordre de tabulation prévisible et compatibilité lecteurs d'écran.
+- Les erreurs sont expliquées près du champ concerné et dans un résumé accessible si nécessaire.
+- Ne pas coder un statut uniquement par la couleur.
+- Respecter la réduction des mouvements et éviter les animations indispensables à la compréhension.
+- Concevoir les états vide, chargement, erreur, succès, accès restreint, hors ligne et conflit de synchronisation.
+- Ne pas prétendre qu'un contraste, un rendu ou une compatibilité appareil est validé sans mesure et test correspondants.
+
+### Confidentialité visuelle
+- Ne pas exposer les documents, références sensibles, coordonnées précises, identités d'ayants droit ou informations de différend dans les aperçus publics.
+- Afficher les données sensibles uniquement dans le contexte et pour les personnes autorisées.
+- Séparer clairement le rôle métier déclaré, le niveau de traitement documentaire et les permissions applicatives.
 
 ## 10. Contrôles et critères d'acceptation
 
