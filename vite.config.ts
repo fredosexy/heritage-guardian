@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => ({
       manifest: false,
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/, /^\/api/, /^\/auth/],
-        globPatterns: ["**/*.{js,css,html,svg,png,webp,woff2}"],
+        globPatterns: ["**/*.{js,css,html,svg,png,jpg,jpeg,webp,woff2,webmanifest}"],
         runtimeCaching: pwaRuntimeCaching,
       },
     }),
