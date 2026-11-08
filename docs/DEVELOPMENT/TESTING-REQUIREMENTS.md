@@ -571,6 +571,19 @@ Il est interdit de :
 - [ ] Les documents et preuves sont mis à jour.
 - [ ] Les autorisations humaines de livraison sont obtenues.
 
+## 31 bis. Exigences de validation PWA
+
+Toute évolution du manifeste, du service worker, des caches, de l'installation ou du mode hors ligne doit être vérifiée selon [PWA-OPERATIONS.md](PWA-OPERATIONS.md).
+
+- [ ] Le manifeste est valide et les icônes déclarées existent avec les dimensions attendues.
+- [ ] L'installation et la détection du mode autonome sont testées selon les capacités Android/iOS.
+- [ ] Les réponses privées et les URL signées ne sont pas placées dans un cache runtime générique.
+- [ ] Les données IndexedDB sont cloisonnées par identité de lecteur et les anciennes entrées non attribuées sont traitées.
+- [ ] Le changement de compte ne révèle aucune donnée locale du compte précédent.
+- [ ] Le service worker gère l'état prêt hors ligne, les erreurs et les mises à jour sans perte de saisie.
+- [ ] La perte et le retour du réseau sont testés avec les files d'opérations et les conflits existants.
+- [ ] Les essais réels sur Android et iOS sont documentés séparément des tests CI.
+
 ## 32. Référentiels complémentaires
 
 - [AGENTS.md](../../AGENTS.md) — instructions applicables à chaque agent et intervenant.
