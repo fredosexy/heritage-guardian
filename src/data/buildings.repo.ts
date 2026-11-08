@@ -33,13 +33,13 @@ export function readBuildingPropertyInput(metadata: Record<string, unknown> | un
 }
 
 export async function createBuildingProperty(dossierId: string, input: BuildingPropertyInput): Promise<void> {
-  const { error } = await supabase.from("building_properties").insert({
+  const { error } = await supabase.from("building_properties").upsert({
     dossier_id: dossierId,
     property_kind: input.property_kind,
     locality: input.locality ?? null,
     address_description: input.address_description ?? null,
     declared_surface: input.declared_surface ?? null,
     surface_unit: input.surface_unit ?? "m2",
-  });
+  }, { onConflict: "dossier_id" });
   if (error) throw error;
 }
