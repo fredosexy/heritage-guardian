@@ -218,6 +218,8 @@ export const en = {
       add: "Add this person",
       empty: "No associated person has been declared yet.",
       declared: "Declaration not verified",
+      end: "End this relationship",
+      ended: "Relationship ended — retained in history",
       roles: {
         owner_declared: "Declared owner",
         coowner_declared: "Declared co-owner",
