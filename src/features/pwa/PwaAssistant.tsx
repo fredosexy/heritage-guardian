@@ -11,6 +11,7 @@ export function PwaAssistant() {
   const [notice, setNotice] = useState<PwaNotice>(null);
   const [installMessage, setInstallMessage] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     const update = () => setNotice("update");
@@ -26,7 +27,7 @@ export function PwaAssistant() {
     };
   }, []);
 
-  const showInstall = !installed && (canPromptInstall || ios || installMessage !== null);
+  const showInstall = !dismissed && !installed && (canPromptInstall || ios || installMessage !== null);
   if (!showInstall && !notice) return null;
 
   const installApp = async () => {
@@ -57,7 +58,7 @@ export function PwaAssistant() {
           {notice === "update" ? <RefreshCw className="size-5 text-primary" /> : showInstall ? <Download className="size-5 text-primary" /> : online ? <Wifi className="size-5 text-primary" /> : <WifiOff className="size-5 text-warning" />}
           <p className="font-semibold">Heritis · PWA</p>
         </div>
-        <Button size="icon" variant="ghost" className="size-7 shrink-0" aria-label="Fermer l'assistant PWA" onClick={() => { setNotice(null); setInstallMessage(null); }}>
+        <Button size="icon" variant="ghost" className="size-7 shrink-0" aria-label="Fermer l'assistant PWA" onClick={() => { setNotice(null); setInstallMessage(null); setDismissed(true); }}>
           <X className="size-4" />
         </Button>
       </div>
@@ -92,7 +93,7 @@ export function PwaAssistant() {
       )}
 
       {notice === "error" && (
-        <p role="alert" className="mt-3 text-sm text-destructive">La gestion de l’application ou de sa mise à jour a rencontré un problème. Vérifiez votre connexion puis rechargez la page.</p>
+        <p role="alert" className="mt-3 text-sm text-destructive">{online ? "La gestion de l’application ou de sa mise à jour a rencontré un problème. Rechargez la page puis réessayez." : "Vous êtes hors ligne. La mise à jour reprendra lorsque la connexion sera rétablie."}</p>
       )}
     </aside>
   );
