@@ -202,6 +202,7 @@ export const en = {
     locationUnavailable: "Geolocation is unavailable on this device or browser.",
     locationCaptured: "GPS position captured.",
     locationDenied: "Location was not obtained. Check permission and try again.",
+    detail: { summaryFields: "Completed fields", summaryPeople: "Active people", summaryEvents: "Declared events", progressLabel: "Recommended information completeness" },
     actions: {
       title: "Useful next steps",
       hint: "Automatic suggestions based only on information present in this record.",
