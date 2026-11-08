@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ChevronRight, CircleCheck, Loader2, LockKeyhole, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,10 @@ export default function ModulePage() {
 
   if (identityLoading) {
     return <AppLayout><div className="flex justify-center py-20"><Loader2 className="size-6 animate-spin text-primary" /></div></AppLayout>;
+  }
+
+  if (isGuest && id === "savoir") {
+    return <Navigate to="/" replace />;
   }
 
   return (
