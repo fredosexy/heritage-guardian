@@ -202,6 +202,8 @@ export const en = {
       measurementFailed: "Measurements could not be calculated from these points.",
       calculate: "Calculate distances and area",
       perimeter: "Estimated perimeter",
+      segmentDistances: "Distances between vertices",
+      side: "Side",
       area: "Estimated area",
       estimateDisclaimer: "Indicative measurements calculated from entered coordinates. They do not replace official boundary marking or a professional survey.",
     },
