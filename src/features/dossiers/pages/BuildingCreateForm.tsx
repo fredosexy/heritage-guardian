@@ -57,7 +57,7 @@ export function BuildingCreateForm({ onBack }: { onBack: () => void }) {
         navigate("/dossiers/" + result.id);
       } else {
         toast.success(t(result.mode === "local" ? "create.savedLocal" : "create.savedOffline"));
-        navigate("/dossiers");
+        navigate("/buildings");
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("auth.error"));
