@@ -38,6 +38,8 @@ export default function AgriculturalAssetsPage() {
   const [locality, setLocality] = useState("");
   const [specifics, setSpecifics] = useState("");
   const [familyDetails, setFamilyDetails] = useState<Record<string, string>>({});
+  const [geoPoint, setGeoPoint] = useState<{ latitude: number; longitude: number; accuracyMeters: number | null; capturedAt: string } | null>(null);
+  const [locating, setLocating] = useState(false);
 
   const assets = useMemo(() => dossiers.filter((item) => item.type === "agricole"), [dossiers]);
   const filtered = useMemo(() => {
@@ -59,6 +61,32 @@ export default function AgriculturalAssetsPage() {
     setLocality("");
     setSpecifics("");
     setFamilyDetails({});
+    setGeoPoint(null);
+  };
+
+  const captureLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error(t("agricultural.locationUnavailable"));
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setGeoPoint({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracyMeters: Number.isFinite(position.coords.accuracy) ? position.coords.accuracy : null,
+          capturedAt: new Date(position.timestamp).toISOString(),
+        });
+        setLocating(false);
+        toast.success(t("agricultural.locationCaptured"));
+      },
+      () => {
+        setLocating(false);
+        toast.error(t("agricultural.locationDenied"));
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
+    );
   };
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -83,12 +111,15 @@ export default function AgriculturalAssetsPage() {
         title: title.trim(),
         description: description.trim(),
         location_name: locality.trim() || undefined,
+        latitude: geoPoint?.latitude ?? null,
+        longitude: geoPoint?.longitude ?? null,
         metadata: {
           agriculturalRural: {
             version: 1,
             family,
             declaredDetails: specifics.trim() || null,
             familyDetails: normalizedFamilyDetails,
+            ...(geoPoint ? { geospatial: { point: { ...geoPoint, source: "gps" } } } : {}),
             declarationStatus: "declare",
             source: "declarant",
           },
@@ -148,6 +179,20 @@ export default function AgriculturalAssetsPage() {
             <div>
               <Label htmlFor="agricultural-locality">{t("agricultural.location")}</Label>
               <Input id="agricultural-locality" value={locality} onChange={(event) => setLocality(event.target.value)} placeholder={t("agricultural.locationPlaceholder")} className="mt-1.5 min-h-12 rounded-2xl" />
+            </div>
+            <div className="rounded-2xl border border-border/70 bg-background/50 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">{t("agricultural.gpsTitle")}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{geoPoint ? t("agricultural.gpsCaptured", { accuracy: geoPoint.accuracyMeters === null ? "—" : Math.round(geoPoint.accuracyMeters) }) : t("agricultural.gpsHint")}</p>
+                </div>
+                <Button type="button" variant="outline" disabled={locating} onClick={captureLocation} className="min-h-11 rounded-xl">
+                  {locating ? <Loader2 className="mr-2 size-4 animate-spin" /> : <MapPin className="mr-2 size-4" />}
+                  {t("agricultural.captureGps")}
+                </Button>
+              </div>
+              {geoPoint ? <p className="mt-2 break-all text-xs tabular-nums text-muted-foreground">{geoPoint.latitude.toFixed(6)}, {geoPoint.longitude.toFixed(6)}</p> : null}
+              <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.gpsDisclaimer")}</p>
             </div>
           </section>
           <p className="rounded-2xl border border-accent/60 bg-accent/30 p-4 text-xs leading-relaxed text-muted-foreground">{t("agricultural.declarationNotice")}</p>
