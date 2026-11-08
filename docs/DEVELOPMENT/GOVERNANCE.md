@@ -454,3 +454,9 @@ Une référence qui n'a pas encore été créée doit être considérée comme p
 ## Principe directeur
 
 **Heritis doit évoluer par des décisions explicites, des responsabilités identifiables, des autorisations vérifiables et des preuves conservées. Aucune urgence, automatisation, commodité technique ou pression de livraison ne justifie de contourner les protections fondamentales ou de présenter comme acquis ce qui n'a pas été vérifié.**
+
+---
+
+## Référentiel permanent complémentaire
+
+Les règles de modélisation, de qualité, de protection, de synchronisation, de conservation et de sobriété des données sont définies dans [DATA-AND-DATABASE-RULES.md](DATA-AND-DATABASE-RULES.md). Ce référentiel doit être consulté pour toute évolution touchant aux données ou à leur stockage.
