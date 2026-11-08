@@ -612,7 +612,8 @@ Ce document doit être lu avec :
 - `/AGENTS.md` — instructions générales obligatoires pour agents et contributeurs ;
 - `/CONTRIBUTING.md` — processus de contribution et revue ;
 - `/docs/DEVELOPMENT/GOVERNANCE.md` — autorité, décisions, risques, responsabilités et dérogations ;
-- `SECURITY-RULES.md` — règles de sécurité détaillées ;\n- `UI-UX-STANDARDS.md` — règles permanentes de conception des interfaces, actions, mobile-first, offline-first, performance et accessibilité ;
+- `SECURITY-RULES.md` — règles de sécurité détaillées ;
+- `UI-UX-STANDARDS.md` — règles permanentes de conception des interfaces, actions, mobile-first, offline-first, performance et accessibilité ;
 - `DATA-AND-DATABASE-RULES.md` — données, schémas, migrations et accès ;
 - `TESTING-REQUIREMENTS.md` — stratégie et seuils de preuve ;
 - `AI-AND-AUTOMATION-RULES.md` — exigences spécialisées relatives à l'intelligence et aux automatisations ;
