@@ -23,7 +23,7 @@ La catégorie « Biens agricoles et ruraux » peut regrouper les familles d'acti
 2. **Plantations et cultures pérennes** : plantations, vergers et cultures pérennes déclarés, avec leur désignation, leur localisation, leur description et les informations patrimoniales utiles.
 3. **Élevages et cheptels** : élevages et groupes d'animaux déclarés comme actifs patrimoniaux. La V1 permet une description et un inventaire sommaire, sans devenir un registre vétérinaire ou un outil de suivi zootechnique.
 4. **Équipements et matériels agricoles** : machines, outils, matériels et équipements identifiables, qui peuvent être rattachés à une exploitation sans perdre leur identité propre lorsque leur suivi séparé est pertinent.
-5. **Installations et infrastructures rurales** : installations de stockage, d'irrigation ou autres infrastructures rurales déclarées, avec leurs relations éventuelles à un terrain ou à un bâtiment déjà référencé.
+5. **Installations, infrastructures et ressources rurales** : installations de stockage, d'irrigation, bâtiments techniques, points d'eau, puits, forages, retenues d'eau et autres ressources ou infrastructures rurales déclarées. Leur nature, leur localisation et leurs relations éventuelles à un terrain ou à un bâtiment déjà référencé sont décrites sans présumer d'un droit sur l'eau, le sol ou l'installation.
 6. **Autres actifs ruraux liés à une activité agricole** : ressources ou actifs particuliers qui ne trouvent pas leur place dans les familles précédentes. Leur nature doit être explicitement décrite pour éviter une catégorie fourre-tout.
 
 Le choix de la famille classe l'actif dans Heritis ; il ne constitue pas une qualification administrative, foncière, agricole ou juridique.
@@ -51,6 +51,8 @@ La fiche adapte ses rubriques à la famille choisie. Elle ne doit pas imposer le
 - famille et nature de l'actif ;
 - description libre et caractéristiques distinctives utiles ;
 - localisation déclarée ou lieu de conservation, selon la nature de l'actif ;
+- mode de localisation : adresse ou description, repère géographique, coordonnées ponctuelles ou référence à une fiche Terrain existante, selon les informations disponibles ;
+- source, date et précision annoncée des coordonnées, lorsqu'elles existent ;
 - exploitation ou unité de regroupement associée, si pertinente ;
 - terrains, bâtiments ou équipements liés, s'ils existent déjà dans le référentiel ;
 - déclarant, source des informations et dates de déclaration / mise à jour.
@@ -69,6 +71,16 @@ Exemples de rubriques facultatives selon la famille :
 
 Les quantités, superficies, états et caractéristiques restent des informations déclarées, datées et attribuées à leur source. Les champs non pertinents restent facultatifs ou absents.
 
+### 4.3 Localisation et données géographiques
+
+La localisation doit être adaptée à la nature de l'actif : une plantation ou une infrastructure fixe peut être rattachée à un Terrain existant ; un équipement peut être décrit par son lieu de conservation ; un cheptel peut être associé à un lieu d'élevage déclaré et daté, sans supposer qu'il y reste en permanence.
+
+Lorsque des coordonnées sont utiles, elles peuvent être saisies manuellement, capturées par GPS après action explicite de l'utilisateur ou reprises d'une source identifiée. Conserver, si disponibles, la méthode, la date de capture, la précision annoncée et la source. Une position ponctuelle est un repère et ne constitue pas une limite foncière.
+
+Lorsqu'un actif est situé sur un Terrain déjà enregistré, privilégier le lien vers cette fiche et réutiliser ses informations géographiques autorisées. Ne pas dupliquer son contour, ses sommets ou son identité. Si un actif occupe seulement une partie d'un terrain, cette emprise peut être décrite comme indicative et distincte du contour foncier ; elle ne vaut ni bornage ni reconnaissance d'un droit.
+
+Les calculs de distance, de périmètre ou de superficie ne sont pas automatiquement requis pour chaque actif. Lorsqu'une mesure indicative est utile et disponible, conserver séparément sa valeur, son unité, sa méthode, sa source, sa date et ses limites. Une superficie déclarée, une superficie issue d'un document et une estimation géographique ne doivent jamais être fusionnées en une seule valeur.
+
 ## 5. Personnes, relations et droits déclarés
 
 Une fiche peut associer plusieurs personnes, simultanément ou successivement. Les qualités possibles comprennent notamment :
@@ -82,7 +94,7 @@ Une fiche peut associer plusieurs personnes, simultanément ou successivement. L
 
 La relation avec l'actif est distincte du rôle d'accès dans Heritis. Une personne qui gère une exploitation n'est pas automatiquement propriétaire ; une personne qui fournit un document n'est pas automatiquement titulaire d'un droit.
 
-Chaque association conserve son auteur, sa source, ses dates déclarées, son statut de vérification éventuel et son historique. Les conflits entre déclarations ne sont pas résolus automatiquement.
+Chaque association conserve son auteur, sa source, ses dates déclarées, son statut de vérification éventuel et son historique. Lorsque cela est pertinent, la nature et la portée de la relation, les dates d'effet déclarées et les conditions de mise à disposition, de location ou d'usage sont précisées. Les conflits entre déclarations ne sont pas résolus automatiquement.
 
 ## 6. Documents et sécurisation patrimoniale
 
@@ -114,6 +126,8 @@ La V1 permet de consigner les événements qui changent la compréhension patrim
 - correction d'une information antérieure.
 
 Un événement conserve sa date déclarée, sa date d'enregistrement, son auteur, sa description et les pièces associées. Les événements n'écrasent pas silencieusement les informations antérieures.
+
+La fiche distingue également la situation déclarée de l'actif (par exemple : en activité, temporairement inutilisé, loué ou mis à disposition, cédé, perdu, détruit, dégradé ou activité/plantation cessée) de son statut documentaire. Ces états sont adaptés à la famille de l'actif, datés et attribués à leur source ; ils ne constituent pas une qualification juridique ou un contrôle technique.
 
 La V1 ne met pas en place un suivi de production, de rendement, de dépenses, de ventes agricoles ou de planification des travaux.
 
@@ -166,7 +180,7 @@ Le formulaire est progressif : seules les informations indispensables à l'ident
 
 ### 10.3 Consulter et gérer
 
-L'utilisateur retrouve ses actifs dans une liste avec recherche et filtres simples par famille et état documentaire. L'ouverture affiche une fiche structurée : résumé, localisation et liens, personnes, documents, événements et transmission. Les sections non renseignées ne doivent pas donner l'impression que l'information a été vérifiée ou qu'elle n'existe pas.
+L'utilisateur retrouve ses actifs dans une liste avec recherche et filtres simples par famille, situation déclarée et état documentaire, ces filtres restant distincts. L'ouverture affiche une fiche structurée : résumé, localisation et liens, personnes, documents, événements et transmission. Les sections non renseignées ne doivent pas donner l'impression que l'information a été vérifiée ou qu'elle n'existe pas.
 
 ### 10.4 Mettre à jour et conserver l'historique
 
@@ -226,16 +240,17 @@ La V1 sera considérée comme fonctionnellement couverte lorsque :
 
 1. Un utilisateur autorisé peut déclarer un actif de chacune des familles retenues avec les seuls champs pertinents.
 2. Chaque actif possède une référence Heritis stable et peut être retrouvé dans sa liste.
-3. Un actif peut être relié à un terrain, bâtiment ou équipement existant sans dupliquer la fiche liée.
-4. Plusieurs personnes peuvent être associées avec des qualités déclarées distinctes.
-5. Les rôles déclarés restent séparés des permissions applicatives.
-6. Les documents peuvent être rattachés à l'actif ou à une relation, avec provenance et accès contrôlé.
-7. Les événements patrimoniaux et corrections conservent leur auteur et leur historique.
-8. Les fiches peuvent être référencées dans les parcours de transmission et de conflit sans dupliquer l'actif.
-9. Les visiteurs n'accèdent qu'à l'aperçu public ; les données privées restent protégées.
-10. Les états hors ligne, de synchronisation et de conflit sont compréhensibles et testables.
-11. Les états UI essentiels, la navigation clavier et les contrastes sont vérifiés avant validation.
-12. Les fonctions exclues de la V1 ne sont pas présentées comme disponibles.
+3. Un actif peut être relié à un terrain, bâtiment ou équipement existant sans dupliquer la fiche liée ni ses données géographiques de référence.
+4. La localisation peut être descriptive ou géographique ; les coordonnées conservent leur source, leur méthode et leur date lorsqu'elles sont disponibles.
+5. Plusieurs personnes peuvent être associées avec des qualités et relations déclarées distinctes.
+6. Les rôles patrimoniaux déclarés restent séparés des permissions applicatives.
+7. Les documents peuvent être rattachés à l'actif ou à une relation, avec provenance et accès contrôlé.
+8. Les événements patrimoniaux, situations déclarées et corrections conservent leur auteur et leur historique, sans les confondre avec le statut documentaire.
+9. Les fiches peuvent être référencées dans les parcours de transmission et de conflit sans dupliquer l'actif.
+10. Les visiteurs n'accèdent qu'à l'aperçu public ; les données privées restent protégées.
+11. Les états hors ligne, de synchronisation et de conflit sont compréhensibles et testables.
+12. Les états UI essentiels, la navigation clavier et les contrastes sont vérifiés avant validation.
+13. Les fonctions exclues de la V1 ne sont pas présentées comme disponibles.
 
 ## 15. Dépendances et ordre de réalisation proposé
 
@@ -256,5 +271,5 @@ Cette spécification décrit un périmètre fonctionnel V1. Elle n'est ni un avi
 
 ---
 
-**Statut :** périmètre V1 approuvé par l'utilisateur ; spécification détaillée à relire avant validation finale du sous-domaine.  
+**Statut :** périmètre V1 approuvé par l'utilisateur ; spécification détaillée mise à jour après revue de cohérence, à valider avant clôture du sous-domaine.  
 **Périmètre technique :** documentation uniquement ; aucune modification du code applicatif, de Supabase distant ou de Lovable.
