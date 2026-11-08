@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ChevronRight, CircleAlert, CircleCheck, CircleDot, Loader2, MapPin, Pencil, Save, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useDossierDetail } from "../hooks/useDossierDetail";
+import { useDossiers } from "../hooks/useDossiers";
 import { buildingsRepo, dossiersRepo, enqueueUpdateDossierMetadata, proceduresRepo } from "@/data";
 import type { DossierStep } from "@/core/types/domain";
 import { ProofsTab } from "../components/ProofsTab";
@@ -21,6 +22,7 @@ export default function DossierDetailPage() {
   const navigate = useNavigate();
   const { dossier, proofs, participants, suggestions, loading, loadError, reload, uploading, addProof, remove, canEdit } =
     useDossierDetail(id);
+  const { dossiers: allDossiers } = useDossiers();
   const [journey, setJourney] = useState<proceduresRepo.DossierJourneyStep[]>([]);
   const [transitioning, setTransitioning] = useState(false);
   const [editingTerrain, setEditingTerrain] = useState(false);
@@ -242,7 +244,7 @@ export default function DossierDetailPage() {
 
   return (
     <AppLayout>
-      <PageHeader title={dossier.title} parentLabel={t("dossiers.title")} showBack />
+      <PageHeader title={dossier.title} parentLabel={t("dossiers.title")} showBack right={<Button variant="outline" size="sm" onClick={() => navigate(`/dossiers/${dossier.id}/edit`)} disabled={!canEdit} className="rounded-xl"><Pencil className="mr-1.5 size-4" />{t("common.edit")}</Button>} />
 
       <div className="rounded-3xl border border-border/60 bg-card/85 p-5 mb-4 shadow-[var(--shadow-soft)]">
         <div className="flex items-start justify-between gap-2 mb-2">
@@ -296,6 +298,111 @@ export default function DossierDetailPage() {
           )}
         </section>
       )}
+
+      {dossier.type === "agricole" && (() => {
+        const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+          ? dossier.metadata as Record<string, unknown>
+          : {};
+        const raw = metadata.agriculturalRural;
+        const asset = raw && typeof raw === "object" && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
+        const family = typeof asset.family === "string" ? asset.family : "autre";
+        const details = typeof asset.declaredDetails === "string" ? asset.declaredDetails : "";
+        const people = Array.isArray(asset.declaredPeople) ? asset.declaredPeople as Array<{ id: string; name: string; role: string; note?: string; active?: boolean }> : [];
+        const events = Array.isArray(asset.events) ? asset.events as Array<{ id: string; type: string; date: string; description: string }> : [];
+        const relatedAssets = Array.isArray(asset.relatedAssets) ? asset.relatedAssets as Array<{ dossierId: string; relationType: string }> : [];
+        const geo = asset.geospatial && typeof asset.geospatial === "object" && !Array.isArray(asset.geospatial)
+          ? (asset.geospatial as { point?: { latitude?: number; longitude?: number; accuracyMeters?: number | null; capturedAt?: string; source?: string } }).point
+          : undefined;
+        return (
+          <section className="card-soft mb-4 p-5">
+            <p className="text-overline text-primary">{t("agricultural.title")}</p>
+            <h2 className="mt-1 text-lg font-semibold">{t("agricultural.families." + family)}</h2>
+            <p className="mt-3 text-xs text-muted-foreground">{t("agricultural.declarationNotice")}</p>
+            {details ? <p className="mt-3 whitespace-pre-wrap text-sm">{details}</p> : null}
+            {asset.familyDetails && typeof asset.familyDetails === "object" && !Array.isArray(asset.familyDetails) ? (
+              <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                {Object.entries(asset.familyDetails as Record<string, unknown>).filter(([, value]) => (typeof value === "string" && value.trim() !== "") || typeof value === "number").map(([key, value]) => (
+                  <div key={key} className="rounded-xl bg-background/60 p-3">
+                    <dt className="text-xs text-muted-foreground">{t("agricultural.fields." + family + "." + key)}</dt>
+                    <dd className="mt-1 whitespace-pre-wrap text-sm font-medium">{String(value)}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+            {dossier.location_name ? <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="size-4" />{dossier.location_name}</p> : null}
+            {geo && typeof geo.latitude === "number" && typeof geo.longitude === "number" ? (
+              <div className="mt-3 rounded-xl bg-background/60 p-3">
+                <p className="text-xs font-medium">{t("agricultural.gpsTitle")}</p>
+                <p className="mt-1 break-all text-sm tabular-nums">{geo.latitude.toFixed(6)}, {geo.longitude.toFixed(6)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.gpsCaptured", { accuracy: geo.accuracyMeters == null ? "—" : Math.round(geo.accuracyMeters) })}</p>
+                {geo.capturedAt ? <p className="mt-1 text-xs text-muted-foreground">{new Date(geo.capturedAt).toLocaleString()}</p> : null}
+                <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.gpsDisclaimer")}</p>
+              </div>
+            ) : null}
+            <div className="mt-4 border-t border-border/60 pt-4">
+              <h3 className="text-sm font-semibold">{t("agricultural.links.title")}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.links.disclaimer")}</p>
+              {relatedAssets.length ? <ul className="mt-2 space-y-2">{relatedAssets.map((link) => {
+                const linked = allDossiers.find((item) => item.id === link.dossierId);
+                return <li key={link.dossierId} className="rounded-xl bg-background/60 p-3"><p className="text-sm font-medium">{linked?.title ?? t("agricultural.links.linkedDossier")}</p><p className="mt-1 text-xs text-muted-foreground">{t("agricultural.links.types." + link.relationType)} · {linked?.type ?? link.dossierId}</p></li>;
+              })}</ul> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.links.empty")}</p>}
+            </div>
+            <div className="mt-4 border-t border-border/60 pt-4">
+              <h3 className="text-sm font-semibold">{t("agricultural.people.title")}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.people.disclaimer")}</p>
+              {people.length ? <ul className="mt-2 space-y-2">{people.map((person) => <li key={person.id} className="rounded-xl bg-background/60 p-3"><p className="text-sm font-medium">{person.name}</p><p className="mt-1 text-xs text-muted-foreground">{t("agricultural.people.roles." + person.role)} · {t("agricultural.people.declared")}{person.active === false ? " · " + t("agricultural.people.ended") : ""}</p>{person.note ? <p className="mt-1 text-xs">{person.note}</p> : null}</li>)}</ul> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.people.empty")}</p>}
+            </div>
+            <div className="mt-4 border-t border-border/60 pt-4">
+              <h3 className="text-sm font-semibold">{t("agricultural.events.title")}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.events.disclaimer")}</p>
+              {events.length ? <ol className="mt-2 space-y-2">{[...events].sort((a, b) => b.date.localeCompare(a.date)).map((event) => <li key={event.id} className="rounded-xl bg-background/60 p-3"><p className="text-sm font-medium">{t("agricultural.events.types." + event.type)} · {event.date}</p><p className="mt-1 text-xs">{event.description}</p><p className="mt-1 text-[11px] text-muted-foreground">{t("agricultural.events.declared")}</p></li>)}</ol> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.events.empty")}</p>}
+            </div>
+          </section>
+        );
+      })()}
+
+      {dossier.type === "agricole" && (() => {
+        const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+          ? dossier.metadata as Record<string, unknown>
+          : {};
+        const raw = metadata.agriculturalRural;
+        const asset = raw && typeof raw === "object" && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
+        const family = typeof asset.family === "string" ? asset.family : "autre";
+        const required: Record<string, string[]> = {
+          exploitation: ["activities", "activeSince"],
+          plantation: ["cropType", "declaredArea", "areaUnit"],
+          elevage: ["animalType", "declaredQuantity", "inventoryDate"],
+          equipement: ["equipmentType", "condition"],
+          infrastructure: ["infrastructureType", "use"],
+          autre: ["nature", "characteristics"],
+        };
+        const familyDetails = asset.familyDetails && typeof asset.familyDetails === "object" && !Array.isArray(asset.familyDetails)
+          ? asset.familyDetails as Record<string, unknown>
+          : {};
+        const missing = (required[family] ?? required.autre).filter((key) => familyDetails[key] === undefined || familyDetails[key] === null || String(familyDetails[key]).trim() === "");
+        const actions = [
+          ...(missing.length > 0 ? [{ key: "details", label: t("agricultural.actions.completeDetails", { count: missing.length }), run: () => navigate(`/dossiers/${dossier.id}/edit`) }] : []),
+          ...(!dossier.location_name && !asset.geospatial ? [{ key: "location", label: t("agricultural.actions.addLocation"), run: () => navigate(`/dossiers/${dossier.id}/edit`) }] : []),
+          ...(proofs.length === 0 ? [{ key: "proof", label: t("agricultural.actions.addProof"), run: () => document.getElementById("proofs")?.scrollIntoView({ behavior: "smooth", block: "start" }) }] : []),
+        ];
+        if (actions.length === 0) return null;
+        return (
+          <section className="mb-4 rounded-3xl border border-primary/15 bg-accent/20 p-4" aria-live="polite">
+            <div className="flex items-center gap-2">
+              <Sparkles className="size-4 text-primary" />
+              <h2 className="text-sm font-semibold">{t("agricultural.actions.title")}</h2>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.actions.hint")}</p>
+            <div className="mt-3 flex flex-col gap-2">
+              {actions.map((action) => (
+                <Button key={action.key} type="button" variant="outline" disabled={!canEdit} onClick={action.run} className="min-h-11 justify-start rounded-xl bg-background text-left">
+                  {action.label}
+                </Button>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
 
       {dossier.type === "terrain" && (
         <TerrainChecklistAssist dossier={dossier} proofs={proofs} canEdit={canEdit} onSaved={() => void reload().catch(() => undefined)} />

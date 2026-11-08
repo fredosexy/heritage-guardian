@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { dossiersRepo, enqueueUpdateDossier } from "@/data";
+import { dossiersRepo, enqueueUpdateDossier, enqueueUpdateDossierMetadata } from "@/data";
 import { db } from "@/data/offline/db";
 import type { Dossier } from "@/core/types/domain";
 import { EDITABLE_FIELDS, type DossierChanges } from "@/services/sync-conflicts";
@@ -42,5 +42,20 @@ export function useEditDossier(id?: string) {
     return true;
   };
 
-  return { dossier, loading, save, canEdit: canEditDossier(dossier, user?.id) };
+  const saveAgricultural = async (asset: Record<string, unknown>): Promise<boolean> => {
+    if (!dossier || dossier.type !== "agricole") return false;
+    assertDossierOwner(dossier, user?.id);
+    const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+      ? dossier.metadata as Record<string, unknown>
+      : {};
+    const current = metadata.agriculturalRural && typeof metadata.agriculturalRural === "object" && !Array.isArray(metadata.agriculturalRural)
+      ? metadata.agriculturalRural as Record<string, unknown>
+      : {};
+    const next = { ...current, ...asset, version: 1, declarationStatus: "declare", source: "declarant" };
+    if (JSON.stringify(current) === JSON.stringify(next)) return false;
+    await enqueueUpdateDossierMetadata(dossier.id, { agriculturalRural: next });
+    return true;
+  };
+
+  return { dossier, loading, save, saveAgricultural, canEdit: canEditDossier(dossier, user?.id) };
 }

@@ -876,7 +876,7 @@ export const Constants = {
       alert_type: ["urgent", "info", "suggestion"],
       app_role: ["admin", "moderator", "user"],
       dossier_status: ["secure", "incomplete", "risk"],
-      dossier_type: ["terrain", "batiment", "heritage", "volonte", "conflit", "savoir"],
+      dossier_type: ["terrain", "batiment", "agricole", "heritage", "volonte", "conflit", "savoir"],
       dossier_visibility: ["private", "family", "public"],
       participant_role: ["owner", "heir", "witness", "expert", "viewer"],
       proof_type: ["image", "document", "video", "audio"],

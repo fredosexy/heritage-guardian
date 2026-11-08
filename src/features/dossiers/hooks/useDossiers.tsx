@@ -14,6 +14,8 @@ export interface DossierListItem {
   completionScore: number;
   updatedAt: string;
   locationName?: string | null;
+  description?: string | null;
+  metadata?: unknown;
   participantsCount: number;
   proofsCount: number;
   nextAttention: string;
@@ -90,13 +92,15 @@ export function useDossiers() {
       id: draft.localId, type: draft.type, title: draft.title,
       status: "incomplete" as DossierStatus, completionScore: 0,
       updatedAt: new Date(draft.updated_at).toISOString(), locationName: draft.location_name,
+      description: draft.description ?? null, metadata: draft.metadata ?? {},
       participantsCount: 0, proofsCount: 0,
       nextAttention: "Commencer votre dossier", journeyProgress: 0, currentStepTitle: null, nextStepTitle: null, blockedStepTitle: null, local: true,
     }));
     return remote.map((d) => ({
       id: d.id, type: d.type, title: d.title, status: d.status,
       completionScore: d.completion_score, updatedAt: d.updated_at,
-      locationName: d.location_name, participantsCount: participants[d.id] ?? 0,
+      locationName: d.location_name, description: d.description, metadata: d.metadata,
+      participantsCount: participants[d.id] ?? 0,
       proofsCount: proofs[d.id] ?? 0,
       nextAttention: journeys[d.id]?.blocked
         ? `Parcours bloqué : ${journeys[d.id].blocked}`
