@@ -10,7 +10,8 @@ describe("PWA private cache cleanup", () => {
 
     await clearLegacyPrivatePwaCaches();
 
-    expect(deleteCache).toHaveBeenCalledExactlyOnceWith("supabase-storage");
+    expect(deleteCache).toHaveBeenCalledTimes(1);
+    expect(deleteCache).toHaveBeenCalledWith("supabase-storage");
   });
 
   it("does not fail in browsers without Cache Storage", async () => {
