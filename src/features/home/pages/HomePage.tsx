@@ -115,7 +115,7 @@ export default function HomePage() {
           </div>
         </section>
         <section className="rounded-[2rem] border border-primary/20 bg-primary p-5 text-primary-foreground shadow-[var(--shadow-elegant)] mb-6">
-          <div className="flex items-start gap-3"><span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-card/75 text-primary shadow-[var(--shadow-soft)]"><Sparkles className="size-5" /></span><div><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><p className="text-sm text-primary-foreground mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>
+          <div className="flex items-start gap-3"><span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-card/75 text-primary shadow-[var(--shadow-soft)]"><Sparkles className="size-5" /></span><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-semibold">{t("home.visitorAssistantTitle")}</p><span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-2 py-1 text-xs font-medium text-primary-foreground"><span className="size-1.5 rounded-full bg-primary-foreground" aria-hidden="true" />{t("home.visitorAssistantReady")}</span></div><p className="text-sm text-primary-foreground mt-1 leading-relaxed">{t("home.visitorAssistantHint")}</p></div></div>
           <Button onClick={() => navigate("/assistant")} variant="secondary" className="w-full mt-4 rounded-2xl justify-between shadow-[var(--shadow-soft)]">{t("home.visitorAssistantCta")}<ChevronRight className="size-4" /></Button>
         </section>
       </AppLayout>
