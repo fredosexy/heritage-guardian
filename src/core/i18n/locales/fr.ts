@@ -168,6 +168,16 @@ export const fr = {
     specificsLabel: "Précisions propres à cette famille",
     specificsHint: "Ces informations sont déclaratives. N’indiquez que ce que vous connaissez.",
     specifics: { exploitation: "Nom d’usage, activités et actifs regroupés…", plantation: "Type de culture, espèces, emplacement ou superficie déclarée…", elevage: "Type d’élevage, groupe d’animaux, quantité déclarée et date d’inventaire…", equipement: "Type, marque, modèle, identifiant visible et état déclaré…", infrastructure: "Nature de l’installation, usage, ressources et description…", autre: "Précisez la nature de cet actif rural et ce qui le distingue…" },
+    structuredTitle: "Informations structurées de l’actif",
+    structuredHint: "Les champs varient selon la famille. Les valeurs saisies restent déclaratives.",
+    fields: {
+      exploitation: { activities: "Activités déclarées", activeSince: "Début d’activité déclaré" },
+      plantation: { cropType: "Type de culture", variety: "Variété ou essence", declaredArea: "Superficie déclarée", areaUnit: "Unité de superficie (m², are, hectare)", plantedPeriod: "Date ou période de plantation" },
+      elevage: { animalType: "Espèce ou type d’élevage", declaredQuantity: "Quantité déclarée", inventoryDate: "Date de référence de l’inventaire" },
+      equipement: { equipmentType: "Nature de l’équipement", brand: "Marque", model: "Modèle", serialNumber: "Numéro ou identifiant visible", condition: "État matériel déclaré" },
+      infrastructure: { infrastructureType: "Nature de l’installation", use: "Usage ou fonction déclarée", condition: "État observé déclaré" },
+      autre: { nature: "Nature de l’actif", characteristics: "Caractéristiques distinctives" }
+    },
     location: "Localisation ou lieu de conservation",
     locationPlaceholder: "Ex. région, département, village ou lieu de conservation",
     declarationNotice: "Les informations enregistrées sont des déclarations. Elles ne certifient ni la propriété, ni un droit, ni la conformité d’une activité. Les personnes, documents et relations pourront être structurés dans les étapes suivantes.",
