@@ -202,6 +202,8 @@ export const fr = {
       measurementFailed: "Impossible de calculer les mesures avec ces points.",
       calculate: "Calculer les distances et la superficie",
       perimeter: "Périmètre estimé",
+      segmentDistances: "Distances entre sommets",
+      side: "Côté",
       area: "Superficie estimée",
       estimateDisclaimer: "Mesures indicatives calculées à partir des coordonnées saisies. Elles ne remplacent ni un bornage ni un levé topographique officiel.",
     },
