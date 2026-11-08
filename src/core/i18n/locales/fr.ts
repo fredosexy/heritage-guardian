@@ -195,6 +195,13 @@ export const fr = {
     locationUnavailable: "La géolocalisation n'est pas disponible sur cet appareil ou navigateur.",
     locationCaptured: "Position GPS capturée.",
     locationDenied: "Position non obtenue. Vérifiez l'autorisation et réessayez.",
+    actions: {
+      title: "Les prochaines étapes utiles",
+      hint: "Suggestions automatiques fondées uniquement sur les informations présentes dans cette fiche.",
+      completeDetails: "Compléter les {{count}} information(s) recommandée(s)",
+      addLocation: "Préciser le lieu ou ajouter un repère GPS",
+      addProof: "Joindre une première pièce ou photographie",
+    },
     declarationNotice: "Les informations enregistrées sont des déclarations. Elles ne certifient ni la propriété, ni un droit, ni la conformité d’une activité. Les personnes, documents et relations pourront être structurés dans les étapes suivantes.",
     save: "Enregistrer la déclaration",
     saved: "Déclaration enregistrée",
