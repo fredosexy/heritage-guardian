@@ -48,7 +48,12 @@ export default function DossierDetailPage() {
     const sections = metadata.terrain?.sections ?? {};
     setTerrainSections(sections);
     setInitialTerrainSections(sections);
-    setTerrainGeospatial(metadata.terrain?.geospatial ?? { boundaryPoints: [] });
+    setTerrainGeospatial(metadata.terrain?.geospatial ?? {
+      boundaryPoints: [],
+      ...(dossier.latitude != null && dossier.longitude != null ? {
+        point: { latitude: dossier.latitude, longitude: dossier.longitude, source: "manual" as const, accuracyMeters: null, capturedAt: dossier.created_at },
+      } : {}),
+    });
   }, [dossier?.id, dossier?.metadata, dossier?.type]);
 
   const saveTerrainSections = async () => {
