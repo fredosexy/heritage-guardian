@@ -45,7 +45,7 @@ export default function AgriculturalAssetsPage() {
       const itemFamily = typeof data.family === "string" ? data.family : "autre";
       const matchesQuery = !normalized ||
         item.title.toLocaleLowerCase().includes(normalized) ||
-        (item.location_name ?? "").toLocaleLowerCase().includes(normalized);
+        (item.locationName ?? "").toLocaleLowerCase().includes(normalized);
       return matchesQuery && (familyFilter === "all" || itemFamily === familyFilter);
     });
   }, [assets, familyFilter, query]);
@@ -176,7 +176,7 @@ export default function AgriculturalAssetsPage() {
               <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-accent text-primary"><Sprout className="size-5" /></span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-base font-semibold">{asset.title}</span>
-                <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="size-3.5 shrink-0" /><span className="truncate">{asset.location_name || t("agricultural.locationNotSpecified")}</span></span>
+                <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="size-3.5 shrink-0" /><span className="truncate">{asset.locationName || t("agricultural.locationNotSpecified")}</span></span>
                 <span className="mt-2 flex flex-wrap items-center gap-2"><span className="text-xs text-primary">{t("agricultural.families." + itemFamily)}</span><DossierStatusBadge status={asset.status} />{asset.local ? <span className="text-xs text-muted-foreground"><CloudOff className="mr-1 inline size-3" />{t("dossiers.draftPending")}</span> : null}</span>
               </span>
               <span aria-hidden="true" className="text-lg text-muted-foreground">›</span>
