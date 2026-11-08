@@ -2,18 +2,18 @@
 
 Ce document décrit la méthode de contribution applicable aux développeurs, contributeurs et équipes intervenant sur Heritis.
 
-Il complète le référentiel racine [AGENTS.md](AGENTS.md), qui reste la source centrale des règles applicables aux agents IA et aux interventions techniques. En cas de contradiction, suspendre l'action concernée et demander une clarification ; ne pas choisir silencieusement la règle la moins contraignante.
+Il complète le référentiel racine [AGENTS.md](AGENTS.md), qui reste la source centrale des instructions applicables, ainsi que [GOVERNANCE.md](docs/DEVELOPMENT/GOVERNANCE.md), qui définit les responsabilités, les décisions, les autorisations et les mécanismes de contrôle. En cas de contradiction, suspendre l'action concernée et demander une clarification ; ne pas choisir silencieusement la règle la moins contraignante.
 
 ## 1. Avant de commencer
 
 Toute contribution doit commencer par une phase de compréhension :
 
-1. Lire intégralement [AGENTS.md](AGENTS.md).
+1. Lire intégralement [AGENTS.md](AGENTS.md) et [GOVERNANCE.md](docs/DEVELOPMENT/GOVERNANCE.md).
 2. Lire les instructions locales du répertoire concerné, si elles existent.
 3. Lire les documents produit et techniques pertinents, en vérifiant leur statut et leur date.
 4. Examiner la branche de base, les commits récents, les PR ouvertes et les dépendances.
 5. Reproduire ou comprendre le comportement actuel avant de proposer une correction.
-6. Définir le périmètre, les risques, les tests et la documentation à mettre à jour.
+6. Définir le périmètre, les risques, les tests, les autorisations et la documentation à mettre à jour.
 
 Ne pas commencer une implémentation sur la base d'une supposition, d'une ancienne capture d'écran ou d'une description qui n'a pas été confrontée à l'état réel du dépôt.
 
