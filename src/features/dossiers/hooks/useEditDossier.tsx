@@ -40,9 +40,13 @@ export function useEditDossier(id?: string) {
           });
         }
       } catch {
-        const cached = await db.cachedDossiers.get(id);
-        if (cached?.viewer_user_id === userId) {
-          loaded = cached.data as Dossier;
+        try {
+          const cached = await db.cachedDossiers.get(id);
+          if (cached?.viewer_user_id === userId) {
+            loaded = cached.data as Dossier;
+          }
+        } catch {
+          loaded = null;
         }
       }
       if (!cancelled) {
