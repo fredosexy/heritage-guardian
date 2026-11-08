@@ -286,3 +286,21 @@ La V1 n'effectue pas de certification de propriété, de bornage officiel, de le
 - Attribution OpenStreetMap : https://www.openstreetmap.org/copyright
 
 Ces références doivent être revérifiées avant toute mise en production ou changement de fournisseur.
+## 17. État d’implémentation de la première tranche
+
+### Disponible dans la branche de travail
+- Position GPS à la demande ou coordonnées saisies manuellement.
+- Affichage d’un fond cartographique MapLibre, avec OpenFreeMap Liberty par défaut et URL de style remplaçable par configuration.
+- Ajout de sommets par clic sur la carte, visualisation du contour et des sommets, annulation du dernier sommet et effacement du contour.
+- Correction du contour par édition manuelle des coordonnées dans la liste ordonnée.
+- Calcul des distances de côtés, du périmètre et de la superficie estimée ; saisie distincte de la superficie déclarée et affichage de l’écart.
+- Sauvegarde des informations géographiques dans les métadonnées Terrain et conservation hors ligne/synchronisation.
+
+### À compléter avant de considérer la fiche Terrain comme terminée
+- Déplacer, supprimer individuellement et réordonner les sommets directement sur la carte.
+- Recherche d’adresse/localité et géocodage avec confirmation de l’utilisateur.
+- Import contrôlé GeoJSON/KML/GPX et gestion éventuelle de parcelles multiparties.
+- Téléchargement explicite de zones cartographiques hors ligne, conforme aux limites et conditions du fournisseur retenu.
+- Vérifications fonctionnelles sur appareils Android réels, précision GPS, permissions, reprise réseau et accessibilité.
+
+Les tests unitaires de calcul sont présents dans la branche. Tant que la PR reste empilée sur une branche de travail au lieu de `main`, les workflows du dépôt configurés uniquement pour les PR ciblant `main` ne se déclenchent pas ; lint, build et tests CI restent donc à confirmer après réintégration de la PR #55 et retargeting de cette PR vers `main`.
