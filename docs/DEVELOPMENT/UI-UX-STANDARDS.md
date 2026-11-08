@@ -813,16 +813,55 @@ Une interface est prête à être proposée à la revue lorsque :
 - [ ] Les animations respectent la préférence de réduction du mouvement.
 - [ ] Les textes sont clairs, traduits et adaptés aux formats locaux.
 - [ ] Les tests automatisés et manuels pertinents ont été exécutés.
-- [ ] Les limites et éléments non vérifiés sont clairement signalés.
+- [ ] Les limites et éléments non vérifiés sont clairement signalés.\n- [ ] La solution choisie privilégie le natif, le gratuit ou l'open source avant toute option payante.\n- [ ] Les requêtes, transferts et appels externes sont limités au strict nécessaire.\n- [ ] Aucun dépassement facturable ou abonnement tiers n'est activé sans validation explicite.\n- [ ] Une solution de repli existe pour tout service externe non essentiel.
 
-## 30. Références et règle finale
+## 30. Économie des ressources, requêtes et coûts d'exploitation
+
+### 30.1 Principe « gratuit d'abord, coût minimal ensuite »
+
+La V1 doit être conçue pour offrir les fonctionnalités prévues sans imposer à l'utilisateur final un abonnement payant à un service tiers. Pour chaque besoin, rechercher dans cet ordre :
+1. une capacité native déjà présente dans la plateforme ou le socle technique ;
+2. une méthode simple, gratuite, maintenue et suffisamment fiable ;
+3. une bibliothèque open source légère, déjà compatible avec le projet ;
+4. un service gratuit ou un palier gratuit, après vérification de ses limites, conditions, quotas, confidentialité et pérennité ;
+5. seulement si les solutions précédentes sont insuffisantes, une solution payante ou une architecture plus complexe, avec comparaison du coût total, justification et validation préalable.
+
+Un palier gratuit ne doit pas être considéré comme gratuit à vie : documenter les quotas, les conditions de dépassement, les limites de stockage, les appels, la rétention, la possibilité d'export et le risque de verrouillage fournisseur. Ne jamais activer silencieusement une consommation payante ou un dépassement facturable.
+
+### 30.2 Requêtes et transferts minimaux
+
+- Ne charger que les données nécessaires à l'écran et à l'action en cours.
+- Éviter les requêtes en cascade, les appels identiques répétés et les rafraîchissements complets inutiles.
+- Regrouper les lectures compatibles, utiliser pagination ou chargement progressif pour les listes, et limiter les colonnes et relations demandées.
+- Mettre en place debounce pour la recherche et les saisies qui déclenchent des appels ; annuler les requêtes devenues obsolètes.
+- Dédupliquer les demandes concurrentes et réutiliser les données en cache lorsque la fraîcheur et la confidentialité le permettent.
+- Éviter le polling fréquent ; préférer une mise à jour à la demande, une stratégie de rafraîchissement raisonnable ou un mécanisme temps réel uniquement lorsqu'il apporte une valeur démontrable.
+- Ne pas télécharger de gros fichiers, images ou historiques avant qu'ils soient nécessaires.
+- Compresser et adapter les médias, et éviter de retransmettre des contenus inchangés.
+- Prévoir des limites, timeouts, annulations, reprises et protections contre les boucles de requêtes.
+- Mesurer le nombre d'appels, le volume transféré, la latence et les coûts avant et après une évolution.
+
+### 30.3 Sobriété des services externes et de l'intelligence
+
+- Ne pas appeler un service externe pour une opération que le client ou le serveur peut effectuer simplement et sûrement localement.
+- Ne pas solliciter l'IA pour une validation déterministe, un calcul simple, une recherche SQL ou une règle métier qui doit être explicite et testable.
+- Pour l'IA, limiter le contexte, la longueur des échanges, les répétitions, la taille des documents et les appels au modèle ; réutiliser les résultats uniquement lorsque la confidentialité, la fraîcheur et le contexte le permettent.
+- Prévoir quotas, limites par utilisateur, budgets, alertes et arrêt contrôlé pour les services facturables.
+- Proposer un mode dégradé fonctionnel lorsque l'IA, un fournisseur ou un service payant est indisponible.
+- Ne pas faire dépendre une fonction essentielle V1 d'un service payant sans décision produit explicite et solution de repli.
+
+### 30.4 Validation avant adoption d'une solution coûteuse
+
+Avant d'ajouter une dépendance, un fournisseur, un abonnement ou une API facturée, comparer au minimum : solution native, solution open source, solution gratuite, coût d'exploitation réel, coût à l'échelle, limites de quota, confidentialité, maintenance, réversibilité, dépendance fournisseur et effort d'intégration. Documenter le choix et obtenir l'autorisation requise selon la gouvernance. La solution la moins chère n'est pas acceptable si elle compromet la sécurité, la fiabilité, la conformité ou l'expérience utilisateur.
+
+## 31. Références et règle finale
 
 Références complémentaires :
 - `/AGENTS.md` — instructions générales obligatoires ;
 - `/CONTRIBUTING.md` — contribution et revue ;
 - `GOVERNANCE.md` — autorité, décisions et responsabilités ;
 - `ARCHITECTURE-RULES.md` — architecture, résilience et séparation des responsabilités ;
-- `SECURITY-RULES.md` — identité, accès, confidentialité et sécurité ;
+- `SECURITY-RULES.md` — identité, accès, confidentialité et sécurité ;\n- `DATA-AND-DATABASE-RULES.md` — structure, requêtes, stockage, synchronisation et maîtrise des coûts de données ;
 - `DESIGN_SYSTEM_UI_UX.md` — direction artistique et tokens ;
 - `UX-PRINCIPLES.md` — langage utilisateur et progression ;
 - `UI_UX_CURRENT_STATE_AUDIT_2026-11-07.md` — audit statique daté, à revalider ;
