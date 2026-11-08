@@ -30,12 +30,17 @@ Les documents de référence se complètent selon leur fonction :
 
 | Référence | Autorité et fonction |
 |---|---|
-| AGENTS.md | Instructions communes obligatoires avant toute intervention technique ou assistée par IA. |
-| CONTRIBUTING.md | Méthode de contribution, de préparation et de revue. |
+| AGENTS.md | Instructions centrales obligatoires pour tout agent IA, développeur et contributeur. |
+| CONTRIBUTING.md | Méthode de contribution, de préparation, de revue et de livraison. |
 | docs/DEVELOPMENT/GOVERNANCE.md | Responsabilités, décisions, autorisations, contrôles et évolution de la gouvernance. |
+| docs/DEVELOPMENT/ARCHITECTURE-RULES.md | Architecture, frontières, contrats, intégrations, résilience et évolutivité. |
+| docs/DEVELOPMENT/SECURITY-RULES.md | Identité, authentification, permissions, confidentialité, menaces et réponse aux incidents. |
+| docs/DEVELOPMENT/UI-UX-STANDARDS.md | Direction artistique, parcours, interfaces, accessibilité, responsive et sobriété UX. |
+| docs/DEVELOPMENT/DATA-AND-DATABASE-RULES.md | Modèles, intégrité, migrations, RLS, stockage, synchronisation et conservation. |
+| docs/DEVELOPMENT/TESTING-REQUIREMENTS.md | Tests, qualité du code, sécurité, performance, résilience et critères de livraison. |
+| docs/DEVELOPMENT/AI-AND-AUTOMATION-RULES.md | Assistants, modèles, agents, outils, mémoire, automatisations, autonomie et validation humaine. |
 | Documents de vision et de stratégie | Finalité, mission, objectifs, positionnement et limites de Heritis. |
 | Cartographie et spécifications métier | Périmètres, parcours, règles métier, cas d'usage et critères d'acceptation. |
-| Documents spécialisés de développement | Exigences détaillées d'architecture, sécurité, données, UI/UX, tests, IA et exploitation. |
 | Code, migrations et configurations | État technique effectivement implémenté, à vérifier dans le dépôt et les environnements autorisés. |
 
 Règles de priorité :
@@ -438,15 +443,14 @@ L'application de ce document doit être traduite en contrôles techniques et org
 
 Les documents spécialisés du référentiel de développement précisent les exigences opérationnelles de chaque domaine. Ils doivent être cohérents avec le présent document et être maintenus dans le même référentiel.
 
-- AGENTS.md — instructions centrales pour agents et intervenants ;
-- docs/DEVELOPMENT/ARCHITECTURE-RULES.md — architecture, frontières techniques, contrats, intelligence, synchronisation et évolution ;
-- CONTRIBUTING.md — méthode de contribution ;
-- docs/DEVELOPMENT/ARCHITECTURE-RULES.md — architecture et décisions techniques ;
-- docs/DEVELOPMENT/SECURITY-RULES.md — sécurité, identité, permissions et protection ;
-- docs/DEVELOPMENT/UI-UX-STANDARDS.md — standards d'expérience et d'interface ;
-- docs/DEVELOPMENT/DATA-AND-DATABASE-RULES.md — données, schémas, migrations et intégrité ;
-- docs/DEVELOPMENT/TESTING-REQUIREMENTS.md — stratégie et exigences de test ;
-- docs/DEVELOPMENT/AI-AND-AUTOMATION-RULES.md — intelligence artificielle et automatisation.
+- [AGENTS.md](../../AGENTS.md) — instructions centrales obligatoires ;
+- [CONTRIBUTING.md](../../CONTRIBUTING.md) — méthode de contribution et de revue ;
+- [ARCHITECTURE-RULES.md](ARCHITECTURE-RULES.md) — architecture et décisions techniques ;
+- [SECURITY-RULES.md](SECURITY-RULES.md) — sécurité, identité, permissions et protection ;
+- [UI-UX-STANDARDS.md](UI-UX-STANDARDS.md) — standards d'expérience et d'interface ;
+- [DATA-AND-DATABASE-RULES.md](DATA-AND-DATABASE-RULES.md) — données, schémas, migrations et intégrité ;
+- [TESTING-REQUIREMENTS.md](TESTING-REQUIREMENTS.md) — stratégie et exigences de test ;
+- [AI-AND-AUTOMATION-RULES.md](AI-AND-AUTOMATION-RULES.md) — intelligence artificielle et automatisation.
 
 Une référence qui n'a pas encore été créée doit être considérée comme planifiée, et non comme une politique déjà disponible. Les règles communes de ce document restent applicables jusqu'à la publication et la validation du document spécialisé correspondant.
 
