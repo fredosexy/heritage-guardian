@@ -17,10 +17,10 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
-      registerType: "autoUpdate",
-      injectRegister: null, // we register manually with iframe/preview guard
+      registerType: "prompt",
+      injectRegister: null,
       devOptions: { enabled: false },
-      manifest: false, // we ship our own /manifest.webmanifest
+      manifest: false,
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/, /^\/api/, /^\/auth/],
         globPatterns: ["**/*.{js,css,html,svg,png,webp,woff2}"],
@@ -34,11 +34,6 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /\/icons\/.*/,
             handler: "CacheFirst",
             options: { cacheName: "icons", expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 } },
-          },
-          {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
-            handler: "StaleWhileRevalidate",
-            options: { cacheName: "supabase-storage", expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 7 } },
           },
         ],
       },
