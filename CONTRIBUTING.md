@@ -182,3 +182,9 @@ La contribution est considérée prête à être examinée lorsque son périmèt
 ---
 
 **Principe de contribution Heritis :** comprendre avant de modifier, préserver avant de remplacer, vérifier avant d'affirmer et documenter avant de passer à la suite.
+
+---
+
+## Référentiel permanent complémentaire
+
+Les règles de modélisation, de qualité, de protection, de synchronisation, de conservation et de sobriété des données sont définies dans [DATA-AND-DATABASE-RULES.md](docs/DEVELOPMENT/DATA-AND-DATABASE-RULES.md). Ce référentiel doit être consulté pour toute évolution touchant aux données ou à leur stockage.
