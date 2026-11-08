@@ -15,7 +15,7 @@ import { ChevronRight, Loader2, Sparkles } from "lucide-react";
 const severityClass = (severity: string) =>
   severity === "high" ? "border-l-destructive bg-destructive/5" : severity === "medium" ? "border-l-warning bg-warning/5" : "border-l-primary bg-primary/5";
 
-const modules = DOSSIER_TYPES.map(({ id, icon, available }) => ({ id, icon, available }));
+const modules = DOSSIER_TYPES.filter(({ id }) => id !== "batiment").map(({ id, icon, available }) => ({ id, icon, available }));
 
 export default function HomePage() {
   const { t } = useTranslation();
