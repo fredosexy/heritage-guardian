@@ -27,15 +27,21 @@ Ordre de lecture recommandé :
 | Domaine | Document | Finalité |
 |---|---|---|
 | 1. Patrimoine et gestion des biens | [Document détaillé](../01-DOMAINES/PATRIMOINE-ET-GESTION-DES-BIENS-V1.md) | Identifier, déclarer, inventorier, documenter et suivre les biens et les relations déclarées. |
+| ↳ Bâtiments et biens immobiliers | [Spécification fonctionnelle et UI/UX](../01-DOMAINES/BUILDINGS-AND-REAL-ESTATE-FUNCTIONAL-SPEC-V1.md) | Déclaration, sécurisation, documentation, gestion, ayants droit, transmission, différends et modèles d'écrans V1. |
 | 2. Héritage et succession | [Document détaillé](../02-DOMAINES/HERITAGE-ET-SUCCESSION-V1.md) | Organiser les personnes, biens, documents, participations et étapes d'une succession. |
 | 3. Volontés secrètes et dernières volontés | [Document détaillé](../03-DOMAINES/VOLONTES-SECRETES-ET-DERNIERES-VOLONTES-V1.md) | Préserver des volontés confidentielles et organiser leur transmission après vérifications. |
 | 4. Gestion des conflits et litiges | [Document détaillé](../04-DOMAINES/GESTION-DES-CONFLITS-ET-LITIGES-V1.md) | Constituer un dossier de conflit et orienter vers les méthodes et services compétents. |
 
 ## 3.1 Spécifications des sous-domaines du patrimoine
 
-| Sous-domaine | Document | Finalité |
+| Sous-domaine | Document | Contenu |
 |---|---|---|
-| Biens mobiliers | [Spécification fonctionnelle V1](../01-DOMAINES/MOVABLE-ASSETS-FUNCTIONAL-SPEC-V1.md) | Déclarer, identifier, documenter, sécuriser et suivre les biens mobiliers, leurs relations déclarées, leurs pièces et leur historique. |
+| 1. Terrains et biens fonciers | À référencer après consolidation de la spécification dédiée | Déclaration, identification, limites, localisation et documentation des terrains. |
+| 2. Bâtiments et biens immobiliers | [Spécification fonctionnelle V1](../01-DOMAINES/BUILDINGS-AND-REAL-ESTATE-FUNCTIONAL-SPEC-V1.md) | Déclaration, documentation, gestion patrimoniale, relations, transmission et différends relatifs aux bâtiments et biens immobiliers. |
+| 3. Biens agricoles et ruraux | [Spécification fonctionnelle V1](../01-DOMAINES/AGRICULTURAL-AND-RURAL-ASSETS-FUNCTIONAL-SPEC-V1.md) | Exploitations, plantations, élevages, équipements et installations rurales ; documentation, gestion patrimoniale et transmission. |
+| 4. Biens mobiliers | [Spécification fonctionnelle V1](../01-DOMAINES/MOVABLE-ASSETS-FUNCTIONAL-SPEC-V1.md) | Déclarer, identifier, documenter, sécuriser et suivre les biens mobiliers, leurs relations déclarées, leurs pièces et leur historique. |
+
+Les documents de sous-domaines détaillent les parcours du domaine Patrimoine sans créer de nouveaux domaines métier. Leur périmètre reste subordonné aux principes et limites du document général Patrimoine V1.
 
 ## 4. Services transversaux
 
