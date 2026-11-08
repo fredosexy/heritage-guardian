@@ -142,4 +142,31 @@ describe("IndexedDB offline continuity", () => {
     expect(await db.queue.count()).toBe(1);
     expect((await db.queue.toArray())[0]).toMatchObject({ attempts: 1, last_error: "Only the dossier owner can modify this dossier" });
   });
+
+  it("hides another account's queued operations and conflicts from Sync Center", async () => {
+    await db.queue.add({
+      viewer_user_id: "another-account",
+      kind: "delete_dossier",
+      payload: { dossierId: "private-dossier" },
+      attempts: 0,
+      created_at: 1,
+    });
+    await db.conflicts.add({
+      viewer_user_id: "another-account",
+      dossier_id: "private-dossier",
+      title: "Private conflict",
+      fields: ["title"],
+      mine: { title: "Private value A" },
+      theirs: { title: "Private value B" },
+      remote_updated_at: "v1",
+      created_at: 1,
+    });
+
+    const hook = renderHook(() => useSyncCenter());
+    await waitFor(() => expect(hook.result.current.queue).toEqual([]));
+    expect(hook.result.current.conflicts).toEqual([]);
+    expect(hook.result.current.legacyUnassignedCount).toBe(0);
+    hook.unmount();
+  });
+
 });
