@@ -102,3 +102,21 @@ Aucune migration distante ni modification Lovable n'est prévue dans cette tranc
 - Le conseil ne choisit qu'une fiche selon les champs recommandés manquants ou l'absence de localisation ; il ne constitue pas une IA autonome.
 - Les cartes réutilisent les données déjà disponibles et n'ajoutent aucun accès ni permission.
 - Le contrôle responsive doit encore être confirmé par essais visuels sur téléphone, tablette et écran large, en modes clair et sombre.
+
+
+## Quatrième tranche — fiche agricole premium
+
+### Présentation de la fiche
+- En-tête visuel dédié à l'actif : nom, famille, description et localisation.
+- Bandeau synthétique : champs recommandés renseignés, personnes actives et événements déclarés.
+- Indicateur de complétude calculé selon les champs recommandés de la famille.
+- Grille adaptative pour les informations spécifiques, avec des cartes mieux espacées.
+- Sections séparées pour la géolocalisation, les actifs liés, les personnes et les événements.
+- Traductions FR/EN des indicateurs de synthèse.
+
+### Intelligence contextuelle et limites
+- La complétude reste un indicateur de saisie et ne constitue aucune validation juridique, foncière, agronomique ou matérielle.
+- Les personnes et événements restent des déclarations ; les liens entre dossiers ne prouvent pas des droits.
+- La position GPS reste indicative, avec sa précision et sa date de capture affichées.
+- Les actions existantes restent soumises aux droits d'édition du dossier.
+- Les essais visuels sur appareils réels et la validation CI sont requis avant intégration.
