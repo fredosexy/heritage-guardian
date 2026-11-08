@@ -1,6 +1,6 @@
 # Modèle de données — Bâtiments et immobilier V1
 
-Statut : première tranche technique en cours, non déployée.
+Statut : première tranche technique et UI en cours sur une branche dédiée, non fusionnée et non déployée.
 
 ## Principes
 
@@ -37,7 +37,7 @@ Les documents et preuves continuent d'utiliser le système existant `proofs` et 
 
 Le brouillon conserve les informations bâtiment dans ses métadonnées locales existantes. Lors de la reprise réseau, le dossier distant est créé en premier, son identifiant est persisté localement avant la création de la fiche bâtiment, puis la fiche est enregistrée de manière idempotente. Une reprise après échec ne doit donc pas créer un deuxième dossier.
 
-Aucune nouvelle version Dexie n'est requise à ce stade : la structure de brouillon existante accepte déjà le type et les métadonnées génériques. Cette compatibilité doit être confirmée par les tests d'intégration hors ligne avant activation de l'entrée utilisateur.
+Aucune nouvelle version Dexie n'est requise à ce stade : la structure de brouillon existante accepte déjà le type et les métadonnées génériques. Le formulaire progressif de déclaration est présent sur la branche ; le détail peut relire les métadonnées locales si la lecture distante échoue. Cette chaîne reste à confirmer par les tests d'intégration hors ligne avant fusion et déploiement.
 
 ## Migrations
 
@@ -46,11 +46,18 @@ Aucune nouvelle version Dexie n'est requise à ce stade : la structure de brouil
 
 Ces migrations sont seulement versionnées sur cette branche. Elles n'ont pas été appliquées à un projet Supabase distant.
 
-## Vérifications requises avant activation complète
+## UI/UX déjà présente sur la branche
+
+- Sous-domaine Bâtiments présenté depuis le parcours Patrimoine, sans créer un cinquième domaine public.
+- Formulaire progressif de déclaration en deux étapes, avec localisation et surface facultatives.
+- Fiche de détail affichant les informations principales et utilisant les métadonnées du dossier comme repli hors ligne.
+- L'écran de liste dédié, l'édition, les unités, les personnes, les documents, les événements et le suivi des différends restent à réaliser.
+
+## Vérifications requises avant fusion et déploiement
 
 - Exécuter `supabase db reset` sur une base locale jetable, puis `supabase test db`.
 - Vérifier les accès propriétaire, participant accepté, participant en attente et tiers.
 - Vérifier les relations Terrain/bâtiment et bâtiment/unité.
 - Vérifier la reprise de synchronisation après échec entre la création du dossier et de la fiche bâtiment.
 - Exécuter typecheck, lint, tests applicatifs et build.
-- Ne pas activer le parcours public ou le formulaire de création tant que ces contrôles ne sont pas verts.
+- Ne pas fusionner ni déployer cette première tranche tant que ces contrôles ne sont pas verts.
