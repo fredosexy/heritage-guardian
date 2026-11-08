@@ -438,6 +438,7 @@ L'application de ce document doit être traduite en contrôles techniques et org
 Les documents spécialisés du référentiel de développement précisent les exigences opérationnelles de chaque domaine. Ils doivent être cohérents avec le présent document et être maintenus dans le même référentiel.
 
 - AGENTS.md — instructions centrales pour agents et intervenants ;
+- docs/DEVELOPMENT/ARCHITECTURE-RULES.md — architecture, frontières techniques, contrats, intelligence, synchronisation et évolution ;
 - CONTRIBUTING.md — méthode de contribution ;
 - docs/DEVELOPMENT/ARCHITECTURE-RULES.md — architecture et décisions techniques ;
 - docs/DEVELOPMENT/SECURITY-RULES.md — sécurité, identité, permissions et protection ;
