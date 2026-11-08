@@ -238,7 +238,7 @@ Les décisions produit doivent :
 8. définir les critères d'acceptation et les preuves de validation ;
 9. distinguer le périmètre validé de la disponibilité réelle.
 
-La V1 comprend les quatre domaines métier décrits dans la documentation produit : patrimoine et gestion des biens, héritage et succession, volontés secrètes et dernières volontés, gestion des conflits et litiges. Les capacités transversales, dont l'enregistrement des biens et la documentation, soutiennent ces domaines sans constituer un domaine métier supplémentaire.
+La vision générale de Heritis comprend six domaines métier. Le périmètre validé de la V1 en met en œuvre quatre : patrimoine et gestion des biens, héritage et succession, volontés secrètes et dernières volontés, gestion des conflits et litiges. Les deux domaines complémentaires de la vision générale ne sont pas encore définis de manière suffisamment validée pour être nommés ou spécifiés ; aucun intervenant ne doit leur attribuer un nom, un périmètre ou des fonctionnalités par déduction. Les capacités transversales, dont l'enregistrement des biens et la documentation, soutiennent les domaines sans constituer un domaine métier supplémentaire.
 
 Toute évolution de la cartographie doit être répercutée dans l'index documentaire, les spécifications concernées et les dépendances applicatives.
 
