@@ -238,7 +238,7 @@ export default function AgriculturalAssetsPage() {
   return (
     <AppLayout>
       <PageHeader title={t("agricultural.title")} subtitle={t("agricultural.subtitle")} parentLabel={t("modules.terrain.title")} showBack
-        right={<Button onClick={() => setCreateStep(0); setCreating(true)} className="min-h-11 shrink-0 rounded-2xl px-3 sm:px-4"><Plus className="size-4 sm:mr-2" /><span className="hidden sm:inline">{t("agricultural.create")}</span><span className="sm:hidden">{t("common.add", "Ajouter")}</span></Button>}
+        right={<Button onClick={() => { setCreateStep(0); setCreating(true); }} className="min-h-11 shrink-0 rounded-2xl px-3 sm:px-4"><Plus className="size-4 sm:mr-2" /><span className="hidden sm:inline">{t("agricultural.create")}</span><span className="sm:hidden">{t("common.add", "Ajouter")}</span></Button>}
       />
       {isGuest ? <p className="mb-4 rounded-2xl border border-border bg-muted/50 p-3 text-sm">{t("home.previewOnlyHint")}</p> : null}
       <div className="relative mb-4">
@@ -282,7 +282,7 @@ export default function AgriculturalAssetsPage() {
       })() : null}
       {loading ? <div className="flex justify-center py-12" role="status"><Loader2 className="size-5 animate-spin text-primary" /></div>
         : loadError ? <div role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm"><p className="mb-3">{t("auth.error")}</p><Button variant="outline" onClick={reload}>{t("common.retry", "Réessayer")}</Button></div>
-        : assets.length === 0 ? <EmptyState icon={Sprout} title={t("agricultural.empty")} description={t("agricultural.emptyHint")} actionLabel={t("agricultural.create")} onAction={() => setCreateStep(0); setCreating(true)} secondaryLabel={t("next.seeDossiers")} onSecondary={() => navigate("/dossiers")} />
+        : assets.length === 0 ? <EmptyState icon={Sprout} title={t("agricultural.empty")} description={t("agricultural.emptyHint")} actionLabel={t("agricultural.create")} onAction={() => { setCreateStep(0); setCreating(true); }} secondaryLabel={t("next.seeDossiers")} onSecondary={() => navigate("/dossiers")} />
         : filtered.length === 0 ? <div className="rounded-3xl border border-border bg-card p-6 text-center"><p className="font-semibold">{t("agricultural.noResults")}</p><p className="mt-1 text-sm text-muted-foreground">{t("agricultural.noResultsHint")}</p><Button variant="outline" className="mt-4" onClick={() => { setQuery(""); setFamilyFilter("all"); }}>{t("buildings.clearFilters")}</Button></div>
         : <section aria-label={t("agricultural.results")} className="space-y-4">
           <div className="flex items-end justify-between gap-3">
