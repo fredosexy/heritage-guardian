@@ -304,3 +304,89 @@ Ces références doivent être revérifiées avant toute mise en production ou c
 - Vérifications fonctionnelles sur appareils Android réels, précision GPS, permissions, reprise réseau et accessibilité.
 
 Les tests unitaires de calcul sont présents dans la branche. Tant que la PR reste empilée sur une branche de travail au lieu de `main`, les workflows du dépôt configurés uniquement pour les PR ciblant `main` ne se déclenchent pas ; lint, build et tests CI restent donc à confirmer après réintégration de la PR #55 et retargeting de cette PR vers `main`.
+
+## 18. Provenance géographique, précision et incertitude
+
+Chaque position, sommet ou mesure doit conserver autant que possible :
+- la valeur et le système de coordonnées utilisé ;
+- la méthode de capture (GPS appareil, saisie manuelle, point placé sur carte, document, relevé professionnel ou autre) ;
+- la date de capture ou de déclaration et la date d'enregistrement ;
+- l'auteur ou la source ;
+- la précision annoncée par l'appareil ou le document, sans la transformer en garantie ;
+- le contexte et les réserves utiles (point approximatif, repère, borne observée, position estimée).
+
+La précision horizontale annoncée par un appareil est une indication technique, non une certification de la position réelle. Une coordonnée saisie manuellement ne doit pas recevoir une précision GPS inventée. Si le système de coordonnées ou le datum d'origine d'un document n'est pas connu, l'indiquer comme inconnu plutôt que supposer une conversion.
+
+Les coordonnées du point principal, les sommets du contour, la superficie déclarée, la superficie issue d'un document et la superficie calculée sont des informations distinctes. Elles peuvent diverger ; Heritis affiche les écarts et leurs sources sans choisir automatiquement une valeur réputée correcte.
+
+## 19. Validation du contour et règles de calcul
+
+### 19.1 Construction et édition
+
+Un contour est une séquence ordonnée de sommets. L'ordre est significatif et doit être visible. L'utilisateur doit pouvoir comprendre le point de départ, le sens de parcours, la fermeture du polygone et les points qui restent approximatifs. Une édition future devra permettre de déplacer un sommet, de le supprimer individuellement et de réordonner la liste, avec confirmation et possibilité d'annuler.
+
+Toute modification d'un sommet doit recalculer les mesures indicatives et conserver la version antérieure du contour dans l'historique lorsque le contour avait déjà été enregistré. Le système ne doit pas mélanger des sommets issus de versions différentes.
+
+### 19.2 Contrôles géométriques
+
+Avant calcul, contrôler au minimum :
+- latitude et longitude dans leurs plages valides ;
+- présence d'au moins trois sommets distincts ;
+- absence de coordonnées non numériques ;
+- répétition de sommets consécutifs ou doublons évidents ;
+- fermeture et ordre du contour ;
+- géométrie manifestement invalide ou auto-intersectée, lorsque le contrôle est disponible.
+
+Un contrôle automatique ne doit pas déplacer ou corriger les sommets sans confirmation. Si la géométrie est invalide ou incertaine, expliquer pourquoi le calcul n'est pas fourni ou pourquoi il reste approximatif.
+
+### 19.3 Mesures et unités
+
+Les distances de côtés, le périmètre et la superficie doivent préciser leur nature et leur méthode. Les conversions d'unités doivent conserver la valeur de référence et éviter les arrondis successifs. Les résultats affichés sont indicatifs et ne remplacent ni un bornage, ni un levé topographique, ni un document cadastral ou une mesure professionnelle.
+
+Une comparaison entre superficie déclarée et superficie calculée doit afficher les deux valeurs, les unités, les dates et les sources. Aucun seuil d'écart ne doit déclencher automatiquement une accusation d'erreur ou une qualification juridique.
+
+## 20. Relations patrimoniales, références et changements
+
+La fiche Terrain peut être liée à plusieurs bâtiments, exploitations, plantations, infrastructures et autres actifs déjà enregistrés. Le lien doit référencer la fiche existante et préciser sa nature (situé sur, support de, partie de, accès déclaré, usage déclaré ou autre lien documenté). Le lien ne duplique pas la géométrie et ne prouve pas que le déclarant possède le terrain ou les actifs associés.
+
+Les personnes associées peuvent avoir des qualités distinctes et simultanées : propriétaire déclaré, copropriétaire déclaré, détenteur/possesseur, occupant, bénéficiaire d'un droit ou usage déclaré, représentant, exploitant ou personne concernée par un différend. Chaque relation précise sa portée, ses dates, son auteur et sa source. Une relation déclarée au terrain ne donne pas automatiquement accès à la fiche ni aux documents.
+
+Les références administratives, foncières ou cadastrales sont conservées selon le libellé exact fourni et rattachées à l'objet concerné. Une référence liée au terrain ne doit pas être recopiée comme référence propre à un bâtiment ou à une unité. Une pièce ou un numéro saisi ne certifie pas l'authenticité, l'actualité ou la titularité.
+
+Les changements de localisation, de contour, de superficie déclarée, de personnes associées ou de statut doivent créer une trace datée. Une correction conserve la valeur antérieure, la nouvelle valeur, l'auteur, le motif et la source. Une contestation de limite ou de droit reste attribuée à chaque partie et peut être reliée au domaine Gestion des conflits et litiges sans arbitrage Heritis.
+
+## 21. Parcours détaillés et scénarios d'acceptation complémentaires
+
+### 21.1 Parcours de localisation
+
+1. choisir une localisation descriptive ou géographique ;
+2. saisir une adresse ou des coordonnées, ou demander explicitement la position GPS ;
+3. présenter la précision annoncée et les limites de la capture ;
+4. permettre la correction manuelle avant enregistrement ;
+5. conserver méthode, date, auteur et source ;
+6. enregistrer le brouillon même si le fond cartographique ou le géocodage est indisponible.
+
+### 21.2 Parcours de délimitation
+
+1. choisir le mode de saisie des sommets ;
+2. ajouter les sommets dans l'ordre et afficher la liste ;
+3. signaler les coordonnées manquantes, répétées ou invalides ;
+4. calculer périmètre et superficie uniquement lorsque les conditions minimales sont satisfaites ;
+5. afficher la méthode et le caractère indicatif des résultats ;
+6. comparer séparément les mesures déclarées, documentaires et calculées ;
+7. conserver l'historique après correction du contour.
+
+### 21.3 Scénarios à vérifier
+
+1. saisir des coordonnées manuelles sans autoriser la géolocalisation ;
+2. refuser la permission GPS et conserver la possibilité de saisir manuellement ;
+3. enregistrer un point GPS avec la précision annoncée, sans présenter cette précision comme garantie ;
+4. tracer un contour avec trois sommets valides puis corriger un sommet ;
+5. refuser ou signaler un contour insuffisant, auto-intersecté ou contenant des coordonnées invalides ;
+6. distinguer superficie déclarée, superficie issue d'un document et superficie calculée ;
+7. relier un bâtiment et une exploitation au même Terrain sans dupliquer la fiche ni sa géométrie ;
+8. modifier une limite et conserver l'ancienne version et sa provenance ;
+9. partager une fiche sans rendre publiques ses coordonnées précises ;
+10. reprendre une saisie hors connexion et résoudre une modification concurrente sans écrasement silencieux.
+
+Ces scénarios sont des critères de validation future. Ils ne signifient pas que les tests sur appareils Android, les contrôles de sécurité ou les essais de synchronisation ont déjà été exécutés.
