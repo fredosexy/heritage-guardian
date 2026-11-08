@@ -140,6 +140,8 @@ export const fr = {
     journeyNeedsAttention: "Le dossier est créé, mais le parcours guidé n’a pas pu être initialisé. Vous pouvez continuer à consulter la fiche ; une vérification technique est nécessaire.",
     savedLocal: "Enregistré sur cet appareil",
     savedOffline: "Enregistré hors ligne — sera synchronisé automatiquement.",
+    buildingStepOne: "Étape 1 sur 2",
+    buildingStepTwo: "Étape 2 sur 2",
     buildingFormTitle: "Déclarer un bâtiment ou un bien immobilier",
     buildingFormHint: "Commencez par les informations essentielles. Vous pourrez ensuite ajouter les unités, les personnes, les documents et les événements.",
     buildingKindLabel: "Nature du bien",
