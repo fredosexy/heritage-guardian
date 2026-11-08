@@ -7,7 +7,7 @@ import { usePwa } from "./usePwa";
 type PwaNotice = "update" | "offline-ready" | "error" | null;
 
 export function PwaAssistant() {
-  const { installed, ios, online, canPromptInstall, install } = usePwa();
+  const { installed, ios, android, online, canPromptInstall, install } = usePwa();
   const [notice, setNotice] = useState<PwaNotice>(null);
   const [installMessage, setInstallMessage] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
@@ -15,7 +15,7 @@ export function PwaAssistant() {
 
   useEffect(() => subscribePwaStatus(setNotice), []);
 
-  const showInstall = !dismissed && !installed && (canPromptInstall || ios || installMessage !== null);
+  const showInstall = !dismissed && !installed && (canPromptInstall || ios || android || installMessage !== null);
   if (!showInstall && !notice) return null;
 
   const installApp = async () => {
@@ -60,7 +60,9 @@ export function PwaAssistant() {
           ) : (
             <>
               <p className="text-sm text-muted-foreground">Installez Heritis sur votre appareil pour retrouver un accès direct depuis votre écran d’accueil.</p>
-              {canPromptInstall && <Button className="w-full" onClick={() => void installApp()}><Download className="mr-2 size-4" /> Installer Heritis</Button>}
+              {canPromptInstall
+                ? <Button className="w-full" onClick={() => void installApp()}><Download className="mr-2 size-4" /> Installer Heritis</Button>
+                : android && <p className="text-sm text-muted-foreground">Ouvrez le menu du navigateur, puis choisissez « Installer l’application » ou « Ajouter à l’écran d’accueil » si cette option est proposée.</p>}
             </>
           )}
           {installMessage && <p role="status" className="text-xs text-muted-foreground">{installMessage}</p>}
