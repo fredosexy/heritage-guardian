@@ -63,6 +63,20 @@ jobs:
       # Clear setup-cli's GHCR override to allow cross-registry fallback.
       - name: Enable Supabase registry fallbacks
         run: echo 'SUPABASE_INTERNAL_IMAGE_REGISTRY=' >> "$GITHUB_ENV"
+      - name: Clean up stale local Supabase containers and inspect the database port
+        shell: bash
+        run: |
+          set -euo pipefail
+          # A previous or partially initialized local stack must not retain
+          # Supabase's default database port on this runner.
+          supabase stop --no-backup || true
+          if ss -ltnp | grep -q ':54322'; then
+            echo "Port 54322 is still occupied after Supabase cleanup:"
+            ss -ltnp | grep ':54322' || true
+            echo "Docker containers publishing port 54322:"
+            docker ps --filter publish=54322 --format '{{.ID}} {{.Names}} {{.Ports}}' || true
+            exit 1
+          fi
       - name: Start isolated local Supabase stack
         run: supabase start
       - name: Reset database and prepare local Edge environment
