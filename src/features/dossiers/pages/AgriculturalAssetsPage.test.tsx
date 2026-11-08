@@ -57,7 +57,7 @@ it("creates an agricultural declaration with its selected family and declared de
     type: "agricole",
     title: "Plantation cacao",
     locationName: "Littoral",
-    metadata: { agriculturalRural: expect.objectContaining({ family: "plantation", declaredDetails: "Plantation familiale", familyDetails: { cropType: "Cacao", declaredArea: "2" }, source: "declarant" }) },
+    metadata: { agriculturalRural: expect.objectContaining({ family: "plantation", declaredDetails: "Plantation familiale", familyDetails: { cropType: "Cacao", declaredArea: 2 }, source: "declarant" }) },
   })));
   expect(mocks.navigate).toHaveBeenCalledWith("/dossiers/new-farm");
 });
