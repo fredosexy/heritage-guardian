@@ -51,6 +51,10 @@ jobs:
   edge-integration:
     runs-on: ubuntu-latest
     needs: database-migrations
+    # Keep Edge integration isolated from the default PostgreSQL port used by
+    # other local Supabase stacks on shared/self-hosted runners.
+    env:
+      SUPABASE_DB_PORT: 55432
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -70,11 +74,11 @@ jobs:
           # A previous or partially initialized local stack must not retain
           # Supabase's default database port on this runner.
           supabase stop --no-backup || true
-          if ss -ltnp | grep -q ':54322'; then
-            echo "Port 54322 is still occupied after Supabase cleanup:"
-            ss -ltnp | grep ':54322' || true
-            echo "Docker containers publishing port 54322:"
-            docker ps --filter publish=54322 --format '{{.ID}} {{.Names}} {{.Ports}}' || true
+          if ss -ltnp | grep -q ':55432'; then
+            echo "Port 55432 is still occupied after Supabase cleanup:"
+            ss -ltnp | grep ':55432' || true
+            echo "Docker containers publishing port 55432:"
+            docker ps --filter publish=55432 --format '{{.ID}} {{.Names}} {{.Ports}}' || true
             exit 1
           fi
       - name: Start isolated local Supabase stack
