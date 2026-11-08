@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { AgriculturalFamilyFields } from "./AgriculturalFamilyFields";
 
 const FAMILIES = ["exploitation", "plantation", "elevage", "equipement", "infrastructure", "autre"] as const;
 type Family = typeof FAMILIES[number];
@@ -36,6 +37,7 @@ export default function AgriculturalAssetsPage() {
   const [description, setDescription] = useState("");
   const [locality, setLocality] = useState("");
   const [specifics, setSpecifics] = useState("");
+  const [familyDetails, setFamilyDetails] = useState<Record<string, string>>({});
 
   const assets = useMemo(() => dossiers.filter((item) => item.type === "agricole"), [dossiers]);
   const filtered = useMemo(() => {
@@ -56,6 +58,7 @@ export default function AgriculturalAssetsPage() {
     setDescription("");
     setLocality("");
     setSpecifics("");
+    setFamilyDetails({});
   };
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -72,6 +75,7 @@ export default function AgriculturalAssetsPage() {
             version: 1,
             family,
             declaredDetails: specifics.trim() || null,
+            familyDetails: Object.fromEntries(Object.entries(familyDetails).filter(([, value]) => value.trim() !== "")),
             declarationStatus: "declare",
             source: "declarant",
           },
@@ -110,7 +114,7 @@ export default function AgriculturalAssetsPage() {
           <section className="card-soft space-y-4 p-4 sm:p-5">
             <div>
               <Label htmlFor="agricultural-family">{t("agricultural.family")}</Label>
-              <select id="agricultural-family" value={family} onChange={(event) => { setFamily(event.target.value as Family); setSpecifics(""); }} className="mt-1.5 min-h-12 w-full rounded-2xl border border-input bg-background px-3 text-sm">
+              <select id="agricultural-family" value={family} onChange={(event) => { setFamily(event.target.value as Family); setSpecifics(""); setFamilyDetails({}); }} className="mt-1.5 min-h-12 w-full rounded-2xl border border-input bg-background px-3 text-sm">
                 {FAMILIES.map((value) => <option key={value} value={value}>{t("agricultural.families." + value)}</option>)}
               </select>
             </div>
@@ -122,6 +126,7 @@ export default function AgriculturalAssetsPage() {
               <Label htmlFor="agricultural-description">{t("agricultural.description")}</Label>
               <Textarea id="agricultural-description" rows={3} value={description} onChange={(event) => setDescription(event.target.value)} placeholder={t("agricultural.descriptionPlaceholder")} className="mt-1.5 rounded-2xl" />
             </div>
+            <AgriculturalFamilyFields family={family} value={familyDetails} onChange={setFamilyDetails} />
             <div>
               <Label htmlFor="agricultural-specifics">{t("agricultural.specificsLabel")}</Label>
               <Textarea id="agricultural-specifics" rows={3} value={specifics} onChange={(event) => setSpecifics(event.target.value)} placeholder={t("agricultural.specifics." + family)} className="mt-1.5 rounded-2xl" />
