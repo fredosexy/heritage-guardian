@@ -47,4 +47,10 @@ describe("usePwa", () => {
     act(() => window.dispatchEvent(new Event("online")));
     expect(result.current.online).toBe(true);
   });
+  it("detects iOS devices for the manual home-screen installation flow", () => {
+    Object.defineProperty(navigator, "userAgent", { configurable: true, value: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)" });
+    const { result } = renderHook(() => usePwa());
+    expect(result.current.ios).toBe(true);
+    expect(result.current.canPromptInstall).toBe(false);
+  });
 });
