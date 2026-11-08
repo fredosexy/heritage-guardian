@@ -132,6 +132,230 @@ export type Database = {
           },
         ]
       }
+      building_events: {
+        Row: {
+          building_dossier_id: string
+          created_at: string
+          description: string | null
+          event_type: string
+          id: string
+          metadata: Json
+          occurred_on: string | null
+          parties_statements: Json
+          title: string
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          building_dossier_id: string
+          created_at?: string
+          description?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json
+          occurred_on?: string | null
+          parties_statements?: Json
+          title: string
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          building_dossier_id?: string
+          created_at?: string
+          description?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json
+          occurred_on?: string | null
+          parties_statements?: Json
+          title?: string
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "building_events_building_dossier_id_fkey"
+            columns: ["building_dossier_id"]
+            isOneToOne: false
+            referencedRelation: "building_properties"
+            referencedColumns: ["dossier_id"]
+          },
+          {
+            foreignKeyName: "building_events_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "building_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      building_person_relations: {
+        Row: {
+          building_dossier_id: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          declaration_status: string
+          declared_role: string
+          id: string
+          metadata: Json
+          person_name: string
+          relation_notes: string | null
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          building_dossier_id: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          declaration_status?: string
+          declared_role: string
+          id?: string
+          metadata?: Json
+          person_name: string
+          relation_notes?: string | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          building_dossier_id?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          declaration_status?: string
+          declared_role?: string
+          id?: string
+          metadata?: Json
+          person_name?: string
+          relation_notes?: string | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "building_person_relations_building_dossier_id_fkey"
+            columns: ["building_dossier_id"]
+            isOneToOne: false
+            referencedRelation: "building_properties"
+            referencedColumns: ["dossier_id"]
+          },
+          {
+            foreignKeyName: "building_person_relations_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "building_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      building_properties: {
+        Row: {
+          address_description: string | null
+          administrative_references: Json
+          created_at: string
+          declared_surface: number | null
+          dossier_id: string
+          locality: string | null
+          metadata: Json
+          parent_terrain_dossier_id: string | null
+          property_kind: string
+          surface_unit: string
+          updated_at: string
+        }
+        Insert: {
+          address_description?: string | null
+          administrative_references?: Json
+          created_at?: string
+          declared_surface?: number | null
+          dossier_id: string
+          locality?: string | null
+          metadata?: Json
+          parent_terrain_dossier_id?: string | null
+          property_kind: string
+          surface_unit?: string
+          updated_at?: string
+        }
+        Update: {
+          address_description?: string | null
+          administrative_references?: Json
+          created_at?: string
+          declared_surface?: number | null
+          dossier_id?: string
+          locality?: string | null
+          metadata?: Json
+          parent_terrain_dossier_id?: string | null
+          property_kind?: string
+          surface_unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "building_properties_dossier_id_fkey"
+            columns: ["dossier_id"]
+            isOneToOne: true
+            referencedRelation: "dossiers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "building_properties_parent_terrain_dossier_id_fkey"
+            columns: ["parent_terrain_dossier_id"]
+            isOneToOne: false
+            referencedRelation: "dossiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      building_units: {
+        Row: {
+          building_dossier_id: string
+          created_at: string
+          declared_surface: number | null
+          description: string | null
+          designation: string
+          id: string
+          metadata: Json
+          occupancy_status: string
+          surface_unit: string
+          unit_kind: string
+          updated_at: string
+        }
+        Insert: {
+          building_dossier_id: string
+          created_at?: string
+          declared_surface?: number | null
+          description?: string | null
+          designation: string
+          id?: string
+          metadata?: Json
+          occupancy_status?: string
+          surface_unit?: string
+          unit_kind: string
+          updated_at?: string
+        }
+        Update: {
+          building_dossier_id?: string
+          created_at?: string
+          declared_surface?: number | null
+          description?: string | null
+          designation?: string
+          id?: string
+          metadata?: Json
+          occupancy_status?: string
+          surface_unit?: string
+          unit_kind?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "building_units_building_dossier_id_fkey"
+            columns: ["building_dossier_id"]
+            isOneToOne: false
+            referencedRelation: "building_properties"
+            referencedColumns: ["dossier_id"]
+          },
+        ]
+      }
       dossier_steps: {
         Row: {
           blocked_reason: string | null
