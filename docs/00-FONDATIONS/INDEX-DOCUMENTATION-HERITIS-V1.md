@@ -41,6 +41,7 @@ Ordre de lecture recommandé :
 | 2. Bâtiments et biens immobiliers | [Spécification fonctionnelle V1](../01-DOMAINES/BUILDINGS-AND-REAL-ESTATE-FUNCTIONAL-SPEC-V1.md) | Déclaration, documentation, gestion patrimoniale, relations, transmission et différends relatifs aux bâtiments et biens immobiliers. |
 | 3. Biens agricoles et ruraux | [Spécification fonctionnelle V1](../01-DOMAINES/AGRICULTURAL-AND-RURAL-ASSETS-FUNCTIONAL-SPEC-V1.md) | Exploitations, plantations, élevages, équipements et installations rurales ; documentation, gestion patrimoniale et transmission. |
 | 4. Biens mobiliers | [Spécification fonctionnelle V1](../01-DOMAINES/MOVABLE-ASSETS-FUNCTIONAL-SPEC-V1.md) | Déclarer, identifier, documenter, sécuriser et suivre les biens mobiliers, leurs relations déclarées, leurs pièces et leur historique. |
+| 5. Biens financiers et droits patrimoniaux | [Spécification fonctionnelle V1](../01-DOMAINES/FINANCIAL-ASSETS-AND-PATRIMONIAL-RIGHTS-FUNCTIONAL-SPEC-V1.md) | Déclarer, documenter et suivre les actifs financiers et droits patrimoniaux, avec confidentialité renforcée et préparation de la transmission. |
 
 Les documents de sous-domaines détaillent les parcours du domaine Patrimoine sans créer de nouveaux domaines métier. Leur périmètre reste subordonné aux principes et limites du document général Patrimoine V1.
 
