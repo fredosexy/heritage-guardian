@@ -80,7 +80,7 @@ export function BuildingCreateForm({ onBack }: { onBack: () => void }) {
         </div>
       </header>
 
-      <div className="mb-5 flex items-center gap-2" aria-label={step === 1 ? "Étape 1 sur 2" : "Étape 2 sur 2"}>
+      <div className="mb-5 flex items-center gap-2" aria-label={t(step === 1 ? "create.buildingStepOne" : "create.buildingStepTwo")}>
         <span className="h-1.5 flex-1 rounded-full bg-primary" />
         <span className={"h-1.5 flex-1 rounded-full " + (step === 2 ? "bg-primary" : "bg-muted")} />
         <span className="text-xs text-muted-foreground">{step}/2</span>
@@ -105,7 +105,7 @@ export function BuildingCreateForm({ onBack }: { onBack: () => void }) {
             <Textarea id="building-description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("create.descPlaceholder")} rows={3} className="mt-1.5 rounded-2xl" />
           </div>
           <Button type="button" disabled={!title.trim()} onClick={() => setStep(2)} className="w-full min-h-12 rounded-2xl">
-            Continuer <ChevronRight className="size-4 ml-2" />
+            {t("firstStep.continue")} <ChevronRight className="size-4 ml-2" />
           </Button>
         </section>
       ) : (
