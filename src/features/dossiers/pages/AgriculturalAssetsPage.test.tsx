@@ -19,7 +19,7 @@ vi.mock("../hooks/useDossiers", () => ({ useDossiers: () => ({ dossiers: mocks.d
 vi.mock("../hooks/useCreateDossier", () => ({ useCreateDossier: () => ({ create: mocks.create, saving: false }) }));
 vi.mock("@/features/shell", () => ({
   AppLayout: ({ children }: { children: ReactNode }) => <main>{children}</main>,
-  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
+  PageHeader: ({ title, right }: { title: string; right?: ReactNode }) => <header><h1>{title}</h1>{right}</header>,
   EmptyState: ({ title }: { title: string }) => <h2>{title}</h2>,
 }));
 vi.mock("@/components/ui/button", () => ({ Button: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => <button {...props}>{children}</button> }));
@@ -40,4 +40,22 @@ it("shows only agricultural assets and filters by family", () => {
   fireEvent.click(screen.getByRole("button", { name: "agricultural.families.plantation" }));
   expect(screen.getByText("Plantation cacao")).toBeTruthy();
   expect(screen.queryByText("Exploitation familiale")).toBeNull();
+});
+
+it("creates an agricultural declaration with its selected family and declared details", async () => {
+  mocks.create.mockResolvedValue({ mode: "online", id: "new-farm", journeyStatus: "procedure_unavailable" });
+  render(<AgriculturalAssetsPage />);
+  fireEvent.click(screen.getByRole("button", { name: /agricultural.create/ }));
+  fireEvent.change(screen.getByLabelText("agricultural.family"), { target: { value: "plantation" } });
+  fireEvent.change(screen.getByLabelText("agricultural.designation"), { target: { value: "Plantation cacao" } });
+  fireEvent.change(screen.getByLabelText("agricultural.specificsLabel"), { target: { value: "Cacao, 2 hectares déclarés" } });
+  fireEvent.change(screen.getByLabelText("agricultural.location"), { target: { value: "Littoral" } });
+  fireEvent.click(screen.getByRole("button", { name: "agricultural.save" }));
+  await vi.waitFor(() => expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({
+    type: "agricole",
+    title: "Plantation cacao",
+    location_name: "Littoral",
+    metadata: { agriculturalRural: expect.objectContaining({ family: "plantation", declaredDetails: "Cacao, 2 hectares déclarés", source: "declarant" }) },
+  })));
+  expect(mocks.navigate).toHaveBeenCalledWith("/dossiers/new-farm");
 });
