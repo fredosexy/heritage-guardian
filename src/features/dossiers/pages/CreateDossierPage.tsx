@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useCreateDossier } from "../hooks/useCreateDossier";
 import { DOSSIER_TYPES, typeLabelKey } from "../components/dossierTypeMeta";
 import { BuildingCreateForm } from "./BuildingCreateForm";
+import { TerrainGeoFields, type TerrainGeospatialData } from "../components/TerrainGeoFields";
 
 type TerrainSections = {
   histoire: string;
@@ -61,6 +62,7 @@ export default function CreateDossierPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [sections, setSections] = useState<TerrainSections>(emptyTerrain);
+  const [geospatial, setGeospatial] = useState<TerrainGeospatialData>({ boundaryPoints: [] });
   const [openSection, setOpenSection] = useState<(typeof sectionKeys)[number] | null>("histoire");
   const { create, saving } = useCreateDossier();
 
@@ -76,12 +78,15 @@ export default function CreateDossierPage() {
         title: title.trim(),
         description,
         location_name: sections.localisation || undefined,
+        latitude: type === "terrain" ? geospatial.point?.latitude ?? null : null,
+        longitude: type === "terrain" ? geospatial.point?.longitude ?? null : null,
         metadata:
           type === "terrain"
             ? {
                 terrain: {
-                  version: 1,
+                  version: 2,
                   sections,
+                  geospatial,
                 },
               }
             : {},
@@ -177,6 +182,8 @@ export default function CreateDossierPage() {
           <Label htmlFor="desc" className="block mt-4">{t("create.descLabel")}</Label>
           <Textarea id="desc" value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("create.descPlaceholder")} rows={3} className="rounded-2xl border-border/70 bg-background/70 focus-visible:ring-2 focus-visible:ring-ring mt-1.5" />
         </section>
+
+        <TerrainGeoFields value={geospatial} onChange={setGeospatial} />
 
         <div className="space-y-2">
           {sectionKeys.map((key, index) => {
