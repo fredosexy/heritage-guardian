@@ -7,7 +7,8 @@ const mocks = vi.hoisted(() => ({
   create: vi.fn(),
   dossiers: [
     { id: "farm-1", type: "agricole", title: "Exploitation familiale", status: "incomplete", locationName: "Centre", metadata: { agriculturalRural: { family: "exploitation" } }, local: false },
-    { id: "plant-1", type: "agricole", title: "Plantation cacao", status: "secure", locationName: "Littoral", metadata: { agriculturalRural: { family: "plantation" } }, local: false },
+    { id: "plant-1", type: "agricole", title: "Plantation cacao", status: "secure", description: "",
+    location_name: "Littoral", metadata: { agriculturalRural: { family: "plantation" } }, local: false },
     { id: "land-1", type: "terrain", title: "Terrain", status: "secure", locationName: "Centre", metadata: {}, local: false },
   ],
 }));
@@ -57,7 +58,7 @@ it("creates an agricultural declaration with its selected family and declared de
     type: "agricole",
     title: "Plantation cacao",
     locationName: "Littoral",
-    metadata: { agriculturalRural: expect.objectContaining({ family: "plantation", declaredDetails: "Plantation familiale", familyDetails: { cropType: "Cacao", declaredArea: 2 }, source: "declarant" }) },
+    metadata: { agriculturalRural: { version: 1, family: "plantation", declaredDetails: "Plantation familiale", familyDetails: { cropType: "Cacao", declaredArea: 2 }, declarationStatus: "declare", source: "declarant" } },
   })));
   expect(mocks.navigate).toHaveBeenCalledWith("/dossiers/new-farm");
 });
