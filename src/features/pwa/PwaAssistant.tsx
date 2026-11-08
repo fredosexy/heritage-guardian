@@ -26,7 +26,7 @@ export function PwaAssistant() {
     };
   }, []);
 
-  const showInstall = !installed && (canPromptInstall || ios);
+  const showInstall = !installed && (canPromptInstall || ios || installMessage !== null);
   if (!showInstall && !notice) return null;
 
   const installApp = async () => {
