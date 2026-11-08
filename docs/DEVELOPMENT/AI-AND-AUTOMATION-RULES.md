@@ -386,7 +386,8 @@ Règles opérationnelles :
 
 L'assistant doit s'intégrer à l'expérience adaptative de Heritis sans prendre le contrôle de la navigation.
 
-- Le visiteur sans compte bénéficie d'une découverte et d'explications, pas d'un accès aux fonctions protégées.
+- Le visiteur sans compte bénéficie de la découverte, des explications et d'un aperçu conversationnel guidé uniquement ; la conversation complète exige un compte authentifié et une session valide.
+- Dès qu'une personne communique un prénom ou un nom (l'un ou l'autre suffit), elle est reconnue dans le parcours, sans que cela lui confère une authentification ou un droit d'accès.
 - L'assistant explique clairement les possibilités disponibles selon le statut réel de la personne.
 - Il distingue visiteur, personne reconnue et utilisateur inscrit, sans inférer des droits à partir du prénom ou du nom.
 - L'interface indique lorsqu'une réponse est générée par IA.
