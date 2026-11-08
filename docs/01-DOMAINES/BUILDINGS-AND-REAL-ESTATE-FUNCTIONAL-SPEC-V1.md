@@ -11,7 +11,7 @@
 
 ## 1. Finalité et limites
 
-Ce parcours permet à une personne autorisée de créer, décrire, documenter, localiser et suivre un bâtiment ou un ensemble immobilier, ainsi que les relations déclarées entre ce bien, les personnes, les terrains et les autres dossiers Heritis.
+Ce parcours permet à une personne autorisée de déclarer un bâtiment ou un bien immobilier, de le sécuriser par la conservation des informations et preuves disponibles, de le documenter et d'en organiser la gestion patrimoniale. Il permet aussi d'identifier les personnes et ayants droit déclarés, de préparer la transmission du bien et de documenter les désaccords ou différends qui le concernent (voisinage, occupation, vente, achat ou location).
 
 Heritis est un outil d'organisation et de traçabilité. Il ne constitue ni un service cadastral, ni une autorité foncière, ni un notaire, ni un tribunal, ni un expert immobilier. Une fiche, un document téléversé, une mesure, un rapprochement ou un statut interne ne certifie jamais un titre, une propriété, une superficie officielle, une conformité technique ou un droit juridiquement établi.
 
@@ -27,17 +27,16 @@ Aucune distribution automatique de droits, quote-part, succession ou valeur juri
 ## 2. Périmètre fonctionnel V1
 
 Le parcours couvre :
-- maisons et logements individuels ;
-- immeubles résidentiels ;
-- appartements et unités d'habitation lorsqu'ils sont gérés comme éléments distincts ;
-- bâtiments commerciaux, professionnels, administratifs ou mixtes ;
-- bâtiments agricoles ou de stockage lorsqu'ils sont inventoriés comme constructions ;
-- dépendances et annexes : garage, hangar, magasin, atelier, entrepôt, clôture bâtie ou autre construction déclarée ;
-- bâtiments en construction, inachevés, achevés, dégradés ou démolis, avec conservation de leur historique.
+- maisons, logements individuels et immeubles ;
+- appartements, boutiques, bureaux et autres unités lorsqu'ils sont gérés séparément ;
+- bâtiments commerciaux, professionnels, administratifs, agricoles ou mixtes ;
+- dépendances et autres constructions déclarées.
 
-La catégorie « bâtiment » décrit une construction. Elle ne remplace pas la catégorie « terrain ». Un même terrain peut porter plusieurs bâtiments ; un bâtiment peut être composé de plusieurs unités ou locaux ; une unité peut être suivie séparément si le besoin et les droits d'accès le justifient.
+La catégorie « bâtiment » décrit le bien immobilier déclaré et ne remplace pas la catégorie « terrain ». En V1, un bâtiment peut être rattaché à un seul terrain connu ou rester sans rattachement. Le suivi séparé des unités pertinentes est conservé, sans présumer de leur indépendance juridique.
 
-Hors périmètre V1 tant qu'ils ne sont pas spécifiquement validés : expertise immobilière certifiée, estimation automatisée de marché, calcul juridique de propriété, titre foncier électronique officiel, gestion locative complète, comptabilité immobilière, plans architecturaux CAO, diagnostic structurel, permis de construire automatisé ou démarches administratives exécutées au nom de l'utilisateur.
+La V1 se concentre sur la déclaration du bien, son identification, la conservation des preuves, les relations entre personnes et bien, la gestion des occupations, ventes et locations, la préparation de la transmission et le suivi documentaire des différends.
+
+Sont reportés aux versions futures : description technique détaillée des matériaux, structures, fondations, toitures et équipements ; diagnostic de sécurité ou d'habitabilité ; expertise technique ; plans architecturaux détaillés ; estimation automatisée de marché ; gestion locative complète et comptabilité immobilière ; exécution de démarches administratives au nom de l'utilisateur.
 
 ## 3. Modèle métier et distinctions fondamentales
 
@@ -122,28 +121,17 @@ Champs minimaux :
 
 La désignation peut être provisoire. Le système ne doit pas inventer une adresse ou un identifiant lorsque l'information manque.
 
-### Étape 2 — Identifier et caractériser
+### Étape 2 — Identifier le bien
 
-Choisir une catégorie :
-- maison / logement individuel ;
-- immeuble résidentiel ;
-- appartement / unité ;
-- bâtiment commercial ou professionnel ;
-- bâtiment à usage mixte ;
-- bâtiment agricole ou de stockage ;
-- dépendance / annexe ;
-- autre construction (préciser).
+Renseigner uniquement les informations utiles à son identification et à son suivi :
+- désignation ou nom usuel du bien ;
+- catégorie générale : maison, immeuble, appartement, boutique, bureau, bâtiment commercial, bâtiment mixte, dépendance ou autre ;
+- usage déclaré, si connu ;
+- adresse, quartier, localité ou description permettant de le retrouver ;
+- statut général déclaré : en projet, en construction, existant, inoccupé, occupé, en travaux ou démoli ;
+- description courte facultative et nombre d'unités lorsque cela aide à identifier l'ensemble.
 
-Renseigner si connu :
-- usage principal et usages secondaires ;
-- statut physique : projet, en construction, inachevé, achevé, occupé, vacant, dégradé, sinistré, en rénovation, démoli ;
-- nombre de niveaux au-dessus du sol et niveaux en sous-sol, sans imposer une valeur si inconnue ;
-- nombre d'unités ou de locaux, si pertinent ;
-- matériaux principaux, structure et couverture, sous forme de déclarations descriptives ;
-- année ou période de construction, avec possibilité « inconnue » et indication de la source ;
-- description libre et caractéristiques utiles.
-
-Les listes de choix doivent rester compréhensibles et permettre « autre » et « inconnu ». Ne pas transformer une absence de réponse en valeur négative.
+Les détails techniques (matériaux, structure, toiture, équipements, diagnostic et état technique détaillé) ne font pas partie du parcours V1. Les champs inconnus restent explicitement inconnus ; aucune caractéristique ne doit être déduite automatiquement.
 
 ### Étape 3 — Localiser
 
@@ -179,32 +167,34 @@ Pour chaque mesure :
 
 Ne jamais additionner des surfaces de nature différente. Ne pas déduire une surface habitable à partir de l'emprise au sol ou d'un nombre de niveaux. Les calculs automatiques sont indicatifs, explicitement nommés et ne remplacent pas un relevé professionnel. Aucune surface ne doit être qualifiée d'officielle sans référence externe vérifiable et correctement attribuée.
 
-### Étape 5 — Décrire l'état, l'occupation et les équipements
+### Étape 5 — Suivre l'occupation et la gestion courante
 
-Informations déclaratives facultatives :
-- état général : très bon, bon, moyen, dégradé, dangereux déclaré, en travaux, inconnu ;
-- éléments observés : toiture, murs, fondations apparentes, ouvertures, installations, finitions ;
-- présence déclarée d'eau, électricité, assainissement, accès routier et autres équipements ;
-- situation d'occupation : occupé par le déclarant, membres de la famille, locataire, tiers, vacant, usage mixte, inconnue ;
-- dates de début et de fin d'occupation si elles sont utiles et connues ;
-- commentaire et pièces associées.
+Enregistrer les informations de gestion utiles, selon les besoins :
+- bien occupé, vacant ou utilisé par plusieurs personnes ;
+- personnes qui occupent le bien et qualité déclarée (membre de famille, occupant, locataire, gardien, gestionnaire ou autre) ;
+- période d'occupation connue ;
+- contrat ou accord de location, vente, mise à disposition ou gestion lorsqu'il existe ;
+- loyers, dépôts, échéances ou paiements uniquement si le suivi correspondant est activé et validé dans le périmètre fonctionnel ;
+- événements de remise des clés, entrée, sortie, remise en état ou fin d'accord.
 
-Ne pas produire de diagnostic de sécurité, d'habitabilité ou de conformité technique sur la seule base d'une déclaration ou de photos. Les situations dangereuses doivent être présentées comme des signalements à faire évaluer par un professionnel compétent.
+La V1 permet de documenter les relations et événements de gestion ; elle ne constitue pas un logiciel complet de gestion locative ni un service de recouvrement. Aucune occupation ou transaction déclarée ne vaut reconnaissance juridique automatique.
 
-### Étape 6 — Associer les personnes et organisations
+### Étape 6 — Identifier les personnes liées et les ayants droit déclarés
 
-Une fiche peut être liée à plusieurs personnes ou organisations. Chaque relation est indépendante et peut contenir :
-- personne / organisation liée ;
-- rôle déclaré : propriétaire déclaré, copropriétaire déclaré, détenteur / possesseur, bénéficiaire d'un droit déclaré, représentant, gestionnaire, occupant, locataire, mandataire ou autre rôle documenté ;
-- description libre de la portée du rôle ;
-- période de validité déclarée ;
-- source de l'information et personne ayant effectué la déclaration ;
-- documents associés ;
-- niveau de vérification interne et historique des corrections.
+Une fiche peut être liée à plusieurs personnes ou organisations, avec des relations distinctes et datées :
+- propriétaire ou copropriétaire déclaré ;
+- détenteur ou possesseur déclaré ;
+- bénéficiaire d'un droit déclaré ;
+- représentant, mandataire ou gestionnaire ;
+- occupant, locataire ou acquéreur déclaré ;
+- héritier ou ayant droit potentiel/déclaré ;
+- voisin ou autre personne concernée par une limite, un accès ou un différend.
 
-Les rôles d'occupation, de gestion ou de location ne doivent pas être assimilés à un droit de propriété. Les rôles déclarés ne sont pas des statuts juridiques automatiquement confirmés. Ne pas calculer ni attribuer automatiquement des quotes-parts.
+Pour chaque relation, conserver sa nature, sa portée déclarée, sa période, sa source, les documents associés et son historique. Identifier un ayant droit dans Heritis ne signifie pas que sa qualité successorale est juridiquement établie. Les droits, parts et qualités successorales ne sont pas calculés ou confirmés automatiquement.
 
-L'accès à la fiche, la capacité de modifier les données et la relation déclarée au bien sont trois notions distinctes. Les permissions doivent être gérées selon le modèle transversal des profils et accès Heritis, et non déduites du seul rôle métier.
+Les informations de succession et de legs doivent être reliées au domaine « Héritage et succession » et, lorsque cela est pertinent, au domaine « Volontés secrètes et dernières volontés ». La fiche immobilière conserve le lien avec le bien et les personnes concernées sans remplacer le dossier successoral, un testament ou les formalités applicables.
+
+L'accès à la fiche, la capacité de modifier les données et la relation déclarée au bien sont trois notions distinctes. Les permissions sont gérées selon les règles transversales Heritis.
 
 ### Étape 7 — Ajouter les documents et preuves
 
@@ -234,19 +224,31 @@ Pour chaque pièce, conserver lorsque disponible :
 
 Un fichier lisible ou marqué « vérifié » par un contrôle interne n'est pas une authentification juridique de son contenu. Ne pas afficher « titre valide » ou « propriété certifiée » sur la base d'un dépôt ou d'un contrôle automatique.
 
-### Étape 8 — Historique et événements
+### Étape 8 — Documenter les ventes, achats, locations et transmissions
 
-Permettre d'enregistrer des événements datés :
-- construction / début et fin déclarés ;
-- acquisition ou transmission déclarée ;
-- extension, rénovation, transformation ou changement d'usage ;
-- création ou division d'unités ;
-- occupation ou libération ;
-- sinistre, dégradation ou démolition ;
-- expertise ou intervention professionnelle ;
-- correction d'une information antérieure.
+Conserver les événements et pièces relatifs à :
+- vente ou achat déclaré, promesse ou accord préparatoire ;
+- changement de personne se présentant comme acquéreur ou vendeur ;
+- location, renouvellement, modification ou fin d'un contrat ;
+- remise ou restitution des clés ;
+- donation, legs annoncé ou transmission déclarée ;
+- décès signalé et ouverture d'un suivi successoral, avec accès restreint ;
+- contestation, opposition ou désaccord signalé sur une transaction ou une occupation.
 
-Chaque événement conserve son auteur, sa date, sa description, sa source et ses pièces. Une correction ne doit pas écraser silencieusement la valeur précédente.
+Pour chaque événement, préciser qui a fait la déclaration, à quelle date, sur quelle base et avec quelles pièces. Plusieurs versions ou déclarations contradictoires doivent pouvoir coexister avec leur provenance ; ne pas écraser une déclaration antérieure ni désigner automatiquement une partie comme titulaire du droit.
+
+### Étape 9 — Documenter les différends et échanges
+
+Prévoir un dossier ou un signalement lié au bien pour organiser notamment :
+- désaccord de voisinage ;
+- contestation de limite, passage, accès ou occupation ;
+- plainte ou désaccord concernant des nuisances ou dégradations ;
+- contestation entre vendeur, acheteur, propriétaire déclaré, locataire, occupant ou gestionnaire ;
+- désaccord sur un contrat, une remise de clés, un paiement ou la libération du bien.
+
+Le suivi peut contenir les personnes concernées, les faits allégués par chaque partie, une chronologie, les échanges, les pièces, les témoins déclarés, les démarches entreprises et les suites connues. Les informations contradictoires restent attribuées à leur auteur et ne sont pas fusionnées en une version réputée vraie.
+
+Heritis aide à conserver et organiser les éléments, à suivre les actions et à orienter vers un professionnel ou une autorité compétente lorsque nécessaire. Il ne mène pas d'enquête coercitive, ne convoque pas les parties, ne tranche pas le différend, ne fixe pas une limite officielle et ne rend aucune décision juridique. Toute médiation éventuelle doit être explicitement cadrée, volontaire et distincte d'une décision officielle.
 
 ### Étape 9 — Vérifier et enregistrer
 
@@ -371,22 +373,22 @@ Aucun critère ne doit être marqué réussi sans preuve de test correspondante.
 
 ## 11. Découpage de réalisation recommandé
 
-1. **Lot A — Modèle et audit technique :** vérifier les entités, métadonnées, permissions, RLS, synchronisation et données existantes ; proposer un modèle cible sans migration prématurée.
-2. **Lot B — Création et identification :** formulaire progressif, catégories de bâtiments, descriptions et sauvegarde sûre.
-3. **Lot C — Localisation et surfaces :** adresse, GPS, rattachement au terrain, mesures différenciées et provenance.
-4. **Lot D — Personnes, unités et occupation :** relations multiples, unités, accès et occupation.
-5. **Lot E — Documents et historique :** pièces, événements, corrections et traçabilité.
+1. **Lot A — Audit et modèle :** vérifier les entités, relations, permissions, RLS, synchronisation et données existantes ; proposer un modèle cible sans migration prématurée.
+2. **Lot B — Déclaration et sécurisation :** identification minimale du bien, rattachement facultatif à un terrain, sauvegarde, accès et protection des informations.
+3. **Lot C — Personnes et gestion :** rôles déclarés, unités, occupants, locataires, acquéreurs, gestionnaires et événements de gestion.
+4. **Lot D — Documentation et transmission :** pièces, historique, ayants droit déclarés et liens avec les domaines succession et volontés.
+5. **Lot E — Différends :** signalements, chronologie contradictoire, échanges, preuves et orientation sans arbitrage.
 6. **Lot F — Fiche détaillée et qualité :** consultation, actions, accessibilité, mode hors connexion, sécurité et non-régression.
 
 Chaque lot doit être audité, testé et documenté sur GitHub avant le suivant. Ne pas modifier Lovable. Ne pas fusionner une PR sans validation explicite.
 
-## 12. Questions à trancher avant le développement
+## 12. Points à valider avant développement
 
-Les points suivants doivent être confirmés à la revue métier et technique :
-- quel niveau de détail est réellement utile pour les matériaux, équipements et états sans transformer Heritis en outil de diagnostic technique ?
-- quelles catégories de documents et de relations doivent être obligatoires ou facultatives selon le type de bâtiment ?
+- Le périmètre exact du suivi financier des locations (loyers, dépôts, échéances et paiements) doit être confirmé avant d'en faire une fonctionnalité complète.
+- Les règles de partage d'un dossier de différend entre plusieurs parties doivent être cadrées avec des permissions strictes, car chaque partie peut fournir des informations contradictoires ou confidentielles.
+- Les modalités d'orientation, de médiation volontaire ou de transfert vers un professionnel/une autorité doivent être définies sans présenter Heritis comme arbitre.
 
-Ces questions ne bloquent pas la spécification du parcours de base, mais doivent être résolues avant de figer le schéma de données et les validations métier.
+Les caractéristiques techniques détaillées du bâtiment et les diagnostics sont reportés aux versions futures et ne constituent pas des questions bloquantes de la V1.
 
 ---
 
