@@ -1,3 +1,10 @@
+> **ARCHIVE HISTORIQUE — NON EXÉCUTABLE EN L'ÉTAT**  
+> Ce document conserve des idées et hypothèses datées du 21 août 2026. Il ne constitue pas une spécification approuvée ni une autorisation de réalisation. Plusieurs éléments peuvent être incomplets, dépassés ou incompatibles avec les décisions produit ultérieures.  
+> Avant toute utilisation, lire [le référentiel Lovable](README.md), [la conduite opérationnelle](CONDUITE-OPERATIONNELLE.md), [les portes d'acceptation](PORTES-ACCEPTATION.md) et [le plan V1 actuel](PLAN-DE-TRAVAIL-HERITIS-V1.md).  
+> Aucune proposition de ce document ne peut être appliquée sans audit de l'existant, vérification des règles actuelles et validation explicite lorsque nécessaire. En cas de contradiction, les règles permanentes du dépôt et les décisions produit validées prévalent.
+
+---
+
 # Plan — Refonte Mémoire (13 parties)
 
 App de sécurisation du patrimoine africain (terres, héritages, volontés, savoirs).
