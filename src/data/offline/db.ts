@@ -41,7 +41,7 @@ export interface SyncConflict {
 export interface CachedDossier {
   id: string;
   user_id: string;
-  viewer_user_id?: string;
+  viewer_user_id: string;
   data: Json | Record<string, unknown>;
   cached_at: number;
 }
