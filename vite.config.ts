@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => ({
         // The activation hook removes the legacy private cache at the actual
         // service-worker handover, not only during page bootstrap.
         importScripts: ["/pwa-legacy-cache-cleanup.js"],
-        navigateFallbackDenylist: [/^\\/~oauth/, /^\\/api/, /^\\/auth/],
+        navigateFallbackDenylist: [/^\/~oauth/, /^\/api/, /^\/auth/],
         globPatterns: ["**/*.{js,css,html,svg,png,jpg,jpeg,webp,woff2,webmanifest}"],
         runtimeCaching: pwaRuntimeCaching,
       },
