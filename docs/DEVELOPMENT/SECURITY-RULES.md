@@ -74,12 +74,14 @@ Le propriétaire métier de la donnée définit sa finalité, sa sensibilité, l
 Heritis doit distinguer explicitement :
 
 - **Visiteur :** personne non authentifiée qui découvre la vision, les explications et les aperçus publics autorisés.
-- **Personne reconnue :** personne ayant communiqué un élément d'identification initial, par exemple prénom ou nom. Cette reconnaissance produit un contexte de parcours, pas une preuve d'identité.
+- **Personne reconnue :** personne qui vient de communiquer un prénom ou un nom (un seul des deux suffit). Cette reconnaissance produit un contexte de parcours, pas une preuve d'identité, une authentification ou une permission.
 - **Utilisateur authentifié :** personne disposant d'une session valide liée à un compte.
 - **Participant/invité :** utilisateur auquel un accès déterminé à une ressource a été accordé et accepté selon le processus applicable.
 - **Représentant ou professionnel :** acteur disposant d'une qualité et d'un périmètre explicitement établis, lorsque cette capacité existe et a été vérifiée.
 
 Un prénom, un nom, une adresse e-mail saisie, un numéro, un lien d'invitation ou un identifiant d'URL ne prouvent pas à eux seuls l'identité réelle, la propriété, la filiation, la qualité d'héritier, le mandat ou le consentement.
+
+Sans compte authentifié, la personne ne bénéficie que de l'aperçu guidé ; la conversation complète exige un compte et une session valide. La reconnaissance par prénom ou nom ne débloque pas cette conversation complète.
 
 Les données d'un visiteur ne doivent pas être visibles par un autre visiteur simplement parce qu'ils partagent un appareil, un navigateur ou un parcours. Les données locales créées avant authentification doivent être isolées et rattachées au compte uniquement par une procédure contrôlée, avec vérification du propriétaire et traitement des collisions.
 
