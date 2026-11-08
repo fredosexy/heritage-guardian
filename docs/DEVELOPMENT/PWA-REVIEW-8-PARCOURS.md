@@ -1,11 +1,12 @@
 # Revue documentaire PWA Heritis — 8 parcours
 
-**Périmètre :** revue statique de la branche `feat/pwa-intelligent-complete` de la PR #71.  
+**Périmètre :** revue statique du socle PWA intégré dans `main` par la PR #71.  
 **Référence de code initiale :** commit `d99e04e4d43bfc9dfd447809d9ce174f867bfdcc`.  
 **Correction iOS intégrée ensuite :** commit `21629706864a73320a3021032ff90a3cabf3563c`.  
-**Dernière mise à jour documentaire de cette revue :** 8 novembre 2026, après correction de l'indicateur hors ligne.  
+**Dernière mise à jour documentaire de cette revue :** 8 novembre 2026, après intégration de la PR #71 et ajout de la feuille de route produit.  
 **Méthode :** comparaison du code, des tests et de la documentation opérationnelle avec les recommandations officielles consultées le 8 novembre 2026.  
-**Limite :** aucun appareil physique ni déploiement HTTPS n'a été utilisé. Les résultats ci-dessous ne constituent donc pas une recette d'exécution réelle.
+**Limite :** aucun appareil physique ni déploiement HTTPS n'a été utilisé. Les résultats ci-dessous ne constituent donc pas une recette d'exécution réelle.  
+**Suite documentaire :** [PWA — trajectoire produit et parcours professionnel](./PWA-PRODUCT-ROADMAP.md), qui détaille les capacités intégrées, les parcours cibles et les priorités P0 à P4.
 
 ## Synthèse
 
@@ -170,8 +171,9 @@ Les tests contrôlent l'existence, le type MIME déclaré et les dimensions. Ils
 
 ## Décision de revue
 
-- **Condition de fusion :** tous les contrôles automatisés (tests, lint, build et vérification post-build du service worker, migrations et tests DB locaux, intégration Edge, Terrain CI) doivent être réussis sur le SHA exact de la tête de PR.
+- **État GitHub :** la PR #71 est fusionnée dans `main`. Les contrôles automatisés de la tête de PR ont été réussis avant fusion.
 - Le risque de conservation du cache privé historique est traité dans le code par la purge au démarrage et à l'activation du nouveau service worker ; le hook d'activation attend la suppression et le build vérifie son import effectif.
 - **Avant publication en production :** exécuter la recette de migration navigateur multi-onglets, les essais Android Chrome et iOS Safari, la vérification HTTPS/portée/réécritures et l'inspection visuelle de la zone maskable des icônes.
 - L'optimisation du bundle initial (970,81 Ko avant compression dans le build observé) reste une amélioration de performance à planifier ; elle n'est pas confondue avec un échec de build.
 - Les résultats de cette revue sont documentaires et ne doivent pas être présentés comme des preuves d'exécution Android/iOS ou de déploiement réel.
+- Les validations restantes et les priorités d'évolution sont centralisées dans [la trajectoire produit PWA](./PWA-PRODUCT-ROADMAP.md).
