@@ -202,6 +202,13 @@ export const en = {
     locationUnavailable: "Geolocation is unavailable on this device or browser.",
     locationCaptured: "GPS position captured.",
     locationDenied: "Location was not obtained. Check permission and try again.",
+    actions: {
+      title: "Useful next steps",
+      hint: "Automatic suggestions based only on information present in this record.",
+      completeDetails: "Complete {{count}} recommended detail(s)",
+      addLocation: "Add a location description or GPS point",
+      addProof: "Attach a first document or photo",
+    },
     declarationNotice: "The information saved is declarative. It does not certify ownership, a right or regulatory compliance. Structured people, documents and relationships will be addressed in subsequent steps.",
     save: "Save declaration",
     saved: "Declaration saved",
