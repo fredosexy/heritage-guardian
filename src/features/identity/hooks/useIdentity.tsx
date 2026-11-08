@@ -17,7 +17,7 @@ export interface IdentityState {
   /** Vrai tant que le visiteur n'a pas répondu à la première question. */
   needsFirstStep: boolean;
   updateGuest: (patch: Partial<Omit<GuestIdentity, "id" | "createdAt">>) => void;
-  /** Prénom affichable, quelle que soit la situation. */
+  /** Nom affiché, quelle que soit la situation. */
   displayName: string | null;
 }
 

@@ -9,8 +9,8 @@ import { Loader2, MapPin } from "lucide-react";
 import { useIdentity } from "../hooks/useIdentity";
 
 /**
- * Une seule question au premier geste utile : le prénom, et si l'on veut,
- * la position. Toujours possible de passer.
+ * Première identification facultative : prénom ou nom, avec localisation facultative.
+ * La découverte reste possible sans répondre.
  */
 export function FirstStepDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();

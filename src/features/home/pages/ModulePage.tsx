@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, ChevronRight, CircleCheck, LockKeyhole, Sparkles } from "lucide-react";
+import { ArrowLeft, ChevronRight, CircleCheck, Loader2, LockKeyhole, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/features/shell";
 import { useDossiers } from "@/features/dossiers/hooks/useDossiers";
@@ -31,6 +31,10 @@ export default function ModulePage() {
 
   const startRoute = id === "terrain" ? "/create?type=terrain" : "/assistant?module=" + encodeURIComponent(id);
   const nextStep = related.find((d) => d.status !== "secure");
+
+  if (identityLoading) {
+    return <AppLayout><div className="flex justify-center py-20"><Loader2 className="size-6 animate-spin text-primary" /></div></AppLayout>;
+  }
 
   return (
     <AppLayout>
@@ -66,7 +70,7 @@ export default function ModulePage() {
         </section>
       )}
 
-      {identityLoading ? null : available && isAuthenticated ? <section className="rounded-3xl border border-border bg-card p-5 mb-5">
+      {available && isAuthenticated ? <section className="rounded-3xl border border-border bg-card p-5 mb-5">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div>
             <p className="text-sm font-semibold">{t("modules.progressTitle")}</p>
