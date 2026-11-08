@@ -1,4 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
+
+export type BuildingProperty = Tables<"building_properties">;
 
 export type BuildingKind = "immeuble" | "maison" | "commerce" | "bureau" | "autre";
 export type SurfaceUnit = "m2" | "are" | "hectare";
@@ -42,4 +45,14 @@ export async function createBuildingProperty(dossierId: string, input: BuildingP
     surface_unit: input.surface_unit ?? "m2",
   }, { onConflict: "dossier_id" });
   if (error) throw error;
+}
+
+export async function getBuildingProperty(dossierId: string): Promise<BuildingProperty | null> {
+  const { data, error } = await supabase
+    .from("building_properties")
+    .select("*")
+    .eq("dossier_id", dossierId)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
 }
