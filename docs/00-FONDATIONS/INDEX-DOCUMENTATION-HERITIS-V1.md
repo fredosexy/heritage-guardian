@@ -31,7 +31,6 @@ Ordre de lecture recommandé :
 | 3. Volontés secrètes et dernières volontés | [Document détaillé](../03-DOMAINES/VOLONTES-SECRETES-ET-DERNIERES-VOLONTES-V1.md) | Préserver des volontés confidentielles et organiser leur transmission après vérifications. |
 | 4. Gestion des conflits et litiges | [Document détaillé](../04-DOMAINES/GESTION-DES-CONFLITS-ET-LITIGES-V1.md) | Constituer un dossier de conflit et orienter vers les méthodes et services compétents. |
 
-
 ## 3.1 Spécifications des sous-domaines du patrimoine
 
 | Sous-domaine | Document | Finalité |
