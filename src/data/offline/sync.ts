@@ -134,6 +134,7 @@ export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: 
   const pending = await db.queue.where("kind").equals("update_dossier").toArray();
   const existing = pending.find((op): op is Extract<QueuedOp, { kind: "update_dossier" }> =>
     op.kind === "update_dossier" &&
+    op.viewer_user_id === viewerUserId &&
     op.payload?.dossierId === dossierId &&
     op.payload?.metadata &&
     typeof op.payload.metadata === "object" &&
