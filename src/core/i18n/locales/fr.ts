@@ -168,6 +168,7 @@ export const fr = {
     specificsLabel: "Précisions propres à cette famille",
     specificsHint: "Ces informations sont déclaratives. N’indiquez que ce que vous connaissez.",
     specifics: { exploitation: "Nom d’usage, activités et actifs regroupés…", plantation: "Type de culture, espèces, emplacement ou superficie déclarée…", elevage: "Type d’élevage, groupe d’animaux, quantité déclarée et date d’inventaire…", equipement: "Type, marque, modèle, identifiant visible et état déclaré…", infrastructure: "Nature de l’installation, usage, ressources et description…", autre: "Précisez la nature de cet actif rural et ce qui le distingue…" },
+    invalidNumber: "Valeur numérique invalide. Saisissez un nombre positif ou nul.",
     structuredTitle: "Informations structurées de l’actif",
     structuredHint: "Les champs varient selon la famille. Les valeurs saisies restent déclaratives.",
     fields: {
