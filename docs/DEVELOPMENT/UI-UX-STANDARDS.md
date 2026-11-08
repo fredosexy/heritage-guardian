@@ -869,3 +869,9 @@ Références complémentaires :
 - spécifications V1 des quatre domaines et `SERVICES_TRANSVERSAUX_V1.md`.
 
 **Règle finale : Heritis doit être puissant par ce qu'il permet, simple par ce qu'il montre, rapide par sa construction, fiable dans ses actions et accessible dans les conditions réelles d'utilisation. Une interface réussie ne demande pas à l'utilisateur de comprendre la complexité interne du système ; elle l'aide à avancer avec confiance, sans lui imposer un compte, une décision, une action ou une charge mentale qui ne sont pas nécessaires.**
+
+---
+
+## Référentiel permanent complémentaire
+
+Les règles de modélisation, de qualité, de protection, de synchronisation, de conservation et de sobriété des données sont définies dans [DATA-AND-DATABASE-RULES.md](DATA-AND-DATABASE-RULES.md). Ce référentiel doit être consulté pour toute évolution touchant aux données ou à leur stockage.
