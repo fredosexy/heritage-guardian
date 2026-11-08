@@ -78,7 +78,8 @@ Ne pas inventer la liste officielle des domaines, leurs règles ou leur périmè
 ### 4.1 Parcours et niveaux d'accès
 
 - Distinguer clairement visiteur, personne reconnue/identifiée et utilisateur disposant d'un compte authentifié.
-- Dans le parcours produit, la saisie d'un prénom ou d'un nom peut permettre de reconnaître une personne ; elle ne constitue jamais une authentification, une preuve d'identité ni une autorisation d'accès.
+- Dès qu'une personne communique un prénom ou un nom (l'un ou l'autre suffit), elle passe à l'état « personne reconnue » dans le parcours ; cette reconnaissance ne constitue jamais une authentification, une preuve d'identité ni une autorisation d'accès.
+- Sans compte authentifié, la personne conserve uniquement un aperçu guidé ; la conversation complète exige un compte et une session valide.
 - Le visiteur découvre la vision et les explications de Heritis et ne doit pas accéder à des fonctions de gestion qu'il ne peut pas encore utiliser légitimement.
 - Un aperçu public ne doit exposer ni données privées, ni actions réservées, ni informations appartenant à d'autres utilisateurs.
 - L'accès complet dépend d'une session valide, des permissions effectives et des règles métier applicables ; la simple présence d'un écran ou d'un bouton ne donne aucun droit.
