@@ -48,14 +48,16 @@ it("creates an agricultural declaration with its selected family and declared de
   fireEvent.click(screen.getByRole("button", { name: /agricultural.create/ }));
   fireEvent.change(screen.getByLabelText("agricultural.family"), { target: { value: "plantation" } });
   fireEvent.change(screen.getByLabelText("agricultural.designation"), { target: { value: "Plantation cacao" } });
-  fireEvent.change(screen.getByLabelText("agricultural.specificsLabel"), { target: { value: "Cacao, 2 hectares déclarés" } });
+  fireEvent.change(screen.getByLabelText("agricultural.fields.plantation.cropType"), { target: { value: "Cacao" } });
+  fireEvent.change(screen.getByLabelText("agricultural.fields.plantation.declaredArea"), { target: { value: "2" } });
+  fireEvent.change(screen.getByLabelText("agricultural.specificsLabel"), { target: { value: "Plantation familiale" } });
   fireEvent.change(screen.getByLabelText("agricultural.location"), { target: { value: "Littoral" } });
   fireEvent.click(screen.getByRole("button", { name: "agricultural.save" }));
   await waitFor(() => expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({
     type: "agricole",
     title: "Plantation cacao",
     locationName: "Littoral",
-    metadata: { agriculturalRural: expect.objectContaining({ family: "plantation", declaredDetails: "Cacao, 2 hectares déclarés", source: "declarant" }) },
+    metadata: { agriculturalRural: expect.objectContaining({ family: "plantation", declaredDetails: "Plantation familiale", familyDetails: { cropType: "Cacao", declaredArea: "2" }, source: "declarant" }) },
   })));
   expect(mocks.navigate).toHaveBeenCalledWith("/dossiers/new-farm");
 });
