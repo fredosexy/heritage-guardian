@@ -65,10 +65,11 @@ export default function ProfilePage() {
 
       <VisitorBanner />
       <AssistantTip className="mb-4" />
-      <ProfileCompletionCard />
+      {user && <ProfileCompletionCard />}
 
       {user && <AvatarCard userId={user.id} profile={profile} onChanged={refresh} />}
 
+      {user && (
       <section className="mb-4 space-y-2">
         {[
           { icon: Paperclip, label: t("profile.myFiles"), hint: t("profile.myFilesHint"), route: "/files" },
@@ -91,6 +92,9 @@ export default function ProfilePage() {
         ))}
       </section>
 
+      )}
+
+      {user && (
       <section className="rounded-3xl border border-border/60 bg-card/85 p-5 mb-4 space-y-4 shadow-[var(--shadow-soft)]">
         <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{t("profile.personal")}</h2>
         <div>
@@ -109,6 +113,8 @@ export default function ProfilePage() {
           {saving && <Loader2 className="size-4 animate-spin" />} {t("profile.save")}
         </Button>
       </section>
+
+      )}
 
       <section className="card-soft p-5 mb-4 space-y-3">
         <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">

@@ -68,21 +68,25 @@ describe("navigation", () => {
     await i18n.changeLanguage("fr");
   });
 
-  it("affiche une navigation de découverte à deux entrées pour le visiteur", async () => {
+  it("affiche une navigation de découverte à trois entrées pour le visiteur", async () => {
     renderRoutes("/");
     const navigation = await screen.findByRole("navigation", { name: "Navigation principale" });
     expect(within(navigation).getByRole("link", { name: "Accueil" })).toHaveAttribute("href", "/");
     expect(within(navigation).getByRole("link", { name: "Assistant" })).toHaveAttribute("href", "/assistant");
-    expect(within(navigation).queryByRole("link", { name: "Profil" })).not.toBeInTheDocument();
-    expect(within(navigation).getAllByRole("link")).toHaveLength(2);
+    expect(within(navigation).getByRole("link", { name: "Profil" })).toHaveAttribute("href", "/profile");
+    expect(within(navigation).getAllByRole("link")).toHaveLength(3);
     expect(within(navigation).queryByRole("link", { name: "Mes espaces" })).not.toBeInTheDocument();
     expect(within(navigation).queryByRole("link", { name: "Alertes" })).not.toBeInTheDocument();
   });
 
-  it("protège le profil visiteur et le redirige vers l'authentification", async () => {
+  it("affiche un aperçu du profil sans exposer les fonctions de gestion au visiteur", async () => {
     renderRoutes("/profile");
-    expect(await screen.findByRole("button", { name: "Se connecter" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Profil" })).toBeInTheDocument();
+    expect(screen.getByText("Vous découvrez Heritis")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Créer un compte" })).toBeInTheDocument();
     expect(screen.queryByLabelText("Nom complet")).not.toBeInTheDocument();
+    expect(screen.queryByText("Mes dossiers")).not.toBeInTheDocument();
+    expect(screen.queryByText("Mes fichiers")).not.toBeInTheDocument();
   });
 
   it("l'accueil s'ouvre depuis /", async () => {
