@@ -70,3 +70,31 @@ it("offers contextual next actions while the declaration is incomplete", () => {
   expect(screen.getByText("agricultural.assistant.nextStep")).toBeTruthy();
   expect(screen.getByRole("button", { name: "agricultural.fields.exploitation.activities" })).toBeTruthy();
 });
+
+it("captures GPS only after explicit action and stores the declared point with accuracy and date", async () => {
+  const getCurrentPosition = vi.fn((success: (position: GeolocationPosition) => void) => {
+    success({
+      coords: { latitude: 4.0511, longitude: 9.7679, accuracy: 8, altitude: null, altitudeAccuracy: null, heading: null, speed: null, toJSON: () => ({}) },
+      timestamp: 1794153600000,
+      toJSON: () => ({}),
+    } as GeolocationPosition);
+  });
+  Object.defineProperty(navigator, "geolocation", { configurable: true, value: { getCurrentPosition } });
+  mocks.create.mockResolvedValue({ mode: "online", id: "gps-farm", journeyStatus: "ready" });
+  render(<AgriculturalAssetsPage />);
+  fireEvent.click(screen.getByRole("button", { name: /agricultural.create/ }));
+  fireEvent.change(screen.getByLabelText("agricultural.designation"), { target: { value: "Plantation GPS" } });
+  expect(getCurrentPosition).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "agricultural.captureGps" }));
+  await waitFor(() => expect(getCurrentPosition).toHaveBeenCalledTimes(1));
+  fireEvent.click(screen.getByRole("button", { name: "agricultural.save" }));
+  await waitFor(() => expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({
+    latitude: 4.0511,
+    longitude: 9.7679,
+    metadata: expect.objectContaining({
+      agriculturalRural: expect.objectContaining({
+        geospatial: { point: expect.objectContaining({ latitude: 4.0511, longitude: 9.7679, accuracyMeters: 8, source: "gps" }) },
+      }),
+    }),
+  })));
+});
