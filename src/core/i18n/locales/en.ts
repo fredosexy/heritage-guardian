@@ -206,7 +206,7 @@ export const en = {
       title: "Useful next steps",
       hint: "Automatic suggestions based only on information present in this record.",
       completeDetails: "Complete {{count}} recommended detail(s)",
-      addLocation: "Add a location description or GPS point",
+      addLocation: "Add the asset's location description",
       addProof: "Attach a first document or photo",
     },
     people: {
