@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Navigation principale adaptée au statut :
- * - visiteur : Accueil, Assistant, Profil ;
+ * - visiteur : Accueil et accueil guidé ;
  * - compte connecté : Accueil, Mes espaces, action centrale, Alertes, Profil.
  */
 export function BottomNav() {
