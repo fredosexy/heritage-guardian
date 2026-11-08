@@ -10,7 +10,6 @@ export interface DossierTypeMeta {
 export const DOSSIER_TYPES: DossierTypeMeta[] = [
   { id: "terrain", icon: MapPin, descKey: "create.terrainDesc", available: true },
   { id: "batiment", icon: Building2, descKey: "create.buildingDesc", available: true },
-  { id: "agricole", icon: Sprout, descKey: "agricultural.subtitle", available: true },
   { id: "heritage", icon: Users, descKey: "create.heritageDesc", available: false },
   { id: "volonte", icon: ScrollText, descKey: "create.volonteDesc", available: false },
   { id: "conflit", icon: Scale, descKey: "create.conflitDesc", available: false },
@@ -18,7 +17,9 @@ export const DOSSIER_TYPES: DossierTypeMeta[] = [
 ];
 
 export function iconForType(type: string): LucideIcon {
-  return type === "batiment" ? Building2 : DOSSIER_TYPES.find((t) => t.id === type)?.icon ?? MapPin;
+  if (type === "batiment") return Building2;
+  if (type === "agricole") return Sprout;
+  return DOSSIER_TYPES.find((t) => t.id === type)?.icon ?? MapPin;
 }
 
 export function typeLabelKey(type: string): string {
