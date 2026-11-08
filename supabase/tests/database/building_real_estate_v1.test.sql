@@ -5,7 +5,7 @@
 --   supabase test db
 
 BEGIN;
-SELECT plan(15);
+SELECT plan(16);
 
 INSERT INTO auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -13,7 +13,8 @@ INSERT INTO auth.users (
 ) VALUES
   ('00000000-0000-0000-0000-000000000000', '61000000-0000-0000-0000-000000000001', 'authenticated', 'authenticated', 'building-owner@test.invalid', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now()),
   ('00000000-0000-0000-0000-000000000000', '61000000-0000-0000-0000-000000000002', 'authenticated', 'authenticated', 'building-participant@test.invalid', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000000', '61000000-0000-0000-0000-000000000003', 'authenticated', 'authenticated', 'building-outsider@test.invalid', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now());
+  ('00000000-0000-0000-0000-000000000003', '61000000-0000-0000-0000-000000000003', 'authenticated', 'authenticated', 'building-outsider@test.invalid', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000000', '61000000-0000-0000-0000-000000000004', 'authenticated', 'authenticated', 'building-pending@test.invalid', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now());
 
 INSERT INTO public.dossiers (id, user_id, type, title)
 VALUES
@@ -24,7 +25,9 @@ VALUES
   ('62000000-0000-0000-0000-000000000005', '61000000-0000-0000-0000-000000000001', 'terrain', 'Dossier non bâtiment');
 
 INSERT INTO public.participants (dossier_id, user_id, role, accepted_at)
-VALUES ('62000000-0000-0000-0000-000000000002', '61000000-0000-0000-0000-000000000002', 'viewer', now());
+VALUES
+  ('62000000-0000-0000-0000-000000000002', '61000000-0000-0000-0000-000000000002', 'viewer', now()),
+  ('62000000-0000-0000-0000-000000000002', '61000000-0000-0000-0000-000000000004', 'viewer', NULL);
 
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub', '61000000-0000-0000-0000-000000000001', true);
@@ -71,6 +74,13 @@ SELECT throws_ok(
      VALUES ('62000000-0000-0000-0000-000000000002', 'autre', 'Participant write attempt') $$,
   '42501', NULL,
   'a read-only participant cannot add building events'
+);
+
+SELECT set_config('request.jwt.claim.sub', '61000000-0000-0000-0000-000000000004', true);
+SELECT is(
+  (SELECT count(*)::integer FROM public.building_properties WHERE dossier_id = '62000000-0000-0000-0000-000000000002'),
+  0,
+  'a pending participant cannot read the building property'
 );
 
 SELECT set_config('request.jwt.claim.sub', '61000000-0000-0000-0000-000000000003', true);
