@@ -9,7 +9,9 @@
 
 ## 1. Finalité
 
-Permettre à une personne ou à une famille de déclarer, identifier, documenter, sécuriser et suivre les biens mobiliers auxquels elle indique être liée. La fiche doit rendre compréhensibles l'identité du bien, ses caractéristiques utiles, son état déclaré, son lieu connu de conservation, les personnes associées, les pièces disponibles et les événements de son historique.
+Permettre à une personne ou à une famille de déclarer, identifier, documenter, sécuriser et suivre les biens mobiliers corporels auxquels elle indique être liée. La fiche doit rendre compréhensibles l'identité du bien, ses caractéristiques utiles, son état déclaré, son lieu connu de conservation, les personnes associées, les pièces disponibles et les événements de son historique.
+
+Le périmètre porte sur les objets et équipements matériels. Les biens financiers et droits patrimoniaux relèvent du sous-domaine correspondant ; les exploitations, élevages et équipements déjà suivis dans le sous-domaine agricole et rural doivent y rester référencés sans créer de fiche concurrente. Les animaux vivants ne sont pas enregistrés dans ce sous-domaine.
 
 Heritis constitue un référentiel d'information et de traçabilité. Il ne certifie pas la propriété, l'authenticité d'un objet, la valeur d'un bien ni la validité juridique d'une transaction.
 
@@ -25,7 +27,7 @@ La classification V1 couvre notamment :
 6. **Collections et biens personnels :** collections, objets de famille, souvenirs et autres biens personnels présentant un intérêt patrimonial.
 7. **Autres biens mobiliers :** catégorie de repli motivée, avec description obligatoire de la nature du bien.
 
-Cette classification est fonctionnelle. Elle ne constitue pas une qualification juridique, fiscale, douanière ou assurantielle.
+Cette classification est fonctionnelle. Elle ne constitue pas une qualification juridique, fiscale, douanière ou assurantielle. Les biens incorporels, créances, participations et autres droits patrimoniaux ne relèvent pas de cette fiche. Les animaux et élevages relèvent du sous-domaine agricole et rural, et non de l'inventaire des biens mobiliers.
 
 ## 3. Principes d'identification et d'unicité
 
@@ -47,7 +49,7 @@ Un lot ou un ensemble peut être enregistré comme un ensemble lorsque son suivi
 
 Avant de créer une fiche, l'interface peut aider à rechercher un bien déjà enregistré à partir des informations disponibles. Une correspondance possible doit être présentée comme une suggestion à vérifier, jamais comme une fusion automatique.
 
-Les domaines et dossiers qui concernent un bien déjà enregistré doivent référencer sa fiche patrimoniale. Un équipement agricole ou professionnel déjà enregistré dans un autre sous-domaine ne doit pas être recréé uniquement pour apparaître dans un nouveau dossier.
+Les domaines et dossiers qui concernent un bien déjà enregistré doivent référencer sa fiche patrimoniale. Un équipement agricole ou professionnel déjà enregistré dans un autre sous-domaine ne doit pas être recréé uniquement pour apparaître dans un nouveau dossier. Les fiches du sous-domaine agricole et rural restent les références pour les équipements et installations qui y sont déjà gérés ; la présente fiche ne crée pas de doublon.
 
 ## 4. Informations de la fiche
 
@@ -95,7 +97,7 @@ L'état matériel doit être distinct du statut documentaire. Valeurs indicative
 
 ### 5.2 Situation déclarée
 
-La situation du bien peut notamment être : utilisé, conservé, prêté, loué, confié à un tiers, immobilisé, perdu, volé ou présumé volé, vendu, donné, détruit ou situation inconnue. Ces valeurs décrivent les informations saisies dans Heritis et ne constituent pas une décision ou qualification officielle.
+La situation du bien peut notamment être : utilisé, conservé, prêté, loué, confié à un tiers, immobilisé, perdu, signalé comme volé, faisant l'objet d'une suspicion déclarée de vol, vendu, donné, détruit ou situation inconnue. Ces valeurs décrivent exclusivement une déclaration attribuée à son auteur ; elles ne constituent ni un constat de vol, ni une qualification officielle, ni une conclusion sur la responsabilité d'une personne.
 
 La fin d'une situation ou un changement doit être historisé plutôt que remplacer silencieusement l'état antérieur.
 
@@ -167,7 +169,7 @@ La fiche peut retracer notamment :
 - changement de détenteur, d'utilisateur, de dépositaire ou de lieu ;
 - prêt, dépôt, location ou restitution ;
 - entretien ou réparation simplement signalé ;
-- détérioration, perte, vol déclaré, récupération ou destruction ;
+- détérioration, perte, signalement de vol ou suspicion déclarée de vol, récupération ou destruction ;
 - vente, don, échange ou transmission déclarée ;
 - ajout ou remplacement d'un document ;
 - vérification, contestation ou correction ;
@@ -297,4 +299,4 @@ Toute implémentation devra être précédée d'une vérification de l'état ré
 
 ---
 
-**Statut :** périmètre V1 validé par l'utilisateur ; spécification fonctionnelle documentée pour revue GitHub.  
+**Statut :** périmètre V1 validé par l'utilisateur ; spécification fonctionnelle revue et précisée sur GitHub.  
