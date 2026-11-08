@@ -41,7 +41,7 @@ Toute cartographie technique datée doit préciser le commit ou la branche obser
 
 ## 3. Principes architecturaux non négociables
 
-1. **Domaines métier d'abord :** l'architecture reflète les quatre domaines métier Heritis et leurs frontières.
+1. **Domaines métier d'abord :** l'architecture de la V1 reflète les quatre domaines métier validés et leurs frontières. La vision générale cible six domaines ; les deux domaines complémentaires restent non spécifiés et ne doivent pas être anticipés dans le code sans décision produit formelle.
 2. **Responsabilités explicites :** chaque module possède un rôle identifiable et une interface compréhensible.
 3. **Source de vérité unique :** une information métier partagée ne doit pas être dupliquée sans raison et stratégie de cohérence documentées.
 4. **Séparation des préoccupations :** présentation, orchestration, logique métier, accès aux données et intégrations ne sont pas confondus.
