@@ -79,7 +79,7 @@ export const en = {
     alerts: "Alerts", suggestions: "AI suggestions", noAlerts: "No alerts. All in order 🌿", noSuggestions: "AI is preparing your suggestions…",
     visitorEyebrow: "Welcome to Heritis", visitorTitle: "Heritis",
     visitorVision: "Explore Heritis’ four domains and understand what each one is designed to help you prepare. Features and dossier management require an account.",
-    modulesTitle: "Heritis’ four domains", modulesVisitorHint: "Explore their purpose and scope. The Land journey is currently the only available journey.", modulesConnectedHint: "Continue your land dossiers. Inheritance, wishes and other journeys are in preparation.",
+    modulesTitle: "Heritis’ four domains", modulesConnectedTitle: "Your dossiers by type", modulesVisitorHint: "Explore their purpose and scope. The Land journey is currently the only available journey.", modulesConnectedHint: "Find your dossiers by type and review their current status.",
     visitorAssistantTitle: "Guidance from the start", visitorAssistantHint: "You do not need to know everything. The assistant helps you choose the right first action.", visitorAssistantCta: "Ask for advice",
     visitorIdentityTitle: "Build your identity progressively", visitorIdentityHint: "Your first or last name is enough for Heritis to recognise you during discovery. You can then create an account or keep exploring.", visitorAccountCta: "Create my account",
     discoverDomains: "Explore the domains", createAccountToContinue: "Create an account to continue", previewOnlyHint: "This preview explains the domain. Create an account to access available features.",

@@ -79,7 +79,7 @@ export const fr = {
     alerts: "Alertes", suggestions: "Suggestions de l'IA", noAlerts: "Aucune alerte. Tout est en ordre 🌿", noSuggestions: "L'IA prépare vos suggestions…",
     visitorEyebrow: "Bienvenue dans Heritis", visitorTitle: "Heritis",
     visitorVision: "Découvrez les quatre domaines de Heritis et comprenez ce que chacun permet de préparer. Les fonctionnalités et la gestion de vos dossiers nécessitent un compte.",
-    modulesTitle: "Les quatre domaines de Heritis", modulesVisitorHint: "Explorez leur rôle et leur périmètre. Le parcours Terrain est actuellement le seul parcours disponible.", modulesConnectedHint: "Continuez vos dossiers Terrain. Héritages, volontés et autres parcours sont en préparation.",
+    modulesTitle: "Les quatre domaines de Heritis", modulesConnectedTitle: "Vos dossiers par type", modulesVisitorHint: "Explorez leur rôle et leur périmètre. Le parcours Terrain est actuellement le seul parcours disponible.", modulesConnectedHint: "Retrouvez vos dossiers classés par type et consultez leur état actuel.",
     visitorAssistantTitle: "Un accompagnement dès maintenant", visitorAssistantHint: "Vous n'avez pas besoin de tout connaître. L'assistant vous aide à choisir le bon premier geste.", visitorAssistantCta: "Demander conseil",
     visitorIdentityTitle: "Construisons votre identité progressivement", visitorIdentityHint: "Votre prénom ou votre nom suffit pour être reconnu. Vous pourrez ensuite créer un compte ou continuer à découvrir Heritis.", visitorAccountCta: "Créer mon compte",
     discoverDomains: "Découvrir les domaines", createAccountToContinue: "Créer un compte pour continuer", previewOnlyHint: "Cet aperçu présente le domaine. Créez un compte pour accéder aux fonctionnalités disponibles.",
