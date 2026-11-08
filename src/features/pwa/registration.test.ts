@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { applyPwaUpdate, setPwaUpdateWorker } from "./registration";
+import { applyPwaUpdate, publishPwaStatus, setPwaUpdateWorker, subscribePwaStatus } from "./registration";
 
 describe("PWA update lifecycle", () => {
   beforeEach(() => {
@@ -12,6 +12,7 @@ describe("PWA update lifecycle", () => {
 
     await applyPwaUpdate();
 
-    expect(update).toHaveBeenCalledExactlyOnceWith(true);
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(update).toHaveBeenCalledWith(true);
   });
 });
