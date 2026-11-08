@@ -6,9 +6,9 @@ const mocks = vi.hoisted(() => ({
   navigate: vi.fn(),
   create: vi.fn(),
   dossiers: [
-    { id: "farm-1", type: "agricole", title: "Exploitation familiale", status: "incomplete", location_name: "Centre", metadata: { agriculturalRural: { family: "exploitation" } }, local: false },
-    { id: "plant-1", type: "agricole", title: "Plantation cacao", status: "secure", location_name: "Littoral", metadata: { agriculturalRural: { family: "plantation" } }, local: false },
-    { id: "land-1", type: "terrain", title: "Terrain", status: "secure", location_name: "Centre", metadata: {}, local: false },
+    { id: "farm-1", type: "agricole", title: "Exploitation familiale", status: "incomplete", locationName: "Centre", metadata: { agriculturalRural: { family: "exploitation" } }, local: false },
+    { id: "plant-1", type: "agricole", title: "Plantation cacao", status: "secure", locationName: "Littoral", metadata: { agriculturalRural: { family: "plantation" } }, local: false },
+    { id: "land-1", type: "terrain", title: "Terrain", status: "secure", locationName: "Centre", metadata: {}, local: false },
   ],
 }));
 
@@ -54,7 +54,7 @@ it("creates an agricultural declaration with its selected family and declared de
   await waitFor(() => expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({
     type: "agricole",
     title: "Plantation cacao",
-    location_name: "Littoral",
+    locationName: "Littoral",
     metadata: { agriculturalRural: expect.objectContaining({ family: "plantation", declaredDetails: "Cacao, 2 hectares déclarés", source: "declarant" }) },
   })));
   expect(mocks.navigate).toHaveBeenCalledWith("/dossiers/new-farm");
