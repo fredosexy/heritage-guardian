@@ -7,6 +7,8 @@ export interface CreateDossierForm {
   title: string;
   description?: string;
   location_name?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   metadata?: Record<string, unknown>;
 }
 
@@ -35,6 +37,8 @@ export function useCreateDossier() {
           title: form.title,
           description: form.description || null,
           location_name: form.location_name || null,
+          latitude: form.latitude ?? null,
+          longitude: form.longitude ?? null,
           metadata: form.metadata ?? {},
         };
 
@@ -52,6 +56,8 @@ export function useCreateDossier() {
             title: form.title,
             description: form.description || null,
             location_name: form.location_name || null,
+            latitude: form.latitude ?? null,
+            longitude: form.longitude ?? null,
             metadata: form.metadata ?? {},
           });
           let journeyStatus: "ready" | "procedure_unavailable" | "attention" = "ready";
