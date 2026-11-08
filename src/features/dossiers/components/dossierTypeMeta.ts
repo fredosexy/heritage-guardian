@@ -1,4 +1,4 @@
-import { BookOpen, MapPin, Scale, ScrollText, Users, type LucideIcon } from "lucide-react";
+import { BookOpen, Building2, MapPin, Scale, ScrollText, Users, type LucideIcon } from "lucide-react";
 
 export interface DossierTypeMeta {
   id: string;
@@ -9,6 +9,7 @@ export interface DossierTypeMeta {
 
 export const DOSSIER_TYPES: DossierTypeMeta[] = [
   { id: "terrain", icon: MapPin, descKey: "create.terrainDesc", available: true },
+  { id: "batiment", icon: Building2, descKey: "create.buildingDesc", available: true },
   { id: "heritage", icon: Users, descKey: "create.heritageDesc", available: false },
   { id: "volonte", icon: ScrollText, descKey: "create.volonteDesc", available: false },
   { id: "conflit", icon: Scale, descKey: "create.conflitDesc", available: false },
