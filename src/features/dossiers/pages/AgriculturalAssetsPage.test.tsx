@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -51,7 +51,7 @@ it("creates an agricultural declaration with its selected family and declared de
   fireEvent.change(screen.getByLabelText("agricultural.specificsLabel"), { target: { value: "Cacao, 2 hectares déclarés" } });
   fireEvent.change(screen.getByLabelText("agricultural.location"), { target: { value: "Littoral" } });
   fireEvent.click(screen.getByRole("button", { name: "agricultural.save" }));
-  await vi.waitFor(() => expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({
+  await waitFor(() => expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({
     type: "agricole",
     title: "Plantation cacao",
     location_name: "Littoral",
