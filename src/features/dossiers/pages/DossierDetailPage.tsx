@@ -81,6 +81,7 @@ export default function DossierDetailPage() {
       ? dossier.metadata as { terrain?: { sections?: Record<string, string> } }
       : {};
     const sections = metadata.terrain?.sections ?? {};
+    // geospatial est lu plus bas via le même cast élargi
     setTerrainSections(sections);
     setInitialTerrainSections(sections);
     setTerrainGeospatial(metadata.terrain?.geospatial ?? {

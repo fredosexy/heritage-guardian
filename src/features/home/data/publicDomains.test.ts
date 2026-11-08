@@ -18,7 +18,7 @@ describe("public V1 domain catalogue", () => {
       "volonte",
       "conflit",
     ]);
-    expect(PUBLIC_DOMAINS_V1.some((domain) => domain.id === "savoir")).toBe(false);
+    expect(PUBLIC_DOMAINS_V1.some((domain) => (domain.id as string) === "savoir")).toBe(false);
   });
 
   it("routes the assets domain to the available Land journey", () => {
