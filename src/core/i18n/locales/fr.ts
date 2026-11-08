@@ -199,7 +199,7 @@ export const fr = {
       title: "Les prochaines étapes utiles",
       hint: "Suggestions automatiques fondées uniquement sur les informations présentes dans cette fiche.",
       completeDetails: "Compléter les {{count}} information(s) recommandée(s)",
-      addLocation: "Préciser le lieu ou ajouter un repère GPS",
+      addLocation: "Préciser le lieu de l'actif",
       addProof: "Joindre une première pièce ou photographie",
     },
     people: {
