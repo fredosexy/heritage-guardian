@@ -3,7 +3,7 @@ import { runInNewContext } from "node:vm";
 import { describe, expect, it, vi } from "vitest";
 
 const migrationScript = readFileSync(
-  new URL("../../../public/pwa-legacy-cache-cleanup.js", import.meta.url),
+  "public/pwa-legacy-cache-cleanup.js",
   "utf8",
 );
 
