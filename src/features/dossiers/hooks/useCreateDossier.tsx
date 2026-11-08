@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { dossiersRepo, enqueueCreateDossier, proceduresRepo, saveLocalDraft } from "@/data";
+import { buildingsRepo, dossiersRepo, enqueueCreateDossier, proceduresRepo, saveLocalDraft } from "@/data";
 import { useIdentity } from "@/features/identity";
 
 export interface CreateDossierForm {
@@ -54,6 +54,19 @@ export function useCreateDossier() {
             location_name: form.location_name || null,
             metadata: form.metadata ?? {},
           });
+          if (form.type === "batiment") {
+            const building = buildingsRepo.readBuildingPropertyInput(form.metadata);
+            if (!building) {
+              await dossiersRepo.deleteDossier(dossier.id);
+              throw new Error("Les informations principales du bâtiment sont incomplètes.");
+            }
+            try {
+              await buildingsRepo.createBuildingProperty(dossier.id, building);
+            } catch (error) {
+              await dossiersRepo.deleteDossier(dossier.id);
+              throw error;
+            }
+          }
           let journeyStatus: "ready" | "procedure_unavailable" | "attention" = "ready";
           try {
             await proceduresRepo.initializeDossierJourney(dossier.id);

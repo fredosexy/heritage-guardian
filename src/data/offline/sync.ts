@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import * as proceduresRepo from "@/data/procedures.repo";
+import * as buildingsRepo from "@/data/buildings.repo";
 import { detectConflictFields, type DossierChanges } from "@/services/sync-conflicts";
 import { db, DraftDossier } from "./db";
 import { replayProof } from "./replay-proof";
@@ -226,31 +227,47 @@ async function runQueue(): Promise<void> {
             continue;
           }
           assertDossierOwner(draft, currentUser.id);
-          const { data, error } = await supabase.from("dossiers").insert({
-            user_id: draft.user_id,
-            type: draft.type as Database["public"]["Enums"]["dossier_type"],
-            title: draft.title,
-            description: draft.description || null,
-            location_name: draft.location_name || null,
-            latitude: draft.latitude ?? null,
-            metadata: JSON.parse(JSON.stringify(draft.metadata ?? {})) as Json,
-            longitude: draft.longitude ?? null,
-            status: "incomplete",
-          }).select().single();
-          if (error) throw error;
+          let remoteDossierId = draft.remote_id ?? null;
+          if (remoteDossierId) {
+            await requireCurrentOwnerForDossier(remoteDossierId, currentUser.id);
+          } else {
+            const { data, error } = await supabase.from("dossiers").insert({
+              user_id: draft.user_id,
+              type: draft.type as Database["public"]["Enums"]["dossier_type"],
+              title: draft.title,
+              description: draft.description || null,
+              location_name: draft.location_name || null,
+              latitude: draft.latitude ?? null,
+              metadata: JSON.parse(JSON.stringify(draft.metadata ?? {})) as Json,
+              longitude: draft.longitude ?? null,
+              status: "incomplete",
+            }).select().single();
+            if (error) throw error;
+            remoteDossierId = data.id;
+            if (draft.id === undefined) throw new Error("Invalid draft identity");
+            // Persist the remote ID before dependent writes so a retry never
+            // creates a duplicate dossier if a later building write fails.
+            await db.drafts.update(draft.id, { remote_id: remoteDossierId });
+          }
+          if (!remoteDossierId) throw new Error("Building dossier could not be created");
+          if (draft.type === "batiment") {
+            const building = buildingsRepo.readBuildingPropertyInput(draft.metadata);
+            if (!building) throw new Error("Building draft is missing its property details");
+            await buildingsRepo.createBuildingProperty(remoteDossierId, building);
+          }
           if (draft.id === undefined) throw new Error("Invalid draft identity");
-          await db.drafts.update(draft.id, { synced: 1, remote_id: data.id });
+          await db.drafts.update(draft.id, { synced: 1, remote_id: remoteDossierId });
           await db.queue.delete(opId);
           emit();
           try {
-            await proceduresRepo.initializeDossierJourney(data.id);
+            await proceduresRepo.initializeDossierJourney(remoteDossierId);
           } catch (journeyError: unknown) {
             const code = typeof journeyError === "object" && journeyError !== null && "code" in journeyError ? journeyError.code : undefined;
             const message = getErrorMessage(journeyError);
             if (code !== "P0002" && !message.includes("published_procedure_not_found")) {
               await db.queue.add({
                 kind: "initialize_journey",
-                payload: { dossierId: data.id },
+                payload: { dossierId: remoteDossierId },
                 created_at: Date.now(),
                 attempts: 0,
                 last_error: message,

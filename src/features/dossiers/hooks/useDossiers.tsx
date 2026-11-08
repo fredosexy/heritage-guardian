@@ -89,7 +89,8 @@ export function useDossiers() {
     if (isGuest) return (localDrafts ?? []).map((draft) => ({
       id: draft.localId, type: draft.type, title: draft.title,
       status: "incomplete" as DossierStatus, completionScore: 0,
-      updatedAt: new Date().toISOString(), participantsCount: 0, proofsCount: 0,
+      updatedAt: new Date(draft.updated_at).toISOString(), locationName: draft.location_name,
+      participantsCount: 0, proofsCount: 0,
       nextAttention: "Commencer votre dossier", journeyProgress: 0, currentStepTitle: null, nextStepTitle: null, blockedStepTitle: null, local: true,
     }));
     return remote.map((d) => ({
