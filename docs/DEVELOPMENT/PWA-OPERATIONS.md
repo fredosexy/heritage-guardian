@@ -30,6 +30,9 @@
 - Au démarrage de la PWA, le cache historique `supabase-storage` est supprimé afin de retirer les réponses enregistrées par les versions précédentes.
 - Les dossiers mis en cache dans IndexedDB sont associés à l'identité du compte qui avait obtenu le droit de les consulter (`viewer_user_id`). Le propriétaire métier reste conservé séparément dans `user_id`.
 - Le schéma Dexie version 4 supprime les anciens instantanés qui ne portent pas l'identité du lecteur. Ils ne sont donc jamais réutilisés comme cache hors ligne pour un autre compte.
+- Les opérations en attente et les conflits sont associés au compte lecteur (`viewer_user_id`) ; le centre de synchronisation ne montre que les éléments du compte actif.
+- Le rejeu et la suppression d'une opération en attente vérifient cette attribution ; une opération d'un autre compte ou sans attribution n'est ni rejouée ni supprimable depuis le centre.
+- La migration Dexie v5 attribue les anciennes créations de dossiers à partir du brouillon et les anciens transferts de preuves à partir de leur propriétaire déclaré. Les anciennes opérations qui ne peuvent pas être attribuées de façon certaine, ainsi que les anciens conflits, sont conservés mais masqués et signalés dans le centre de synchronisation ; ils exigent un examen avant reprise.
 - Les brouillons et opérations non synchronisés ne sont pas supprimés automatiquement lors d'une déconnexion : leur suppression silencieuse ferait perdre du travail. Leur rejeu doit continuer à revérifier la session et les droits côté serveur.
 
 Aucun cache navigateur ne constitue un contrôle d'accès. Toute donnée locale reste exposée aux risques propres à un appareil partagé, compromis ou accessible à un autre script ; la minimisation et la durée de conservation restent obligatoires.
