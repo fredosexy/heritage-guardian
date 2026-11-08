@@ -11,11 +11,14 @@ export function useEditDossier(id?: string) {
   const { user } = useAuth();
   const userId = user?.id ?? null;
   const [dossier, setDossier] = useState<Dossier | null>(null);
+  const [dossierViewerId, setDossierViewerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const visibleDossier = dossierViewerId === userId ? dossier : null;
 
   useEffect(() => {
     let cancelled = false;
     setDossier(null);
+    setDossierViewerId(null);
     setLoading(Boolean(id && userId));
 
     if (!id || !userId) {
@@ -27,20 +30,24 @@ export function useEditDossier(id?: string) {
       let loaded: Dossier | null = null;
       try {
         loaded = await dossiersRepo.getDossier(id);
-        if (loaded && loaded.user_id === userId) {
-          await db.cachedDossiers.put({ id: loaded.id, user_id: loaded.user_id, data: loaded, cached_at: Date.now() });
-        } else if (loaded) {
-          loaded = null;
+        if (loaded) {
+          await db.cachedDossiers.put({
+            id: loaded.id,
+            user_id: loaded.user_id,
+            viewer_user_id: userId,
+            data: loaded,
+            cached_at: Date.now(),
+          });
         }
       } catch {
         const cached = await db.cachedDossiers.get(id);
-        if (cached?.user_id === userId) {
-          const cachedDossier = cached.data as Dossier;
-          loaded = cachedDossier.user_id === userId ? cachedDossier : null;
+        if (cached?.viewer_user_id === userId) {
+          loaded = cached.data as Dossier;
         }
       }
       if (!cancelled) {
         setDossier(loaded);
+        setDossierViewerId(userId);
         setLoading(false);
       }
     })();
@@ -49,17 +56,17 @@ export function useEditDossier(id?: string) {
   }, [id, userId]);
 
   const save = async (values: DossierChanges): Promise<boolean> => {
-    if (!dossier) return false;
-    assertDossierOwner(dossier, userId);
+    if (!visibleDossier) return false;
+    assertDossierOwner(visibleDossier, userId);
     const changes: DossierChanges = {};
     for (const f of EDITABLE_FIELDS) {
       const v = (values[f] ?? "").trim() || null;
-      if (v !== (dossier[f] ?? null)) changes[f] = v;
+      if (v !== (visibleDossier[f] ?? null)) changes[f] = v;
     }
     if (Object.keys(changes).length === 0) return false;
-    await enqueueUpdateDossier(dossier.id, changes, dossier.updated_at);
+    await enqueueUpdateDossier(visibleDossier.id, changes, visibleDossier.updated_at);
     return true;
   };
 
-  return { dossier, loading, save, canEdit: canEditDossier(dossier, userId) };
+  return { dossier: visibleDossier, loading, save, canEdit: canEditDossier(visibleDossier, userId) };
 }
