@@ -506,3 +506,7 @@ Les exigences de validation, de qualité du code, de tests, de sécurité, de pe
 ## Exigences permanentes de tests et de qualité
 
 Les règles de validation du comportement réel, de qualité du code de production, de sécurité, de maintenabilité, de scalabilité, de résilience, d'accessibilité et de modernisation progressive sont définies dans [TESTING-REQUIREMENTS.md](TESTING-REQUIREMENTS.md). Les techniques éprouvées et déjà maîtrisées doivent être privilégiées ; toute nouvelle technologie doit démontrer son bénéfice, sa maturité, sa sécurité et son coût total avant adoption.
+
+## Référentiel permanent de l'intelligence et des automatisations
+
+Les contextes transmis aux modèles, la mémoire, les données générées, les tâches automatiques et leurs traces doivent respecter [AI-AND-AUTOMATION-RULES.md](AI-AND-AUTOMATION-RULES.md), en complément des présentes règles de données.
