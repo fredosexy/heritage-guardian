@@ -227,7 +227,7 @@ export function TerrainBoundaryMap({
 
   return (
     <div className="space-y-2">
-      <div ref={containerRef} className="h-72 w-full overflow-hidden rounded-2xl border border-border bg-muted" role="application" aria-label={t("create.terrainGeo.mapLabel")} />
+      <div className="relative"><div ref={containerRef} className="h-72 w-full overflow-hidden rounded-2xl border border-border bg-muted" role="application" aria-label={t("create.terrainGeo.mapLabel")} />{!loaded && !mapError && <p className="absolute inset-x-3 top-3 rounded-xl bg-card/95 px-3 py-2 text-xs text-muted-foreground shadow">{t("create.terrainGeo.mapLoading")}</p>}</div>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">{t("create.terrainGeo.mapPointCount", { count: boundaryPoints.length })}</p>
         <div className="flex gap-2">
@@ -241,6 +241,7 @@ export function TerrainBoundaryMap({
       </div>
       {mapError && <p className="text-xs text-destructive" role="alert">{mapError}</p>}
       <p className="text-xs text-muted-foreground">{t("create.terrainGeo.mapTapHint")}</p>
+      <p className="text-[11px] text-muted-foreground">{t("create.terrainGeo.mapPrivacyHint")}</p>
     </div>
   );
 }
