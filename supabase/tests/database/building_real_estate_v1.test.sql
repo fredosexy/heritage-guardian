@@ -13,7 +13,7 @@ INSERT INTO auth.users (
 ) VALUES
   ('00000000-0000-0000-0000-000000000000', '61000000-0000-0000-0000-000000000001', 'authenticated', 'authenticated', 'building-owner@test.invalid', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now()),
   ('00000000-0000-0000-0000-000000000000', '61000000-0000-0000-0000-000000000002', 'authenticated', 'authenticated', 'building-participant@test.invalid', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000003', '61000000-0000-0000-0000-000000000003', 'authenticated', 'authenticated', 'building-outsider@test.invalid', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000000', '61000000-0000-0000-0000-000000000003', 'authenticated', 'authenticated', 'building-outsider@test.invalid', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now()),
   ('00000000-0000-0000-0000-000000000000', '61000000-0000-0000-0000-000000000004', 'authenticated', 'authenticated', 'building-pending@test.invalid', '', now(), '{}'::jsonb, '{}'::jsonb, now(), now());
 
 INSERT INTO public.dossiers (id, user_id, type, title)
