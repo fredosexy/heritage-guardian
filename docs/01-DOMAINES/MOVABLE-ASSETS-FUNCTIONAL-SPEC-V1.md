@@ -1,0 +1,300 @@
+# Spécification fonctionnelle V1 — Biens mobiliers
+
+**Domaine :** Patrimoine et gestion des biens  
+**Sous-domaine :** Biens mobiliers  
+**Version :** V1  
+**Pays de lancement :** Cameroun  
+**Statut :** spécification fonctionnelle proposée, périmètre validé par l'utilisateur  
+**Nature de cette livraison :** documentation uniquement
+
+## 1. Finalité
+
+Permettre à une personne ou à une famille de déclarer, identifier, documenter, sécuriser et suivre les biens mobiliers auxquels elle indique être liée. La fiche doit rendre compréhensibles l'identité du bien, ses caractéristiques utiles, son état déclaré, son lieu connu de conservation, les personnes associées, les pièces disponibles et les événements de son historique.
+
+Heritis constitue un référentiel d'information et de traçabilité. Il ne certifie pas la propriété, l'authenticité d'un objet, la valeur d'un bien ni la validité juridique d'une transaction.
+
+## 2. Périmètre des familles de biens
+
+La classification V1 couvre notamment :
+
+1. **Véhicules et moyens de transport :** voitures, motos, tricycles, camions, remorques, embarcations et autres moyens de transport déclarés.
+2. **Mobilier :** meubles domestiques, mobiliers de bureau, de commerce ou d'établissement.
+3. **Équipements domestiques :** appareils électroménagers, équipements électroniques et matériels d'usage courant.
+4. **Matériels et équipements professionnels :** machines, outils, matériels techniques et équipements de travail.
+5. **Objets de valeur :** bijoux, montres, œuvres d'art, objets précieux ou singuliers.
+6. **Collections et biens personnels :** collections, objets de famille, souvenirs et autres biens personnels présentant un intérêt patrimonial.
+7. **Autres biens mobiliers :** catégorie de repli motivée, avec description obligatoire de la nature du bien.
+
+Cette classification est fonctionnelle. Elle ne constitue pas une qualification juridique, fiscale, douanière ou assurantielle.
+
+## 3. Principes d'identification et d'unicité
+
+### 3.1 Identifiant Heritis
+
+Chaque bien mobilier dispose d'un identifiant interne unique et permanent. Cet identifiant :
+- reste stable pendant toute la vie de la fiche ;
+- ne change pas lors d'un changement de détenteur, d'utilisateur, de lieu de conservation ou de situation déclarée ;
+- n'est jamais réattribué à un autre bien ;
+- ne remplace aucun numéro officiel, numéro de série constructeur, immatriculation ou référence externe.
+
+### 3.2 Distinguer les biens proches
+
+Lorsque plusieurs biens sont semblables, la fiche doit permettre de les distinguer par une combinaison adaptée de désignation, marque, modèle, numéro de série, caractéristiques, photographie, quantité ou autre élément descriptif.
+
+Un lot ou un ensemble peut être enregistré comme un ensemble lorsque son suivi global est pertinent. Les composants qui nécessitent une identité ou un historique autonomes doivent pouvoir être référencés séparément et reliés à l'ensemble. Cette relation ne présume pas leur indépendance juridique.
+
+### 3.3 Prévention des doublons
+
+Avant de créer une fiche, l'interface peut aider à rechercher un bien déjà enregistré à partir des informations disponibles. Une correspondance possible doit être présentée comme une suggestion à vérifier, jamais comme une fusion automatique.
+
+Les domaines et dossiers qui concernent un bien déjà enregistré doivent référencer sa fiche patrimoniale. Un équipement agricole ou professionnel déjà enregistré dans un autre sous-domaine ne doit pas être recréé uniquement pour apparaître dans un nouveau dossier.
+
+## 4. Informations de la fiche
+
+Les champs sont progressifs et adaptés à la famille du bien. La V1 ne doit pas imposer toutes les rubriques à chaque catégorie.
+
+### 4.1 Informations communes
+
+Selon les informations disponibles, la fiche peut contenir :
+- identifiant Heritis ;
+- désignation ou nom usuel ;
+- famille et sous-catégorie ;
+- description libre et caractéristiques distinctives ;
+- marque, fabricant, modèle ou référence, si pertinents ;
+- numéro de série, immatriculation ou autre référence externe, si disponible ;
+- quantité ou composition, lorsque le bien est un lot ;
+- date ou période d'acquisition déclarée ;
+- mode d'entrée déclaré : achat, don, héritage, fabrication, échange, prêt, autre ou inconnu ;
+- état matériel déclaré ;
+- situation d'utilisation ou de détention ;
+- lieu de conservation connu ;
+- personnes et relations déclarées ;
+- documents, photographies et autres pièces ;
+- provenance des informations ;
+- événements et historique ;
+- liens vers d'autres biens et dossiers Heritis.
+
+### 4.2 Caractéristiques par famille
+
+Les champs spécifiques sont facultatifs et pertinents uniquement pour la famille choisie.
+
+- **Véhicules :** type, marque, modèle, année ou période, immatriculation, numéro de châssis ou de série, énergie ou motorisation déclarée, kilométrage déclaré avec date de relevé, documents disponibles.
+- **Mobilier :** type, matière déclarée, dimensions si utiles, fabricant ou artisan connu, quantité, particularités d'identification.
+- **Équipements domestiques :** type, marque, modèle, numéro de série, caractéristiques utiles, accessoires associés.
+- **Matériels professionnels :** fonction, marque, modèle, numéro de série, accessoires, lieu d'utilisation ou de stockage.
+- **Objets de valeur :** description distinctive, matière ou caractéristiques déclarées, marque ou signature si connue, photographie et documents de provenance disponibles.
+- **Collections :** nature de la collection, description de l'ensemble, nombre d'éléments déclaré, inventaire sommaire et possibilité de fiches liées pour les éléments suivis séparément.
+
+Heritis ne doit pas présenter ces caractéristiques déclarées comme une expertise technique ou une certification.
+
+## 5. État, situation et localisation
+
+### 5.1 État matériel déclaré
+
+L'état matériel doit être distinct du statut documentaire. Valeurs indicatives possibles : neuf, très bon état, bon état, usagé, endommagé, hors d'usage, détruit ou inconnu. L'utilisateur peut préciser une observation, sa date et son auteur.
+
+### 5.2 Situation déclarée
+
+La situation du bien peut notamment être : utilisé, conservé, prêté, loué, confié à un tiers, immobilisé, perdu, volé ou présumé volé, vendu, donné, détruit ou situation inconnue. Ces valeurs décrivent les informations saisies dans Heritis et ne constituent pas une décision ou qualification officielle.
+
+La fin d'une situation ou un changement doit être historisé plutôt que remplacer silencieusement l'état antérieur.
+
+### 5.3 Lieu de conservation
+
+La fiche peut indiquer un lieu connu de conservation ou d'utilisation : domicile, local, atelier, entrepôt, véhicule, autre lieu décrit ou lieu inconnu. La précision est limitée à ce qui est nécessaire et autorisé.
+
+La V1 ne prévoit pas de suivi GPS permanent, de surveillance en temps réel ni de partage public de la localisation. Les coordonnées ou adresses précises, lorsqu'elles sont réellement nécessaires, sont soumises aux permissions et protections applicables.
+
+## 6. Valeur déclarée et limites d'évaluation
+
+La V1 peut conserver une valeur indiquée par un utilisateur ou portée par un document, avec :
+- montant et devise tels que déclarés ;
+- nature de la valeur : prix d'acquisition, valeur déclarée, estimation externe ou montant figurant sur une pièce ;
+- auteur ou source ;
+- date de référence ;
+- document associé, le cas échéant ;
+- réserves ou contexte utiles.
+
+Ces notions doivent être affichées distinctement. Une valeur déclarée n'est pas une estimation Heritis. Une estimation externe n'est pas une expertise réalisée par Heritis. Le système ne calcule pas automatiquement une valeur marchande, une indemnité, une valeur fiscale ou une valeur de succession.
+
+## 7. Personnes, rôles et relations déclarées
+
+Un même bien peut être associé à plusieurs personnes, simultanément ou successivement. La fiche ne doit pas imposer un propriétaire unique.
+
+Selon le cas, les qualités déclarées peuvent comprendre :
+- propriétaire ou copropriétaire déclaré ;
+- détenteur ou possesseur ;
+- utilisateur ;
+- dépositaire ou gardien ;
+- locataire ou occupant ;
+- prêteur ou emprunteur, selon le contexte ;
+- bénéficiaire d'un droit déclaré ;
+- représentant ;
+- gestionnaire ou autre personne concernée.
+
+Pour chaque relation, conserver selon disponibilité : personne, qualité déclarée, description, auteur de la déclaration, source, date de saisie, dates d'effet déclarées, pièces associées, statut de vérification, éventuelle date de fin et historique des corrections.
+
+Les rôles dans l'application et les permissions d'accès sont distincts des qualités patrimoniales déclarées. Être détenteur, utilisateur, dépositaire ou propriétaire déclaré ne donne pas automatiquement un droit d'accès ou de modification dans Heritis.
+
+Une association ou une pièce jointe ne prouve pas à elle seule la propriété ou l'existence d'un droit.
+
+## 8. Documents, photographies et provenance
+
+La fiche peut recevoir, selon la nature du bien :
+- factures, reçus et preuves d'achat ;
+- contrats de vente, de don, de prêt, de location ou de dépôt ;
+- certificats, garanties et notices ;
+- documents d'immatriculation ou d'identification disponibles ;
+- attestations, inventaires et correspondances ;
+- photographies du bien, de ses marques distinctives ou de ses accessoires ;
+- documents de provenance ou d'estimation établis par des tiers.
+
+Pour chaque pièce, conserver autant que possible son auteur ou fournisseur, sa date de dépôt, sa catégorie, le bien ou la relation concernés, sa source et les éventuels contrôles réalisés.
+
+Les statuts doivent distinguer :
+1. information déclarée ;
+2. pièce déposée ;
+3. pièce examinée dans un contrôle interne identifié ;
+4. résultat d'une vérification externe ou décision d'une autorité compétente, lorsque documenté.
+
+Le dépôt d'un document ou d'une photographie ne garantit ni son authenticité, ni sa validité, ni sa suffisance. Les pièces privées ne sont accessibles qu'aux personnes autorisées.
+
+## 9. Événements et historique
+
+La fiche peut retracer notamment :
+- déclaration et création de la fiche ;
+- acquisition ou entrée déclarée dans le patrimoine ;
+- changement de détenteur, d'utilisateur, de dépositaire ou de lieu ;
+- prêt, dépôt, location ou restitution ;
+- entretien ou réparation simplement signalé ;
+- détérioration, perte, vol déclaré, récupération ou destruction ;
+- vente, don, échange ou transmission déclarée ;
+- ajout ou remplacement d'un document ;
+- vérification, contestation ou correction ;
+- rattachement à un dossier de succession ou de conflit.
+
+Pour les événements importants, distinguer la date de l'événement déclarée et la date d'enregistrement dans Heritis. Conserver l'auteur, la source, les observations et les pièces associées lorsque disponibles.
+
+Un événement déclaré ne doit pas être présenté comme une transaction juridiquement confirmée. Les corrections ne doivent pas effacer silencieusement les informations antérieures nécessaires à la traçabilité.
+
+## 10. Transmission et dossiers liés
+
+Un bien mobilier peut être référencé depuis un dossier de succession, de volontés ou de conflit. Le dossier lié réutilise l'identifiant patrimonial et ne crée pas une copie concurrente du bien.
+
+La fiche peut conserver les informations et pièces utiles à la préparation d'une transmission : personnes concernées, relations déclarées, historique, documents de provenance et indications reçues. Heritis ne détermine pas automatiquement les héritiers, les quotes-parts, la validité d'un testament ou l'attribution finale du bien.
+
+Un changement de détenteur ou une transmission déclarée doit être tracé comme événement, sans effacer les relations antérieures et sans être présenté comme un transfert juridiquement établi en l'absence de preuve ou décision compétente.
+
+## 11. Désaccords et contestations
+
+Lorsque plusieurs personnes déclarent des informations contradictoires sur un bien, Heritis doit permettre de :
+- conserver chaque déclaration avec son auteur et sa date ;
+- distinguer les positions des différentes personnes ;
+- rattacher les pièces et échanges pertinents ;
+- relier la fiche à un dossier de conflit ;
+- préserver la déclaration initiale et les modifications ultérieures ;
+- limiter l'accès selon les permissions.
+
+La contestation ne modifie pas automatiquement la fiche de référence et ne donne pas à Heritis un pouvoir d'arbitrage. La plateforme organise les informations et peut orienter vers des services ou professionnels compétents.
+
+## 12. Parcours fonctionnels V1
+
+1. **Découvrir :** présenter le rôle du sous-domaine et des exemples de familles de biens. Un visiteur non connecté ne voit qu'un aperçu explicatif.
+2. **Commencer une déclaration :** après authentification et contrôle des permissions, choisir une famille et saisir progressivement les informations essentielles.
+3. **Identifier :** attribuer un identifiant interne et proposer une recherche de doublons à confirmer par l'utilisateur.
+4. **Compléter :** ajouter caractéristiques, état, situation, lieu, personnes associées et pièces pertinentes.
+5. **Consulter :** afficher une fiche structurée, son statut documentaire, ses relations, ses pièces et son historique selon les droits.
+6. **Mettre à jour :** corriger ou compléter les informations en conservant l'auteur, la date et la trace du changement.
+7. **Relier :** référencer le bien depuis les dossiers et domaines autorisés, sans duplication.
+8. **Préparer une transmission ou suivre une contestation :** relier les dossiers concernés et conserver les informations utiles, sans décision automatique.
+
+Les formulaires doivent être progressifs, adaptés à la catégorie et permettre de différer les informations non disponibles sans inventer de données.
+
+## 13. Confidentialité, permissions et fonctionnement hors connexion
+
+- L'accès à la fiche, aux documents, à la localisation et à l'historique dépend des permissions applicables.
+- Les qualités patrimoniales déclarées ne confèrent pas automatiquement des permissions applicatives.
+- Aucun document privé ni renseignement sensible ne doit être rendu public par défaut.
+- Les actions protégées nécessitent une session et les autorisations requises ; le visiteur dispose uniquement d'un aperçu.
+- Les saisies hors connexion doivent pouvoir être identifiées comme locales ou en attente de synchronisation.
+- Une synchronisation ne doit pas écraser silencieusement une modification concurrente. Les conflits doivent être présentés et résolus selon les règles transversales de Heritis.
+- Les suppressions, corrections et révocations doivent respecter les règles communes de traçabilité, de conservation et de confidentialité.
+
+Cette spécification ne définit pas le schéma technique, les politiques RLS ni les mécanismes de synchronisation. Ceux-ci nécessitent un audit séparé de l'architecture existante avant toute implémentation.
+
+## 14. Principes UI/UX
+
+L'interface suit le système visuel global Heritis « Héritage premium » : vert forêt, ivoire et or patiné utilisé avec retenue, avec prise en charge du mode clair et du mode sombre.
+
+Principes :
+- privilégier une présentation sobre, lisible, mobile-first et cohérente ;
+- afficher les familles de biens avec des cartes suffisamment grandes, un titre clair et une description courte ;
+- limiter le nombre de cartes visibles et éviter les éléments décoratifs sans fonction ;
+- adapter les champs à la famille sélectionnée ;
+- distinguer visuellement les informations déclarées, les pièces déposées, les vérifications et les décisions externes ;
+- rendre visibles l'état matériel et la situation du bien sans les confondre avec le statut documentaire ;
+- présenter les personnes et leurs qualités de manière distincte des permissions ;
+- rendre l'historique compréhensible et attribuable ;
+- prévoir les états vide, chargement, erreur, hors connexion, en attente et conflit de synchronisation ;
+- respecter les exigences d'accessibilité du système global, notamment le contraste, la navigation clavier, les libellés et les zones tactiles.
+
+Aucune conformité d'accessibilité ou compatibilité réelle ne doit être revendiquée sans tests correspondants.
+
+## 15. Exclusions explicites de la V1
+
+Sont hors périmètre :
+- gestion commerciale, comptabilité, caisse ou facturation d'activité ;
+- gestion avancée de stocks commerciaux et inventaire logistique professionnel ;
+- maintenance préventive ou corrective détaillée et planification des réparations ;
+- expertise technique, authentification d'œuvres ou certification d'objets ;
+- estimation automatique de valeur, calcul d'indemnité ou évaluation fiscale ;
+- gestion intégrée de contrats d'assurance et de sinistres ;
+- géolocalisation permanente, GPS embarqué et suivi en temps réel ;
+- vente en ligne, marketplace et mise en relation commerciale intégrée ;
+- arbitrage juridique, certification de propriété ou transfert automatique de droits ;
+- automatisation des règles successorales et attribution des biens.
+
+Ces besoins pourront être réévalués dans une version ultérieure après décision explicite.
+
+## 16. Critères d'acceptation fonctionnels
+
+La V1 sera considérée comme fonctionnellement couverte lorsque :
+1. les familles de biens prévues peuvent être choisies et décrites sans champs inadaptés ;
+2. chaque fiche dispose d'un identifiant Heritis stable ;
+3. les biens similaires peuvent être distingués et les doublons potentiels signalés sans fusion automatique ;
+4. les caractéristiques spécifiques sont facultatives et adaptées à la famille ;
+5. l'état matériel, la situation et le statut documentaire sont distincts ;
+6. plusieurs personnes et qualités déclarées peuvent être associées à un même bien ;
+7. les qualités déclarées restent distinctes des permissions applicatives ;
+8. les documents, photographies et leur provenance peuvent être associés à la fiche ;
+9. les événements, corrections et changements sont historisés ;
+10. les valeurs déclarées ou issues de tiers ne sont pas présentées comme des expertises Heritis ;
+11. les fiches peuvent être référencées depuis les dossiers autorisés sans duplication ;
+12. les contestations conservent les positions et pièces attribuables sans arbitrage automatique ;
+13. les permissions protègent les fiches, documents et localisations ;
+14. les états hors connexion, attente et conflit sont prévus dans le parcours ;
+15. le visiteur ne peut consulter que l'aperçu public ;
+16. les écrans sont cohérents avec le système UI/UX global et les critères d'accessibilité à vérifier par tests.
+
+Ces critères décrivent les résultats attendus. Ils ne signifient pas que les fonctionnalités sont déjà implémentées ou testées.
+
+## 17. Ordre recommandé pour une future implémentation
+
+1. Auditer les modèles, composants, routes, permissions et services transversaux déjà présents.
+2. Vérifier les fiches et équipements existants afin de prévenir les doublons avec les autres sous-domaines.
+3. Définir le modèle de données et les règles d'accès après audit, sans présumer des migrations nécessaires.
+4. Réaliser les parcours de déclaration et de recherche de biens.
+5. Réaliser les vues de liste, détail et mise à jour avec historique.
+6. Ajouter les personnes, relations, documents et événements.
+7. Relier les fiches aux dossiers de succession et de conflit.
+8. Vérifier sécurité, permissions, synchronisation, accessibilité et comportement mobile par des tests adaptés.
+
+## 18. Limites de la spécification
+
+Ce document formalise le périmètre fonctionnel V1. Il ne constitue ni un avis juridique, ni une expertise, ni un schéma de base de données, ni une spécification d'API, ni une autorisation de modifier le code applicatif ou une configuration Supabase.
+
+Toute implémentation devra être précédée d'une vérification de l'état réel du dépôt et de l'architecture. Aucun changement Lovable ou Supabase distant n'est autorisé par cette spécification.
+
+---
+
+**Statut :** périmètre V1 validé par l'utilisateur ; spécification fonctionnelle documentée pour revue GitHub.  
