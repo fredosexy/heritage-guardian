@@ -395,7 +395,7 @@ export default function DossierDetailPage() {
             <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.actions.hint")}</p>
             <div className="mt-3 flex flex-col gap-2">
               {actions.map((action) => (
-                <Button key={action.key} type="button" variant="outline" disabled={!canEdit && action.key !== "proof"} onClick={action.run} className="min-h-11 justify-start rounded-xl bg-background text-left">
+                <Button key={action.key} type="button" variant="outline" disabled={!canEdit} onClick={action.run} className="min-h-11 justify-start rounded-xl bg-background text-left">
                   {action.label}
                 </Button>
               ))}
