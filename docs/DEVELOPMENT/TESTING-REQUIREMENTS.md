@@ -581,3 +581,7 @@ Il est interdit de :
 ---
 
 **Règle finale :** Heritis ne doit pas simplement réussir à compiler ou afficher des écrans. Il doit être démontrablement fiable dans ses parcours réels, protéger les personnes et leurs données, rester compréhensible et maintenable, évoluer sans fragiliser l'existant, et adopter les techniques nouvelles uniquement lorsqu'elles apportent une amélioration prouvée et durable.
+
+## Référentiel permanent de l'intelligence et des automatisations
+
+Les tests des prompts, modèles, agents, outils, sorties structurées et automatisations sont soumis à [AI-AND-AUTOMATION-RULES.md](AI-AND-AUTOMATION-RULES.md), en complément du présent référentiel de tests.
