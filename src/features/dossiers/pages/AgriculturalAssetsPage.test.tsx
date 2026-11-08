@@ -98,3 +98,11 @@ it("captures GPS only after explicit action and stores the declared point with a
     }),
   })));
 });
+
+it("shows large asset cards and a contextual action for the first record to enrich", () => {
+  render(<AgriculturalAssetsPage />);
+  expect(screen.getByRole("region", { name: "agricultural.results" })).toBeTruthy();
+  expect(screen.getByText("agricultural.cardInfoProgress")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "agricultural.summary.continue" }));
+  expect(mocks.navigate).toHaveBeenCalledWith("/dossiers/farm-1/edit");
+});
