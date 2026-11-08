@@ -32,6 +32,7 @@ interface TerrainBoundaryMapProps {
   boundaryPoints: GeoPoint[];
   referencePoint?: GeoPoint;
   onBoundaryChange: (points: GeoPoint[]) => void;
+  disabled?: boolean;
 }
 
 function makeBoundaryCollection(points: GeoPoint[]): GeoJsonFeatureCollection {
@@ -64,12 +65,14 @@ export function TerrainBoundaryMap({
   boundaryPoints,
   referencePoint,
   onBoundaryChange,
+  disabled = false,
 }: TerrainBoundaryMapProps) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapInstance | null>(null);
   const latestPointsRef = useRef(boundaryPoints);
   const onChangeRef = useRef(onBoundaryChange);
+  const disabledRef = useRef(disabled);
   const [loaded, setLoaded] = useState(false);
   const [mapError, setMapError] = useState("");
   const styleUrl = import.meta.env.VITE_TERRAIN_MAP_STYLE_URL as string | undefined;
@@ -80,7 +83,8 @@ export function TerrainBoundaryMap({
 
   useEffect(() => {
     onChangeRef.current = onBoundaryChange;
-  }, [onBoundaryChange]);
+    disabledRef.current = disabled;
+  }, [onBoundaryChange, disabled]);
 
   useEffect(() => {
     if (!styleUrl || !containerRef.current) return;
@@ -154,6 +158,7 @@ export function TerrainBoundaryMap({
           setLoaded(true);
         });
         map.on("click", (event) => {
+          if (disabledRef.current) return;
           onChangeRef.current([
             ...latestPointsRef.current,
             { latitude: event.lngLat.lat, longitude: event.lngLat.lng },
@@ -198,7 +203,7 @@ export function TerrainBoundaryMap({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">{t("create.terrainGeo.mapPointCount", { count: boundaryPoints.length })}</p>
         <div className="flex gap-2">
-          <Button type="button" size="sm" variant="outline" disabled={!boundaryPoints.length} onClick={() => onBoundaryChange(boundaryPoints.slice(0, -1))}>
+          <Button type="button" size="sm" variant="outline" disabled={disabled || !boundaryPoints.length} onClick={() => onBoundaryChange(boundaryPoints.slice(0, -1))}>
             {t("create.terrainGeo.undoVertex")}
           </Button>
           <Button type="button" size="sm" variant="ghost" disabled={!boundaryPoints.length} onClick={() => onBoundaryChange([])}>
