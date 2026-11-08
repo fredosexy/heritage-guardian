@@ -18,9 +18,10 @@ type GeoJsonFeatureCollection = {
   }>;
 };
 
+type MapClickEvent = { lngLat: { lat: number; lng: number } };
 type MapSource = { setData: (data: GeoJsonFeatureCollection) => void };
 type MapInstance = {
-  on: (event: string, callback: (event: any) => void) => void;
+  on: (event: string, callback: (event: MapClickEvent) => void) => void;
   addSource: (id: string, source: Record<string, unknown>) => void;
   addLayer: (layer: Record<string, unknown>) => void;
   getSource: (id: string) => MapSource | undefined;
