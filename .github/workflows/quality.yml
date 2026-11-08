@@ -51,10 +51,8 @@ jobs:
   edge-integration:
     runs-on: ubuntu-latest
     needs: database-migrations
-    # Keep Edge integration isolated from the default PostgreSQL port used by
-    # other local Supabase stacks on shared/self-hosted runners.
-    env:
-      SUPABASE_DB_PORT: 55432
+    # Select a free host port at runtime: fixed ports can collide with
+    # Docker-published services even when no TCP listener is visible to ss.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -67,20 +65,27 @@ jobs:
       # Clear setup-cli's GHCR override to allow cross-registry fallback.
       - name: Enable Supabase registry fallbacks
         run: echo 'SUPABASE_INTERNAL_IMAGE_REGISTRY=' >> "$GITHUB_ENV"
-      - name: Clean up stale local Supabase containers and inspect the database port
+      - name: Clean up stale local Supabase containers and select a free database port
         shell: bash
         run: |
           set -euo pipefail
-          # A previous or partially initialized local stack must not retain
-          # Supabase's default database port on this runner.
           supabase stop --no-backup || true
-          if ss -ltnp | grep -q ':55432'; then
-            echo "Port 55432 is still occupied after Supabase cleanup:"
-            ss -ltnp | grep ':55432' || true
-            echo "Docker containers publishing port 55432:"
-            docker ps --filter publish=55432 --format '{{.ID}} {{.Names}} {{.Ports}}' || true
+          # Ask the OS for an available TCP port instead of relying on a
+          # hard-coded port that may already be published by Docker.
+          db_port="$(node -e '
+            const net = require("node:net");
+            const server = net.createServer();
+            server.listen(0, "0.0.0.0", () => {
+              const port = server.address().port;
+              server.close(() => process.stdout.write(String(port)));
+            });
+          ')"
+          if [ -z "$db_port" ]; then
+            echo "Could not allocate a free local PostgreSQL port."
             exit 1
           fi
+          echo "Using isolated Supabase database port: $db_port"
+          echo "SUPABASE_DB_PORT=$db_port" >> "$GITHUB_ENV"
       - name: Start isolated local Supabase stack
         run: supabase start
       - name: Reset database and prepare local Edge environment
