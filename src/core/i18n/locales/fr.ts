@@ -215,6 +215,8 @@ export const fr = {
       mapPointCount: "{{count}} sommet(s) placé(s)",
       undoVertex: "Annuler le dernier sommet",
       clearContour: "Effacer le contour",
+      mapLoading: "Chargement de la carte…",
+      mapPrivacyHint: "Le fournisseur reçoit les requêtes correspondant à la zone affichée. Les sommets et les données du dossier restent dans Heritis.",
       mapTapHint: "Touchez la carte pour ajouter les sommets dans l’ordre du contour. Le contour et les mesures restent indicatifs."
       segmentDistances: "Distances entre sommets",
       side: "Côté",
