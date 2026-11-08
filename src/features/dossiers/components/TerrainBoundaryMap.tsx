@@ -75,7 +75,8 @@ export function TerrainBoundaryMap({
   const disabledRef = useRef(disabled);
   const [loaded, setLoaded] = useState(false);
   const [mapError, setMapError] = useState("");
-  const styleUrl = import.meta.env.VITE_TERRAIN_MAP_STYLE_URL as string | undefined;
+  const configuredStyleUrl = import.meta.env.VITE_TERRAIN_MAP_STYLE_URL as string | undefined;
+  const styleUrl = configuredStyleUrl || "https://tiles.openfreemap.org/styles/liberty";
 
   useEffect(() => {
     latestPointsRef.current = boundaryPoints;
@@ -140,6 +141,21 @@ export function TerrainBoundaryMap({
             source: "terrain-boundary",
             paint: { "line-color": "#173D32", "line-width": 3 },
           });
+          map.addSource("terrain-vertices", {
+            type: "geojson",
+            data: makeBoundaryCollection(boundaryPoints),
+          });
+          map.addLayer({
+            id: "terrain-vertices-points",
+            type: "circle",
+            source: "terrain-vertices",
+            paint: {
+              "circle-radius": 5,
+              "circle-color": "#173D32",
+              "circle-stroke-color": "#FFFFFF",
+              "circle-stroke-width": 2,
+            },
+          });
           map.addSource("terrain-reference", {
             type: "geojson",
             data: makeReferenceCollection(referencePoint),
@@ -186,6 +202,7 @@ export function TerrainBoundaryMap({
   useEffect(() => {
     if (!loaded || !mapRef.current) return;
     mapRef.current.getSource("terrain-boundary")?.setData(makeBoundaryCollection(boundaryPoints));
+    mapRef.current.getSource("terrain-vertices")?.setData(makeBoundaryCollection(boundaryPoints));
     mapRef.current.getSource("terrain-reference")?.setData(makeReferenceCollection(referencePoint));
   }, [boundaryPoints, referencePoint, loaded]);
 
