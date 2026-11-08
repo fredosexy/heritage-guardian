@@ -817,7 +817,11 @@ Une interface est prête à être proposée à la revue lorsque :
 - [ ] Les animations respectent la préférence de réduction du mouvement.
 - [ ] Les textes sont clairs, traduits et adaptés aux formats locaux.
 - [ ] Les tests automatisés et manuels pertinents ont été exécutés.
-- [ ] Les limites et éléments non vérifiés sont clairement signalés.\n- [ ] La solution choisie privilégie le natif, le gratuit ou l'open source avant toute option payante.\n- [ ] Les requêtes, transferts et appels externes sont limités au strict nécessaire.\n- [ ] Aucun dépassement facturable ou abonnement tiers n'est activé sans validation explicite.\n- [ ] Une solution de repli existe pour tout service externe non essentiel.
+- [ ] Les limites et éléments non vérifiés sont clairement signalés.
+- [ ] La solution choisie privilégie le natif, le gratuit ou l'open source avant toute option payante.
+- [ ] Les requêtes, transferts et appels externes sont limités au strict nécessaire.
+- [ ] Aucun dépassement facturable ou abonnement tiers n'est activé sans validation explicite.
+- [ ] Une solution de repli existe pour tout service externe non essentiel.
 
 ## 30. Économie des ressources, requêtes et coûts d'exploitation
 
@@ -865,7 +869,8 @@ Références complémentaires :
 - `/CONTRIBUTING.md` — contribution et revue ;
 - `GOVERNANCE.md` — autorité, décisions et responsabilités ;
 - `ARCHITECTURE-RULES.md` — architecture, résilience et séparation des responsabilités ;
-- `SECURITY-RULES.md` — identité, accès, confidentialité et sécurité ;\n- `DATA-AND-DATABASE-RULES.md` — structure, requêtes, stockage, synchronisation et maîtrise des coûts de données ;
+- `SECURITY-RULES.md` — identité, accès, confidentialité et sécurité ;
+- `DATA-AND-DATABASE-RULES.md` — structure, requêtes, stockage, synchronisation et maîtrise des coûts de données ;
 - `DESIGN_SYSTEM_UI_UX.md` — direction artistique et tokens ;
 - `UX-PRINCIPLES.md` — langage utilisateur et progression ;
 - `UI_UX_CURRENT_STATE_AUDIT_2026-11-07.md` — audit statique daté, à revalider ;
