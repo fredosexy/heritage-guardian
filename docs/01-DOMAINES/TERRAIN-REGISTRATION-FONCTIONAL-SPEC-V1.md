@@ -275,3 +275,14 @@ Une action principale doit rester clairement identifiable. Les valeurs calculée
 ## 15. Limites explicites
 
 La V1 n'effectue pas de certification de propriété, de bornage officiel, de levé topographique certifié, de validation cadastrale, de détection juridique automatique des chevauchements, ni de résolution des conflits de limites. Les calculs sont des outils d'estimation et de documentation. Les imports géographiques, le géocodage et les cartes hors ligne ne sont pas considérés comme disponibles avant implémentation et validation spécifiques.
+## 16. Références techniques et conditions fournisseur
+
+- MapLibre GL JS : https://maplibre.org/maplibre-gl-js/docs/
+- Licence MapLibre GL JS : BSD-3-Clause (voir la distribution officielle du paquet).
+- OpenFreeMap : https://openfreemap.org/
+- Guide d’intégration OpenFreeMap : https://openfreemap.org/quick_start/
+- Conditions OpenFreeMap : https://openfreemap.org/tos/
+- Politique de confidentialité OpenFreeMap : https://openfreemap.org/privacy/
+- Attribution OpenStreetMap : https://www.openstreetmap.org/copyright
+
+Ces références doivent être revérifiées avant toute mise en production ou changement de fournisseur.
