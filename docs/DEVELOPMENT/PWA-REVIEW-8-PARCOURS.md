@@ -141,7 +141,8 @@
 - Deux tests unitaires couvrent l'enregistrement du gestionnaire d'activation, l'appel à la suppression et l'attente de sa promesse. Ils ne simulent pas encore un navigateur complet ni plusieurs onglets.
 
 **Vérifications restantes avant de déclarer la migration sûre**
-- Confirmer dans le build que le service worker généré importe bien le script de migration.
+- Le script `scripts/verify-pwa-worker.mjs` est désormais exécuté à la fin du build de production : il vérifie que `dist/sw.js` référence le hook de migration, que le fichier importé est copié dans `dist/` et que le hook attend la suppression du cache privé.
+- Le nouveau contrôle post-build doit réussir dans la CI sur la tête courante de la PR.
 - Ajouter ou exécuter un test d'intégration navigateur représentant ancien worker actif → nouveau worker en attente → acceptation → activation/purge → transfert de contrôle, avec vérification qu'aucune requête post-activation ne recrée le cache.
 - Effectuer la recette de mise à niveau sur une installation ayant réellement utilisé la version précédente, y compris plusieurs onglets.
 
