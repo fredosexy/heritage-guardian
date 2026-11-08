@@ -100,7 +100,7 @@ export default function DossierDetailPage() {
             ...latestMetadata,
             terrain: {
               ...latestTerrain,
-              version: 1,
+              version: 2,
               sections: { ...latestSections, ...changedSections },
               geospatial: terrainGeospatial,
             },
