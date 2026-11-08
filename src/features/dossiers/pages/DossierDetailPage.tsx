@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ChevronRight, CircleAlert, CircleCheck, CircleDot, Loader2, MapPin, Pencil, Save, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useDossierDetail } from "../hooks/useDossierDetail";
+import { useDossiers } from "../hooks/useDossiers";
 import { buildingsRepo, dossiersRepo, enqueueUpdateDossierMetadata, proceduresRepo } from "@/data";
 import type { DossierStep } from "@/core/types/domain";
 import { ProofsTab } from "../components/ProofsTab";
@@ -21,6 +22,7 @@ export default function DossierDetailPage() {
   const navigate = useNavigate();
   const { dossier, proofs, participants, suggestions, loading, loadError, reload, uploading, addProof, remove, canEdit } =
     useDossierDetail(id);
+  const { dossiers: allDossiers } = useDossiers();
   const [journey, setJourney] = useState<proceduresRepo.DossierJourneyStep[]>([]);
   const [transitioning, setTransitioning] = useState(false);
   const [editingTerrain, setEditingTerrain] = useState(false);
@@ -307,6 +309,7 @@ export default function DossierDetailPage() {
         const details = typeof asset.declaredDetails === "string" ? asset.declaredDetails : "";
         const people = Array.isArray(asset.declaredPeople) ? asset.declaredPeople as Array<{ id: string; name: string; role: string; note?: string }> : [];
         const events = Array.isArray(asset.events) ? asset.events as Array<{ id: string; type: string; date: string; description: string }> : [];
+        const relatedAssets = Array.isArray(asset.relatedAssets) ? asset.relatedAssets as Array<{ dossierId: string; relationType: string }> : [];
         const geo = asset.geospatial && typeof asset.geospatial === "object" && !Array.isArray(asset.geospatial)
           ? (asset.geospatial as { point?: { latitude?: number; longitude?: number; accuracyMeters?: number | null; capturedAt?: string; source?: string } }).point
           : undefined;
@@ -336,6 +339,14 @@ export default function DossierDetailPage() {
                 <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.gpsDisclaimer")}</p>
               </div>
             ) : null}
+            <div className="mt-4 border-t border-border/60 pt-4">
+              <h3 className="text-sm font-semibold">{t("agricultural.links.title")}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.links.disclaimer")}</p>
+              {relatedAssets.length ? <ul className="mt-2 space-y-2">{relatedAssets.map((link) => {
+                const linked = allDossiers.find((item) => item.id === link.dossierId);
+                return <li key={link.dossierId} className="rounded-xl bg-background/60 p-3"><p className="text-sm font-medium">{linked?.title ?? t("agricultural.links.linkedDossier")}</p><p className="mt-1 text-xs text-muted-foreground">{t("agricultural.links.types." + link.relationType)} · {linked?.type ?? link.dossierId}</p></li>;
+              })}</ul> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.links.empty")}</p>}
+            </div>
             <div className="mt-4 border-t border-border/60 pt-4">
               <h3 className="text-sm font-semibold">{t("agricultural.people.title")}</h3>
               <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.people.disclaimer")}</p>
