@@ -14,10 +14,12 @@ Ouvrir un parcours authentifié pour les biens agricoles et ruraux sans présent
 - Page dédiée `/agricultural`, protégée par `ProtectedRoute`.
 - Liste des actifs agricoles et ruraux, recherche par désignation/localisation et filtre par famille.
 - Déclaration progressive initiale avec les six familles prévues par la spécification : exploitation, plantation, élevage, équipement, infrastructure et autre actif rural.
+- Champs structurés facultatifs par famille : activités et date de début pour une exploitation ; culture, variété, superficie/unité et période de plantation ; espèce, quantité et date d’inventaire pour un élevage ; nature, marque, modèle, identifiant et état déclaré pour un équipement ; nature, usage et état observé pour une infrastructure ; nature et caractéristiques pour les autres actifs.
+- Les quantités et superficies sont conservées comme valeurs numériques déclarées ; les champs absents restent absents. Les champs ne constituent ni un inventaire confirmé ni une mesure certifiée.
 - Affichage de la famille et des précisions déclarées dans la fiche de dossier existante.
 - Persistance via le dossier commun Heritis et son mécanisme de création en ligne / brouillon local / synchronisation existant.
 - Libellés français et anglais.
-- Tests de base de la liste et du filtre par famille.
+- Tests de base de la liste, du filtre par famille, de la création et de la persistance des champs structurés.
 
 ## Modèle de données utilisé dans cette première tranche
 
