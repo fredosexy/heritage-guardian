@@ -227,3 +227,9 @@ Les consignes propres à un outil (par exemple les instructions GitHub Copilot o
 ## 15. Règle finale
 
 **En cas de doute, ne pas deviner et ne pas agir silencieusement.** Examiner les faits, préserver l'existant, exposer les conséquences possibles et demander la décision nécessaire. La qualité, la sécurité, l'intégrité des données et la confiance des utilisateurs priment sur la vitesse d'exécution.
+
+---
+
+## Référentiel permanent complémentaire
+
+Les règles de modélisation, de qualité, de protection, de synchronisation, de conservation et de sobriété des données sont définies dans [DATA-AND-DATABASE-RULES.md](docs/DEVELOPMENT/DATA-AND-DATABASE-RULES.md). Ce référentiel doit être consulté pour toute évolution touchant aux données ou à leur stockage.
