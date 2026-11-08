@@ -257,6 +257,122 @@ Après validation documentaire et audit de l'existant :
 
 Ce document décrit le périmètre fonctionnel V1. Il ne constitue ni un schéma de base de données, ni une API, ni une décision de migration, ni une validation juridique ou financière. Toute implémentation devra être précédée d'un audit de l'architecture existante et d'une validation des exigences de sécurité.
 
+## 20. Compléments détaillés par catégorie financière
+
+### 20.1 Comptes et produits d'épargne
+
+La fiche peut décrire l'établissement déclaré, le pays ou l'agence si utile, le type de compte ou de produit, la devise, une désignation personnelle et une référence externe partiellement masquée. Un numéro complet n'est pas requis pour identifier la fiche Heritis. Ne jamais demander un mot de passe, code PIN, CVV, code à usage unique, identifiant secret ou donnée permettant d'initier une opération.
+
+Les soldes ne sont conservés que comme valeurs datées et attribuées : montant déclaré par une personne, montant visible sur une pièce, montant communiqué par un tiers identifié ou valeur ancienne. Un relevé déposé ne donne pas à Heritis une connexion au compte et ne garantit pas que le solde est encore actuel.
+
+### 20.2 Placements et titres
+
+Selon le type, la fiche peut contenir l'émetteur, la dénomination du titre, sa catégorie, le dépositaire ou intermédiaire déclaré, la quantité ou valeur nominale déclarée, la devise, la date de référence, les références non secrètes et les documents associés. Les opérations d'achat/vente ou mouvements de portefeuille ne sont pas exécutés par Heritis. Les quantités restent déclaratives ou issues d'une pièce datée.
+
+### 20.3 Participations et parts sociales
+
+La fiche peut préciser l'entreprise ou structure concernée, sa dénomination telle que déclarée, le pays ou lieu d'enregistrement si connu, la nature de la participation, le nombre ou la proportion de parts déclarés, la date de référence et les pièces disponibles. Distinguer la participation déclarée, la mention portée dans un registre ou document et toute confirmation externe. Une proportion déclarée n'est pas transformée en droit de vote, contrôle ou droit économique juridiquement établi.
+
+### 20.4 Créances, prêts et sommes dues
+
+La fiche peut préciser le créancier déclaré, le débiteur déclaré, l'origine de la somme, le montant initial, la devise, la date d'origine, l'échéance déclarée, les modalités de remboursement mentionnées et les pièces. Les remboursements peuvent être saisis comme événements déclarés avec date, montant, auteur et preuve éventuelle.
+
+Un solde arithmétique peut être calculé uniquement à partir des montants enregistrés et doit afficher sa formule, sa date de calcul et ses limites. Il ne prouve ni la reconnaissance de la dette par le débiteur, ni la réception effective d'un paiement, ni l'exigibilité juridique de la créance. Les intérêts, pénalités ou conversions ne sont pas calculés automatiquement en l'absence d'une règle explicite et validée.
+
+### 20.5 Droits patrimoniaux et contractuels à composante financière
+
+La fiche doit préciser la nature du droit déclaré, le contrat ou événement d'origine, les parties indiquées, la portée économique décrite, les conditions, restrictions, durée, échéances et pièces disponibles. Si le droit est principalement intellectuel, une licence non financière ou une autorisation, orienter vers le sous-domaine des autres actifs particuliers. Si sa nature demeure incertaine, conserver le classement comme provisoire et expliquer pourquoi.
+
+## 21. Événements, échéances et changements de statut
+
+Les événements possibles comprennent ouverture ou clôture déclarée d'un compte, changement d'établissement, dépôt ou retrait mentionné dans une pièce, acquisition ou cession déclarée d'un placement, changement de quantité, distribution ou revenu communiqué, entrée ou sortie d'une participation, création ou modification d'une créance, échéance, remboursement déclaré, retard signalé, contestation, correction, changement de représentant et rattachement à un dossier de succession.
+
+Chaque événement conserve sa date d'effet, sa date d'enregistrement, son auteur, sa source, le montant et la devise s'ils sont pertinents, les personnes concernées et les pièces. Distinguer les statuts de la fiche, les événements financiers déclarés, les échéances et le statut documentaire. Un rappel est une notification de suivi et ne réalise aucune opération bancaire ou contractuelle.
+
+Une clôture, une cession ou un remboursement total déclaré ne supprime pas la fiche : elle demeure consultable selon les permissions et conserve l'historique. Les actifs réellement distincts reçoivent des fiches distinctes reliées par des événements ou liens de filiation adaptés.
+
+## 22. Confidentialité, partage et protection des données financières
+
+### 22.1 Minimisation et masquage
+
+Ne collecter que les données nécessaires à l'identification et au suivi documentaire. Les références de compte, titres ou contrats doivent être masquées par défaut dans les listes, notifications, aperçus et exports lorsque leur exposition n'est pas nécessaire. L'utilisateur doit pouvoir identifier une fiche sans révéler un numéro complet.
+
+Les secrets d'authentification, moyens d'initier un paiement, codes de validation, clés privées et identifiants d'accès sont interdits dans les champs et pièces destinés à Heritis. Le parcours doit avertir l'utilisateur avant dépôt d'un document et lui permettre de ne pas joindre une pièce contenant des informations excessives.
+
+### 22.2 Partage explicite
+
+Un partage doit préciser le destinataire, la fiche ou les champs concernés, les documents inclus, la finalité et, lorsque disponible, la durée. Un récapitulatif est présenté avant confirmation. Les accès sont journalisés et révocables. La révocation empêche les accès futurs selon les capacités du socle, sans prétendre effacer les copies déjà obtenues par un destinataire.
+
+Un lien depuis une succession ou un dossier de conflit ne donne pas automatiquement accès aux montants, références bancaires ou documents confidentiels. Les permissions du dossier source et celles de l'actif doivent être vérifiées séparément.
+
+### 22.3 Accès hors connexion et appareil
+
+Les données financières conservées localement doivent être limitées aux informations explicitement autorisées et nécessaires. L'interface doit signaler les données disponibles hors connexion et ne jamais présenter une modification locale comme confirmée par un établissement financier. Les règles techniques de chiffrement, expiration, effacement et protection de l'appareil seront définies lors de l'audit d'architecture et testées avant mise en production.
+
+## 23. Parcours détaillés et contrôles par opération
+
+### 23.1 Déclarer et identifier
+
+1. Choisir la catégorie financière.
+2. Rechercher une fiche existante pour éviter un doublon.
+3. Saisir la désignation, l'établissement/émetteur/débiteur ou la structure concernée, selon la catégorie.
+4. Renseigner uniquement les références non secrètes nécessaires.
+5. Associer le déclarant et les personnes ayant une relation déclarée.
+6. Indiquer la source et la date des informations.
+7. Enregistrer un brouillon ou la déclaration sans prétendre vérifier l'existence de l'actif.
+
+### 23.2 Ajouter montants et documents
+
+1. Choisir la nature du montant (déclaré, document, tiers, estimation externe ou calcul).
+2. Indiquer devise, date de référence, source et auteur.
+3. Joindre une pièce en contrôlant les données sensibles qu'elle contient.
+4. Masquer les références dans les vues non détaillées.
+5. Enregistrer les versions et corrections sans effacer les pièces précédentes.
+
+### 23.3 Suivre une créance ou un engagement
+
+1. Identifier séparément créancier et débiteur déclarés.
+2. Enregistrer montant initial, devise, date et échéance mentionnée.
+3. Ajouter chaque remboursement comme événement attribué.
+4. Afficher tout solde calculé avec détail arithmétique et date de calcul.
+5. Enregistrer séparément toute contestation ou divergence.
+6. Ne pas envoyer de demande de paiement ni confirmer la réception sans preuve fournie.
+
+### 23.4 Suivre une participation ou un placement
+
+1. Décrire l'émetteur ou la structure.
+2. Enregistrer quantité ou proportion déclarée et date de référence.
+3. Joindre les pièces ou références disponibles.
+4. Historiser toute variation déclarée.
+5. Distinguer les informations de l'utilisateur de celles d'un tiers.
+6. Ne pas fournir de recommandation d'investissement ni exécuter d'opération.
+
+### 23.5 Préparer une transmission
+
+1. Référencer la fiche dans le dossier de succession ou de volontés.
+2. Sélectionner les données et documents nécessaires.
+3. Vérifier séparément les permissions de chaque dossier et de chaque pièce.
+4. Identifier les bénéficiaires ou ayants droit uniquement comme personnes déclarées ou à examiner.
+5. Conserver les conditions contractuelles et restrictions connues.
+6. Ne réaliser aucun transfert ni changement de bénéficiaire auprès d'un établissement.
+
+## 24. Scénarios d'acceptation complémentaires
+
+1. déclarer un compte sans numéro complet ni secret d'accès ;
+2. afficher un solde avec sa date, sa devise et sa provenance, sans le présenter comme actuel s'il est ancien ;
+3. distinguer la quantité déclarée d'un titre de la quantité figurant dans une pièce datée ;
+4. enregistrer une participation et préserver le caractère déclaré de la proportion ;
+5. créer une créance avec créancier et débiteur distincts, puis plusieurs remboursements déclarés ;
+6. vérifier qu'un solde calculé ne confirme ni dette reconnue ni paiement reçu ;
+7. enregistrer une contestation sur une créance sans écraser les positions des parties ;
+8. masquer les références sensibles dans les listes, notifications et aperçus ;
+9. empêcher qu'un lien de succession donne accès implicitement à tous les documents financiers ;
+10. révoquer un partage et conserver la trace de cette révocation ;
+11. synchroniser des changements concurrents de montant ou de relation sans écrasement silencieux ;
+12. orienter un droit intellectuel ou une licence non financière vers le sous-domaine approprié sans créer de doublon.
+
+Ces scénarios constituent des exigences de validation future et non des tests déjà exécutés.
+
 ---
 
 **Statut :** périmètre fonctionnel V1 validé par l'utilisateur le 8 novembre 2026 ; revue documentaire effectuée et lien vérifié dans l'index.  
