@@ -25,6 +25,7 @@ type MapInstance = {
   addLayer: (layer: Record<string, unknown>) => void;
   getSource: (id: string) => MapSource | undefined;
   addControl: (control: unknown, position?: string) => void;
+  flyTo: (options: { center: [number, number]; zoom?: number }) => void;
   remove: () => void;
 };
 
@@ -186,10 +187,12 @@ export function TerrainBoundaryMap({
         });
         map.on("click", (event) => {
           if (disabledRef.current) return;
-          onChangeRef.current([
+          const nextPoints = [
             ...latestPointsRef.current,
             { latitude: event.lngLat.lat, longitude: event.lngLat.lng },
-          ]);
+          ];
+          latestPointsRef.current = nextPoints;
+          onChangeRef.current(nextPoints);
         });
         map.on("error", () => {
           if (!disposed) setMapError(t("create.terrainGeo.mapLoadError"));
@@ -210,6 +213,13 @@ export function TerrainBoundaryMap({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [styleUrl]);
 
+  useEffect(() => {
+    if (!loaded || !mapRef.current || !referencePoint) return;
+    mapRef.current.flyTo({
+      center: [referencePoint.longitude, referencePoint.latitude],
+      zoom: 15,
+    });
+  }, [referencePoint?.latitude, referencePoint?.longitude, loaded]);
   useEffect(() => {
     if (!loaded || !mapRef.current) return;
     mapRef.current.getSource("terrain-boundary")?.setData(makeBoundaryCollection(boundaryPoints));
