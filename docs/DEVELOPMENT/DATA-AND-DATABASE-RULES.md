@@ -88,7 +88,7 @@ Une offre gratuite limitée n'est pas assimilée à une garantie de gratuité du
 
 ## 5. Modèle métier et frontières des domaines
 
-Les données doivent refléter les quatre domaines métier validés :
+Les données de la V1 doivent refléter les quatre domaines métier actuellement validés. La vision générale cible six domaines, mais les deux domaines complémentaires ne sont pas encore spécifiés : ne pas créer de tables, relations, enums ou structures anticipant leurs besoins sans décision produit formelle. Les domaines V1 sont :
 1. patrimoine et gestion des biens ;
 2. héritage et succession ;
 3. volontés secrètes et dernières volontés ;
