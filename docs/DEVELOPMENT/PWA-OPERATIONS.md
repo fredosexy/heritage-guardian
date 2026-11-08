@@ -4,12 +4,14 @@
 **Périmètre :** installation, détection du mode installé, service worker, cache, continuité hors ligne et mises à jour  
 **Principe :** le mode hors ligne améliore la continuité ; il ne contourne jamais l'authentification, les autorisations serveur ou les limites des fonctions non disponibles sans réseau.
 
+> Revue documentaire complémentaire : [PWA — revue des 8 parcours](./PWA-REVIEW-8-PARCOURS.md). Cette revue sépare les constats statiques des essais physiques non effectués et documente les points restant à traiter.
+
 ## 1. Comportement attendu
 
 ### Installation et détection
 
 - Sur les navigateurs qui exposent `beforeinstallprompt`, Heritis conserve l'événement et ne déclenche l'invite qu'après une action explicite de l'utilisateur.
-- Sur iPhone/iPad, où cette invite n'est pas disponible, l'assistant explique le parcours Safari « Partager » puis « Sur l'écran d'accueil ».
+- Sur iPhone/iPad, l'assistant explique le parcours Safari « Partager » puis « Ajouter à l'écran d'accueil » ; si l'option « Ouvrir comme app web » est proposée, l'utilisateur peut l'activer.
 - L'état installé est détecté par `display-mode: standalone`, `display-mode: minimal-ui` et, sur les versions iOS concernées, `navigator.standalone`.
 - L'événement `appinstalled` actualise l'état après installation confirmée par le navigateur.
 - L'absence de `beforeinstallprompt` n'est pas interprétée comme une preuve d'incompatibilité : l'éligibilité réelle dépend aussi du navigateur, de son contexte et du déploiement HTTPS.
@@ -26,8 +28,8 @@
 
 - Le précache Workbox est réservé aux ressources statiques de l'application.
 - Le cache runtime est limité aux bibliothèques cartographiques publiques et aux icônes.
-- Les réponses Supabase Storage ne sont plus mises en cache par une règle générique : les URL de stockage peuvent représenter des documents privés ou des URL signées.
-- Au démarrage de la PWA, le cache historique `supabase-storage` est supprimé afin de retirer les réponses enregistrées par les versions précédentes.
+- Les réponses Supabase Storage ne sont plus mises en cache par une règle générique dans la nouvelle configuration.
+- Le cache historique `supabase-storage` est supprimé au démarrage ; **cette purge au démarrage ne suffit pas, à elle seule, à prouver que l'ancien service worker ne peut pas recréer ce cache pendant la transition**. Voir le point bloquant décrit dans la revue des 8 parcours.
 - Les dossiers mis en cache dans IndexedDB sont associés à l'identité du compte qui avait obtenu le droit de les consulter (`viewer_user_id`). Le propriétaire métier reste conservé séparément dans `user_id`.
 - Le schéma Dexie version 4 supprime les anciens instantanés qui ne portent pas l'identité du lecteur. Ils ne sont donc jamais réutilisés comme cache hors ligne pour un autre compte.
 - Les opérations en attente et les conflits sont associés au compte lecteur (`viewer_user_id`) ; le centre de synchronisation ne montre que les éléments du compte actif.
@@ -58,7 +60,7 @@ La suite PWA doit couvrir au minimum :
 - détection du parcours manuel iOS ;
 - transitions réseau `online/offline` ;
 - activation contrôlée d'une mise à jour en attente ;
-- suppression du cache historique Supabase Storage ;
+- suppression du cache historique Supabase Storage, y compris transition depuis un ancien worker ;
 - isolation des instantanés IndexedDB par compte lecteur ;
 - migration Dexie et préservation des brouillons/opérations en attente ;
 - build de production et génération effective du service worker/manifest.
@@ -70,7 +72,7 @@ Les tests unitaires ne remplacent pas les essais sur appareils réels.
 | Environnement | Scénarios obligatoires |
 |---|---|
 | Android / Chrome récent | HTTPS, manifest et icônes, invite d'installation, installation, lancement autonome, détection installé |
-| iPhone / iPad / Safari | ajout à l'écran d'accueil, lancement autonome, détection `navigator.standalone` |
+| iPhone / iPad / Safari | ajout à l'écran d'accueil, option « Ouvrir comme app web » lorsqu'elle est proposée, lancement autonome, détection `navigator.standalone` |
 | Tous navigateurs ciblés | première visite en ligne, ressources précachées, coupure réseau, retour réseau, mise à jour en attente |
 | Appareil partagé | compte A consulte un dossier, déconnexion, compte B ouvre la même route hors ligne : aucune donnée de A ne doit apparaître |
 | Migration | anciennes entrées IndexedDB et ancien cache runtime : aucune donnée privée ne doit être réutilisée par un autre compte |
@@ -82,12 +84,13 @@ Consigner pour chaque essai : appareil, OS, navigateur/version, URL HTTPS, commi
 Ne pas déclarer la PWA « complètement validée » tant que les points suivants ne sont pas prouvés sur le déploiement réel :
 
 - HTTPS et portée effective du service worker ;
-- validité réelle des fichiers PNG et zone de sécurité des icônes maskable ;
+- validité réelle des fichiers PNG/JPEG et zone de sécurité des icônes maskable ;
 - installabilité Android et parcours iOS ;
 - absence de fuite entre comptes sur appareil partagé ;
 - navigation et synchronisation après perte puis retour du réseau ;
 - activation de mise à jour sans perte de saisie ;
 - comportement des routes d'authentification et de retour OAuth ;
-- absence d'erreurs runtime et de régressions sur les fonctionnalités existantes.
+- absence d'erreurs runtime et de régressions sur les fonctionnalités existantes ;
+- purge définitive de l'ancien cache privé lors de la migration de service worker.
 
 Les essais réels Android/iOS et les contrôles de déploiement doivent être consignés séparément des résultats CI.
