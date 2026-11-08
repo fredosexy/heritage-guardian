@@ -50,6 +50,17 @@ function makeBoundaryCollection(points: GeoPoint[]): GeoJsonFeatureCollection {
   return { type: "FeatureCollection", features };
 }
 
+function makeVertexCollection(points: GeoPoint[]): GeoJsonFeatureCollection {
+  return {
+    type: "FeatureCollection",
+    features: points.map((point) => ({
+      type: "Feature",
+      properties: {},
+      geometry: { type: "Point", coordinates: [point.longitude, point.latitude] },
+    })),
+  };
+}
+
 function makeReferenceCollection(point?: GeoPoint): GeoJsonFeatureCollection {
   return {
     type: "FeatureCollection",
@@ -143,7 +154,7 @@ export function TerrainBoundaryMap({
           });
           map.addSource("terrain-vertices", {
             type: "geojson",
-            data: makeBoundaryCollection(boundaryPoints),
+            data: makeVertexCollection(boundaryPoints),
           });
           map.addLayer({
             id: "terrain-vertices-points",
@@ -202,7 +213,7 @@ export function TerrainBoundaryMap({
   useEffect(() => {
     if (!loaded || !mapRef.current) return;
     mapRef.current.getSource("terrain-boundary")?.setData(makeBoundaryCollection(boundaryPoints));
-    mapRef.current.getSource("terrain-vertices")?.setData(makeBoundaryCollection(boundaryPoints));
+    mapRef.current.getSource("terrain-vertices")?.setData(makeVertexCollection(boundaryPoints));
     mapRef.current.getSource("terrain-reference")?.setData(makeReferenceCollection(referencePoint));
   }, [boundaryPoints, referencePoint, loaded]);
 
