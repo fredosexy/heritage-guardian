@@ -55,7 +55,7 @@ function ConflictCard({ c, onResolve }: { c: SyncConflict; onResolve: (choice: P
 
 export default function SyncCenterPage() {
   const { t } = useTranslation();
-  const { queue, conflicts, retry, retrying, discard, resolve } = useSyncCenter();
+  const { queue, conflicts, legacyUnassignedCount, retry, retrying, discard, resolve } = useSyncCenter();
   const retryNow = async () => {
     if (!navigator.onLine) { toast.info(t("sync.errorNetwork")); return; }
     try { await retry(); }
@@ -70,6 +70,13 @@ export default function SyncCenterPage() {
   return (
     <AppLayout>
       <PageHeader title={t("sync.title")} subtitle={t("sync.subtitle")} />
+
+      {legacyUnassignedCount > 0 && (
+        <div role="status" className="card-soft mb-5 flex items-start gap-2 border border-warning/40 p-3 text-sm">
+          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" />
+          <p>{legacyUnassignedCount} ancienne(s) opération(s) locale(s) ne sont pas attribuées à un compte. Elles sont conservées, masquées et ne seront pas rejouées automatiquement afin d’éviter toute exposition entre comptes. Elles nécessitent un examen avant reprise.</p>
+        </div>
+      )}
 
       {conflicts.length > 0 && (
         <section className="mb-6 space-y-3">
