@@ -2,7 +2,7 @@
 
 > **Portée :** ce fichier s'applique à l'ensemble du dépôt et à toute intervention sur Heritis : développement, correction, refactorisation, documentation, tests, automatisation et assistance par IA.
 >
-> **Statut :** règles de référence du dépôt. Les documents spécialisés viendront les compléter. Une règle spécialisée peut préciser une règle générale, mais ne peut pas affaiblir les garde-fous fondamentaux définis ici.
+> **Statut :** règles de référence du dépôt. Les documents spécialisés présents dans le dépôt les complètent selon le périmètre de chaque intervention. Une règle spécialisée peut préciser une règle générale, mais ne peut pas affaiblir les garde-fous fondamentaux définis ici.
 
 ## 1. Instruction obligatoire avant toute intervention
 
