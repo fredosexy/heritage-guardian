@@ -120,3 +120,13 @@ Aucune migration distante ni modification Lovable n'est prévue dans cette tranc
 - La position GPS reste indicative, avec sa précision et sa date de capture affichées.
 - Les actions existantes restent soumises aux droits d'édition du dossier.
 - Les essais visuels sur appareils réels et la validation CI sont requis avant intégration.
+
+
+## Cinquième tranche — parcours de déclaration guidée
+
+- Découpage de la création en trois étapes : identifier le bien, décrire ses caractéristiques, puis préciser sa localisation.
+- Barre de progression accessible et repères d'étapes traduits en français et en anglais.
+- Navigation précédente/suivante sans perdre les valeurs saisies.
+- Le titre est requis avant de quitter l'étape d'identification ; les champs spécifiques restent des recommandations, non des conditions de validation.
+- La capture GPS n'est proposée qu'à l'étape de localisation et nécessite toujours une action explicite.
+- Les tests existants de création et de GPS sont adaptés au nouveau parcours.

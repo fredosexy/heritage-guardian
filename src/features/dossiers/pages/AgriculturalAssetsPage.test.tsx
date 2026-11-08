@@ -49,9 +49,11 @@ it("creates an agricultural declaration with its selected family and declared de
   fireEvent.click(screen.getByRole("button", { name: /agricultural.create/ }));
   fireEvent.change(screen.getByLabelText("agricultural.family"), { target: { value: "plantation" } });
   fireEvent.change(screen.getByLabelText("agricultural.designation"), { target: { value: "Plantation cacao" } });
+  fireEvent.click(screen.getByRole("button", { name: "agricultural.createSteps.next" }));
   fireEvent.change(screen.getByLabelText("agricultural.fields.plantation.cropType"), { target: { value: "Cacao" } });
   fireEvent.change(screen.getByLabelText("agricultural.fields.plantation.declaredArea"), { target: { value: "2" } });
   fireEvent.change(screen.getByLabelText("agricultural.specificsLabel"), { target: { value: "Plantation familiale" } });
+  fireEvent.click(screen.getByRole("button", { name: "agricultural.createSteps.next" }));
   fireEvent.change(screen.getByLabelText("agricultural.location"), { target: { value: "Littoral" } });
   fireEvent.click(screen.getByRole("button", { name: "agricultural.save" }));
   await waitFor(() => expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({
@@ -66,6 +68,7 @@ it("creates an agricultural declaration with its selected family and declared de
 it("offers contextual next actions while the declaration is incomplete", () => {
   render(<AgriculturalAssetsPage />);
   fireEvent.click(screen.getByRole("button", { name: /agricultural.create/ }));
+  fireEvent.click(screen.getByRole("button", { name: "agricultural.createSteps.next" }));
   expect(screen.getByText("agricultural.assistant.title")).toBeTruthy();
   expect(screen.getByText("agricultural.assistant.nextStep")).toBeTruthy();
   expect(screen.getByRole("button", { name: "agricultural.fields.exploitation.activities" })).toBeTruthy();
@@ -85,6 +88,8 @@ it("captures GPS only after explicit action and stores the declared point with a
   fireEvent.click(screen.getByRole("button", { name: /agricultural.create/ }));
   fireEvent.change(screen.getByLabelText("agricultural.designation"), { target: { value: "Plantation GPS" } });
   expect(getCurrentPosition).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "agricultural.createSteps.next" }));
+  fireEvent.click(screen.getByRole("button", { name: "agricultural.createSteps.next" }));
   fireEvent.click(screen.getByRole("button", { name: "agricultural.captureGps" }));
   await waitFor(() => expect(getCurrentPosition).toHaveBeenCalledTimes(1));
   fireEvent.click(screen.getByRole("button", { name: "agricultural.save" }));

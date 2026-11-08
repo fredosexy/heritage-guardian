@@ -203,6 +203,7 @@ export const en = {
     locationCaptured: "GPS position captured.",
     locationDenied: "Location was not obtained. Check permission and try again.",
     detail: { summaryFields: "Completed fields", summaryPeople: "Active people", summaryEvents: "Declared events", progressLabel: "Recommended information completeness" },
+    createSteps: { title: "Guided declaration", counter: "Step {{current}} of {{total}}", progress: "Declaration progress", steps: { 0: "Identify", 1: "Describe", 2: "Locate" }, hint: { 0: "Choose the asset family and give it a clear name.", 1: "Add useful characteristics for this family. Recommended fields are guidance only.", 2: "Describe the location and, if you wish, allow a one-time GPS capture." }, back: "Back", next: "Continue" },
     actions: {
       title: "Useful next steps",
       hint: "Automatic suggestions based only on information present in this record.",
