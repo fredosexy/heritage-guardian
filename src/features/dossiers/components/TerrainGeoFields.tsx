@@ -50,8 +50,9 @@ export function TerrainGeoFields({ value, onChange, disabled = false }: TerrainG
   const parsedPoints = useMemo(() => {
     const lines = contourText.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
     return lines.map((line) => {
-      const parts = line.split(/[;,]/).map((part) => Number(part.trim()));
-      return parts.length === 2 ? { latitude: parts[0], longitude: parts[1] } : null;
+      const parts = line.split(/[;,]/).map((part) => part.trim());
+      if (parts.length !== 2 || parts.some((part) => !part)) return null;
+      return { latitude: Number(parts[0]), longitude: Number(parts[1]) };
     });
   }, [contourText]);
 
@@ -157,6 +158,7 @@ export function TerrainGeoFields({ value, onChange, disabled = false }: TerrainG
           <div className="grid grid-cols-2 gap-3 rounded-2xl bg-muted/60 p-3">
             <div><p className="text-xs text-muted-foreground">{t("create.terrainGeo.perimeter")}</p><p className="text-sm font-semibold">{value.measurements.perimeterMeters.toLocaleString(undefined, { maximumFractionDigits: 1 })} m</p></div>
             <div><p className="text-xs text-muted-foreground">{t("create.terrainGeo.area")}</p><p className="text-sm font-semibold">{value.measurements.areaSquareMeters.toLocaleString(undefined, { maximumFractionDigits: 1 })} m²</p><p className="text-xs text-muted-foreground">{value.measurements.areaHectares.toLocaleString(undefined, { maximumFractionDigits: 4 })} ha</p></div>
+            <div className="col-span-2 space-y-1"><p className="text-xs font-medium text-muted-foreground">{t("create.terrainGeo.segmentDistances")}</p>{value.measurements.segmentDistancesMeters.map((distance, index) => <p key={index} className="text-xs text-muted-foreground">{t("create.terrainGeo.side")} {index + 1}: {distance.toLocaleString(undefined, { maximumFractionDigits: 1 })} m</p>)}</div>
           </div>
         )}
         <p className="text-[11px] text-muted-foreground">{t("create.terrainGeo.estimateDisclaimer")}</p>
