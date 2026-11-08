@@ -250,7 +250,7 @@ Le suivi peut contenir les personnes concernées, les faits allégués par chaqu
 
 Heritis aide à conserver et organiser les éléments, à suivre les actions et à orienter vers un professionnel ou une autorité compétente lorsque nécessaire. Il ne mène pas d'enquête coercitive, ne convoque pas les parties, ne tranche pas le différend, ne fixe pas une limite officielle et ne rend aucune décision juridique. Toute médiation éventuelle doit être explicitement cadrée, volontaire et distincte d'une décision officielle.
 
-### Étape 9 — Vérifier et enregistrer
+### Étape 10 — Vérifier et enregistrer
 
 Avant l'enregistrement, afficher un récapitulatif lisible avec :
 - informations complètes ;
@@ -572,6 +572,59 @@ Chaque lot doit être audité, testé et documenté sur GitHub avant le suivant.
 - Les modalités d'orientation, de médiation volontaire ou de transfert vers un professionnel/une autorité doivent être définies sans présenter Heritis comme arbitre.
 
 Les caractéristiques techniques détaillées du bâtiment et les diagnostics sont reportés aux versions futures et ne constituent pas des questions bloquantes de la V1.
+
+## 13. Compléments de précision fonctionnelle V1
+
+### 13.1 Distinguer bâtiment, unité, dépendance et terrain
+
+La fiche bâtiment représente une construction ou un ensemble immobilier identifié. Une unité (appartement, boutique, bureau ou local) est une partie suivie séparément, rattachée à un seul bâtiment parent en V1. Une dépendance peut être décrite dans la fiche du bâtiment ou faire l'objet d'une fiche distincte uniquement si elle constitue un actif réellement identifié et suivi séparément. Le choix doit être explicite et ne doit pas produire deux fiches concurrentes pour le même objet.
+
+Le lien bâtiment–terrain est facultatif et unique côté bâtiment en V1. Il réutilise la fiche Terrain existante, ses références et sa géométrie selon les permissions ; il ne copie ni ne transforme ces données en attributs certifiés du bâtiment. Plusieurs bâtiments peuvent être liés au même terrain. Les unités restent des éléments enfants du bâtiment, sans présumer d'une copropriété, d'un titre ou d'une indépendance juridique.
+
+### 13.2 Cycle de vie et changements de situation
+
+La fiche doit distinguer l'état descriptif courant de la chronologie des événements. Les événements possibles comprennent notamment : projet, début de construction, achèvement déclaré, occupation, mise en location, changement d'usage, travaux ou extension déclarés, sinistre, vacance, changement de gestionnaire, vente ou acquisition déclarée, donation ou transmission déclarée, démolition et archivage.
+
+Pour chaque événement, conserver si disponible : type, date d'effet déclarée, date de saisie, auteur, source, description, unité concernée, personnes liées et documents associés. Un événement n'efface pas les états précédents. Une vente ou une transmission déclarée ne change pas automatiquement les personnes ou droits affichés : les relations doivent être mises à jour avec leur propre source et leur propre historique.
+
+Les unités peuvent avoir une occupation et des événements différents de ceux du bâtiment parent. Une modification de l'adresse, du nom ou de l'usage du bâtiment ne doit pas écraser les informations historiques des unités.
+
+### 13.3 Relations entre personnes, unités et bâtiment
+
+Une personne peut être liée au bâtiment entier, à une unité particulière ou aux deux, avec une portée explicitement sélectionnée. Les qualités déclarées peuvent inclure propriétaire déclaré, copropriétaire déclaré, détenteur/possesseur déclaré, bénéficiaire d'un droit déclaré, représentant, gestionnaire, occupant, locataire, acquéreur ou vendeur déclaré, héritier/ayant droit potentiel ou déclaré, voisin ou personne concernée par un différend.
+
+Chaque relation conserve au minimum : personne ou organisation réutilisée depuis le référentiel commun, objet concerné (bâtiment ou unité), qualité déclarée, portée, période, auteur de la déclaration, source, pièces, statut de traitement et historique. Plusieurs relations simultanées ou successives sont possibles. Une relation au bâtiment ne s'étend pas automatiquement à toutes ses unités ; une relation à une unité ne devient pas automatiquement une relation au bâtiment entier.
+
+La qualité patrimoniale, la permission de consulter, la permission de modifier et le mandat éventuel restent quatre informations distinctes. Un représentant ou gestionnaire n'obtient pas automatiquement tous les droits d'accès.
+
+### 13.4 Gestion des contrats, occupations et montants
+
+La V1 permet de référencer et de documenter les contrats, accords, périodes d'occupation, remises de clés, échéances et montants communiqués lorsqu'ils sont utiles à la compréhension patrimoniale. Chaque montant doit être qualifié (déclaré, indiqué dans une pièce, communiqué par un tiers ou calculé à partir des données saisies), daté et associé à une devise et à une source lorsqu'elles sont disponibles.
+
+Le suivi des loyers, dépôts, paiements et soldes ne doit pas devenir une comptabilité locative implicite. Aucun paiement n'est exécuté, aucun montant n'est encaissé et aucun solde n'est présenté comme confirmé par Heritis. Tant que le périmètre financier détaillé n'est pas validé, ces éléments restent des événements ou références documentaires facultatifs, et non une fonctionnalité de gestion financière.
+
+### 13.5 Partage, corrections et conservation
+
+Avant tout partage, l'utilisateur autorisé choisit le destinataire, le bâtiment ou l'unité concernée, les informations et pièces accessibles, la finalité et, si le socle le permet, une durée. Un aperçu doit montrer exactement ce qui sera partagé. Le partage est journalisé et révocable selon les permissions. Le lien vers un dossier de conflit ne donne pas automatiquement à chaque partie accès à l'ensemble de la fiche immobilière ou à toutes les pièces privées.
+
+Une correction doit conserver la valeur antérieure utile, la valeur proposée, l'auteur, la date, le motif et les pièces associées. En cas de désaccord, les positions restent attribuées à leurs auteurs. Une suppression logique ou un archivage ne doit pas effacer les preuves, les événements ou les liens historiques nécessaires.
+
+### 13.6 Scénarios de vérification fonctionnelle
+
+Avant de considérer la spécification comme complètement traduite, vérifier au minimum les scénarios suivants :
+
+1. créer un bâtiment sans terrain connu, puis rattacher un terrain existant sans dupliquer sa fiche ;
+2. rattacher plusieurs bâtiments au même terrain ;
+3. créer plusieurs unités et distinguer les informations du parent et de chaque unité ;
+4. associer une personne à une unité sans lui attribuer automatiquement un rôle sur tout le bâtiment ;
+5. enregistrer plusieurs occupations successives avec leurs dates et pièces ;
+6. corriger une surface en conservant la mesure précédente, sa méthode et sa source ;
+7. documenter une vente ou une transmission déclarée sans transfert automatique de droits ;
+8. relier un différend sans révéler les pièces confidentielles des autres parties ;
+9. partager une seule unité ou un ensemble limité de documents, puis révoquer l'accès ;
+10. reprendre un brouillon hors connexion et résoudre un conflit sans écrasement silencieux.
+
+Les tests techniques de permissions, RLS, synchronisation, accessibilité et sécurité restent à effectuer au moment de l'implémentation ; leur présence dans cette liste ne signifie pas qu'ils ont déjà été exécutés.
 
 ---
 
