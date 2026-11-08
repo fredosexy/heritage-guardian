@@ -466,3 +466,7 @@ Les règles de modélisation, de qualité, de protection, de synchronisation, de
 ## Exigences permanentes de tests et de qualité
 
 Les règles de validation du comportement réel, de qualité du code de production, de sécurité, de maintenabilité, de scalabilité, de résilience, d'accessibilité et de modernisation progressive sont définies dans [TESTING-REQUIREMENTS.md](TESTING-REQUIREMENTS.md). Les techniques éprouvées et déjà maîtrisées doivent être privilégiées ; toute nouvelle technologie doit démontrer son bénéfice, sa maturité, sa sécurité et son coût total avant adoption.
+
+## Référentiel permanent de l'intelligence et des automatisations
+
+Le référentiel [AI-AND-AUTOMATION-RULES.md](AI-AND-AUTOMATION-RULES.md) précise les responsabilités, niveaux d'autonomie, approbations humaines, coûts et contrôles applicables à l'intelligence et aux automatisations.
