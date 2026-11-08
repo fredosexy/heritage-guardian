@@ -305,6 +305,11 @@ export default function DossierDetailPage() {
         const asset = raw && typeof raw === "object" && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
         const family = typeof asset.family === "string" ? asset.family : "autre";
         const details = typeof asset.declaredDetails === "string" ? asset.declaredDetails : "";
+        const people = Array.isArray(asset.declaredPeople) ? asset.declaredPeople as Array<{ id: string; name: string; role: string; note?: string }> : [];
+        const events = Array.isArray(asset.events) ? asset.events as Array<{ id: string; type: string; date: string; description: string }> : [];
+        const geo = asset.geospatial && typeof asset.geospatial === "object" && !Array.isArray(asset.geospatial)
+          ? (asset.geospatial as { point?: { latitude?: number; longitude?: number; accuracyMeters?: number | null; capturedAt?: string; source?: string } }).point
+          : undefined;
         return (
           <section className="card-soft mb-4 p-5">
             <p className="text-overline text-primary">{t("agricultural.title")}</p>
@@ -322,6 +327,25 @@ export default function DossierDetailPage() {
               </dl>
             ) : null}
             {dossier.location_name ? <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="size-4" />{dossier.location_name}</p> : null}
+            {geo && typeof geo.latitude === "number" && typeof geo.longitude === "number" ? (
+              <div className="mt-3 rounded-xl bg-background/60 p-3">
+                <p className="text-xs font-medium">{t("agricultural.gpsTitle")}</p>
+                <p className="mt-1 break-all text-sm tabular-nums">{geo.latitude.toFixed(6)}, {geo.longitude.toFixed(6)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.gpsCaptured", { accuracy: geo.accuracyMeters == null ? "—" : Math.round(geo.accuracyMeters) })}</p>
+                {geo.capturedAt ? <p className="mt-1 text-xs text-muted-foreground">{new Date(geo.capturedAt).toLocaleString()}</p> : null}
+                <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.gpsDisclaimer")}</p>
+              </div>
+            ) : null}
+            <div className="mt-4 border-t border-border/60 pt-4">
+              <h3 className="text-sm font-semibold">{t("agricultural.people.title")}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.people.disclaimer")}</p>
+              {people.length ? <ul className="mt-2 space-y-2">{people.map((person) => <li key={person.id} className="rounded-xl bg-background/60 p-3"><p className="text-sm font-medium">{person.name}</p><p className="mt-1 text-xs text-muted-foreground">{t("agricultural.people.roles." + person.role)} · {t("agricultural.people.declared")}</p>{person.note ? <p className="mt-1 text-xs">{person.note}</p> : null}</li>)}</ul> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.people.empty")}</p>}
+            </div>
+            <div className="mt-4 border-t border-border/60 pt-4">
+              <h3 className="text-sm font-semibold">{t("agricultural.events.title")}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.events.disclaimer")}</p>
+              {events.length ? <ol className="mt-2 space-y-2">{[...events].sort((a, b) => b.date.localeCompare(a.date)).map((event) => <li key={event.id} className="rounded-xl bg-background/60 p-3"><p className="text-sm font-medium">{t("agricultural.events.types." + event.type)} · {event.date}</p><p className="mt-1 text-xs">{event.description}</p><p className="mt-1 text-[11px] text-muted-foreground">{t("agricultural.events.declared")}</p></li>)}</ol> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.events.empty")}</p>}
+            </div>
           </section>
         );
       })()}
