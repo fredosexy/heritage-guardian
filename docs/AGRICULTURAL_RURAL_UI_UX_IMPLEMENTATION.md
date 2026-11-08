@@ -16,10 +16,11 @@ Ouvrir un parcours authentifié pour les biens agricoles et ruraux sans présent
 - Déclaration progressive initiale avec les six familles prévues par la spécification : exploitation, plantation, élevage, équipement, infrastructure et autre actif rural.
 - Champs structurés facultatifs par famille : activités et date de début pour une exploitation ; culture, variété, superficie/unité et période de plantation ; espèce, quantité et date d’inventaire pour un élevage ; nature, marque, modèle, identifiant et état déclaré pour un équipement ; nature, usage et état observé pour une infrastructure ; nature et caractéristiques pour les autres actifs.
 - Les quantités et superficies sont conservées comme valeurs numériques déclarées ; les champs absents restent absents. Les champs ne constituent ni un inventaire confirmé ni une mesure certifiée.
+- Assistant contextuel de déclaration : calcule la progression des informations recommandées selon la famille, identifie les champs encore vides et propose des raccourcis qui déplacent le focus vers le prochain champ à renseigner. Cette aide est déterministe et locale à l’interface ; elle ne prétend pas être une décision IA ni une validation juridique ou technique.
 - Affichage de la famille et des précisions déclarées dans la fiche de dossier existante.
 - Persistance via le dossier commun Heritis et son mécanisme de création en ligne / brouillon local / synchronisation existant.
 - Libellés français et anglais.
-- Tests de base de la liste, du filtre par famille, de la création et de la persistance des champs structurés.
+- Tests de base de la liste, du filtre par famille, de la création et de la persistance des champs structurés, ainsi que de l’affichage de l’assistant contextuel.
 
 ## Modèle de données utilisé dans cette première tranche
 
