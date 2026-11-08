@@ -110,8 +110,12 @@ jobs:
           edge_pid=$!
           trap 'kill "$edge_pid" 2>/dev/null || true' EXIT
 
+          # Supabase CLI reserves SUPABASE_* names in Edge env files, but the
+          # local Auth service still exposes its admin API with the generated key.
+          source /tmp/heritis-edge-test.env
           edge_ready=false
           auth_ready=false
+          auth_admin_ready=false
           for attempt in $(seq 1 90); do
             if ! kill -0 "$edge_pid" 2>/dev/null; then
               echo "Supabase Edge server exited before becoming ready."
@@ -125,17 +129,22 @@ jobs:
               http://127.0.0.1:54321/functions/v1/ai-chat || true)"
             auth_code="$(curl --silent --output /dev/null --write-out '%{http_code}' \
               http://127.0.0.1:54321/auth/v1/health || true)"
+            auth_admin_code="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+              --header "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+              --header "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+              "$SUPABASE_URL/auth/v1/admin/users?page=1&per_page=1" || true)"
 
             if [ "$edge_code" = "200" ]; then edge_ready=true; fi
             if [ "$auth_code" = "200" ]; then auth_ready=true; fi
-            if [ "$edge_ready" = "true" ] && [ "$auth_ready" = "true" ]; then
+            if [ "$auth_admin_code" = "200" ]; then auth_admin_ready=true; fi
+            if [ "$edge_ready" = "true" ] && [ "$auth_ready" = "true" ] && [ "$auth_admin_ready" = "true" ]; then
               break
             fi
             sleep 2
           done
 
-          if [ "$edge_ready" != "true" ] || [ "$auth_ready" != "true" ]; then
-            echo "Local Supabase APIs did not become ready within 180 seconds (Edge HTTP: ${edge_code:-none}; Auth HTTP: ${auth_code:-none})."
+          if [ "$edge_ready" != "true" ] || [ "$auth_ready" != "true" ] || [ "$auth_admin_ready" != "true" ]; then
+            echo "Local Supabase APIs did not become ready within 180 seconds (Edge HTTP: ${edge_code:-none}; Auth health HTTP: ${auth_code:-none}; Auth admin HTTP: ${auth_admin_code:-none})."
             echo "Supabase Edge runtime logs:"
             cat /tmp/heritis-edge-functions.log
             exit 1
