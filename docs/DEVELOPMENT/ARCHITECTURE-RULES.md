@@ -194,12 +194,12 @@ Le dépôt observé contient des migrations Supabase sous `supabase/migrations`,
 
 L'architecture distingue au minimum :
 - visiteur sans compte ;
-- personne reconnue par une première information déclarée ;
+- personne reconnue dès la communication d'un prénom ou d'un nom (l'un ou l'autre suffit), sans authentification ni droit d'accès supplémentaire ;
 - utilisateur authentifié ;
 - participant ou invité à une ressource ;
 - professionnel ou intervenant disposant d'un rôle spécifique, lorsque cette capacité est mise en place.
 
-L'identité de compte, l'identité déclarée, l'identité vérifiée et les qualités métier sont distinctes. L'authentification prouve le contrôle d'un compte ou d'une session, pas la propriété d'un bien, une filiation, une qualité d'héritier ou un mandat.
+L'identité de compte, l'identité déclarée, l'identité vérifiée et les qualités métier sont distinctes. Sans compte authentifié, l'expérience conversationnelle reste un aperçu guidé ; la conversation complète exige une session valide. L'authentification prouve le contrôle d'un compte ou d'une session, pas la propriété d'un bien, une filiation, une qualité d'héritier ou un mandat.
 
 L'autorisation suit le principe du moindre privilège, le refus par défaut et la vérification au niveau de la ressource. Elle tient compte de l'acteur, de l'action, de la ressource, du contexte, de la portée, de la durée et du statut de l'accès.
 
