@@ -67,7 +67,7 @@ Aucune migration distante ni modification Lovable n'est prévue dans cette tranc
 - Modification des champs généraux et spécifiques des dossiers agricoles via la route commune d'édition.
 - Sauvegarde des métadonnées agricoles via `enqueueUpdateDossierMetadata`, avec vérification du propriétaire avant mise en file et reprise par la synchronisation existante.
 - Capture GPS uniquement sur demande explicite ; refus, indisponibilité et erreurs de géolocalisation sont présentés à l'utilisateur.
-- Associations patrimoniales déclarées et événements datés stockés sous `metadata.agriculturalRural`.
+- Associations patrimoniales déclarées et événements datés stockés sous `metadata.agriculturalRural`. Les liens enregistrés peuvent être terminés sans supprimer leur trace ; les événements déjà enregistrés sont conservés et ne sont pas supprimables depuis le formulaire.
 - Références croisées vers des dossiers existants, sans copie des données du dossier cible.
 - Suggestions contextuelles calculées à partir des champs recommandés, de la localisation et du nombre de pièces jointes.
 
