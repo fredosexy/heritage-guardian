@@ -140,4 +140,5 @@ Aucune migration distante ni modification Lovable n'est prévue dans cette tranc
 - Les relations entre actifs sont clôturées avec une date et conservées dans l'historique ; une nouvelle relation crée un nouvel enregistrement au lieu de réactiver silencieusement l'ancien.
 - Les deux blocs du détail agricole ont des rôles distincts : présentation de la fiche et actions contextuelles.
 - La validation des synchronisations concurrentes et des reprises hors ligne reste conditionnée aux tests dédiés et à la CI de cette branche.
-- La migration ajoute uniquement la valeur enum `agricole` au type de dossier partagé ; aucune nouvelle table, politique RLS ou permission n'est créée par cette tranche.
+- La migration ajoute uniquement la valeur enum `agricole` au type de dossier partagé ; aucune nouvelle table ni politique RLS n'est créée par cette tranche.
+- Les tests SQL de régression couvrent la lecture du dossier agricole par son propriétaire et un participant accepté, le refus d'accès au participant en attente et à un tiers, ainsi que l'absence de droit de modification pour le participant.
