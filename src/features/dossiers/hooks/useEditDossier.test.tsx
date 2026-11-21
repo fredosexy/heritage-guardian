@@ -7,12 +7,16 @@ const mocks = vi.hoisted(() => ({
   get: vi.fn(),
   cacheGet: vi.fn(),
   cachePut: vi.fn(),
+  queueToArray: vi.fn(),
 }));
 
 vi.mock("@/features/identity", () => ({ useAuth: () => ({ user: { id: mocks.userId } }) }));
 vi.mock("@/data", () => ({ dossiersRepo: { getDossier: mocks.get }, enqueueUpdateDossier: mocks.save }));
 vi.mock("@/data/offline/db", () => ({
-  db: { cachedDossiers: { put: mocks.cachePut, get: mocks.cacheGet } },
+  db: {
+    cachedDossiers: { put: mocks.cachePut, get: mocks.cacheGet },
+    queue: { where: () => ({ equals: () => ({ toArray: mocks.queueToArray }) }) },
+  },
 }));
 
 import { useEditDossier } from "./useEditDossier";
@@ -21,6 +25,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.userId = "guest";
   mocks.cacheGet.mockResolvedValue(undefined);
+  mocks.queueToArray.mockResolvedValue([]);
   mocks.get.mockResolvedValue({ id: "terrain-1", user_id: "owner", title: "Original", updated_at: "base" });
 });
 
@@ -61,5 +66,46 @@ it("does not load an offline dossier cached for another account", async () => {
   expect(hook.result.current.dossier).toBeNull();
   expect(hook.result.current.canEdit).toBe(false);
   await expect(hook.result.current.save({ title: "Leak" })).resolves.toBe(false);
+  hook.unmount();
+});
+
+it("restores pending agricultural metadata when reopening a dossier offline", async () => {
+  mocks.userId = "owner";
+  mocks.get.mockRejectedValue(new Error("offline"));
+  mocks.cacheGet.mockResolvedValue({
+    id: "farm-1",
+    user_id: "owner",
+    viewer_user_id: "owner",
+    data: {
+      id: "farm-1",
+      user_id: "owner",
+      type: "agricole",
+      title: "Plantation",
+      updated_at: "base",
+      metadata: { agriculturalRural: { family: "plantation" } },
+    },
+    cached_at: Date.now(),
+  });
+  mocks.queueToArray.mockResolvedValue([{
+    id: 7,
+    kind: "update_dossier",
+    viewer_user_id: "owner",
+    payload: {
+      dossierId: "farm-1",
+      metadata: {
+        agriculturalRural: {
+          family: "plantation",
+          familyDetails: { cropType: "Cacao", declaredArea: 2 },
+          declaredPeople: [],
+        },
+      },
+    },
+    created_at: Date.now(),
+    attempts: 0,
+  }]);
+
+  const hook = renderHook(() => useEditDossier("farm-1"));
+  await waitFor(() => expect(hook.result.current.loading).toBe(false));
+  expect((hook.result.current.dossier?.metadata as { agriculturalRural: { familyDetails: { cropType: string } } }).agriculturalRural.familyDetails.cropType).toBe("Cacao");
   hook.unmount();
 });

@@ -1,4 +1,4 @@
-import { BookOpen, Building2, MapPin, Scale, ScrollText, Users, type LucideIcon } from "lucide-react";
+import { BookOpen, Building2, MapPin, Scale, ScrollText, Sprout, Users, type LucideIcon } from "lucide-react";
 
 export interface DossierTypeMeta {
   id: string;
@@ -17,7 +17,9 @@ export const DOSSIER_TYPES: DossierTypeMeta[] = [
 ];
 
 export function iconForType(type: string): LucideIcon {
-  return type === "batiment" ? Building2 : DOSSIER_TYPES.find((t) => t.id === type)?.icon ?? MapPin;
+  if (type === "batiment") return Building2;
+  if (type === "agricole") return Sprout;
+  return DOSSIER_TYPES.find((t) => t.id === type)?.icon ?? MapPin;
 }
 
 export function typeLabelKey(type: string): string {

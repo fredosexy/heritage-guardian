@@ -3,3 +3,4 @@ export { default as CreateDossierPage } from "./pages/CreateDossierPage";
 export { default as DossierDetailPage } from "./pages/DossierDetailPage";
 export { default as EditDossierPage } from "./pages/EditDossierPage";
 export { default as BuildingsPage } from "./pages/BuildingsPage";
+export { default as AgriculturalAssetsPage } from "./pages/AgriculturalAssetsPage";

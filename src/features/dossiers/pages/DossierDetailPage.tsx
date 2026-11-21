@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ChevronRight, CircleAlert, CircleCheck, CircleDot, Loader2, MapPin, Pencil, Save, Sparkles, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useDossierDetail } from "../hooks/useDossierDetail";
+import { useDossiers } from "../hooks/useDossiers";
 import { buildingsRepo, dossiersRepo, enqueueUpdateDossierMetadata, proceduresRepo } from "@/data";
 import type { DossierStep } from "@/core/types/domain";
 import { ProofsTab } from "../components/ProofsTab";
@@ -21,6 +22,7 @@ export default function DossierDetailPage() {
   const navigate = useNavigate();
   const { dossier, proofs, participants, suggestions, loading, loadError, reload, uploading, addProof, remove, canEdit } =
     useDossierDetail(id);
+  const { dossiers: allDossiers } = useDossiers();
   const [journey, setJourney] = useState<proceduresRepo.DossierJourneyStep[]>([]);
   const [transitioning, setTransitioning] = useState(false);
   const [editingTerrain, setEditingTerrain] = useState(false);
@@ -401,6 +403,142 @@ export default function DossierDetailPage() {
           </div>
         </section>
       )}
+      {dossier.type === "agricole" && (() => {
+        const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+          ? dossier.metadata as Record<string, unknown>
+          : {};
+        const raw = metadata.agriculturalRural;
+        const asset = raw && typeof raw === "object" && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
+        const family = typeof asset.family === "string" ? asset.family : "autre";
+        const details = typeof asset.declaredDetails === "string" ? asset.declaredDetails : "";
+        const people = Array.isArray(asset.declaredPeople) ? asset.declaredPeople as Array<{ id: string; name: string; role: string; note?: string; active?: boolean }> : [];
+        const events = Array.isArray(asset.events) ? asset.events as Array<{ id: string; type: string; date: string; description: string }> : [];
+        const relatedAssets = Array.isArray(asset.relatedAssets) ? asset.relatedAssets as Array<{ id?: string; dossierId: string; relationType: string; active?: boolean; endedAt?: string }> : [];
+        const geo = asset.geospatial && typeof asset.geospatial === "object" && !Array.isArray(asset.geospatial)
+          ? (asset.geospatial as { point?: { latitude?: number; longitude?: number; accuracyMeters?: number | null; capturedAt?: string; source?: string } }).point
+          : undefined;
+        const requiredByFamily: Record<string, string[]> = {
+          exploitation: ["activities", "activeSince"],
+          plantation: ["cropType", "declaredArea", "areaUnit"],
+          elevage: ["animalType", "declaredQuantity", "inventoryDate"],
+          equipement: ["equipmentType", "condition"],
+          infrastructure: ["infrastructureType", "use"],
+          autre: ["nature", "characteristics"],
+        };
+        const familyDetails = asset.familyDetails && typeof asset.familyDetails === "object" && !Array.isArray(asset.familyDetails)
+          ? asset.familyDetails as Record<string, unknown>
+          : {};
+        const recommended = requiredByFamily[family] ?? requiredByFamily.autre;
+        const completed = recommended.filter((key) => familyDetails[key] !== undefined && familyDetails[key] !== null && String(familyDetails[key]).trim() !== "").length;
+        const hasGeoPoint = !!geo && typeof geo.latitude === "number" && typeof geo.longitude === "number";
+        return (
+          <section className="mb-5 overflow-hidden rounded-[1.75rem] border border-border/70 bg-card shadow-[var(--shadow-soft)]">
+            <div className="bg-gradient-to-br from-accent/70 via-card to-card p-5 sm:p-7">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-overline font-semibold tracking-[0.16em] text-primary">{t("agricultural.title")}</p>
+                <span className="rounded-full border border-primary/20 bg-background/75 px-3 py-1 text-xs font-medium text-primary">{t("agricultural.families." + family)}</span>
+              </div>
+              <h2 className="mt-3 text-2xl font-semibold leading-tight sm:text-3xl">{dossier.title}</h2>
+              {details ? <p className="mt-3 max-w-3xl whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground sm:text-base">{details}</p> : null}
+              {dossier.location_name ? <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="size-4 shrink-0 text-primary" />{dossier.location_name}</p> : null}
+              <p className="mt-4 text-xs leading-relaxed text-muted-foreground">{t("agricultural.declarationNotice")}</p>
+            </div>
+            <div className="grid grid-cols-3 gap-px border-y border-border/70 bg-border/70">
+              <div className="bg-card p-3 sm:p-4"><p className="text-xl font-semibold tabular-nums sm:text-2xl">{completed}/{recommended.length}</p><p className="mt-1 text-[11px] leading-snug text-muted-foreground sm:text-xs">{t("agricultural.detail.summaryFields")}</p></div>
+              <div className="bg-card p-3 sm:p-4"><p className="text-xl font-semibold tabular-nums sm:text-2xl">{people.filter((person) => person.active !== false).length}</p><p className="mt-1 text-[11px] leading-snug text-muted-foreground sm:text-xs">{t("agricultural.detail.summaryPeople")}</p></div>
+              <div className="bg-card p-3 sm:p-4"><p className="text-xl font-semibold tabular-nums sm:text-2xl">{events.length}</p><p className="mt-1 text-[11px] leading-snug text-muted-foreground sm:text-xs">{t("agricultural.detail.summaryEvents")}</p></div>
+            </div>
+            <div className="space-y-5 p-5 sm:p-7">
+              <div>
+                <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground"><span>{t("agricultural.detail.progressLabel")}</span><span className="font-semibold tabular-nums">{Math.round((completed / recommended.length) * 100)}%</span></div>
+                <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: ((completed / recommended.length) * 100) + "%" }} /></div>
+              </div>
+            {details ? <p className="mt-3 whitespace-pre-wrap text-sm">{details}</p> : null}
+            {asset.familyDetails && typeof asset.familyDetails === "object" && !Array.isArray(asset.familyDetails) ? (
+              <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {Object.entries(asset.familyDetails as Record<string, unknown>).filter(([, value]) => (typeof value === "string" && value.trim() !== "") || typeof value === "number").map(([key, value]) => (
+                  <div key={key} className="rounded-2xl border border-border/60 bg-background/65 p-4">
+                    <dt className="text-xs text-muted-foreground">{t("agricultural.fields." + family + "." + key)}</dt>
+                    <dd className="mt-1 whitespace-pre-wrap text-sm font-medium">{String(value)}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+            {dossier.location_name ? <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="size-4" />{dossier.location_name}</p> : null}
+            {geo && typeof geo.latitude === "number" && typeof geo.longitude === "number" ? (
+              <div className="mt-3 rounded-2xl border border-border/60 bg-background/65 p-4">
+                <p className="text-xs font-medium">{t("agricultural.gpsTitle")}</p>
+                <p className="mt-1 break-all text-sm tabular-nums">{geo.latitude.toFixed(6)}, {geo.longitude.toFixed(6)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.gpsCaptured", { accuracy: geo.accuracyMeters == null ? "—" : Math.round(geo.accuracyMeters) })}</p>
+                {geo.capturedAt ? <p className="mt-1 text-xs text-muted-foreground">{new Date(geo.capturedAt).toLocaleString()}</p> : null}
+                <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.gpsDisclaimer")}</p>
+              </div>
+            ) : null}
+            <div className="border-t border-border/60 pt-5">
+              <h3 className="text-sm font-semibold">{t("agricultural.links.title")}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.links.disclaimer")}</p>
+              {relatedAssets.length ? <ul className="mt-2 space-y-2">{relatedAssets.map((link, index) => {
+                const linked = allDossiers.find((item) => item.id === link.dossierId);
+                return <li key={link.id ?? link.dossierId + "-" + index} className="rounded-2xl border border-border/60 bg-background/65 p-4"><p className="text-sm font-medium">{linked?.title ?? t("agricultural.links.linkedDossier")}</p><p className="mt-1 text-xs text-muted-foreground">{t("agricultural.links.types." + link.relationType)} · {link.active === false ? t("agricultural.links.ended") : t("agricultural.links.active")}{link.endedAt ? " · " + new Date(link.endedAt).toLocaleDateString() : ""} · {linked?.type ?? link.dossierId}</p></li>;
+              })}</ul> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.links.empty")}</p>}
+            </div>
+            <div className="mt-4 border-t border-border/60 pt-4">
+              <h3 className="text-sm font-semibold">{t("agricultural.people.title")}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.people.disclaimer")}</p>
+              {people.length ? <ul className="mt-2 space-y-2">{people.map((person) => <li key={person.id} className="rounded-2xl border border-border/60 bg-background/65 p-4"><p className="text-sm font-medium">{person.name}</p><p className="mt-1 text-xs text-muted-foreground">{t("agricultural.people.roles." + person.role)} · {t("agricultural.people.declared")}{person.active === false ? " · " + t("agricultural.people.ended") : ""}</p>{person.note ? <p className="mt-1 text-xs">{person.note}</p> : null}</li>)}</ul> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.people.empty")}</p>}
+            </div>
+            <div className="mt-4 border-t border-border/60 pt-4">
+              <h3 className="text-sm font-semibold">{t("agricultural.events.title")}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.events.disclaimer")}</p>
+              {events.length ? <ol className="mt-2 space-y-2">{[...events].sort((a, b) => b.date.localeCompare(a.date)).map((event) => <li key={event.id} className="rounded-2xl border border-border/60 bg-background/65 p-4"><p className="text-sm font-medium">{t("agricultural.events.types." + event.type)} · {event.date}</p><p className="mt-1 text-xs">{event.description}</p><p className="mt-1 text-[11px] text-muted-foreground">{t("agricultural.events.declared")}</p></li>)}</ol> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.events.empty")}</p>}
+            </div>
+          </section>
+        );
+      })()}
+
+      {dossier.type === "agricole" && (() => {
+        const metadata = dossier.metadata && typeof dossier.metadata === "object" && !Array.isArray(dossier.metadata)
+          ? dossier.metadata as Record<string, unknown>
+          : {};
+        const raw = metadata.agriculturalRural;
+        const asset = raw && typeof raw === "object" && !Array.isArray(raw) ? raw as Record<string, unknown> : {};
+        const family = typeof asset.family === "string" ? asset.family : "autre";
+        const required: Record<string, string[]> = {
+          exploitation: ["activities", "activeSince"],
+          plantation: ["cropType", "declaredArea", "areaUnit"],
+          elevage: ["animalType", "declaredQuantity", "inventoryDate"],
+          equipement: ["equipmentType", "condition"],
+          infrastructure: ["infrastructureType", "use"],
+          autre: ["nature", "characteristics"],
+        };
+        const familyDetails = asset.familyDetails && typeof asset.familyDetails === "object" && !Array.isArray(asset.familyDetails)
+          ? asset.familyDetails as Record<string, unknown>
+          : {};
+        const missing = (required[family] ?? required.autre).filter((key) => familyDetails[key] === undefined || familyDetails[key] === null || String(familyDetails[key]).trim() === "");
+        const actions = [
+          ...(missing.length > 0 ? [{ key: "details", label: t("agricultural.actions.completeDetails", { count: missing.length }), run: () => navigate(`/dossiers/${dossier.id}/edit`) }] : []),
+          ...(!dossier.location_name && !asset.geospatial ? [{ key: "location", label: t("agricultural.actions.addLocation"), run: () => navigate(`/dossiers/${dossier.id}/edit`) }] : []),
+          ...(proofs.length === 0 ? [{ key: "proof", label: t("agricultural.actions.addProof"), run: () => document.getElementById("proofs")?.scrollIntoView({ behavior: "smooth", block: "start" }) }] : []),
+        ];
+        if (actions.length === 0) return null;
+        return (
+          <section className="mb-4 rounded-3xl border border-primary/15 bg-accent/20 p-4" aria-live="polite">
+            <div className="flex items-center gap-2">
+              <Sparkles className="size-4 text-primary" />
+              <h2 className="text-sm font-semibold">{t("agricultural.actions.title")}</h2>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.actions.hint")}</p>
+            <div className="mt-3 flex flex-col gap-2">
+              {actions.map((action) => (
+                <Button key={action.key} type="button" variant="outline" disabled={!canEdit} onClick={action.run} className="min-h-11 justify-start rounded-xl bg-background text-left">
+                  {action.label}
+                </Button>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
+
       <Tabs defaultValue="proofs">
         <TabsList className="grid grid-cols-3 w-full">
           <TabsTrigger value="proofs">{t("dossier.proofs")}</TabsTrigger>

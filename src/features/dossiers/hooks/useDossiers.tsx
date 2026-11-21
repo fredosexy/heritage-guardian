@@ -14,6 +14,8 @@ export interface DossierListItem {
   completionScore: number;
   updatedAt: string;
   locationName?: string | null;
+  description?: string | null;
+  metadata?: unknown;
   participantsCount: number;
   proofsCount: number;
   nextAttention: string;
@@ -96,7 +98,8 @@ export function useDossiers() {
     return remote.map((d) => ({
       id: d.id, type: d.type, title: d.title, status: d.status,
       completionScore: d.completion_score, updatedAt: d.updated_at,
-      locationName: d.location_name, participantsCount: participants[d.id] ?? 0,
+      locationName: d.location_name, description: d.description, metadata: d.metadata,
+      participantsCount: participants[d.id] ?? 0,
       proofsCount: proofs[d.id] ?? 0,
       nextAttention: journeys[d.id]?.blocked
         ? `Parcours bloqué : ${journeys[d.id].blocked}`
