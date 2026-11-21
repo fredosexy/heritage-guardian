@@ -65,13 +65,11 @@ it("creates an agricultural declaration with its selected family and declared de
   expect(mocks.navigate).toHaveBeenCalledWith("/dossiers/new-farm");
 });
 
-it("offers contextual next actions while the declaration is incomplete", () => {
+it("offers a contextual next action for the first agricultural record to enrich", () => {
   render(<AgriculturalAssetsPage />);
-  fireEvent.click(screen.getByRole("button", { name: /agricultural.create/ }));
-  fireEvent.click(screen.getByRole("button", { name: "agricultural.createSteps.next" }));
-  expect(screen.getByText("agricultural.assistant.title")).toBeTruthy();
-  expect(screen.getByText("agricultural.assistant.nextStep")).toBeTruthy();
-  expect(screen.getByRole("button", { name: "agricultural.fields.exploitation.activities" })).toBeTruthy();
+  expect(screen.getByText("agricultural.summary.assistantTitle")).toBeTruthy();
+  expect(screen.getByText("agricultural.summary.assistantHint")).toBeTruthy();
+  expect(screen.getByRole("button", { name: "agricultural.summary.continue" })).toBeTruthy();
 });
 
 it("captures GPS only after explicit action and stores the declared point with accuracy and date", async () => {
@@ -107,7 +105,7 @@ it("captures GPS only after explicit action and stores the declared point with a
 it("shows large asset cards and a contextual action for the first record to enrich", () => {
   render(<AgriculturalAssetsPage />);
   expect(screen.getByRole("region", { name: "agricultural.results" })).toBeTruthy();
-  expect(screen.getByText("agricultural.cardInfoProgress")).toBeTruthy();
+  expect(screen.getAllByText("agricultural.cardInfoProgress").length).toBeGreaterThan(0);
   fireEvent.click(screen.getByRole("button", { name: "agricultural.summary.continue" }));
   expect(mocks.navigate).toHaveBeenCalledWith("/dossiers/farm-1/edit");
 });
@@ -120,6 +118,6 @@ it("does not save when Enter submits before the final declaration step", () => {
   const form = nextButton.closest("form");
   expect(form).toBeTruthy();
   fireEvent.submit(form!);
-  expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("2");
+  expect(screen.getByRole("progressbar", { name: "agricultural.createSteps.progress" }).getAttribute("aria-valuenow")).toBe("2");
   expect(mocks.create).not.toHaveBeenCalled();
 });

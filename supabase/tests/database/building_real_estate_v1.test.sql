@@ -5,7 +5,7 @@
 --   supabase test db
 
 BEGIN;
-SELECT plan(16);
+SELECT plan(22);
 
 INSERT INTO auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -22,12 +22,15 @@ VALUES
   ('62000000-0000-0000-0000-000000000002', '61000000-0000-0000-0000-000000000001', 'batiment', 'Bâtiment principal'),
   ('62000000-0000-0000-0000-000000000003', '61000000-0000-0000-0000-000000000001', 'batiment', 'Second bâtiment'),
   ('62000000-0000-0000-0000-000000000004', '61000000-0000-0000-0000-000000000002', 'terrain', 'Terrain autre propriétaire'),
-  ('62000000-0000-0000-0000-000000000005', '61000000-0000-0000-0000-000000000001', 'terrain', 'Dossier non bâtiment');
+  ('62000000-0000-0000-0000-000000000005', '61000000-0000-0000-0000-000000000001', 'terrain', 'Dossier non bâtiment'),
+  ('62000000-0000-0000-0000-000000000006', '61000000-0000-0000-0000-000000000001', 'agricole', 'Actif agricole déclaré');
 
 INSERT INTO public.participants (dossier_id, user_id, role, accepted_at)
 VALUES
   ('62000000-0000-0000-0000-000000000002', '61000000-0000-0000-0000-000000000002', 'viewer', now()),
-  ('62000000-0000-0000-0000-000000000002', '61000000-0000-0000-0000-000000000004', 'viewer', NULL);
+  ('62000000-0000-0000-0000-000000000002', '61000000-0000-0000-0000-000000000004', 'viewer', NULL),
+  ('62000000-0000-0000-0000-000000000006', '61000000-0000-0000-0000-000000000002', 'viewer', now()),
+  ('62000000-0000-0000-0000-000000000006', '61000000-0000-0000-0000-000000000004', 'viewer', NULL);
 
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub', '61000000-0000-0000-0000-000000000001', true);
@@ -62,6 +65,18 @@ SELECT is(
   1,
   'the owner can read the building property'
 );
+SELECT is(
+  (SELECT count(*)::integer FROM public.dossiers WHERE id = '62000000-0000-0000-0000-000000000006'),
+  1,
+  'the owner can read an agricultural dossier'
+);
+UPDATE public.dossiers SET title = 'Actif agricole corrigé'
+WHERE id = '62000000-0000-0000-0000-000000000006';
+SELECT is(
+  (SELECT title FROM public.dossiers WHERE id = '62000000-0000-0000-0000-000000000006'),
+  'Actif agricole corrigé',
+  'the owner can update an agricultural dossier'
+);
 
 SELECT set_config('request.jwt.claim.sub', '61000000-0000-0000-0000-000000000002', true);
 SELECT is(
@@ -69,6 +84,13 @@ SELECT is(
   1,
   'an accepted participant can read the building property'
 );
+SELECT is(
+  (SELECT count(*)::integer FROM public.dossiers WHERE id = '62000000-0000-0000-0000-000000000006'),
+  1,
+  'an accepted participant can read an agricultural dossier'
+);
+UPDATE public.dossiers SET title = 'Participant write attempt'
+WHERE id = '62000000-0000-0000-0000-000000000006';
 SELECT throws_ok(
   $$ INSERT INTO public.building_events (building_dossier_id, event_type, title)
      VALUES ('62000000-0000-0000-0000-000000000002', 'autre', 'Participant write attempt') $$,
@@ -77,6 +99,20 @@ SELECT throws_ok(
 );
 
 SELECT set_config('request.jwt.claim.sub', '61000000-0000-0000-0000-000000000004', true);
+
+SELECT set_config('request.jwt.claim.sub', '61000000-0000-0000-0000-000000000001', true);
+SELECT is(
+  (SELECT title FROM public.dossiers WHERE id = '62000000-0000-0000-0000-000000000006'),
+  'Actif agricole corrigé',
+  'an accepted participant cannot update an agricultural dossier'
+);
+
+SELECT set_config('request.jwt.claim.sub', '61000000-0000-0000-0000-000000000004', true);
+SELECT is(
+  (SELECT count(*)::integer FROM public.dossiers WHERE id = '62000000-0000-0000-0000-000000000006'),
+  0,
+  'a pending participant cannot read an agricultural dossier'
+);
 SELECT is(
   (SELECT count(*)::integer FROM public.building_properties WHERE dossier_id = '62000000-0000-0000-0000-000000000002'),
   0,
@@ -84,6 +120,11 @@ SELECT is(
 );
 
 SELECT set_config('request.jwt.claim.sub', '61000000-0000-0000-0000-000000000003', true);
+SELECT is(
+  (SELECT count(*)::integer FROM public.dossiers WHERE id = '62000000-0000-0000-0000-000000000006'),
+  0,
+  'an unrelated user cannot read an agricultural dossier'
+);
 SELECT is(
   (SELECT count(*)::integer FROM public.building_properties WHERE dossier_id = '62000000-0000-0000-0000-000000000002'),
   0,

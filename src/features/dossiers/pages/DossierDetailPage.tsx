@@ -430,7 +430,6 @@ export default function DossierDetailPage() {
           : {};
         const recommended = requiredByFamily[family] ?? requiredByFamily.autre;
         const completed = recommended.filter((key) => familyDetails[key] !== undefined && familyDetails[key] !== null && String(familyDetails[key]).trim() !== "").length;
-        const hasGeoPoint = !!geo && typeof geo.latitude === "number" && typeof geo.longitude === "number";
         return (
           <section className="mb-5 overflow-hidden rounded-[1.75rem] border border-border/70 bg-card shadow-[var(--shadow-soft)]">
             <div className="bg-gradient-to-br from-accent/70 via-card to-card p-5 sm:p-7">
@@ -453,7 +452,6 @@ export default function DossierDetailPage() {
                 <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground"><span>{t("agricultural.detail.progressLabel")}</span><span className="font-semibold tabular-nums">{Math.round((completed / recommended.length) * 100)}%</span></div>
                 <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: ((completed / recommended.length) * 100) + "%" }} /></div>
               </div>
-            {details ? <p className="mt-3 whitespace-pre-wrap text-sm">{details}</p> : null}
             {asset.familyDetails && typeof asset.familyDetails === "object" && !Array.isArray(asset.familyDetails) ? (
               <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {Object.entries(asset.familyDetails as Record<string, unknown>).filter(([, value]) => (typeof value === "string" && value.trim() !== "") || typeof value === "number").map(([key, value]) => (
@@ -464,7 +462,6 @@ export default function DossierDetailPage() {
                 ))}
               </dl>
             ) : null}
-            {dossier.location_name ? <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="size-4" />{dossier.location_name}</p> : null}
             {geo && typeof geo.latitude === "number" && typeof geo.longitude === "number" ? (
               <div className="mt-3 rounded-2xl border border-border/60 bg-background/65 p-4">
                 <p className="text-xs font-medium">{t("agricultural.gpsTitle")}</p>
@@ -491,6 +488,7 @@ export default function DossierDetailPage() {
               <h3 className="text-sm font-semibold">{t("agricultural.events.title")}</h3>
               <p className="mt-1 text-xs text-muted-foreground">{t("agricultural.events.disclaimer")}</p>
               {events.length ? <ol className="mt-2 space-y-2">{[...events].sort((a, b) => b.date.localeCompare(a.date)).map((event) => <li key={event.id} className="rounded-2xl border border-border/60 bg-background/65 p-4"><p className="text-sm font-medium">{t("agricultural.events.types." + event.type)} · {event.date}</p><p className="mt-1 text-xs">{event.description}</p><p className="mt-1 text-[11px] text-muted-foreground">{t("agricultural.events.declared")}</p></li>)}</ol> : <p className="mt-2 text-xs text-muted-foreground">{t("agricultural.events.empty")}</p>}
+            </div>
             </div>
           </section>
         );
