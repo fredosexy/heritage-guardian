@@ -21,6 +21,7 @@
 ### Service worker et mises à jour
 
 - L'enregistrement est réservé à la production et exclu des aperçus Lovable intégrés.
+- Dans l'aperçu intégré, le nettoyage des anciens workers ne bloque plus le montage de l'application : une attente indéfinie ou un refus du navigateur ne laisse pas l'accueil vide. Les erreurs de nettoyage alimentent le statut PWA. La purge préalable des caches privés en production reste inchangée.
 - Le mode de mise à jour est contrôlé (`registerType: prompt`) : une nouvelle version déclenche une proposition explicite dans l'assistant PWA.
 - L'utilisateur peut demander l'activation de la version en attente ; la page est rechargée par le mécanisme du plugin après activation.
 - Un contrôle de mise à jour est relancé lorsque l'application revient au premier plan et que le navigateur indique une connexion.
@@ -102,3 +103,15 @@ Ne pas déclarer la PWA « complètement validée » tant que les points suivant
 - purge définitive de l'ancien cache privé lors de la migration de service worker.
 
 Les essais réels Android/iOS et les contrôles de déploiement doivent être consignés séparément des résultats CI.
+
+## 7. Correctif de démarrage — 22 novembre 2026 UTC
+
+- **État initial confirmé :** une recherche de workers indéfiniment en attente empêchait le montage React en iframe. Des erreurs de types concernaient les imports Node des tests et le callback de cache des icônes.
+- **Périmètre livré :** `src/main.tsx` (nettoyage non bloquant en aperçu, garde du point de montage), `tsconfig.app.json` (types Node déjà installés), `workboxConfig.ts` et son test (indicateur Workbox `sameOrigin`), `src/main.test.tsx` et `vitest.config.ts` (résolution du module PWA pendant les tests), ce document et `roadmap.md`.
+- **Compatibilité :** purge préalable des caches privés en production, file IndexedDB, droits et données métier inchangés. Aucune nouvelle dépendance. Exception de travail sur `main` explicitement autorisée par le propriétaire ; PR et workflows distants non vérifiés.
+- **Tests exécutés :** `bunx vitest run` : 136 tests réussis dans 32 fichiers, dont 3 nouveaux tests de démarrage. Premier essai ciblé : 3 échecs dus au module virtuel PWA non résolu ; résolution corrigée dans la configuration de tests, puis suite complète réussie.
+- **Lint ciblé exécuté :** `bunx eslint src/main.tsx src/main.test.tsx src/features/pwa/workboxConfig.ts src/features/pwa/workboxConfig.test.ts vitest.config.ts` : réussi. Lint global non exécuté.
+- **Compilation :** dernier résultat du contrôle automatique de l'aperçu `build OK` ; aucun build ou contrôle de types manuel supplémentaire lancé.
+- **Navigateur Chromium local :** accueil `/`, redirection `/index` et rechargement contrôlés en 448 × 798 et 1280 × 1800 ; accueil visible en iframe avec recherche de workers volontairement bloquée, aucune erreur runtime capturée. Cette simulation ne valide pas toutes les restrictions du véritable aperçu hébergé.
+- **Avertissements conservés :** avertissements React Router v7 et base Browserslist ancienne ; les diagnostics d'échec IA sont attendus dans les tests négatifs.
+- **Limites :** session authentifiée, appareils physiques, anciens workers réellement déployés et environnement publié non testés pour ce correctif. Aucun service distant, migration, donnée utilisateur, déploiement, publication ou fusion modifié.

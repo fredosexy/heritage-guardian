@@ -11,9 +11,9 @@ describe("PWA runtime cache allowlist", () => {
 
     const iconRule = pwaRuntimeCaching.find((rule) => rule.options.cacheName === "icons");
     expect(iconRule).toBeDefined();
-    const matchesIcon = iconRule?.urlPattern as (context: { url: URL }) => boolean;
-    expect(matchesIcon({ url: new URL("/icons/icon-192.png", self.location.origin) })).toBe(true);
-    expect(matchesIcon({ url: new URL("https://external.example/icons/icon.png") })).toBe(false);
+    const matchesIcon = iconRule?.urlPattern as (context: { url: URL; sameOrigin: boolean }) => boolean;
+    expect(matchesIcon({ url: new URL("/icons/icon-192.png", self.location.origin), sameOrigin: true })).toBe(true);
+    expect(matchesIcon({ url: new URL("https://external.example/icons/icon.png"), sameOrigin: false })).toBe(false);
   });
 
   it("never caches Supabase Storage responses generically", () => {
@@ -21,7 +21,7 @@ describe("PWA runtime cache allowlist", () => {
     const matchesAnyRule = pwaRuntimeCaching.some((rule) =>
       rule.urlPattern instanceof RegExp
         ? rule.urlPattern.test(privateFile.href)
-        : rule.urlPattern({ url: privateFile } as { url: URL }),
+        : rule.urlPattern({ url: privateFile, sameOrigin: false }),
     );
     expect(matchesAnyRule).toBe(false);
   });

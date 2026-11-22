@@ -1,3 +1,8 @@
+# Startup correction (exception on main authorized)
+- [x] Make preview cleanup nonblocking while preserving production privacy cleanup.
+- [x] Fix reported PWA typing errors without changing cache permissions.
+- [x] Run regression tests and browser startup checks; document actual results (136 tests passed; preview build OK; desktop/mobile reload and iframe checked).
+
 # Terrain offline continuity
 - [x] Inspect existing queue, Sync Center, proof retry tests and ownership flows.
 - [x] Preserve diagnostics; explicit retry and confirmed discard; safe proof replay without assuming storage_path uniqueness.
