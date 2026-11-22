@@ -15,16 +15,18 @@ const isPreviewHost =
 
 async function bootstrap() {
   if (isPreviewHost || isInIframe) {
-    if ("serviceWorker" in navigator) {
-      await navigator.serviceWorker.getRegistrations().then((registrations) =>
-        Promise.all(registrations
-          .filter((registration) => {
-            const scope = new URL(registration.scope);
-            return scope.origin === window.location.origin && scope.pathname === "/";
-          })
-          .map((registration) => registration.unregister())),
-      ).catch(() => undefined);
-    }
+    // Browser cleanup may never settle in restricted frames; do not gate rendering.
+    const cleanup = async () => {
+      if (!("serviceWorker" in navigator)) return;
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations
+        .filter((registration) => {
+          const scope = new URL(registration.scope);
+          return scope.origin === window.location.origin && scope.pathname === "/";
+        })
+        .map((registration) => registration.unregister()));
+    };
+    void cleanup().catch(() => publishPwaStatus("error"));
   } else if ("serviceWorker" in navigator && import.meta.env.PROD) {
     try {
       // Remove responses cached by the previous broad Supabase Storage rule
@@ -59,7 +61,9 @@ async function bootstrap() {
 
   // Offline sync remains independent from service-worker availability.
   initSyncListeners();
-  createRoot(document.getElementById("root")!).render(<App />);
+  const root = document.getElementById("root");
+  if (!root) throw new Error("Heritis mount element is missing");
+  createRoot(root).render(<App />);
 }
 
 void bootstrap();
