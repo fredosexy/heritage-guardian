@@ -3,6 +3,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   save: vi.fn(),
+  saveMetadata: vi.fn(),
   userId: "guest",
   get: vi.fn(),
   cacheGet: vi.fn(),
@@ -11,7 +12,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@/features/identity", () => ({ useAuth: () => ({ user: { id: mocks.userId } }) }));
-vi.mock("@/data", () => ({ dossiersRepo: { getDossier: mocks.get }, enqueueUpdateDossier: mocks.save }));
+vi.mock("@/data", () => ({ dossiersRepo: { getDossier: mocks.get }, enqueueUpdateDossier: mocks.save, enqueueUpdateDossierMetadata: mocks.saveMetadata }));
 vi.mock("@/data/offline/db", () => ({
   db: {
     cachedDossiers: { put: mocks.cachePut, get: mocks.cacheGet },
@@ -107,5 +108,47 @@ it("restores pending agricultural metadata when reopening a dossier offline", as
   const hook = renderHook(() => useEditDossier("farm-1"));
   await waitFor(() => expect(hook.result.current.loading).toBe(false));
   expect((hook.result.current.dossier?.metadata as { agriculturalRural: { familyDetails: { cropType: string } } }).agriculturalRural.familyDetails.cropType).toBe("Cacao");
+  hook.unmount();
+});
+
+it("queues only changed agricultural fields for the dossier owner", async () => {
+  mocks.userId = "owner";
+  mocks.get.mockResolvedValue({
+    id: "farm-1",
+    user_id: "owner",
+    type: "agricole",
+    title: "Plantation",
+    updated_at: "base",
+    metadata: { agriculturalRural: { family: "plantation", familyDetails: { cropType: "Cacao", declaredArea: 1 } } },
+  });
+  const hook = renderHook(() => useEditDossier("farm-1"));
+  await waitFor(() => expect(hook.result.current.loading).toBe(false));
+  await act(async () => {
+    expect(await hook.result.current.saveAgricultural({
+      family: "plantation",
+      familyDetails: { cropType: "Cacao", declaredArea: 2 },
+    })).toBe(true);
+  });
+  expect(mocks.saveMetadata).toHaveBeenCalledWith("farm-1", {
+    agriculturalRural: expect.objectContaining({ familyDetails: { declaredArea: 2 } }),
+  });
+  hook.unmount();
+});
+
+it("refuses agricultural metadata writes by a participant who does not own the dossier", async () => {
+  mocks.userId = "participant";
+  mocks.get.mockResolvedValue({
+    id: "farm-1",
+    user_id: "owner",
+    type: "agricole",
+    title: "Plantation",
+    updated_at: "base",
+    metadata: { agriculturalRural: { family: "plantation" } },
+  });
+  const hook = renderHook(() => useEditDossier("farm-1"));
+  await waitFor(() => expect(hook.result.current.loading).toBe(false));
+  expect(hook.result.current.canEdit).toBe(false);
+  await expect(hook.result.current.saveAgricultural({ family: "plantation" })).resolves.toBe(false);
+  expect(mocks.saveMetadata).not.toHaveBeenCalled();
   hook.unmount();
 });

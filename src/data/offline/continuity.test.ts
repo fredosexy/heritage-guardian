@@ -75,6 +75,47 @@ describe("IndexedDB offline continuity", () => {
     reopened.unmount();
   });
 
+  it("merges differential agricultural updates without losing other fields or relationship history", async () => {
+    const id = await db.queue.add({
+      viewer_user_id: "owner",
+      kind: "update_dossier",
+      payload: {
+        dossierId: "farm-1",
+        metadata: {
+          agriculturalRural: {
+            family: "plantation",
+            familyDetails: { cropType: "Cacao", declaredArea: 1 },
+            events: [{ id: "event-1", type: "planting" }],
+            relatedAssets: [{ id: "relation-1", dossierId: "land-1", relationType: "located_on", active: true }],
+          },
+        },
+      },
+      attempts: 1,
+      created_at: 1,
+    });
+    Object.defineProperty(navigator, "onLine", { configurable: true, value: false });
+    await enqueueUpdateDossierMetadata("farm-1", {
+      agriculturalRural: {
+        familyDetails: { declaredArea: 2 },
+        events: [{ id: "event-2", type: "harvest" }],
+        relatedAssets: [{ id: "relation-1", dossierId: "land-1", relationType: "located_on", active: false, endedAt: "2026-11-22" }],
+      },
+    });
+    const queued = await db.queue.get(id);
+    if (queued?.kind !== "update_dossier") throw new Error("Agricultural update must remain queued");
+    const agricultural = queued.payload.metadata?.agriculturalRural as {
+      familyDetails: Record<string, unknown>;
+      events: Array<{ id: string }>;
+      relatedAssets: Array<{ id: string; active: boolean }>;
+    };
+    expect(agricultural.familyDetails).toEqual({ cropType: "Cacao", declaredArea: 2 });
+    expect(agricultural.events.map((event) => event.id)).toEqual(["event-1", "event-2"]);
+    expect(agricultural.relatedAssets).toEqual([
+      { id: "relation-1", dossierId: "land-1", relationType: "located_on", active: false, endedAt: "2026-11-22" },
+    ]);
+    expect(queued).toMatchObject({ attempts: 1, created_at: 1 });
+  });
+
   it("does not erase diagnostics or reorder a failed metadata operation when coalescing an offline edit", async () => {
     const id = await seedUpdate();
     Object.defineProperty(navigator, "onLine", { configurable: true, value: false });

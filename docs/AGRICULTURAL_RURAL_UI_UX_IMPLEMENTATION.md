@@ -142,3 +142,5 @@ Aucune migration distante ni modification Lovable n'est prévue dans cette tranc
 - La validation des synchronisations concurrentes et des reprises hors ligne reste conditionnée aux tests dédiés et à la CI de cette branche.
 - La migration ajoute uniquement la valeur enum `agricole` au type de dossier partagé ; aucune nouvelle table ni politique RLS n'est créée par cette tranche.
 - Les tests SQL de régression couvrent la lecture du dossier agricole par son propriétaire et un participant accepté, le refus d'accès au participant en attente et à un tiers, ainsi que l'absence de droit de modification pour le participant.
+
+- Les métadonnées agricoles sont envoyées sous forme de patchs différentiels : la fusion conserve les champs non modifiés, les événements et les relations historiques lors des synchronisations hors ligne. En cas de modifications simultanées du même champ, aucune résolution métier automatique n'est prétendue ; ce cas reste à traiter par une règle de conflit dédiée.

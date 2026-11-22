@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { dossiersRepo, enqueueUpdateDossier } from "@/data";
+import { dossiersRepo, enqueueUpdateDossier, enqueueUpdateDossierMetadata } from "@/data";
 import { db } from "@/data/offline/db";
+import { createAgriculturalRuralPatch, mergeAgriculturalRural } from "@/data/offline/metadataMerge";
 import type { Dossier } from "@/core/types/domain";
 import { EDITABLE_FIELDS, type DossierChanges } from "@/services/sync-conflicts";
 import { useAuth } from "@/features/identity";
@@ -29,7 +30,7 @@ async function overlayPendingAgriculturalMetadata(dossier: Dossier, viewerUserId
       if (operation.kind !== "update_dossier") continue;
       const queuedMetadata = operation.payload.metadata as Record<string, unknown>;
       if (queuedMetadata.agriculturalRural && typeof queuedMetadata.agriculturalRural === "object" && !Array.isArray(queuedMetadata.agriculturalRural)) {
-        agriculturalRural = queuedMetadata.agriculturalRural;
+        agriculturalRural = mergeAgriculturalRural(agriculturalRural, queuedMetadata.agriculturalRural);
       }
     }
     if (agriculturalRural === currentMetadata.agriculturalRural) return dossier;
@@ -106,5 +107,21 @@ export function useEditDossier(id?: string) {
     return true;
   };
 
-  return { dossier: visibleDossier, loading, save, canEdit: canEditDossier(visibleDossier, userId) };
+  const saveAgricultural = async (asset: Record<string, unknown>): Promise<boolean> => {
+    if (!visibleDossier || visibleDossier.type !== "agricole") return false;
+    assertDossierOwner(visibleDossier, userId);
+    const metadata = visibleDossier.metadata && typeof visibleDossier.metadata === "object" && !Array.isArray(visibleDossier.metadata)
+      ? visibleDossier.metadata as Record<string, unknown>
+      : {};
+    const current = metadata.agriculturalRural && typeof metadata.agriculturalRural === "object" && !Array.isArray(metadata.agriculturalRural)
+      ? metadata.agriculturalRural as Record<string, unknown>
+      : {};
+    const next = { ...asset, version: 1, declarationStatus: "declare", source: "declarant" };
+    const patch = createAgriculturalRuralPatch(current, next);
+    if (Object.keys(patch).length === 0) return false;
+    await enqueueUpdateDossierMetadata(visibleDossier.id, { agriculturalRural: patch });
+    return true;
+  };
+
+  return { dossier: visibleDossier, loading, save, saveAgricultural, canEdit: canEditDossier(visibleDossier, userId) };
 }

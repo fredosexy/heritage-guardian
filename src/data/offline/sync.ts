@@ -3,6 +3,7 @@ import * as proceduresRepo from "@/data/procedures.repo";
 import * as buildingsRepo from "@/data/buildings.repo";
 import { detectConflictFields, type DossierChanges } from "@/services/sync-conflicts";
 import { db, DraftDossier } from "./db";
+import { mergeDossierMetadata } from "./metadataMerge";
 import { replayProof } from "./replay-proof";
 import { assertDossierOwner, normalizeUserId } from "@/services/dossier-ownership";
 import type { QueuedOp } from "./db";
@@ -144,31 +145,7 @@ export async function enqueueUpdateDossierMetadata(dossierId: string, metadata: 
     const previous = existing.payload?.metadata && typeof existing.payload.metadata === "object" && !Array.isArray(existing.payload.metadata)
       ? existing.payload.metadata as Record<string, unknown>
       : {};
-    const previousTerrain = previous.terrain && typeof previous.terrain === "object" && !Array.isArray(previous.terrain)
-      ? previous.terrain as Record<string, unknown>
-      : {};
-    const nextTerrain = metadata.terrain && typeof metadata.terrain === "object" && !Array.isArray(metadata.terrain)
-      ? metadata.terrain as Record<string, unknown>
-      : {};
-    const previousSections = previousTerrain.sections && typeof previousTerrain.sections === "object" && !Array.isArray(previousTerrain.sections)
-      ? previousTerrain.sections as Record<string, unknown>
-      : {};
-    const nextSections = nextTerrain.sections && typeof nextTerrain.sections === "object" && !Array.isArray(nextTerrain.sections)
-      ? nextTerrain.sections as Record<string, unknown>
-      : {};
-    const mergedMetadata = metadata.terrain
-      ? {
-          ...previous,
-          ...metadata,
-          terrain: {
-            ...previousTerrain,
-            ...nextTerrain,
-            ...(previousTerrain.sections || nextTerrain.sections
-              ? { sections: { ...previousSections, ...nextSections } }
-              : {}),
-          },
-        }
-      : { ...previous, ...metadata };
+    const mergedMetadata = mergeDossierMetadata(previous, metadata);
     await db.queue.update(existing.id, { payload: { dossierId, metadata: mergedMetadata } });
   } else {
     await db.queue.add({ kind: "update_dossier", viewer_user_id: viewerUserId, payload: { dossierId, metadata }, created_at: Date.now(), attempts: 0 });
@@ -353,28 +330,7 @@ async function runQueue(): Promise<void> {
               ? currentDossier.metadata as Record<string, unknown>
               : {};
             const queuedMetadata = metadata as Record<string, unknown>;
-            const currentTerrain = currentMetadata.terrain && typeof currentMetadata.terrain === "object" && !Array.isArray(currentMetadata.terrain)
-              ? currentMetadata.terrain as Record<string, unknown>
-              : {};
-            const queuedTerrain = queuedMetadata.terrain && typeof queuedMetadata.terrain === "object" && !Array.isArray(queuedMetadata.terrain)
-              ? queuedMetadata.terrain as Record<string, unknown>
-              : {};
-            const currentSections = currentTerrain.sections && typeof currentTerrain.sections === "object" && !Array.isArray(currentTerrain.sections)
-              ? currentTerrain.sections as Record<string, unknown>
-              : {};
-            const queuedSections = queuedTerrain.sections && typeof queuedTerrain.sections === "object" && !Array.isArray(queuedTerrain.sections)
-              ? queuedTerrain.sections as Record<string, unknown>
-              : {};
-            const mergedMetadata = queuedMetadata.terrain
-              ? {
-                  ...currentMetadata,
-                  terrain: {
-                    ...currentTerrain,
-                    ...queuedTerrain,
-                    ...(queuedTerrain.sections ? { sections: { ...currentSections, ...queuedSections } } : {}),
-                  },
-                }
-              : { ...currentMetadata, ...queuedMetadata };
+            const mergedMetadata = mergeDossierMetadata(currentMetadata, queuedMetadata);
             const { data: updated, error } = await supabase.from("dossiers")
               .update({ metadata: JSON.parse(JSON.stringify(mergedMetadata)) as Json })
               .eq("id", dossierId)
