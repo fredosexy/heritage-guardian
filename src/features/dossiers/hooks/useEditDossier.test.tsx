@@ -148,7 +148,7 @@ it("refuses agricultural metadata writes by a participant who does not own the d
   const hook = renderHook(() => useEditDossier("farm-1"));
   await waitFor(() => expect(hook.result.current.loading).toBe(false));
   expect(hook.result.current.canEdit).toBe(false);
-  await expect(hook.result.current.saveAgricultural({ family: "plantation" })).resolves.toBe(false);
+  await expect(hook.result.current.saveAgricultural({ family: "plantation" })).rejects.toThrow("Only the dossier owner can modify this dossier");
   expect(mocks.saveMetadata).not.toHaveBeenCalled();
   hook.unmount();
 });
