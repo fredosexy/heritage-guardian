@@ -790,6 +790,7 @@ export type Database = {
         | "conflit"
         | "savoir"
         | "batiment"
+        | "agricole"
       dossier_visibility: "private" | "family" | "public"
       participant_role: "owner" | "heir" | "witness" | "expert" | "viewer"
       proof_type: "image" | "document" | "video" | "audio"
